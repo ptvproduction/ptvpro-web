@@ -1,0 +1,129 @@
+﻿/* ============================================================
+   css/event.css — Styling Halaman Publik Acara PTV
+   ============================================================ */
+
+body {
+  background: radial-gradient(ellipse at top, rgba(59,130,246,0.08) 0%, transparent 60%),
+              var(--ptv-bg);
+  min-height: 100vh;
+}
+
+.event-page-wrap {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.event-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ptv-text-soft);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 0;
+  margin-bottom: 24px;
+  transition: color .15s;
+}
+.event-back-btn:hover { color: var(--ptv-blue); }
+
+.event-hero {
+  text-align: center;
+  padding: 48px 24px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(99,102,241,0.08));
+  border: 1px solid var(--ptv-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 28px;
+  backdrop-filter: blur(16px);
+}
+
+.event-badge {
+  display: inline-block;
+  background: rgba(59,130,246,0.15);
+  color: var(--ptv-blue);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  margin-bottom: 16px;
+}
+
+.event-hero h1 {
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff, rgba(255,255,255,0.75));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.event-hero > p {
+  color: var(--ptv-text-soft);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.event-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  color: var(--ptv-text-soft);
+  font-size: 13px;
+}
+.event-meta-row span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.event-meta-row i { color: var(--ptv-blue); }
+
+.event-content { }
+
+/* Event List (index) */
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.event-card {
+  display: block;
+  background: rgba(13,21,38,0.7);
+  border: 1px solid var(--ptv-border);
+  border-radius: var(--radius);
+  padding: 22px;
+  text-decoration: none;
+  transition: all .2s;
+}
+.event-card:hover {
+  border-color: rgba(59,130,246,0.4);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+.event-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ptv-text);
+  margin-bottom: 6px;
+}
+.event-card-desc {
+  font-size: 13px;
+  color: var(--ptv-text-soft);
+  line-height: 1.5;
+}
+.event-card-arrow {
+  margin-top: 16px;
+  color: var(--ptv-blue);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

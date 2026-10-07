@@ -1,0 +1,442 @@
+﻿<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>PTV Pro — Progresif TV Operations Dashboard</title>
+  <meta name="description" content="Dashboard Operasional Studio Progresif TV — Manajemen Kru, Inventaris, Acara, Produksi, dan Keuangan.">
+  <meta name="theme-color" content="#3b82f6">
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PTV Pro">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+<!-- ============================================================
+     LAYAR LOGIN (Tersembunyi jika sudah login)
+     ============================================================ -->
+<div id="ptv-login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <i class="fa-solid fa-tv"></i>
+    </div>
+    <h1>PTV Pro</h1>
+    <p>Masuk untuk mengakses Dashboard Operasional Studio Progresif TV</p>
+
+    <form class="login-form" id="loginForm" autocomplete="on">
+      <div class="form-group">
+        <label for="loginEmail">Email Kru</label>
+        <input
+          id="loginEmail"
+          name="email"
+          type="email"
+          class="input-field"
+          placeholder="kru@progresiftv.id"
+          required
+          autocomplete="username"
+        >
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">Password</label>
+        <div style="position:relative;">
+          <input
+            id="loginPassword"
+            name="password"
+            type="password"
+            class="input-field"
+            placeholder="••••••••"
+            required
+            autocomplete="current-password"
+            style="padding-right:44px;"
+          >
+          <button
+            type="button"
+            id="togglePassword"
+            style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--ptv-text-dim);cursor:pointer;font-size:14px;"
+            aria-label="Tampilkan/Sembunyikan password"
+          ><i class="fa-solid fa-eye"></i></button>
+        </div>
+      </div>
+
+      <div id="loginError" class="login-error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="loginErrorMsg">Email atau password salah.</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-full" style="margin-top:20px;padding:12px;" id="loginSubmitBtn">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        Masuk ke Dashboard
+      </button>
+    </form>
+
+    <div class="login-divider">atau</div>
+
+    <button type="button" class="btn-google" id="loginGoogleBtn">
+      <img src="https://www.google.com/favicon.ico" alt="Google">
+      Masuk dengan Google
+    </button>
+
+    <p style="margin-top:24px;font-size:11px;color:var(--ptv-text-dim);">
+      Hanya kru aktif Progresif TV yang dapat mengakses portal ini.
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     SHELL DASBOR (Tampil setelah login berhasil)
+     ============================================================ -->
+<div id="ptv-app" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside id="ptv-sidebar" aria-label="Navigasi Dasbor">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div style="width:34px;height:34px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;">
+        <i class="fa-solid fa-tv"></i>
+      </div>
+      <div>
+        <div class="sidebar-logo-text">PTV Pro</div>
+        <div class="sidebar-logo-sub">Studio Operations</div>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Utama</div>
+      <button class="nav-item active" data-route="beranda" aria-label="Beranda">
+        <i class="fa-solid fa-house"></i> Beranda
+      </button>
+      <button class="nav-item" data-route="acara" aria-label="Acara & Kalender">
+        <i class="fa-solid fa-calendar-days"></i> Acara & Kalender
+        <span class="nav-badge" id="badge-acara" style="display:none;">0</span>
+      </button>
+      <button class="nav-item" data-route="inventaris" aria-label="Inventaris Alat">
+        <i class="fa-solid fa-box-archive"></i> Inventaris
+      </button>
+      <button class="nav-item" data-route="peminjaman" aria-label="Peminjaman">
+        <i class="fa-solid fa-handshake"></i> Peminjaman
+        <span class="nav-badge" id="badge-pinjam" style="display:none;">0</span>
+      </button>
+
+      <div class="nav-section-label" style="margin-top:8px;">Operasional</div>
+      <button class="nav-item" data-route="kerusakan" aria-label="Laporan Kerusakan">
+        <i class="fa-solid fa-triangle-exclamation"></i> Laporan Kendala
+      </button>
+      <button class="nav-item" data-route="lostfound" aria-label="Lost & Found">
+        <i class="fa-solid fa-magnifying-glass-location"></i> Lost & Found
+      </button>
+      <button class="nav-item" data-route="catatan" aria-label="Catatan & Notulensi">
+        <i class="fa-solid fa-note-sticky"></i> Catatan & Notulensi
+      </button>
+      <button class="nav-item" data-route="keuangan" aria-label="Keuangan & Kas">
+        <i class="fa-solid fa-wallet"></i> Keuangan & Kas
+      </button>
+
+      <div class="nav-section-label" style="margin-top:8px;">Admin</div>
+      <button class="nav-item" data-route="surat" aria-label="Surat Resmi">
+        <i class="fa-solid fa-envelope-open-text"></i> Surat Resmi
+      </button>
+      <button class="nav-item" data-route="kru" aria-label="Data Kru">
+        <i class="fa-solid fa-users"></i> Data Kru
+      </button>
+      <button class="nav-item" data-route="pengaturan" aria-label="Pengaturan">
+        <i class="fa-solid fa-gear"></i> Pengaturan
+      </button>
+    </nav>
+
+    <!-- Footer: Profil Kru -->
+    <div class="sidebar-footer" id="sidebarProfile" role="button" tabindex="0" aria-label="Profil Kru & Logout">
+      <div class="sidebar-avatar" id="sidebarAvatar">
+        <i class="fa-solid fa-user"></i>
+      </div>
+      <div style="min-width:0;flex:1;">
+        <div class="sidebar-user-name" id="sidebarName">—</div>
+        <div class="sidebar-user-role" id="sidebarRole">—</div>
+      </div>
+      <i class="fa-solid fa-ellipsis-vertical" style="color:var(--ptv-text-dim);font-size:13px;"></i>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAP -->
+  <div id="ptv-main-wrap">
+    <!-- HEADER -->
+    <header id="ptv-header">
+      <div class="flex items-center gap-3">
+        <!-- Hamburger (Mobile) -->
+        <button id="sidebarToggle" class="header-icon-btn" style="display:none;" aria-label="Buka/tutup sidebar">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <span class="header-title" id="headerTitle">Beranda</span>
+      </div>
+
+      <div class="header-actions">
+        <!-- Status Realtime -->
+        <div class="flex items-center gap-2" style="margin-right:6px;">
+          <div class="realtime-dot connecting" id="realtimeDot" title="Status Koneksi Realtime"></div>
+          <span class="text-xs text-muted" id="realtimeLabel">Menghubungkan...</span>
+        </div>
+
+        <!-- Pencarian Universal -->
+        <button class="header-icon-btn" id="searchBtn" aria-label="Pencarian Universal" title="Cari (/)">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+
+        <!-- Notifikasi -->
+        <button class="header-icon-btn" id="notifBtn" aria-label="Notifikasi" title="Notifikasi">
+          <i class="fa-solid fa-bell"></i>
+          <span id="notif-badge"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- KONTEN DINAMIS HALAMAN -->
+    <main id="ptv-main" role="main" aria-live="polite">
+      <!-- Konten halaman diinjeksi di sini oleh router + modul JS -->
+      <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--ptv-text-soft);">
+        <div class="spinner"></div>
+        <span>Memuat Dasbor...</span>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Mobile Sidebar Overlay -->
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:190;backdrop-filter:blur(4px);" aria-hidden="true"></div>
+
+<!-- Toast Container -->
+<div id="ptv-toast-container" role="status" aria-live="polite"></div>
+
+<!-- ============================================================
+     SCRIPTS (ES Modules)
+     ============================================================ -->
+<script type="module">
+  import { initAuth, signInWithEmail, signInWithGoogle, signOut, currentCrew } from '/js/auth.js';
+  import { initRouter, addRoute, navigateTo } from '/js/router.js';
+  import { playChime } from '/js/audio.js';
+
+  // ── UTIL: Toast ──────────────────────────────────────────
+  window.toast = function(msg, type = 'info', duration = 3500) {
+    if (type === 'success' || type === 'info' || type === 'bell') playChime();
+    const container = document.getElementById('ptv-toast-container');
+    if (!container) return;
+    const colors = {
+      info:    ['#3b82f6','fa-circle-info'],
+      success: ['#10b981','fa-circle-check'],
+      warning: ['#f59e0b','fa-triangle-exclamation'],
+      error:   ['#ef4444','fa-circle-xmark'],
+    };
+    const [color, icon] = colors[type] || colors.info;
+    const el = document.createElement('div');
+    el.className = 'ptv-toast';
+    el.innerHTML = `<i class="fa-solid ${icon}" style="color:${color};font-size:16px;flex-shrink:0;"></i><span>${msg}</span>`;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.classList.add('out');
+      el.addEventListener('animationend', () => el.remove(), { once: true });
+    }, duration);
+  };
+
+  // ── LOGIN UI ────────────────────────────────────────────
+  const loginScreen = document.getElementById('ptv-login-screen');
+  const appShell    = document.getElementById('ptv-app');
+  const loginForm   = document.getElementById('loginForm');
+  const loginError  = document.getElementById('loginError');
+  const loginErrMsg = document.getElementById('loginErrorMsg');
+  const loginBtn    = document.getElementById('loginSubmitBtn');
+  const togglePw    = document.getElementById('togglePassword');
+  const pwInput     = document.getElementById('loginPassword');
+
+  togglePw.addEventListener('click', () => {
+    const isText = pwInput.type === 'text';
+    pwInput.type = isText ? 'password' : 'text';
+    togglePw.querySelector('i').className = `fa-solid ${isText ? 'fa-eye' : 'fa-eye-slash'}`;
+  });
+
+  function showLoginError(msg) {
+    loginErrMsg.textContent = msg;
+    loginError.classList.add('show');
+  }
+  function hideLoginError() {
+    loginError.classList.remove('show');
+  }
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideLoginError();
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span> Masuk...';
+    try {
+      const email = document.getElementById('loginEmail').value.trim();
+      const pw    = document.getElementById('loginPassword').value;
+      await signInWithEmail(email, pw);
+    } catch (err) {
+      showLoginError(err.message || 'Email atau password tidak valid.');
+      loginBtn.disabled = false;
+      loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Masuk ke Dashboard';
+    }
+  });
+
+  document.getElementById('loginGoogleBtn').addEventListener('click', async () => {
+    hideLoginError();
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      showLoginError(err.message || 'Login Google gagal.');
+    }
+  });
+
+  // ── AUTH INIT ───────────────────────────────────────────
+  await initAuth({
+    onAuthenticated: (user, crew) => {
+      // Sembunyikan login, tampilkan app
+      loginScreen.style.display = 'none';
+      appShell.style.display = 'flex';
+
+      // Isi profil di sidebar
+      document.getElementById('sidebarName').textContent = crew.name || user.email;
+      document.getElementById('sidebarRole').textContent = crew.pos || crew.role || 'Kru';
+
+      const avatarEl = document.getElementById('sidebarAvatar');
+      if (crew.avatar_url) {
+        avatarEl.innerHTML = `<img src="${crew.avatar_url}" alt="${crew.name}">`;
+      } else {
+        const initials = (crew.name || 'K').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+        avatarEl.innerHTML = initials;
+      }
+
+      // Init router
+      _initRouter();
+    },
+    onUnauthenticated: () => {
+      loginScreen.style.display = 'flex';
+      appShell.style.display = 'none';
+    },
+  });
+
+  // ── ROUTER ──────────────────────────────────────────────
+  function _initRouter() {
+    const titles = {
+      beranda:     'Beranda',
+      acara:       'Acara & Kalender',
+      inventaris:  'Inventaris Alat',
+      peminjaman:  'Peminjaman',
+      kerusakan:   'Laporan Kendala',
+      lostfound:   'Lost & Found',
+      catatan:     'Catatan & Notulensi',
+      keuangan:    'Keuangan & Kas',
+      surat:       'Surat Resmi',
+      kru:         'Data Kru',
+      pengaturan:  'Pengaturan',
+    };
+
+    const allRoutes = Object.keys(titles);
+    allRoutes.forEach(route => {
+      addRoute(route, (fullHash) => {
+        document.getElementById('headerTitle').textContent = titles[route] || route;
+        // Update sidebar active state
+        document.querySelectorAll('.nav-item').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.route === route);
+        });
+        // Lazy load modul route
+        _renderRoute(route, fullHash);
+      });
+    });
+
+    initRouter('beranda');
+  }
+
+  // ── RENDER ROUTE ────────────────────────────────────────
+  async function _renderRoute(route, fullHash) {
+    const main = document.getElementById('ptv-main');
+    // Tampilkan loading skeleton sementara modul dimuat
+    main.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--ptv-text-soft);"><div class="spinner"></div><span>Memuat ${route}...</span></div>`;
+
+    try {
+      const mod = await import(`/js/modules/${route}.js`);
+      if (typeof mod.render === 'function') {
+        mod.render(main, fullHash);
+      } else {
+        main.innerHTML = `<div style="padding:32px;color:var(--ptv-text-soft);text-align:center;"><i class="fa-solid fa-tools" style="font-size:32px;margin-bottom:12px;display:block;"></i>Modul <strong>${route}</strong> sedang dalam pengembangan.</div>`;
+      }
+    } catch (err) {
+      console.warn('[ROUTER] Modul belum tersedia:', route, err);
+      main.innerHTML = `<div style="padding:32px;color:var(--ptv-text-soft);text-align:center;"><i class="fa-solid fa-tools" style="font-size:32px;margin-bottom:12px;display:block;color:var(--ptv-yellow);"></i><strong>${titles[route] || route}</strong><br><span style="font-size:13px;">Modul ini sedang dalam pengembangan & migrasi.</span></div>`;
+    }
+  }
+
+  // ── SIDEBAR NAV CLICK ───────────────────────────────────
+  document.querySelectorAll('.nav-item[data-route]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const route = btn.dataset.route;
+      window.location.hash = '#' + route;
+      // Tutup sidebar di mobile
+      if (window.innerWidth <= 768) {
+        document.getElementById('ptv-sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').style.display = 'none';
+      }
+    });
+  });
+
+  // ── MOBILE SIDEBAR TOGGLE ───────────────────────────────
+  const sidebarToggle  = document.getElementById('sidebarToggle');
+  const sidebar        = document.getElementById('ptv-sidebar');
+  const overlay        = document.getElementById('sidebarOverlay');
+
+  function checkMobile() {
+    if (window.innerWidth <= 768) {
+      sidebarToggle.style.display = 'flex';
+    } else {
+      sidebarToggle.style.display = 'none';
+      sidebar.classList.remove('open');
+      overlay.style.display = 'none';
+    }
+  }
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+
+  sidebarToggle.addEventListener('click', () => {
+    const isOpen = sidebar.classList.toggle('open');
+    overlay.style.display = isOpen ? 'block' : 'none';
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.style.display = 'none';
+  });
+
+  // ── LOGOUT ──────────────────────────────────────────────
+  document.getElementById('sidebarProfile').addEventListener('click', async () => {
+    if (!confirm('Yakin ingin keluar dari PTV Pro?')) return;
+    await signOut();
+    toast('Berhasil keluar. Sampai jumpa!', 'info');
+  });
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .then(reg => console.info('[SW] Registered:', reg.scope))
+      .catch(err => console.warn('[SW] Gagal register:', err));
+  }
+</script>
+
+</body>
+</html>

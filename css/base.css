@@ -1,0 +1,272 @@
+﻿/* ============================================================
+   css/base.css — Design Tokens, Reset & Typography PTV Pro
+   Atmospheric Azure Glassmorphism Design System
+   ============================================================ */
+
+/* ── Google Fonts ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+/* ── Design Tokens ────────────────────────────────────────── */
+:root {
+  /* Warna Utama */
+  --ptv-bg:        #060a12;
+  --ptv-surface:   #0d1526;
+  --ptv-surface2:  #121e35;
+  --ptv-border:    rgba(59, 130, 246, 0.15);
+  --ptv-border-soft: rgba(255, 255, 255, 0.07);
+
+  /* Azure Blue Palette */
+  --ptv-blue:      #3b82f6;
+  --ptv-blue-dark: #1d4ed8;
+  --ptv-blue-glow: rgba(59, 130, 246, 0.25);
+  --ptv-cyan:      #06b6d4;
+  --ptv-indigo:    #6366f1;
+
+  /* Teks */
+  --ptv-text:      #e8ecf3;
+  --ptv-text-soft: #8899b4;
+  --ptv-text-dim:  #4a5568;
+
+  /* Status */
+  --ptv-green:     #10b981;
+  --ptv-yellow:    #f59e0b;
+  --ptv-red:       #ef4444;
+  --ptv-orange:    #f97316;
+
+  /* Gold Accent */
+  --ptv-gold:      #c5a35a;
+  --ptv-gold-light:#e6c87f;
+
+  /* Glassmorphism */
+  --glass-bg:      rgba(13, 21, 38, 0.75);
+  --glass-border:  rgba(59, 130, 246, 0.2);
+  --glass-blur:    blur(20px) saturate(1.4);
+
+  /* Layout */
+  --sidebar-w:     240px;
+  --header-h:      60px;
+  --radius:        14px;
+  --radius-sm:     8px;
+  --radius-lg:     20px;
+
+  /* Animasi */
+  --ease-spring:   cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-out:      cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --dur-fast:      0.15s;
+  --dur-med:       0.25s;
+  --dur-slow:      0.4s;
+
+  /* Shadow */
+  --shadow-sm:     0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md:     0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg:     0 8px 32px rgba(0,0,0,0.5);
+  --shadow-glow:   0 0 24px rgba(59, 130, 246, 0.2);
+}
+
+/* ── Reset ────────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+html, body {
+  height: 100%;
+  background: var(--ptv-bg);
+  color: var(--ptv-text);
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(59,130,246,0.3);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.6); }
+
+/* ── Typography ───────────────────────────────────────────── */
+h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; }
+h2 { font-size: clamp(1.3rem, 3vw, 1.9rem); font-weight: 700; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+h4 { font-size: 1rem;    font-weight: 600; }
+p  { color: var(--ptv-text-soft); }
+a  { color: var(--ptv-blue); text-decoration: none; transition: color var(--dur-fast); }
+a:hover { color: var(--ptv-cyan); }
+
+/* ── Utility Classes ─────────────────────────────────────── */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.text-muted { color: var(--ptv-text-soft); }
+.text-sm { font-size: 13px; }
+.text-xs { font-size: 11px; }
+.font-bold { font-weight: 700; }
+.hidden { display: none !important; }
+.w-full { width: 100%; }
+
+/* ── Glassmorphism Card ───────────────────────────────────── */
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow var(--dur-med), border-color var(--dur-med);
+}
+.glass-card:hover {
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+/* ── Tombol ───────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--dur-fast) var(--ease-out);
+  white-space: nowrap;
+  user-select: none;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--ptv-blue), var(--ptv-indigo));
+  color: #fff;
+  box-shadow: 0 4px 16px var(--ptv-blue-glow);
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 24px var(--ptv-blue-glow);
+}
+
+.btn-ghost {
+  background: rgba(255,255,255,0.05);
+  color: var(--ptv-text);
+  border-color: var(--ptv-border-soft);
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.1); }
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--ptv-red);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+.btn-danger:hover { background: rgba(239, 68, 68, 0.25); }
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+/* ── Input / Form ─────────────────────────────────────────── */
+.input-field {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--ptv-border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--ptv-text);
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.input-field::placeholder { color: var(--ptv-text-dim); }
+.input-field:focus {
+  border-color: var(--ptv-blue);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+  background: rgba(59,130,246,0.05);
+}
+
+/* ── Badge / Chip ─────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  gap: 4px;
+}
+.badge-blue   { background: rgba(59,130,246,0.15); color: var(--ptv-blue);   border: 1px solid rgba(59,130,246,0.25); }
+.badge-green  { background: rgba(16,185,129,0.15); color: var(--ptv-green);  border: 1px solid rgba(16,185,129,0.25); }
+.badge-yellow { background: rgba(245,158,11,0.15); color: var(--ptv-yellow); border: 1px solid rgba(245,158,11,0.25); }
+.badge-red    { background: rgba(239,68,68,0.15);  color: var(--ptv-red);    border: 1px solid rgba(239,68,68,0.25); }
+.badge-gold   { background: rgba(197,163,90,0.15); color: var(--ptv-gold);   border: 1px solid rgba(197,163,90,0.3); }
+
+/* ── Loading Spinner ─────────────────────────────────────── */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(59,130,246,0.2);
+  border-top-color: var(--ptv-blue);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Toast ────────────────────────────────────────────────── */
+#ptv-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.ptv-toast {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  color: var(--ptv-text);
+  font-size: 13.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 260px;
+  max-width: 360px;
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+  animation: toastIn 0.3s var(--ease-spring) forwards;
+}
+.ptv-toast.out { animation: toastOut 0.25s ease forwards; }
+@keyframes toastIn  { from { opacity:0; transform: translateX(40px); } to { opacity:1; transform: translateX(0); } }
+@keyframes toastOut { from { opacity:1; transform: translateX(0); } to { opacity:0; transform: translateX(40px); } }
+
+/* ── Responsif Mobile ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  :root { --sidebar-w: 0px; }
+}
