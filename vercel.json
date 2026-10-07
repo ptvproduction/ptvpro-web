@@ -1,9 +1,6 @@
-﻿{
+{
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [
-    { "source": "/event/:path*", "destination": "/event/:path*" }
-  ],
   "headers": [
     {
       "source": "/(.*)",
