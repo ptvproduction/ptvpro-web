@@ -17,7 +17,7 @@ export async function render(container, fullHash) {
           </div>
           <div>
             <h2 style="font-size:18px;font-weight:800;margin:0;color:var(--ptv-text);">${crew.name}</h2>
-            <div style="font-size:13px;color:var(--ptv-cyan);font-weight:600;margin-top:2px;">${crew.ptv_id || 'Kru Studio'} • ${crew.role || 'Kru'}</div>
+            <div style="font-size:13px;color:var(--ptv-cyan);font-weight:600;margin-top:2px;">${crew.crew_id || crew.ptv_id || 'Kru Studio'} • ${crew.role || 'Kru'}</div>
             <div style="font-size:12px;color:var(--ptv-text-dim);margin-top:2px;">${crew.email || '-'}</div>
           </div>
         </div>

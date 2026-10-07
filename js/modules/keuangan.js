@@ -563,14 +563,14 @@ function _openPeriodeModal(container) {
       });
 
       // 2. Ambil list kru aktif dari ptv_kru
-      const { data: crews } = await sb.from('ptv_kru').select('id, nama, ptv_id, status').eq('status', 'Aktif');
+      const { data: crews } = await sb.from('ptv_kru').select('id, nama, crew_id, status').eq('status', 'aktif');
 
       if (crews && crews.length > 0) {
         // PERINGATAN: DILARANG mengirim nilai untuk kolom 'sisa' (GENERATED ALWAYS)
         const kasRows = crews.map(c => ({
           kru_id:        c.id,
           kru_nama:      c.nama,
-          kru_ptv_id:    c.ptv_id,
+          kru_ptv_id:    c.crew_id,
           periode_bulan: pBulan,
           tagihan:       nom,
           dibayar:       0,

@@ -37,7 +37,7 @@ async function _loadData() {
         .select('id, inventaris_id, nomor_unit, kode_unit, status_kondisi, status_peminjaman')
         .order('nomor_unit', { ascending: true }),
       sb.from('ptv_kru')
-        .select('id, nama, divisi, jabatan, ptv_id')
+        .select('id, nama, divisi, jabatan, crew_id')
         .order('nama', { ascending: true }),
       sb.from('ptv_acara')
         .select('id, nama_acara, tanggal')

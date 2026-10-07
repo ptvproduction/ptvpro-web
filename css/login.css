@@ -1,0 +1,505 @@
+﻿/* ============================================================
+   css/login.css - Atmospheric Azure Mosaic Login Portal
+   Exact 1:1 match with page-dasbor.php
+   ============================================================ */
+
+#ptv-login-screen {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  z-index: 99999;
+  background: #061A36;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Plus Jakarta Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(20px, env(safe-area-inset-top, 20px)) max(18px, env(safe-area-inset-right, 18px)) max(20px, env(safe-area-inset-bottom, 20px)) max(18px, env(safe-area-inset-left, 18px));
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Single-Asset Photo Mosaic Background (PC & Mobile Responsive) */
+.login-bg-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  background: #061A36;
+}
+.login-bg-picture,
+.login-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  opacity: 0.58;
+  transform: scale(1.02);
+  transition: opacity 0.3s ease;
+}
+@media (max-width: 768px) {
+  .login-bg-picture,
+  .login-bg-img {
+    opacity: 0.52;
+  }
+}
+
+/* Luminous Atmosphere Gradient & Vignette Overlay */
+.mosaic-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 75% 65% at 50% 48%, rgba(6, 26, 54, 0.35) 0%, rgba(4, 18, 38, 0.65) 100%),
+    linear-gradient(155deg, rgba(11, 95, 191, 0.25) 0%, rgba(18, 115, 230, 0.18) 45%, rgba(59, 142, 247, 0.15) 85%, rgba(94, 162, 248, 0.20) 100%);
+}
+
+/* Top Bar Header */
+.lk-topbar {
+  position: absolute;
+  top: max(18px, env(safe-area-inset-top, 18px));
+  right: max(24px, env(safe-area-inset-right, 24px));
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  z-index: 10;
+}
+.lk-navlink {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  transition: color 0.15s ease, opacity 0.15s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.lk-navlink:hover {
+  color: #FFFFFF;
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* Center Content Container */
+.lk-auth-box {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Brand Logo (Official PTV Logo in Pure White) */
+.lk-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+  user-select: none;
+}
+.lk-brand-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lk-brand-logo-img {
+  width: auto;
+  height: 64px;
+  max-width: 250px;
+  object-fit: contain;
+  filter: brightness(0) invert(1) drop-shadow(0 4px 16px rgba(0, 0, 0, 0.3));
+  display: block;
+}
+@media (max-width: 440px) {
+  .lk-brand {
+    margin-bottom: 22px;
+  }
+  .lk-brand-logo-img {
+    height: 52px;
+    max-width: 210px;
+  }
+}
+
+/* Error Badge */
+.lk-error {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #FCA5A5;
+  color: #B02B23;
+  padding: 11px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  animation: lkShake 0.34s ease both;
+}
+@keyframes lkShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+/* Form Controls */
+.lk-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.lk-input {
+  width: 100%;
+  height: 48px;
+  border-radius: 999px;
+  border: none;
+  background: #FFFFFF;
+  color: #072A52;
+  padding: 0 22px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  outline: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+.lk-input:focus {
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.45), 0 6px 22px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
+}
+.lk-input::placeholder {
+  color: #9DB2CF;
+  font-weight: 400;
+}
+
+.lk-input-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.lk-input-wrap .lk-input {
+  padding-right: 48px;
+}
+.lk-pass-toggle {
+  position: absolute;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #8CA1C4;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: color 0.15s ease, background 0.15s ease;
+  padding: 0;
+}
+.lk-pass-toggle:hover {
+  color: #0B5FBF;
+  background: rgba(11, 95, 191, 0.08);
+}
+
+/* Action Row: Signup / Bantuan on Left, Login Button on Right */
+.lk-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding: 0 8px;
+}
+.lk-sublink {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: color 0.15s ease, opacity 0.15s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.lk-sublink:hover {
+  color: #FFFFFF;
+  text-decoration: underline;
+}
+.lk-btn-login {
+  height: 44px;
+  padding: 0 36px;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: #0B5FBF;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.15s ease;
+  touch-action: manipulation;
+  user-select: none;
+}
+.lk-btn-login:hover {
+  background: #F8FAFD;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+.lk-btn-login:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Google Sign In & Divider */
+.lk-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 16px 0 12px;
+  color: rgba(255, 255, 255, 0.80);
+}
+.lk-divider::before, .lk-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+.lk-divider span {
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lk-btn-google {
+  width: 100%;
+  height: 46px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: #072A52;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.15s ease;
+  user-select: none;
+}
+.lk-btn-google:hover {
+  background: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+}
+.lk-btn-google:active {
+  transform: translateY(0);
+}
+
+/* Help Modal Popup */
+.lk-modal-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 28, 58, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100000;
+  opacity: 0;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+.lk-modal-scrim.active {
+  opacity: 1;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+.lk-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -46%) scale(0.95);
+  width: min(440px, calc(100vw - 32px));
+  max-height: min(88vh, 88dvh);
+  background: #FFFFFF;
+  border-radius: 24px;
+  padding: 24px 22px 20px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100001;
+  opacity: 0;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.22s ease, visibility 0.22s ease;
+  color: #072A52;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.lk-modal.active {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+.lk-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(11, 42, 74, 0.08);
+}
+.lk-modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lk-modal-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: rgba(10, 102, 194, 0.10);
+  color: #0A66C2;
+  display: grid;
+  place-items: center;
+}
+.lk-modal-title {
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  color: #072A52;
+}
+.lk-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(11, 42, 74, 0.06);
+  color: #5B6B8A;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.lk-modal-close:hover {
+  background: rgba(11, 42, 74, 0.12);
+  color: #072A52;
+}
+.lk-modal-body {
+  padding: 16px 2px 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+.lk-help-card {
+  background: #F8FAFD;
+  border: 1px solid #E2ECF8;
+  border-radius: 14px;
+  padding: 13px 15px;
+}
+.lk-help-card h4 {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0B5FBF;
+  margin-bottom: 4px;
+}
+.lk-help-card p {
+  font-size: 12.5px;
+  color: #38587A;
+  line-height: 1.45;
+  margin: 0;
+}
+.lk-help-card code {
+  background: #E8F0FB;
+  color: #0B5FBF;
+  padding: 1px 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+.lk-modal-footer {
+  display: flex;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(11, 42, 74, 0.08);
+}
+.lk-modal-btn {
+  flex: 1;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 650;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.lk-modal-btn.pri {
+  background: #0A66C2;
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(10, 102, 194, 0.28);
+}
+.lk-modal-btn.pri:hover {
+  background: #0854A1;
+}
+.lk-modal-btn.sec {
+  background: #F1F4F9;
+  color: #38587A;
+}
+.lk-modal-btn.sec:hover {
+  background: #E2E8F0;
+  color: #072A52;
+}
+
+@media (max-width: 440px) {
+  .lk-auth-box {
+    max-width: 100%;
+    padding: 0 6px;
+  }
+  .lk-topbar {
+    top: max(14px, env(safe-area-inset-top, 14px));
+    right: max(16px, env(safe-area-inset-right, 16px));
+    gap: 14px;
+  }
+  .lk-navlink {
+    font-size: 12.5px;
+  }
+}

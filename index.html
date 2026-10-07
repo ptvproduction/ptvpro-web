@@ -1,22 +1,27 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="robots" content="noindex, nofollow">
-  <title>PTV Pro — Progresif TV Operations Dashboard</title>
+  <title>Masuk Dasbor Operasional | Progresif TV</title>
   <meta name="description" content="Dashboard Operasional Studio Progresif TV — Manajemen Kru, Inventaris, Acara, Produksi, dan Keuangan.">
-  <meta name="theme-color" content="#3b82f6">
+  <meta name="theme-color" content="#061A36">
 
-  <!-- PWA -->
+  <!-- PWA & Mobile Web App Specs -->
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
   <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PTV Pro">
+
+  <!-- Preload Background Assets -->
+  <link rel="preload" as="image" href="/assets/images/login-bg-pc.webp" media="(min-width: 769px)" type="image/webp">
+  <link rel="preload" as="image" href="/assets/images/login-bg-mobile.webp" media="(max-width: 768px)" type="image/webp">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,76 +34,113 @@
   <!-- CSS -->
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/login.css">
+
+  <!-- Local Offline Bcrypt Helper -->
+  <script src="/js/bcrypt.min.js"></script>
 </head>
 <body>
 
 <!-- ============================================================
-     LAYAR LOGIN (Tersembunyi jika sudah login)
+     LAYAR LOGIN (Sesuai 1:1 page-dasbor.php)
      ============================================================ -->
 <div id="ptv-login-screen">
-  <div class="login-card">
-    <div class="login-logo">
-      <i class="fa-solid fa-tv"></i>
+  <!-- Photo Mosaic Background (Single-Asset Responsive for PC & Mobile) -->
+  <div class="login-bg-container" aria-hidden="true">
+    <picture class="login-bg-picture">
+      <source media="(max-width: 768px)" srcset="/assets/images/login-bg-mobile.webp" type="image/webp">
+      <source media="(max-width: 768px)" srcset="/assets/images/login-bg-mobile.jpg" type="image/jpeg">
+      <source media="(min-width: 769px)" srcset="/assets/images/login-bg-pc.webp" type="image/webp">
+      <source media="(min-width: 769px)" srcset="/assets/images/login-bg-pc.jpg" type="image/jpeg">
+      <img src="/assets/images/login-bg-pc.webp" alt="" class="login-bg-img" fetchpriority="high" decoding="async">
+    </picture>
+  </div>
+  <div class="mosaic-overlay" aria-hidden="true"></div>
+
+  <!-- Topbar -->
+  <header class="lk-topbar">
+    <a href="#kru" class="lk-navlink">Verifikasi Kru</a>
+    <button type="button" class="lk-navlink" id="openHelpBtn">Bantuan</button>
+  </header>
+
+  <!-- Center Auth Box -->
+  <main class="lk-auth-box">
+    <div class="lk-brand">
+      <div class="lk-brand-logo-wrap">
+        <img src="/assets/images/LOGO-NON-RESMI.webp" alt="Progresif TV" class="lk-brand-logo-img">
+      </div>
     </div>
-    <h1>PTV Pro</h1>
-    <p>Masuk untuk mengakses Dashboard Operasional Studio Progresif TV</p>
 
-    <form class="login-form" id="loginForm" autocomplete="on">
-      <div class="form-group">
-        <label for="loginEmail">Email Kru</label>
-        <input
-          id="loginEmail"
-          name="email"
-          type="email"
-          class="input-field"
-          placeholder="kru@progresiftv.id"
-          required
-          autocomplete="username"
-        >
-      </div>
-      <div class="form-group">
-        <label for="loginPassword">Password</label>
-        <div style="position:relative;">
-          <input
-            id="loginPassword"
-            name="password"
-            type="password"
-            class="input-field"
-            placeholder="••••••••"
-            required
-            autocomplete="current-password"
-            style="padding-right:44px;"
-          >
-          <button
-            type="button"
-            id="togglePassword"
-            style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--ptv-text-dim);cursor:pointer;font-size:14px;"
-            aria-label="Tampilkan/Sembunyikan password"
-          ><i class="fa-solid fa-eye"></i></button>
-        </div>
+    <div class="lk-error" id="loginError" style="display:none;">
+      <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" height="16" width="16"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <span id="loginErrorMsg">Akun tidak ditemukan!</span>
+    </div>
+
+    <form class="lk-form" id="loginForm" autocomplete="on">
+      <input type="text" id="loginUser" name="ptv_user" class="lk-input" placeholder="Email / Username" required autocomplete="username">
+      
+      <div class="lk-input-wrap">
+        <input type="password" id="loginPass" name="ptv_pass" class="lk-input" placeholder="Password" required autocomplete="current-password">
+        <button type="button" class="lk-pass-toggle" id="passToggleBtn" aria-label="Lihat kata sandi">
+          <svg class="eye-open" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" height="19" width="19"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <svg class="eye-closed" style="display:none" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" height="19" width="19"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>
+        </button>
       </div>
 
-      <div id="loginError" class="login-error">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span id="loginErrorMsg">Email atau password salah.</span>
+      <div class="lk-actions">
+        <button type="button" class="lk-sublink" id="btnHelpAccess">Bantuan Akses</button>
+        <button type="submit" class="lk-btn-login" id="loginSubmitBtn">Login</button>
       </div>
 
-      <button type="submit" class="btn btn-primary w-full" style="margin-top:20px;padding:12px;" id="loginSubmitBtn">
-        <i class="fa-solid fa-right-to-bracket"></i>
-        Masuk ke Dashboard
+      <div class="lk-divider">
+        <span>atau</span>
+      </div>
+
+      <button type="button" class="lk-btn-google" id="loginGoogleBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24Z"/>
+          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15Z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
+        </svg>
+        <span>Lanjutkan dengan Google</span>
       </button>
     </form>
+  </main>
 
-    <div class="login-divider">atau</div>
-
-    <button type="button" class="btn-google" id="loginGoogleBtn">
-      <img src="https://www.google.com/favicon.ico" alt="Google">
-      Masuk dengan Google
-    </button>
-
-    <p style="margin-top:24px;font-size:11px;color:var(--ptv-text-dim);">
-      Hanya kru aktif Progresif TV yang dapat mengakses portal ini.
-    </p>
+  <!-- Help Modal Popup -->
+  <div class="lk-modal-scrim" id="helpModalScrim"></div>
+  <div class="lk-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
+    <div class="lk-modal-header">
+      <div class="lk-modal-title-wrap">
+        <div class="lk-modal-ic">
+          <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" height="20" width="20"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </div>
+        <h3 id="helpModalTitle" class="lk-modal-title">Bantuan Akses Dasbor</h3>
+      </div>
+      <button type="button" class="lk-modal-close" id="closeHelpBtn" aria-label="Tutup">&times;</button>
+    </div>
+    <div class="lk-modal-body">
+      <div class="lk-help-card">
+        <h4>Format Username / Akun</h4>
+        <p>Gunakan <strong>Username</strong>, <strong>Crew ID</strong> (contoh: <code>PTV-001</code>), atau <strong>Email</strong> resmi kru yang telah didaftarkan.</p>
+      </div>
+      <div class="lk-help-card">
+        <h4>Kata Sandi Resmi</h4>
+        <p>Gunakan kata sandi akun kru yang telah dibuat. Hubungi Koordinator Divisi atau Administrator jika Anda belum memiliki sandi.</p>
+      </div>
+      <div class="lk-help-card">
+        <h4>Lupa Password / Belum Terdaftar?</h4>
+        <p>Jika Anda belum memiliki akses atau mengalami kendala login, silakan hubungi Administrator PTV atau Koordinator Divisi Anda.</p>
+      </div>
+    </div>
+    <div class="lk-modal-footer">
+      <a href="https://wa.me/628123456789?text=Halo%20Admin%20PTV,%20saya%20butuh%20bantuan%20akses%20akun%20dasbor" target="_blank" rel="noopener" class="lk-modal-btn pri">
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="15" width="15"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"></path></svg>
+        <span>Hubungi Admin</span>
+      </a>
+      <button type="button" class="lk-modal-btn sec" id="closeHelpBtn2">Tutup</button>
+    </div>
   </div>
 </div>
 
@@ -230,7 +272,7 @@
      SCRIPTS (ES Modules)
      ============================================================ -->
 <script type="module">
-  import { initAuth, signInWithEmail, signInWithGoogle, signOut, currentCrew } from '/js/auth.js';
+  import { initAuth, signInWithCredentials, signInWithGoogle, signOut, currentCrew } from '/js/auth.js';
   import { initRouter, addRoute, navigateTo } from '/js/router.js';
   import { playChime } from '/js/audio.js';
 
@@ -256,47 +298,106 @@
     }, duration);
   };
 
-  // ── LOGIN UI ────────────────────────────────────────────
+  // ── PASSWORD VISIBILITY TOGGLE ──────────────────────────
+  const passToggleBtn = document.getElementById('passToggleBtn');
+  const loginPass     = document.getElementById('loginPass');
+  if (passToggleBtn && loginPass) {
+    passToggleBtn.addEventListener('click', () => {
+      const isPass = loginPass.type === 'password';
+      loginPass.type = isPass ? 'text' : 'password';
+      const eyeOpen   = passToggleBtn.querySelector('.eye-open');
+      const eyeClosed = passToggleBtn.querySelector('.eye-closed');
+      if (eyeOpen && eyeClosed) {
+        eyeOpen.style.display   = isPass ? 'none' : 'block';
+        eyeClosed.style.display = isPass ? 'block' : 'none';
+      }
+    });
+  }
+
+  // ── HELP MODAL TOGGLE ───────────────────────────────────
+  function openHelpModal() {
+    const s = document.getElementById('helpModalScrim');
+    const m = document.getElementById('helpModal');
+    if (s) s.classList.add('active');
+    if (m) m.classList.add('active');
+  }
+  function closeHelpModal() {
+    const s = document.getElementById('helpModalScrim');
+    const m = document.getElementById('helpModal');
+    if (s) s.classList.remove('active');
+    if (m) m.classList.remove('active');
+  }
+
+  document.getElementById('openHelpBtn')?.addEventListener('click', openHelpModal);
+  document.getElementById('btnHelpAccess')?.addEventListener('click', openHelpModal);
+  document.getElementById('closeHelpBtn')?.addEventListener('click', closeHelpModal);
+  document.getElementById('closeHelpBtn2')?.addEventListener('click', closeHelpModal);
+  document.getElementById('helpModalScrim')?.addEventListener('click', closeHelpModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeHelpModal();
+  });
+
+  // ── LOGIN FORM SUBMISSION ───────────────────────────────
   const loginScreen = document.getElementById('ptv-login-screen');
   const appShell    = document.getElementById('ptv-app');
   const loginForm   = document.getElementById('loginForm');
   const loginError  = document.getElementById('loginError');
   const loginErrMsg = document.getElementById('loginErrorMsg');
   const loginBtn    = document.getElementById('loginSubmitBtn');
-  const togglePw    = document.getElementById('togglePassword');
-  const pwInput     = document.getElementById('loginPassword');
-
-  togglePw.addEventListener('click', () => {
-    const isText = pwInput.type === 'text';
-    pwInput.type = isText ? 'password' : 'text';
-    togglePw.querySelector('i').className = `fa-solid ${isText ? 'fa-eye' : 'fa-eye-slash'}`;
-  });
 
   function showLoginError(msg) {
-    loginErrMsg.textContent = msg;
-    loginError.classList.add('show');
+    if (loginErrMsg) loginErrMsg.textContent = msg || 'Akun tidak ditemukan!';
+    if (loginError) {
+      loginError.style.display = 'flex';
+      // Trigger CSS shake animation
+      loginError.style.animation = 'none';
+      loginError.offsetHeight; // force reflow
+      loginError.style.animation = 'lkShake 0.34s ease both';
+    }
   }
   function hideLoginError() {
-    loginError.classList.remove('show');
+    if (loginError) loginError.style.display = 'none';
   }
 
-  loginForm.addEventListener('submit', async (e) => {
+  loginForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideLoginError();
-    loginBtn.disabled = true;
-    loginBtn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span> Masuk...';
+
+    const userInput = document.getElementById('loginUser');
+    const passInput = document.getElementById('loginPass');
+    const userVal   = userInput ? userInput.value.trim() : '';
+    const passVal   = passInput ? passInput.value : '';
+
+    if (!userVal || !passVal) {
+      showLoginError('Email / Username dan Password wajib diisi!');
+      return;
+    }
+
+    if (loginBtn) {
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Memverifikasi...';
+      loginBtn.style.opacity = '0.7';
+    }
+
     try {
-      const email = document.getElementById('loginEmail').value.trim();
-      const pw    = document.getElementById('loginPassword').value;
-      await signInWithEmail(email, pw);
+      const res = await signInWithCredentials(userVal, passVal);
+      // Sukses otentikasi
+      loginScreen.style.display = 'none';
+      appShell.style.display    = 'flex';
+      _populateSidebar(res.crew);
+      _initRouter();
     } catch (err) {
-      showLoginError(err.message || 'Email atau password tidak valid.');
-      loginBtn.disabled = false;
-      loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Masuk ke Dashboard';
+      showLoginError(err.message || 'Akun tidak ditemukan!');
+      if (loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
+        loginBtn.style.opacity = '1';
+      }
     }
   });
 
-  document.getElementById('loginGoogleBtn').addEventListener('click', async () => {
+  // ── GOOGLE LOGIN ─────────────────────────────────────────
+  document.getElementById('loginGoogleBtn')?.addEventListener('click', async () => {
     hideLoginError();
     try {
       await signInWithGoogle();
@@ -305,31 +406,37 @@
     }
   });
 
-  // ── AUTH INIT ───────────────────────────────────────────
+  // ── POPULATE SIDEBAR PROFIL ──────────────────────────────
+  function _populateSidebar(crew) {
+    if (!crew) return;
+    const nameEl = document.getElementById('sidebarName');
+    const roleEl = document.getElementById('sidebarRole');
+    const avEl   = document.getElementById('sidebarAvatar');
+
+    if (nameEl) nameEl.textContent = crew.name || crew.nama || 'Kru PTV';
+    if (roleEl) roleEl.textContent = crew.pos || crew.jabatan || crew.role || 'Kru';
+
+    if (avEl) {
+      if (crew.avatar_url || crew.foto_url) {
+        avEl.innerHTML = `<img src="${crew.avatar_url || crew.foto_url}" alt="${crew.name}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+      } else {
+        const initials = ((crew.name || crew.nama || 'K').split(' ').map(w => w[0]).slice(0, 2).join('')).toUpperCase();
+        avEl.innerHTML = initials;
+      }
+    }
+  }
+
+  // ── AUTH INITIALIZATION ──────────────────────────────────
   await initAuth({
     onAuthenticated: (user, crew) => {
-      // Sembunyikan login, tampilkan app
       loginScreen.style.display = 'none';
-      appShell.style.display = 'flex';
-
-      // Isi profil di sidebar
-      document.getElementById('sidebarName').textContent = crew.name || user.email;
-      document.getElementById('sidebarRole').textContent = crew.pos || crew.role || 'Kru';
-
-      const avatarEl = document.getElementById('sidebarAvatar');
-      if (crew.avatar_url) {
-        avatarEl.innerHTML = `<img src="${crew.avatar_url}" alt="${crew.name}">`;
-      } else {
-        const initials = (crew.name || 'K').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
-        avatarEl.innerHTML = initials;
-      }
-
-      // Init router
+      appShell.style.display    = 'flex';
+      _populateSidebar(crew);
       _initRouter();
     },
     onUnauthenticated: () => {
       loginScreen.style.display = 'flex';
-      appShell.style.display = 'none';
+      appShell.style.display    = 'none';
     },
   });
 
@@ -352,7 +459,8 @@
     const allRoutes = Object.keys(titles);
     allRoutes.forEach(route => {
       addRoute(route, (fullHash) => {
-        document.getElementById('headerTitle').textContent = titles[route] || route;
+        const titleEl = document.getElementById('headerTitle');
+        if (titleEl) titleEl.textContent = titles[route] || route;
         // Update sidebar active state
         document.querySelectorAll('.nav-item').forEach(btn => {
           btn.classList.toggle('active', btn.dataset.route === route);
@@ -368,7 +476,7 @@
   // ── RENDER ROUTE ────────────────────────────────────────
   async function _renderRoute(route, fullHash) {
     const main = document.getElementById('ptv-main');
-    // Tampilkan loading skeleton sementara modul dimuat
+    if (!main) return;
     main.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--ptv-text-soft);"><div class="spinner"></div><span>Memuat ${route}...</span></div>`;
 
     try {
@@ -380,7 +488,7 @@
       }
     } catch (err) {
       console.warn('[ROUTER] Modul belum tersedia:', route, err);
-      main.innerHTML = `<div style="padding:32px;color:var(--ptv-text-soft);text-align:center;"><i class="fa-solid fa-tools" style="font-size:32px;margin-bottom:12px;display:block;color:var(--ptv-yellow);"></i><strong>${titles[route] || route}</strong><br><span style="font-size:13px;">Modul ini sedang dalam pengembangan & migrasi.</span></div>`;
+      main.innerHTML = `<div style="padding:32px;color:var(--ptv-text-soft);text-align:center;"><i class="fa-solid fa-tools" style="font-size:32px;margin-bottom:12px;display:block;color:var(--ptv-yellow);"></i><strong>${route}</strong><br><span style="font-size:13px;">Modul ini sedang dalam pengembangan & migrasi.</span></div>`;
     }
   }
 
@@ -389,10 +497,10 @@
     btn.addEventListener('click', () => {
       const route = btn.dataset.route;
       window.location.hash = '#' + route;
-      // Tutup sidebar di mobile
       if (window.innerWidth <= 768) {
-        document.getElementById('ptv-sidebar').classList.remove('open');
-        document.getElementById('sidebarOverlay').style.display = 'none';
+        document.getElementById('ptv-sidebar')?.classList.remove('open');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (overlay) overlay.style.display = 'none';
       }
     });
   });
@@ -404,33 +512,33 @@
 
   function checkMobile() {
     if (window.innerWidth <= 768) {
-      sidebarToggle.style.display = 'flex';
+      if (sidebarToggle) sidebarToggle.style.display = 'flex';
     } else {
-      sidebarToggle.style.display = 'none';
-      sidebar.classList.remove('open');
-      overlay.style.display = 'none';
+      if (sidebarToggle) sidebarToggle.style.display = 'none';
+      sidebar?.classList.remove('open');
+      if (overlay) overlay.style.display = 'none';
     }
   }
   checkMobile();
   window.addEventListener('resize', checkMobile);
 
-  sidebarToggle.addEventListener('click', () => {
-    const isOpen = sidebar.classList.toggle('open');
-    overlay.style.display = isOpen ? 'block' : 'none';
+  sidebarToggle?.addEventListener('click', () => {
+    const isOpen = sidebar?.classList.toggle('open');
+    if (overlay) overlay.style.display = isOpen ? 'block' : 'none';
   });
-  overlay.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    overlay.style.display = 'none';
+  overlay?.addEventListener('click', () => {
+    sidebar?.classList.remove('open');
+    if (overlay) overlay.style.display = 'none';
   });
 
   // ── LOGOUT ──────────────────────────────────────────────
-  document.getElementById('sidebarProfile').addEventListener('click', async () => {
+  document.getElementById('sidebarProfile')?.addEventListener('click', async () => {
     if (!confirm('Yakin ingin keluar dari PTV Pro?')) return;
     await signOut();
     toast('Berhasil keluar. Sampai jumpa!', 'info');
   });
 
-  // Service Worker
+  // ── SERVICE WORKER ──────────────────────────────────────
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js', { scope: '/' })
       .then(reg => console.info('[SW] Registered:', reg.scope))

@@ -61,7 +61,7 @@ async function _loadBerandaData(crew) {
     supabase.from('ptv_acara').select('*', { count:'exact', head:true }),
     supabase.from('ptv_peminjaman').select('*', { count:'exact', head:true }).eq('status', 'dipinjam'),
     supabase.from('ptv_inventaris').select('*', { count:'exact', head:true }),
-    supabase.from('ptv_kru').select('*', { count:'exact', head:true }).eq('is_active', true),
+    supabase.from('ptv_kru').select('*', { count:'exact', head:true }).eq('status', 'aktif'),
   ]);
 
   const stats = [

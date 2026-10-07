@@ -108,7 +108,7 @@ function _renderView(container) {
 
 // ── STATS CARDS ───────────────────────────────────────────
 function _statsCardsHTML() {
-  const aktifCount = _allCrews.filter(c => (c.status || 'Aktif') === 'Aktif').length;
+  const aktifCount = _allCrews.filter(c => (c.status || '').toLowerCase() === 'aktif').length;
   const execCount  = _allCrews.filter(c => (c.role || '').toLowerCase() === 'eksekutif').length;
   const divSet     = new Set(_allCrews.map(c => c.divisi).filter(Boolean));
 
@@ -166,7 +166,7 @@ function _applyFilter() {
 
     if (q) {
       const matchNama = (c.nama || '').toLowerCase().includes(q);
-      const matchPtv  = (c.ptv_id || '').toLowerCase().includes(q);
+      const matchPtv  = (c.crew_id || c.ptv_id || '').toLowerCase().includes(q);
       const matchJab  = (c.jabatan || '').toLowerCase().includes(q);
       const matchMail = (c.email || '').toLowerCase().includes(q);
       if (!matchNama && !matchPtv && !matchJab && !matchMail) return false;
@@ -178,7 +178,7 @@ function _applyFilter() {
 // ── CARD HTML ─────────────────────────────────────────────
 function _crewCardHTML(c) {
   const init = (c.nama || 'Kru').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-  const isAktif = (c.status || 'Aktif') === 'Aktif';
+  const isAktif = (c.status || '').toLowerCase() === 'aktif';
   const roleName = c.role || 'Kru Operasional';
 
   return `
@@ -195,7 +195,7 @@ function _crewCardHTML(c) {
               ${c.nama}
             </h3>
             <div style="font-size:12px;font-weight:600;color:var(--ptv-cyan);margin-top:2px;">
-              ${c.ptv_id || 'ID Pending'}
+              ${c.crew_id || c.ptv_id || 'ID Pending'}
             </div>
           </div>
         </div>
@@ -334,7 +334,7 @@ function _openCrewModal(container) {
     try {
       const { error } = await sb.from('ptv_kru').insert({
         nama:      nama,
-        ptv_id:    ptvId || null,
+        crew_id:   ptvId || null,
         divisi:    divisi,
         jabatan:   jabatan || 'Anggota',
         nomor_wa:  wa || null,

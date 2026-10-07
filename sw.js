@@ -2,12 +2,14 @@
 // sw.js — Service Worker PTV Pro v1.0
 // PWA Cache & Web Push Notification
 // ============================================================
-const CACHE_NAME = 'ptv-pro-v1.0';
+const CACHE_NAME = 'ptv-pro-v1.1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/css/base.css',
   '/css/dashboard.css',
+  '/css/login.css',
+  '/js/bcrypt.min.js',
   '/manifest.json',
 ];
 
