@@ -1,0 +1,148 @@
+/**
+ * PTV PRO Official Design Tokens
+ * Ported 1:1 from page-dasbor.php (Style #2)
+ */
+
+:root {
+  /* ── PTV Royal Blue Scales ── */
+  --b-900: #072A52;
+  --b-800: #0A3C74;
+  --b-700: #0B5FBF;
+  --b-600: #1273E6;
+  --b-500: #3B8EF7;
+  --b-400: #6FB0FF;
+  --b-300: #A7CEFF;
+  --b-100: #DCEBFF;
+  --b-050: #EDF4FF;
+
+  /* ── Surfaces & Backgrounds (Light Default) ── */
+  --bg: #F8FAFD;
+  --bg-2: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-2: #FFFFFF;
+  --glass: rgba(255, 255, 255, 0.85);
+  --card-bg: #FFFFFF;
+
+  /* ── Typography & Ink ── */
+  --ink: #0B2A4A;
+  --ink-2: #38587A;
+  --muted: #6E8CAE;
+  --line: rgba(11, 42, 74, 0.10);
+  --line-2: rgba(11, 42, 74, 0.055);
+
+  /* ── Elevation & Shadows ── */
+  --shadow-s: 0 1px 2px rgba(11, 60, 116, 0.05), 0 3px 10px rgba(11, 60, 116, 0.05);
+  --shadow-m: 0 4px 12px rgba(11, 60, 116, 0.07), 0 18px 40px rgba(11, 60, 116, 0.10);
+  --shadow-l: 0 -4px 16px rgba(11, 60, 116, 0.06), 0 -24px 60px rgba(11, 60, 116, 0.16);
+  --shadow-blue: 0 8px 22px rgba(18, 115, 230, 0.28);
+
+  /* ── Feedback & Semantic Status ── */
+  --ok: #0F7A5A;
+  --ok-bg: #E1F5EE;
+  --warn: #9A6B08;
+  --warn-bg: #FCF0D6;
+  --dang: #B02B23;
+  --dang-bg: #FDE8E6;
+  --info: #0B5FBF;
+  --info-bg: #E2EDFD;
+  --neutral-bg: #E9F0F9;
+  --neutral-fg: #5A7793;
+  --accent-bg: #E2EDFD;
+  --accent-fg: #0B5FBF;
+
+  /* ── Border Radius ── */
+  --r-xs: 9px;
+  --r-s: 13px;
+  --r-m: 18px;
+  --r-l: 24px;
+  --r-xl: 30px;
+  --r-full: 999px;
+
+  /* ── Layout & Responsive Metrics ── */
+  --header-h: 58px;
+  --dock-h: 64px;
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sidebar-w: 250px;
+  --maxw: 1160px;
+
+  /* ── Typography Stack ── */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Plus Jakarta Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-sans: var(--font);
+
+  /* ── Compatibility Aliases for Existing React Components ── */
+  --bg-primary: var(--bg);
+  --bg-secondary: var(--surface);
+  --bg-surface: var(--surface);
+  --bg-surface-hover: var(--b-050);
+  --bg-card: var(--surface);
+  --bg-card-border: var(--line);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-2);
+  --text-muted: var(--muted);
+  --accent-blue: var(--b-700);
+  --accent-cyan: var(--b-600);
+  --status-success: var(--ok);
+  --status-success-bg: var(--ok-bg);
+  --status-warning: var(--warn);
+  --status-warning-bg: var(--warn-bg);
+  --status-danger: var(--dang);
+  --status-danger-bg: var(--dang-bg);
+  --status-info: var(--info);
+  --status-info-bg: var(--info-bg);
+  --radius-sm: var(--r-xs);
+  --radius-md: var(--r-s);
+  --radius-lg: var(--r-m);
+  --radius-full: var(--r-full);
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+}
+
+/* ── Dark Mode Token Overrides ── */
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  --bg: #060F1C;
+  --bg-2: #0A1626;
+  --surface: #0E1B2D;
+  --surface-2: #122238;
+  --glass: rgba(14, 27, 45, 0.72);
+  --card-bg: #0E1B2D;
+
+  --ink: #E6F0FC;
+  --ink-2: #B8CEE6;
+  --muted: #7F9ABA;
+  --line: rgba(255, 255, 255, 0.10);
+  --line-2: rgba(255, 255, 255, 0.055);
+
+  --b-100: #12314F;
+  --b-050: #0E2540;
+  --b-600: #4E9BFB;
+  --b-700: #3B8EF7;
+
+  --ok: #4FC79B;
+  --ok-bg: #0E2E26;
+  --warn: #E3BA63;
+  --warn-bg: #30260F;
+  --dang: #EE8C82;
+  --dang-bg: #351B18;
+  --info: #7DBCEA;
+  --info-bg: #0F2740;
+  --neutral-bg: #16253A;
+  --neutral-fg: #92AACA;
+
+  --shadow-s: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-m: 0 6px 18px rgba(0, 0, 0, 0.5);
+  --shadow-l: 0 10px 30px rgba(0, 0, 0, 0.6);
+
+  --bg-primary: var(--bg);
+  --bg-secondary: var(--surface);
+  --bg-surface: var(--surface);
+  --bg-surface-hover: var(--b-050);
+  --bg-card: var(--surface);
+  --bg-card-border: var(--line);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-2);
+  --text-muted: var(--muted);
+}
