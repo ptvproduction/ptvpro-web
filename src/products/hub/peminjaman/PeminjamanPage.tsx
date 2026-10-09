@@ -1,503 +1,856 @@
-import React, { useState } from 'react';
-import { usePeminjamanList, useAvailableUnits } from './usePeminjaman';
+import React, { useState, useEffect } from 'react';
 import { useSessionStore } from '@core/session';
-import { Card, Button, Badge, LoadingState, ErrorState, EmptyState, Input } from '@shared/components';
-import { ArrowLeftRight, Plus, Search, Filter, Calendar, Clock, CheckCircle, X, CheckSquare, Square } from 'lucide-react';
-import { KondisiKembali, CheckoutLoanDTO } from './types';
+import { peminjamanService } from './peminjamanService';
+import { inventarisService } from '../inventaris/inventarisService';
+import { PeminjamanRecord, KondisiKembali } from './types';
+import { AvailableUnitItem } from '../inventaris/inventarisService';
+
+interface GroupedTransaction {
+  transaction_id: string;
+  by: string;
+  purpose: string;
+  out: string;
+  due: string;
+  items: PeminjamanRecord[];
+}
 
 export const PeminjamanPage: React.FC = () => {
   const { user, can } = useSessionStore();
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'dipinjam' | 'dikembalikan' | 'terlambat'>('all');
-  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [returnTargetTx, setReturnTargetTx] = useState<string | null>(null);
+
+  const [records, setRecords] = useState<PeminjamanRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Filters from pgPeminjaman()
+  const [loanFilter, setLoanFilter] = useState<'aktif' | 'saya' | 'selesai'>('aktif');
+  const [searchQ, setSearchQ] = useState('');
+
+  // Modals & Sheets
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [returnTargetUnit, setReturnTargetUnit] = useState<PeminjamanRecord | null>(null);
+  const [returnTargetTxn, setReturnTargetTxn] = useState<GroupedTransaction | null>(null);
   const [returnCondition, setReturnCondition] = useState<KondisiKembali>('bagus');
   const [returnNotes, setReturnNotes] = useState('');
-  const [submittingReturn, setSubmittingReturn] = useState(false);
-  const [returnError, setReturnError] = useState('');
+  const [submittingAction, setSubmittingAction] = useState(false);
 
   // Checkout Form State
-  const [borrowerName, setBorrowerName] = useState('');
+  const [borrowerName, setBorrowerName] = useState(user?.full_name || '');
   const [purpose, setPurpose] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [eventName, setEventName] = useState('');
+  const [dueDate, setDueDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 2);
+    return d.toISOString().split('T')[0];
+  });
+  const [availableUnits, setAvailableUnits] = useState<AvailableUnitItem[]>([]);
   const [selectedUnitIds, setSelectedUnitIds] = useState<string[]>([]);
-  const [checkoutError, setCheckoutError] = useState('');
   const [checkoutSubmitting, setCheckoutSubmitting] = useState(false);
 
-  const { data, isLoading, isError, error, refetch, checkout, returnLoan } = usePeminjamanList({
-    search: search.trim() || undefined,
-    status: statusFilter !== 'all' ? statusFilter : undefined,
-  });
-
-  const { availableUnits, isLoading: isLoadingUnits, reload: reloadUnits } = useAvailableUnits();
-
-  const canCheckout = can('loans.checkout');
-  const canManageLoan = can('loans.manage') || can('loans.checkout');
-
-  const handleOpenCheckout = () => {
-    setBorrowerName(user?.full_name ? `${user.full_name} (${user.division})` : '');
-    setPurpose('');
-    // Default tenggat kembali: besok
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    setDueDate(tomorrow.toISOString().split('T')[0]);
-    setEventName('');
-    setSelectedUnitIds([]);
-    setCheckoutError('');
-    reloadUnits();
-    setIsCheckoutModalOpen(true);
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await peminjamanService.getPeminjamanList();
+      setRecords(data);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const toggleSelectUnit = (unitId: string) => {
-    setSelectedUnitIds((prev) =>
-      prev.includes(unitId) ? prev.filter((id) => id !== unitId) : [...prev, unitId]
-    );
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadAvailableUnits = async () => {
+    const list = await inventarisService.getAvailableUnits();
+    setAvailableUnits(list);
+  };
+
+  // Group all loans by transaction (1 submit = 1 card) - identical to groupLoansByTransaction()
+  const groupLoansByTransaction = (loans: PeminjamanRecord[]): GroupedTransaction[] => {
+    const map = new Map<string, GroupedTransaction>();
+    loans.forEach((l) => {
+      const key = l.transaction_id || `txn_${l.id}`;
+      if (!map.has(key)) {
+        map.set(key, {
+          transaction_id: key,
+          by: l.peminjam_nama,
+          purpose: l.keperluan,
+          out: l.tanggal_pinjam,
+          due: l.tenggat_kembali,
+          items: [],
+        });
+      }
+      const grp = map.get(key)!;
+      if (l.tanggal_pinjam && (!grp.out || l.tanggal_pinjam < grp.out)) grp.out = l.tanggal_pinjam;
+      if (l.tenggat_kembali && (!grp.due || l.tenggat_kembali > grp.due)) grp.due = l.tenggat_kembali;
+      grp.items.push(l);
+    });
+    return Array.from(map.values());
+  };
+
+  const allGroups = groupLoansByTransaction(records);
+  const todayIso = new Date().toISOString().split('T')[0];
+
+  // Global metrics
+  const activeLoans = records.filter((l) => l.status !== 'dikembalikan');
+  const activeTxnCount = allGroups.filter((g) => g.items.some((l) => l.status !== 'dikembalikan')).length;
+  const activeUnitsCount = activeLoans.length;
+  const overdueCount = activeLoans.filter((l) => l.tenggat_kembali && l.tenggat_kembali < todayIso).length;
+
+  // Filter groups
+  let groups = [...allGroups];
+  if (loanFilter === 'aktif') {
+    groups = groups.filter((g) => g.items.some((l) => l.status !== 'dikembalikan'));
+  } else if (loanFilter === 'saya') {
+    groups = groups.filter((g) => g.by.toLowerCase().includes((user?.full_name || '').toLowerCase()));
+  } else if (loanFilter === 'selesai') {
+    groups = groups.filter((g) => g.items.every((l) => l.status === 'dikembalikan'));
+  }
+
+  // Search filter
+  if (searchQ.trim()) {
+    const q = searchQ.trim().toLowerCase();
+    groups = groups.filter((g) => {
+      const byMatch = g.by.toLowerCase().includes(q);
+      const purpMatch = g.purpose.toLowerCase().includes(q);
+      const txnMatch = g.transaction_id.toLowerCase().includes(q);
+      const itemMatch = g.items.some(
+        (l) => l.nama_alat.toLowerCase().includes(q) || l.kode_unit.toLowerCase().includes(q)
+      );
+      return byMatch || purpMatch || txnMatch || itemMatch;
+    });
+  }
+
+  const fmtDate = (dStr?: string) => {
+    if (!dStr) return '-';
+    try {
+      const parts = dStr.split('-');
+      if (parts.length === 3) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const mIdx = parseInt(parts[1], 10) - 1;
+        return `${parseInt(parts[2], 10)} ${months[mIdx] || parts[1]} ${parts[0]}`;
+      }
+    } catch {
+      // ignore
+    }
+    return dStr;
+  };
+
+  const handleReturnSingleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!returnTargetUnit) return;
+    try {
+      setSubmittingAction(true);
+      await peminjamanService.returnSingleLoan(
+        returnTargetUnit.id,
+        returnCondition,
+        returnNotes.trim() || undefined,
+        user?.ptv_id,
+        user?.full_name
+      );
+      setReturnTargetUnit(null);
+      setReturnNotes('');
+      alert(`Unit ${returnTargetUnit.kode_unit} berhasil dikembalikan!`);
+      await loadData();
+    } catch (err: unknown) {
+      alert((err as Error).message || 'Gagal memproses pengembalian');
+    } finally {
+      setSubmittingAction(false);
+    }
+  };
+
+  const handleReturnTxnSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!returnTargetTxn) return;
+    try {
+      setSubmittingAction(true);
+      await peminjamanService.returnLoan(
+        {
+          transaction_id: returnTargetTxn.transaction_id,
+          condition_status: returnCondition,
+          notes: returnNotes.trim() || undefined,
+        },
+        user?.ptv_id,
+        user?.full_name
+      );
+      setReturnTargetTxn(null);
+      setReturnNotes('');
+      alert(`Seluruh alat dalam transaksi ${returnTargetTxn.transaction_id} berhasil dikembalikan!`);
+      await loadData();
+    } catch (err: unknown) {
+      alert((err as Error).message || 'Gagal memproses pengembalian');
+    } finally {
+      setSubmittingAction(false);
+    }
   };
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedUnitIds.length === 0) {
-      setCheckoutError('Pilih minimal satu unit alat untuk dipinjam.');
+      alert('Pilih minimal satu unit alat untuk dipinjam.');
       return;
     }
     if (!borrowerName.trim()) {
-      setCheckoutError('Nama peminjam wajib diisi.');
+      alert('Nama peminjam wajib diisi.');
       return;
     }
-    if (!purpose.trim()) {
-      setCheckoutError('Keperluan peminjaman wajib diisi.');
-      return;
-    }
-
     try {
       setCheckoutSubmitting(true);
-      setCheckoutError('');
-      const dto: CheckoutLoanDTO = {
-        borrower_name: borrowerName.trim(),
-        purpose: purpose.trim(),
-        due_date: dueDate,
-        event_name: eventName.trim() || undefined,
-        unit_ids: selectedUnitIds,
-      };
-      await checkout(dto, user?.id, user?.full_name);
-      setIsCheckoutModalOpen(false);
-      reloadUnits();
-    } catch (err) {
-      setCheckoutError(err instanceof Error ? err.message : 'Gagal memproses peminjaman.');
+      await peminjamanService.checkoutLoan(
+        {
+          borrower_name: borrowerName.trim(),
+          purpose: purpose.trim(),
+          due_date: dueDate,
+          unit_ids: selectedUnitIds,
+        },
+        user?.ptv_id,
+        user?.full_name
+      );
+      setIsCheckoutOpen(false);
+      setSelectedUnitIds([]);
+      setPurpose('');
+      alert('Peminjaman multi-unit berhasil diproses!');
+      await loadData();
+    } catch (err: unknown) {
+      alert((err as Error).message || 'Gagal memproses peminjaman');
     } finally {
       setCheckoutSubmitting(false);
     }
   };
 
-  const handleReturnSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!returnTargetTx) return;
-
-    try {
-      setSubmittingReturn(true);
-      setReturnError('');
-      await returnLoan({
-        transaction_id: returnTargetTx,
-        condition_status: returnCondition,
-        notes: returnNotes.trim() || undefined,
-      }, user?.id, user?.full_name);
-      setReturnTargetTx(null);
-      setReturnNotes('');
-      reloadUnits();
-    } catch (err) {
-      setReturnError(err instanceof Error ? err.message : 'Gagal memproses pengembalian alat.');
-    } finally {
-      setSubmittingReturn(false);
-    }
-  };
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Header Halaman */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-            <ArrowLeftRight size={22} style={{ color: 'var(--accent-cyan)' }} />
-            <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Sirkulasi Peminjaman Alat
-            </h2>
-          </div>
-          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
-            Pencatatan checkout multi-unit, batas pengembalian, status QC kondisi, dan riwayat sirkulasi studio.
-          </p>
+    <div className="page">
+      {/* ── TOP SEARCH BAR & TAMBAH PINJAMAN BUTTON ── */}
+      <div className="row gap8 mb12" style={{ alignItems: 'center' }}>
+        <div className="searchbar flex-1" style={{ margin: 0 }}>
+          <i className="fa-solid fa-magnifying-glass" />
+          <input
+            id="loanSearchInput"
+            value={searchQ}
+            onChange={(e) => setSearchQ(e.target.value)}
+            placeholder="Cari peminjam, keperluan, nama alat, kode unit / inventaris…"
+            autoComplete="off"
+          />
         </div>
 
-        {canCheckout && (
-          <Button variant="primary" size="md" onClick={handleOpenCheckout}>
-            <Plus size={16} />
-            Checkout Peminjaman Baru
-          </Button>
+        {can('loans.checkout') && (
+          <button
+            type="button"
+            className="btn pri"
+            onClick={() => {
+              loadAvailableUnits();
+              setIsCheckoutOpen(true);
+            }}
+            style={{
+              whiteSpace: 'nowrap',
+              minHeight: '42px',
+              borderRadius: 'var(--r-full)',
+              padding: '0 18px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <i className="fa-solid fa-plus" />
+            <span>Pinjam Alat</span>
+          </button>
         )}
       </div>
 
-      {/* Filter dan Pencarian */}
-      <Card style={{ padding: '0.75rem 1rem' }}>
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '220px', backgroundColor: 'var(--bg-secondary)', padding: '0.35rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--bg-card-border)' }}>
-            <Search size={16} style={{ color: 'var(--text-muted)' }} />
-            <input
-              type="text"
-              placeholder="Cari No Transaksi (TRX-xxx), nama peminjam, atau nama alat..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-primary)',
-                fontSize: 'var(--text-sm)',
-                width: '100%',
-                outline: 'none',
-              }}
-            />
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Filter size={16} style={{ color: 'var(--text-muted)' }} />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              style={{
-                backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--bg-card-border)',
-                borderRadius: 'var(--radius-sm)',
-                color: 'var(--text-primary)',
-                padding: '0.45rem 0.75rem',
-                fontSize: 'var(--text-xs)',
-                outline: 'none',
-              }}
-            >
-              <option value="all">Semua Status</option>
-              <option value="dipinjam">Sedang Dipinjam</option>
-              <option value="terlambat">Lewat Tenggat</option>
-              <option value="dikembalikan">Sudah Kembali</option>
-            </select>
-          </div>
+      {/* ── GLOBAL METRICS BAR 1:1 DARI pgPeminjaman() ── */}
+      <div className="row gap8 mb14" style={{ flexWrap: 'wrap' }}>
+        <div className="loan-metric-pill">
+          <span className="num">{activeTxnCount}</span>
+          <span className="lbl">Transaksi Aktif</span>
         </div>
-      </Card>
+        <div className="loan-metric-pill">
+          <span className="num">{activeUnitsCount}</span>
+          <span className="lbl">Unit Dipinjam</span>
+        </div>
+        <div className={`loan-metric-pill ${overdueCount > 0 ? 'is-danger' : ''}`}>
+          <span className="num">{overdueCount}</span>
+          <span className="lbl">Terlambat</span>
+        </div>
+      </div>
 
-      {/* Tabel Sirkulasi Peminjaman */}
-      {isLoading ? (
-        <LoadingState message="Memuat daftar sirkulasi peminjaman..." />
-      ) : isError ? (
-        <ErrorState
-          title="Gagal Memuat Peminjaman"
-          message={error instanceof Error ? error.message : 'Terjadi kesalahan sistem saat memuat data.'}
-          onRetry={() => refetch()}
-        />
-      ) : !data || data.length === 0 ? (
-        <EmptyState
-          title="Tidak Ada Catatan Peminjaman"
-          description="Belum ada transaksi peminjaman yang sesuai dengan filter saat ini."
-        />
+      {/* ── FILTER TABS: AKTIF, SAYA, SELESAI ── */}
+      <div className="filter-tabs mb14">
+        <button
+          type="button"
+          className={`ftab ${loanFilter === 'aktif' ? 'on' : ''}`}
+          onClick={() => setLoanFilter('aktif')}
+        >
+          Aktif ({allGroups.filter((g) => g.items.some((l) => l.status !== 'dikembalikan')).length})
+        </button>
+        <button
+          type="button"
+          className={`ftab ${loanFilter === 'saya' ? 'on' : ''}`}
+          onClick={() => setLoanFilter('saya')}
+        >
+          Saya (
+          {
+            allGroups.filter((g) =>
+              g.by.toLowerCase().includes((user?.full_name || '').toLowerCase())
+            ).length
+          }
+          )
+        </button>
+        <button
+          type="button"
+          className={`ftab ${loanFilter === 'selesai' ? 'on' : ''}`}
+          onClick={() => setLoanFilter('selesai')}
+        >
+          Selesai ({allGroups.filter((g) => g.items.every((l) => l.status === 'dikembalikan')).length})
+        </button>
+      </div>
+
+      {/* ── RESULT COUNT ── */}
+      <div className="row-b mb10">
+        <span className="t-sm" style={{ fontWeight: 700, color: 'var(--ink)' }}>
+          {groups.length} form peminjaman
+        </span>
+      </div>
+
+      {/* ── TRANSACTION CARDS LIST 1:1 DARI pgPeminjaman() ── */}
+      {loading ? (
+        <div style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)' }}>
+          <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: '8px' }} />
+          Memuat data peminjaman...
+        </div>
+      ) : groups.length === 0 ? (
+        <div className="empty card">
+          <i className="fa-solid fa-right-left" />
+          <p>Tidak ada transaksi peminjaman pada tab ini.</p>
+        </div>
       ) : (
-        <Card style={{ padding: 0, overflow: 'hidden' }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 'var(--text-sm)' }}>
-              <thead>
-                <tr style={{ backgroundColor: 'var(--bg-card)', borderBottom: '1px solid var(--bg-card-border)', color: 'var(--text-muted)', fontSize: 'var(--text-xs)' }}>
-                  <th style={{ padding: '0.85rem 1rem', fontWeight: 600 }}>TRANSAKSI & UNIT</th>
-                  <th style={{ padding: '0.85rem 1rem', fontWeight: 600 }}>PEMINJAM & KEPERLUAN</th>
-                  <th style={{ padding: '0.85rem 1rem', fontWeight: 600 }}>JADWAL PINJAM</th>
-                  <th style={{ padding: '0.85rem 1rem', fontWeight: 600 }}>STATUS</th>
-                  <th style={{ padding: '0.85rem 1rem', fontWeight: 600, textAlign: 'right' }}>AKSI</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((loan, idx) => (
-                  <tr
-                    key={loan.id}
-                    style={{
-                      borderBottom: idx === data.length - 1 ? 'none' : '1px solid var(--bg-card-border)',
-                      backgroundColor: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.01)',
-                    }}
-                  >
-                    <td style={{ padding: '0.85rem 1rem' }}>
-                      <div style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--accent-cyan)', fontSize: 'var(--text-xs)' }}>
-                        {loan.transaction_id}
-                      </div>
-                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginTop: '0.15rem' }}>
-                        {loan.nama_alat}
-                      </div>
-                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-                        Barcode: <span style={{ fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{loan.kode_unit}</span>
-                      </div>
-                    </td>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          {groups.map((grp) => {
+            const allBack = grp.items.every((l) => l.status === 'dikembalikan');
+            const anyLate = grp.items.some(
+              (l) => l.status !== 'dikembalikan' && l.tenggat_kembali && l.tenggat_kembali < todayIso
+            );
+            const returnedCount = grp.items.filter((l) => l.status === 'dikembalikan').length;
+            const totalCount = grp.items.length;
 
-                    <td style={{ padding: '0.85rem 1rem' }}>
-                      <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                        {loan.peminjam_nama}
-                      </div>
-                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
-                        {loan.keperluan}
-                      </div>
-                    </td>
-
-                    <td style={{ padding: '0.85rem 1rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
-                        <Calendar size={13} style={{ color: 'var(--text-muted)' }} />
-                        <span>Pinjam: {loan.tanggal_pinjam}</span>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: 'var(--text-xs)', color: loan.status === 'terlambat' ? 'var(--status-danger)' : 'var(--text-muted)', marginTop: '0.2rem' }}>
-                        <Clock size={13} />
-                        <span>Tenggat: {loan.tenggat_kembali}</span>
-                      </div>
-                    </td>
-
-                    <td style={{ padding: '0.85rem 1rem' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-start' }}>
-                        {loan.status === 'dipinjam' && (
-                          <Badge variant="warning">Sedang Dipinjam</Badge>
-                        )}
-                        {loan.status === 'terlambat' && (
-                          <Badge variant="danger">Lewat Tenggat</Badge>
-                        )}
-                        {loan.status === 'dikembalikan' && (
-                          <Badge variant="success">Dikembalikan ({loan.kondisi_kembali || 'bagus'})</Badge>
-                        )}
-                      </div>
-                    </td>
-
-                    <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
-                      {loan.status !== 'dikembalikan' && canManageLoan ? (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => {
-                            setReturnTargetTx(loan.transaction_id);
-                            setReturnCondition('bagus');
-                            setReturnNotes('');
-                            setReturnError('');
-                          }}
-                        >
-                          <CheckCircle size={14} />
-                          Kembalikan
-                        </Button>
-                      ) : loan.status === 'dikembalikan' ? (
-                        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-                          Selesai &bull; {loan.tanggal_kembali}
-                        </span>
-                      ) : null}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
-
-      {/* Modal Checkout Peminjaman */}
-      {isCheckoutModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem' }}>
-          <div style={{ width: '100%', maxWidth: '640px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--bg-card-border)', borderRadius: 'var(--radius-md)', padding: '1.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-              <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--text-primary)' }}>
-                Formulir Checkout Peminjaman Unit
-              </h3>
-              <button
-                onClick={() => setIsCheckoutModalOpen(false)}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            return (
+              <div
+                key={grp.transaction_id}
+                className={`loan-txn-card ${anyLate ? 'is-overdue' : allBack ? 'is-done' : ''}`}
               >
-                <X size={20} />
-              </button>
-            </div>
-
-            {checkoutError && (
-              <div style={{ padding: '0.75rem', backgroundColor: 'var(--status-danger-bg)', color: '#fca5a5', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', marginBottom: '1rem', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                {checkoutError}
-              </div>
-            )}
-
-            <form onSubmit={handleCheckoutSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <Input
-                  label="Nama Peminjam / Kru"
-                  value={borrowerName}
-                  onChange={(e) => setBorrowerName(e.target.value)}
-                  placeholder="Misal: Ahmad (Technical)"
-                  required
-                />
-                <Input
-                  label="Tenggat Pengembalian"
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  required
-                />
-              </div>
-
-              <Input
-                label="Keperluan Peminjaman"
-                value={purpose}
-                onChange={(e) => setPurpose(e.target.value)}
-                placeholder="Misal: Liputan Wisuda Akbar Santri 2026"
-                required
-              />
-
-              <Input
-                label="Nama Acara / Program (Opsional)"
-                value={eventName}
-                onChange={(e) => setEventName(e.target.value)}
-                placeholder="Misal: Wisuda Akbar BSH"
-              />
-
-              {/* Pemilihan Unit Alat Tersedia */}
-              <div>
-                <label style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 500, marginBottom: '0.5rem', display: 'block' }}>
-                  Pilih Unit Alat yang Tersedia ({selectedUnitIds.length} unit dipilih):
-                </label>
-
-                {isLoadingUnits ? (
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Memuat unit siap pinjam...</div>
-                ) : availableUnits.length === 0 ? (
-                  <div style={{ padding: '0.75rem', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-                    Tidak ada unit fisik yang berstatus 'tersedia' saat ini.
-                  </div>
-                ) : (
-                  <div style={{ maxHeight: '180px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem', border: '1px solid var(--bg-card-border)', borderRadius: 'var(--radius-sm)', padding: '0.5rem', backgroundColor: 'var(--bg-primary)' }}>
-                    {availableUnits.map(({ unit, item }) => {
-                      const isSelected = selectedUnitIds.includes(unit.id);
-                      return (
-                        <div
-                          key={unit.id}
-                          onClick={() => toggleSelectUnit(unit.id)}
+                {/* ── BAGIAN KIRI: Metadata Peminjam ── */}
+                <div className="loan-split-left">
+                  <div>
+                    {/* Header Peminjam: Avatar + Nama + Keperluan */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '11px' }}>
+                      <div style={{ position: 'relative', flexShrink: 0 }}>
+                        <span className="avatar md">
+                          {grp.by
+                            .split(' ')
+                            .map((w) => w[0])
+                            .slice(0, 2)
+                            .join('')
+                            .toUpperCase()}
+                        </span>
+                        <span
                           style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '0.5rem 0.75rem',
-                            borderRadius: 'var(--radius-sm)',
-                            backgroundColor: isSelected ? 'rgba(72, 202, 228, 0.15)' : 'var(--bg-card)',
-                            border: isSelected ? '1px solid var(--accent-cyan)' : '1px solid var(--bg-card-border)',
-                            cursor: 'pointer',
+                            position: 'absolute',
+                            bottom: 0,
+                            right: 0,
+                            width: '9px',
+                            height: '9px',
+                            borderRadius: '50%',
+                            border: '2px solid #ffffff',
+                            background: allBack ? '#10b981' : anyLate ? '#ef4444' : '#2563eb',
+                          }}
+                        />
+                      </div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              fontSize: '14.5px',
+                              fontWeight: 700,
+                              color: 'var(--ink)',
+                              letterSpacing: '-0.01em',
+                              lineHeight: 1.25,
+                            }}
+                          >
+                            {grp.by}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              padding: '1.5px 7px',
+                              borderRadius: '999px',
+                              background: 'rgba(15,23,42,0.05)',
+                              color: 'var(--ink-2)',
+                              fontWeight: 550,
+                            }}
+                          >
+                            {grp.transaction_id}
+                          </span>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '12px',
+                            color: 'var(--ink-2)',
+                            marginTop: '3px',
+                            lineHeight: 1.4,
+                            fontWeight: 400,
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                            {isSelected ? (
-                              <CheckSquare size={16} style={{ color: 'var(--accent-cyan)' }} />
-                            ) : (
-                              <Square size={16} style={{ color: 'var(--text-muted)' }} />
-                            )}
-                            <div>
-                              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-primary)' }}>
-                                {item.nama_alat}
+                          {grp.purpose || 'Operasional Produksi PTV'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Metadata Durasi Pinjam */}
+                    <div className="loan-meta-block">
+                      <div className="loan-meta-label">Durasi Pinjam</div>
+                      <div className="loan-meta-dates">
+                        <span>{fmtDate(grp.out)}</span>
+                        <span style={{ color: 'var(--muted)', fontSize: '11.5px' }}>s/d</span>
+                        <span style={{ color: anyLate ? '#dc2626' : 'var(--ink)', fontWeight: anyLate ? 700 : 600 }}>
+                          {fmtDate(grp.due)}
+                        </span>
+                      </div>
+                      {anyLate && (
+                        <div className="loan-late-indicator">
+                          <i className="fa-solid fa-clock-rotate-left" style={{ fontSize: '10px' }} />
+                          <span>Melewati Batas Pengembalian</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Status chip panel kiri */}
+                  <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
+                    {allBack ? (
+                      <span className="loan-status-chip selesai">
+                        <i className="fa-solid fa-circle-check" style={{ fontSize: '11px' }} /> Selesai
+                      </span>
+                    ) : anyLate ? (
+                      <span className="loan-status-chip terlambat">
+                        <i className="fa-solid fa-circle-exclamation" style={{ fontSize: '11px' }} /> Terlambat
+                      </span>
+                    ) : (
+                      <span className="loan-status-chip dipinjam">
+                        <i className="fa-solid fa-arrow-right-arrow-left" style={{ fontSize: '10.5px' }} /> Dipinjam
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* ── BAGIAN KANAN: Daftar Seluruh Alat ── */}
+                <div className="loan-split-right">
+                  <div className="loan-split-items-list">
+                    {grp.items.map((l) => {
+                      const isBack = l.status === 'dikembalikan';
+                      const isItemLate = !isBack && l.tenggat_kembali && l.tenggat_kembali < todayIso;
+
+                      return (
+                        <div key={l.id} className="loan-item-row">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
+                            <div className="loan-item-thumb">
+                              <span className="li-ic sm">
+                                <i className="fa-solid fa-camera-retro" />
+                              </span>
+                            </div>
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                                <span className="loan-item-name">{l.nama_alat}</span>
+                                <span className="chip blue" style={{ fontSize: '10.5px', fontFamily: 'monospace' }}>
+                                  {l.kode_unit}
+                                </span>
                               </div>
-                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                Barcode: <span style={{ fontFamily: 'monospace', color: 'var(--accent-cyan)' }}>{unit.kode_unit}</span> &bull; Lokasi: {unit.lokasi_penyimpanan || '-'}
+                              <div
+                                style={{
+                                  fontSize: '11.5px',
+                                  color: 'var(--muted)',
+                                  marginTop: '2px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  flexWrap: 'wrap',
+                                }}
+                              >
+                                <span>1 Unit</span>
+                                {isBack ? (
+                                  <span style={{ color: '#059669', fontWeight: 600 }}>
+                                    &bull; Selesai ({fmtDate(l.tanggal_kembali)})
+                                  </span>
+                                ) : (
+                                  isItemLate && (
+                                    <span style={{ color: '#dc2626', fontWeight: 600 }}>
+                                      &bull; Batas: {fmtDate(l.tenggat_kembali)}
+                                    </span>
+                                  )
+                                )}
                               </div>
                             </div>
                           </div>
-                          <Badge variant="info">{item.kategori}</Badge>
+
+                          <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {isBack ? (
+                              <span className="loan-status-chip selesai" style={{ fontSize: '11px', padding: '3px 9px' }}>
+                                <i className="fa-solid fa-check" style={{ fontSize: '10px' }} /> Selesai
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                className="loan-btn-return-item"
+                                onClick={() => {
+                                  setReturnTargetUnit(l);
+                                  setReturnCondition('bagus');
+                                  setReturnNotes('');
+                                }}
+                                title={`Kembalikan ${l.nama_alat}`}
+                              >
+                                <i className="fa-solid fa-rotate-left" style={{ fontSize: '10.5px' }} />
+                                <span>Kembalikan</span>
+                              </button>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
                   </div>
-                )}
-              </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem' }}>
-                <Button type="button" variant="secondary" onClick={() => setIsCheckoutModalOpen(false)}>
-                  Batal
-                </Button>
-                <Button type="submit" variant="primary" disabled={checkoutSubmitting || selectedUnitIds.length === 0}>
-                  {checkoutSubmitting ? 'Memproses Checkout...' : `Konfirmasi Pinjam (${selectedUnitIds.length} Unit)`}
-                </Button>
+                  {/* Footer Kanan: Total Unit & Kembalikan Semua */}
+                  <div className="loan-split-footer">
+                    <div style={{ fontSize: '12px', color: 'var(--ink-2)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <i className="fa-solid fa-boxes-stacked" style={{ color: 'var(--muted)', fontSize: '11.5px' }} />
+                      <span>
+                        Total: <strong style={{ fontWeight: 700, color: 'var(--ink)' }}>{totalCount} unit alat</strong>
+                      </span>
+                      {returnedCount > 0 && (
+                        <span style={{ color: 'var(--muted)', fontSize: '11.5px' }}>
+                          ({returnedCount} kembali)
+                        </span>
+                      )}
+                    </div>
+
+                    {!allBack ? (
+                      <button
+                        type="button"
+                        className="loan-btn-return-all"
+                        onClick={() => {
+                          setReturnTargetTxn(grp);
+                          setReturnCondition('bagus');
+                          setReturnNotes('');
+                        }}
+                      >
+                        <i className="fa-solid fa-rotate-left" style={{ fontSize: '10.5px' }} />
+                        <span>Kembalikan Semua</span>
+                      </button>
+                    ) : (
+                      <span
+                        style={{
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          color: '#059669',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                        }}
+                      >
+                        <i className="fa-solid fa-circle-check" style={{ fontSize: '12px' }} />
+                        <span>Semua alat telah dikembalikan</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </form>
-          </div>
+            );
+          })}
         </div>
       )}
 
-      {/* Modal Pengembalian Alat */}
-      {returnTargetTx && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem' }}>
-          <div style={{ width: '100%', maxWidth: '480px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--bg-card-border)', borderRadius: 'var(--radius-md)', padding: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-              <div>
-                <span style={{ fontFamily: 'monospace', fontSize: 'var(--text-xs)', color: 'var(--accent-cyan)', fontWeight: 700 }}>
-                  {returnTargetTx}
-                </span>
-                <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  Konfirmasi Pengembalian Alat
-                </h3>
-              </div>
+      {/* ── MODAL KONFIRMASI PENGEMBALIAN UNIT TUNGGAL ── */}
+      {returnTargetUnit && (
+        <>
+          <div className="scrim on" onClick={() => setReturnTargetUnit(null)} />
+          <section className="sheet on" role="dialog" aria-modal="true">
+            <div className="sheet-grab" />
+            <div className="sheet-hd">
+              <h3>Konfirmasi Pengembalian Unit</h3>
               <button
-                onClick={() => setReturnTargetTx(null)}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                type="button"
+                className="icon-btn"
+                onClick={() => setReturnTargetUnit(null)}
+                aria-label="Tutup"
               >
-                <X size={20} />
+                <i className="fa-solid fa-xmark" />
               </button>
             </div>
+            <div className="sheet-body" style={{ padding: '16px' }}>
+              <form onSubmit={handleReturnSingleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+                    Detail Alat & Unit
+                  </div>
+                  <div style={{ fontSize: '14.5px', fontWeight: 750, color: '#0f172a', marginTop: '2px' }}>
+                    {returnTargetUnit.nama_alat}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#0284c7', fontWeight: 650, marginTop: '2px' }}>
+                    Kode Unit: {returnTargetUnit.kode_unit}
+                  </div>
+                </div>
 
-            {returnError && (
-              <div style={{ padding: '0.75rem', backgroundColor: 'var(--status-danger-bg)', color: '#fca5a5', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', marginBottom: '1rem' }}>
-                {returnError}
-              </div>
-            )}
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
+                    Kondisi Fisik Saat Dikembalikan
+                  </label>
+                  <select
+                    value={returnCondition}
+                    onChange={(e) => setReturnCondition(e.target.value as KondisiKembali)}
+                    style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  >
+                    <option value="bagus">Bagus / Normal (Siap Pakai)</option>
+                    <option value="perlu_servis">Perlu Servis / Pembersihan</option>
+                    <option value="rusak">Rusak / Bermasalah (Kunci ke Maintenance)</option>
+                  </select>
+                </div>
 
-            <form onSubmit={handleReturnSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                  Kondisi Fisik Saat Kembali (QC)
-                </label>
-                <select
-                  value={returnCondition}
-                  onChange={(e) => setReturnCondition(e.target.value as KondisiKembali)}
-                  style={{
-                    backgroundColor: 'var(--bg-secondary)',
-                    border: '1px solid var(--bg-card-border)',
-                    borderRadius: 'var(--radius-sm)',
-                    color: 'var(--text-primary)',
-                    padding: '0.55rem 0.75rem',
-                    fontSize: 'var(--text-sm)',
-                    outline: 'none',
-                  }}
-                >
-                  <option value="bagus">Bagus (Siap Dipinjam Kembali)</option>
-                  <option value="perlu_servis">Perlu Servis / Pembersihan</option>
-                  <option value="rusak">Rusak (Perlu Perbaikan / Masuk Lapor Masalah)</option>
-                </select>
-              </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
+                    Catatan Pemeriksaan (Opsional)
+                  </label>
+                  <input
+                    type="text"
+                    value={returnNotes}
+                    onChange={(e) => setReturnNotes(e.target.value)}
+                    placeholder="Contoh: Lengkap dengan tas & charger."
+                    style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  />
+                </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                  Catatan Pengembalian & Kelengkapan
-                </label>
-                <textarea
-                  value={returnNotes}
-                  onChange={(e) => setReturnNotes(e.target.value)}
-                  placeholder="Misal: Tutup lensa lengkap, baterai terisi penuh..."
-                  rows={3}
-                  style={{
-                    backgroundColor: 'var(--bg-secondary)',
-                    border: '1px solid var(--bg-card-border)',
-                    borderRadius: 'var(--radius-sm)',
-                    color: 'var(--text-primary)',
-                    padding: '0.55rem 0.75rem',
-                    fontSize: 'var(--text-sm)',
-                    outline: 'none',
-                    resize: 'vertical',
-                  }}
-                />
-              </div>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                  <button
+                    type="button"
+                    className="btn sec flex-1"
+                    onClick={() => setReturnTargetUnit(null)}
+                    style={{ borderRadius: '8px' }}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn pri flex-1"
+                    disabled={submittingAction}
+                    style={{ borderRadius: '8px', background: '#0e4f40' }}
+                  >
+                    {submittingAction ? 'Menyimpan...' : 'Ya, Kembalikan Unit'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        </>
+      )}
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem' }}>
-                <Button type="button" variant="secondary" onClick={() => setReturnTargetTx(null)}>
-                  Batal
-                </Button>
-                <Button type="submit" variant="primary" disabled={submittingReturn}>
-                  {submittingReturn ? 'Menyimpan...' : 'Proses Pengembalian'}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {/* ── MODAL KONFIRMASI PENGEMBALIAN SELURUH TRANSAKSI ── */}
+      {returnTargetTxn && (
+        <>
+          <div className="scrim on" onClick={() => setReturnTargetTxn(null)} />
+          <section className="sheet on" role="dialog" aria-modal="true">
+            <div className="sheet-grab" />
+            <div className="sheet-hd">
+              <h3>Kembalikan Seluruh Alat Transaksi</h3>
+              <button
+                type="button"
+                className="icon-btn"
+                onClick={() => setReturnTargetTxn(null)}
+                aria-label="Tutup"
+              >
+                <i className="fa-solid fa-xmark" />
+              </button>
+            </div>
+            <div className="sheet-body" style={{ padding: '16px' }}>
+              <form onSubmit={handleReturnTxnSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+                    Nomor Transaksi: {returnTargetTxn.transaction_id}
+                  </div>
+                  <div style={{ fontSize: '14px', fontWeight: 750, color: '#0f172a', marginTop: '3px' }}>
+                    Peminjam: {returnTargetTxn.by} ({returnTargetTxn.items.length} Unit Alat)
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
+                    Kondisi Fisik Pengembalian
+                  </label>
+                  <select
+                    value={returnCondition}
+                    onChange={(e) => setReturnCondition(e.target.value as KondisiKembali)}
+                    style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  >
+                    <option value="bagus">Semua Unit Bagus / Normal</option>
+                    <option value="perlu_servis">Perlu Servis / Pengecekan Ulang</option>
+                    <option value="rusak">Terdapat Kerusakan</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
+                    Catatan Verifikasi (Opsional)
+                  </label>
+                  <input
+                    type="text"
+                    value={returnNotes}
+                    onChange={(e) => setReturnNotes(e.target.value)}
+                    placeholder="Contoh: Seluruh unit telah diverifikasi oleh technical."
+                    style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                  <button
+                    type="button"
+                    className="btn sec flex-1"
+                    onClick={() => setReturnTargetTxn(null)}
+                    style={{ borderRadius: '8px' }}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn pri flex-1"
+                    disabled={submittingAction}
+                    style={{ borderRadius: '8px', background: '#0e4f40' }}
+                  >
+                    {submittingAction ? 'Menyimpan...' : 'Kembalikan Semua Unit'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* ── MODAL PINJAM ALAT BARU (MULTI-UNIT CHECKOUT) ── */}
+      {isCheckoutOpen && (
+        <>
+          <div className="scrim on" onClick={() => setIsCheckoutOpen(false)} />
+          <section className="sheet on" role="dialog" aria-modal="true" style={{ maxHeight: '90vh' }}>
+            <div className="sheet-grab" />
+            <div className="sheet-hd">
+              <h3>Formulir Peminjaman Multi-Unit</h3>
+              <button
+                type="button"
+                className="icon-btn"
+                onClick={() => setIsCheckoutOpen(false)}
+                aria-label="Tutup"
+              >
+                <i className="fa-solid fa-xmark" />
+              </button>
+            </div>
+            <div className="sheet-body" style={{ padding: '16px', overflowY: 'auto' }}>
+              <form onSubmit={handleCheckoutSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Nama Peminjam</label>
+                  <input
+                    type="text"
+                    value={borrowerName}
+                    onChange={(e) => setBorrowerName(e.target.value)}
+                    required
+                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Keperluan Peminjaman</label>
+                  <input
+                    type="text"
+                    value={purpose}
+                    onChange={(e) => setPurpose(e.target.value)}
+                    placeholder="Contoh: Liputan Kegiatan Haul Akbar 2026"
+                    required
+                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Tenggat Pengembalian</label>
+                  <input
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    required
+                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)', marginBottom: '6px', display: 'block' }}>
+                    Pilih Unit Alat Yang Tersedia ({selectedUnitIds.length} dipilih):
+                  </label>
+                  <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {availableUnits.length === 0 ? (
+                      <div style={{ fontSize: '12px', color: '#64748b', textAlign: 'center', padding: '12px' }}>
+                        Tidak ada unit alat yang tersedia untuk dipinjam saat ini.
+                      </div>
+                    ) : (
+                      availableUnits.map((u) => {
+                        const isSelected = selectedUnitIds.includes(u.unit.id);
+                        return (
+                          <div
+                            key={u.unit.id}
+                            onClick={() => {
+                              setSelectedUnitIds((prev) =>
+                                prev.includes(u.unit.id)
+                                  ? prev.filter((id) => id !== u.unit.id)
+                                  : [...prev, u.unit.id]
+                              );
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '8px 10px',
+                              borderRadius: '6px',
+                              border: `1px solid ${isSelected ? '#3b82f6' : '#e2e8f0'}`,
+                              background: isSelected ? '#eff6ff' : '#ffffff',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: '12.5px', color: '#0f172a' }}>
+                                {u.item.nama_alat}
+                              </div>
+                              <div style={{ fontSize: '11px', color: '#64748b' }}>
+                                Unit: <span className="font-mono">{u.unit.kode_unit}</span> &bull; {u.item.kategori}
+                              </div>
+                            </div>
+                            <i className={`fa-solid ${isSelected ? 'fa-square-check' : 'fa-square'}`} style={{ color: isSelected ? '#2563eb' : '#94a3b8', fontSize: '16px' }} />
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                  <button
+                    type="button"
+                    className="btn sec flex-1"
+                    onClick={() => setIsCheckoutOpen(false)}
+                    style={{ borderRadius: '8px' }}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn pri flex-1"
+                    disabled={checkoutSubmitting}
+                    style={{ borderRadius: '8px' }}
+                  >
+                    {checkoutSubmitting ? 'Memproses...' : 'Proses Peminjaman'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        </>
       )}
     </div>
   );

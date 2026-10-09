@@ -1,9 +1,14 @@
 import { ItemInventaris, InventarisUnit, InventarisFilterParams, CreateInventarisDTO } from './types';
 
+export interface AvailableUnitItem {
+  unit: InventarisUnit;
+  item: ItemInventaris;
+}
+
 export interface IInventarisService {
   getInventarisList(filters?: InventarisFilterParams): Promise<ItemInventaris[]>;
   getInventarisById(id: string): Promise<ItemInventaris | null>;
-  getAvailableUnits(): Promise<{ unit: InventarisUnit; item: ItemInventaris }[]>;
+  getAvailableUnits(): Promise<AvailableUnitItem[]>;
   createInventaris(dto: CreateInventarisDTO): Promise<ItemInventaris>;
   updateUnitStatus(unitId: string, status: InventarisUnit['status_peminjaman'], kondisi?: InventarisUnit['kondisi']): Promise<boolean>;
 }

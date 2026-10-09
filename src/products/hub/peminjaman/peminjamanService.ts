@@ -1,10 +1,11 @@
-import { PeminjamanRecord, PeminjamanFilterParams, CheckoutLoanDTO, ReturnLoanDTO } from './types';
+import { PeminjamanRecord, PeminjamanFilterParams, CheckoutLoanDTO, ReturnLoanDTO, KondisiKembali } from './types';
 import { inventarisService } from '../inventaris/inventarisService';
 
 export interface IPeminjamanService {
   getPeminjamanList(filters?: PeminjamanFilterParams): Promise<PeminjamanRecord[]>;
   checkoutLoan(dto: CheckoutLoanDTO, actorId?: string, actorNama?: string): Promise<{ success: boolean; transaction_id: string; message: string }>;
   returnLoan(dto: ReturnLoanDTO, actorId?: string, actorNama?: string): Promise<{ success: boolean; message: string }>;
+  returnSingleLoan(loanId: string, conditionStatus?: KondisiKembali, notes?: string, actorId?: string, actorNama?: string): Promise<{ success: boolean; message: string }>;
 }
 
 /**
@@ -200,6 +201,31 @@ export class LocalPeminjamanService implements IPeminjamanService {
     return {
       success: true,
       message: `Pengembalian untuk transaksi ${dto.transaction_id} (${loans.length} unit) berhasil dicatat dengan kondisi '${dto.condition_status}'.`,
+    };
+  }
+
+  async returnSingleLoan(loanId: string, conditionStatus: KondisiKembali = 'bagus', notes?: string, actorId?: string, actorNama?: string): Promise<{ success: boolean; message: string }> {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const loan = this.records.find((r) => r.id === loanId && r.status !== 'dikembalikan');
+    if (!loan) {
+      throw new Error(`Data peminjaman unit tidak ditemukan atau sudah dikembalikan.`);
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    loan.status = 'dikembalikan';
+    loan.tanggal_kembali = today;
+    loan.kondisi_kembali = conditionStatus;
+    if (notes) loan.catatan = notes;
+    if (actorId) loan.actor_id = actorId;
+    if (actorNama) loan.actor_nama = actorNama;
+
+    const newUnitStatus = conditionStatus === 'bagus' ? 'tersedia' : 'maintenance';
+    await inventarisService.updateUnitStatus(loan.unit_id, newUnitStatus, conditionStatus);
+
+    return {
+      success: true,
+      message: `Unit '${loan.kode_unit}' (${loan.nama_alat}) berhasil dikembalikan dengan kondisi '${conditionStatus}'.`,
     };
   }
 }

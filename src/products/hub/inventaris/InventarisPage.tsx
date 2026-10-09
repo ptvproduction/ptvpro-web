@@ -1,446 +1,1203 @@
-import React, { useState } from 'react';
-import { useInventarisList } from './useInventaris';
+import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import { useSessionStore } from '@core/session';
-import { Card, Button, Badge, LoadingState, ErrorState, EmptyState, Input } from '@shared/components';
-import { Package, Plus, Search, Filter, QrCode, AlertCircle, CheckCircle2, ChevronRight, X } from 'lucide-react';
-import { ItemInventaris, CreateInventarisDTO } from './types';
+import { inventarisService } from './inventarisService';
+import { peminjamanService } from '../peminjaman/peminjamanService';
+import { ItemInventaris } from './types';
+import { loanBasketStore } from './loanBasketStore';
 
 export const InventarisPage: React.FC = () => {
-  const { can } = useSessionStore();
-  const [search, setSearch] = useState('');
-  const [kategori, setKategori] = useState('all');
-  const [status, setStatus] = useState<'all' | 'tersedia' | 'habis'>('all');
-  const [selectedItem, setSelectedItem] = useState<ItemInventaris | null>(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const { can, user } = useSessionStore();
 
-  // Form State
-  const [formKode, setFormKode] = useState('');
-  const [formNama, setFormNama] = useState('');
-  const [formKategori, setFormKategori] = useState('Kamera');
-  const [formSpesifikasi, setFormSpesifikasi] = useState('');
-  const [formLokasi, setFormLokasi] = useState('Studio Lt 1');
-  const [formJumlah, setFormJumlah] = useState('1');
-  const [formError, setFormError] = useState('');
-  const [formSubmitting, setFormSubmitting] = useState(false);
+  const [items, setItems] = useState<ItemInventaris[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const { data, isLoading, isError, error, refetch, createItem } = useInventarisList({
-    search: search.trim() || undefined,
-    kategori: kategori !== 'all' ? kategori : undefined,
-    status: status !== 'all' ? status : undefined,
+  // Filters from pgInventaris()
+  const [searchQ, setSearchQ] = useState('');
+  const [catFilter, setCatFilter] = useState('semua');
+  const [statusFilter, setStatusFilter] = useState('semua');
+
+  // Detail & Modals
+  const [selectedAsset, setSelectedAsset] = useState<ItemInventaris | null>(null);
+  const [isDaftarPinjamanOpen, setIsDaftarPinjamanOpen] = useState(false);
+  const [isNewAssetOpen, setIsNewAssetOpen] = useState(false);
+  const [unitPickerAsset, setUnitPickerAsset] = useState<ItemInventaris | null>(null);
+
+  // Form New Asset
+  const [newKode, setNewKode] = useState('');
+  const [newNama, setNewNama] = useState('');
+  const [newKat, setNewKat] = useState('Kamera');
+  const [newSpec, setNewSpec] = useState('');
+  const [newLoc, setNewLoc] = useState('Studio PTV');
+  const [newQty, setNewQty] = useState('1');
+  const [newSubmitting, setNewSubmitting] = useState(false);
+
+  // Form Checkout from Basket
+  const [borrowerName, setBorrowerName] = useState(user?.full_name || '');
+  const [purpose, setPurpose] = useState('Operasional Liputan PTV');
+  const [dueDate, setDueDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 2);
+    return d.toISOString().split('T')[0];
   });
+  const [checkoutSubmitting, setCheckoutSubmitting] = useState(false);
+
+  // Sync loanBasket
+  const basketItems = useSyncExternalStore(
+    (cb) => loanBasketStore.subscribe(cb),
+    () => loanBasketStore.getItems()
+  );
+  const basketCount = basketItems.length;
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await inventarisService.getInventarisList();
+      setItems(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const canCreate = can('inventory.create');
 
-  const handleOpenAdd = () => {
-    const nextSuffix = (data.length + 1).toString().padStart(3, '0');
-    setFormKode(`INV-${nextSuffix}`);
-    setFormNama('');
-    setFormKategori('Kamera');
-    setFormSpesifikasi('');
-    setFormLokasi('Studio Lt 1');
-    setFormJumlah('1');
-    setFormError('');
-    setIsAddModalOpen(true);
+  // Helper categories
+  const ALL_CATEGORIES = [
+    'Kamera',
+    'Lensa',
+    'Tripod & Rig',
+    'Baterai & Power',
+    'Audio',
+    'Lighting',
+    'Stabilizer',
+    'Streaming / Live',
+    'Lainnya',
+  ];
+
+  const getCatIconMarkup = (c: string) => {
+    const lower = c.toLowerCase();
+    if (lower.includes('kamera')) return <i className="fa-solid fa-camera-retro" />;
+    if (lower.includes('lensa')) return <i className="fa-solid fa-circle-dot" />;
+    if (lower.includes('audio') || lower.includes('mic')) return <i className="fa-solid fa-microphone" />;
+    if (lower.includes('lighting') || lower.includes('lampu')) return <i className="fa-solid fa-lightbulb" />;
+    if (lower.includes('tripod') || lower.includes('rig') || lower.includes('stabilizer')) return <i className="fa-solid fa-arrows-to-dot" />;
+    if (lower.includes('baterai') || lower.includes('power')) return <i className="fa-solid fa-battery-three-quarters" />;
+    return <i className="fa-solid fa-shapes" />;
   };
 
-  const handleAddSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formKode.trim() || !formNama.trim()) {
-      setFormError('Kode dan Nama Alat wajib diisi.');
-      return;
-    }
-    const jumlah = parseInt(formJumlah, 10);
-    if (isNaN(jumlah) || jumlah < 1) {
-      setFormError('Jumlah unit minimal 1.');
-      return;
-    }
+  // Filtered Rows
+  let filteredRows = [...items];
 
+  // 1. Kategori
+  if (catFilter !== 'semua') {
+    filteredRows = filteredRows.filter((x) => x.kategori.toLowerCase() === catFilter.toLowerCase());
+  }
+
+  // 2. Status
+  if (statusFilter !== 'semua') {
+    if (statusFilter === 'Tersedia') filteredRows = filteredRows.filter((x) => x.unit_tersedia > 0);
+    else if (statusFilter === 'Dipinjam') filteredRows = filteredRows.filter((x) => x.total_unit - x.unit_tersedia > 0);
+    else if (statusFilter === 'Rusak') {
+      filteredRows = filteredRows.filter((x) => x.units.some((u) => u.kondisi === 'rusak' || u.status_peminjaman === 'maintenance'));
+    }
+  }
+
+  // 3. Search query
+  if (searchQ.trim()) {
+    const q = searchQ.trim().toLowerCase();
+    filteredRows = filteredRows.filter((x) =>
+      (x.nama_alat + ' ' + x.kode + ' ' + (x.spesifikasi || '') + ' ' + x.kategori).toLowerCase().includes(q)
+    );
+  }
+
+  // Metrics for scoped category
+  const catScoped = catFilter === 'semua' ? items : items.filter((x) => x.kategori.toLowerCase() === catFilter.toLowerCase());
+  const countCatAll = catScoped.length;
+  const countCatAvail = catScoped.filter((x) => x.unit_tersedia > 0).length;
+  const countCatBorrowed = catScoped.filter((x) => x.total_unit - x.unit_tersedia > 0).length;
+  const countCatDamaged = catScoped.filter((x) => x.units.some((u) => u.kondisi === 'rusak' || u.status_peminjaman === 'maintenance')).length;
+
+  const isFiltered = catFilter !== 'semua' || statusFilter !== 'semua' || !!searchQ.trim();
+
+  // Quick add to basket handler
+  const handleQuickAdd = (e: React.MouseEvent, asset: ItemInventaris) => {
+    e.stopPropagation();
+    const availUnits = asset.units.filter((u) => u.status_peminjaman === 'tersedia');
+    if (availUnits.length === 0) {
+      alert(`Semua unit "${asset.nama_alat}" sedang tidak tersedia.`);
+      return;
+    }
+    if (asset.units.length > 1) {
+      setUnitPickerAsset(asset);
+    } else {
+      const unit = availUnits[0];
+      const basketKey = `${asset.id}_${unit.id}`;
+      loanBasketStore.toggle({
+        key: basketKey,
+        assetId: asset.id,
+        unitId: unit.id,
+        unitNo: 1,
+        unitCode: unit.kode_unit,
+        unitName: `Unit 01 (${unit.kode_unit})`,
+        assetName: asset.nama_alat,
+        invCode: asset.kode,
+      });
+    }
+  };
+
+  const handleCheckoutSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (basketItems.length === 0) {
+      alert('Daftar pinjaman kosong. Pilih unit terlebih dahulu.');
+      return;
+    }
+    if (!borrowerName.trim()) {
+      alert('Nama peminjam wajib diisi.');
+      return;
+    }
     try {
-      setFormSubmitting(true);
-      setFormError('');
-      const dto: CreateInventarisDTO = {
-        kode: formKode.trim().toUpperCase(),
-        nama_alat: formNama.trim(),
-        kategori: formKategori,
-        spesifikasi: formSpesifikasi.trim() || undefined,
-        lokasi_penyimpanan: formLokasi.trim() || undefined,
-        jumlah_unit: jumlah,
-      };
-      await createItem(dto);
-      setIsAddModalOpen(false);
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Gagal menyimpan alat inventaris.');
+      setCheckoutSubmitting(true);
+      const unitIds = basketItems.map((b) => b.unitId);
+      await peminjamanService.checkoutLoan(
+        {
+          borrower_name: borrowerName.trim(),
+          purpose: purpose.trim(),
+          due_date: dueDate,
+          unit_ids: unitIds,
+        },
+        user?.ptv_id,
+        user?.full_name
+      );
+      loanBasketStore.clear();
+      setIsDaftarPinjamanOpen(false);
+      alert('Peminjaman multi-unit berhasil diproses!');
+      await loadData();
+    } catch (err: unknown) {
+      alert((err as Error).message || 'Gagal memproses peminjaman');
     } finally {
-      setFormSubmitting(false);
+      setCheckoutSubmitting(false);
+    }
+  };
+
+  const handleNewAssetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newKode.trim() || !newNama.trim()) {
+      alert('Kode dan Nama Alat wajib diisi.');
+      return;
+    }
+    try {
+      setNewSubmitting(true);
+      await inventarisService.createInventaris({
+        kode: newKode.trim(),
+        nama_alat: newNama.trim(),
+        kategori: newKat,
+        spesifikasi: newSpec.trim(),
+        lokasi_penyimpanan: newLoc.trim(),
+        jumlah_unit: parseInt(newQty, 10) || 1,
+      });
+      setIsNewAssetOpen(false);
+      alert('Alat baru berhasil ditambahkan ke inventaris!');
+      await loadData();
+    } catch (err: unknown) {
+      alert((err as Error).message || 'Gagal menyimpan alat baru');
+    } finally {
+      setNewSubmitting(false);
     }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Header Halaman */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-            <Package size={22} style={{ color: 'var(--accent-cyan)' }} />
-            <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Katalog Inventaris Studio
-            </h2>
-          </div>
-          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
-            Manajemen master alat broadcast, barcode unit fisik, dan ketersediaan operasional.
-          </p>
+    <div className="page">
+      {/* ── HEADER: UNIFIED SEARCH BAR WITH SCAN & BASKET BUTTON ── */}
+      <div className="row gap8" style={{ alignItems: 'center' }}>
+        <div className="inv-search-wrap">
+          <span className="search-icon">
+            <i className="fa-solid fa-magnifying-glass" />
+          </span>
+          <input
+            id="invQ"
+            value={searchQ}
+            onChange={(e) => setSearchQ(e.target.value)}
+            placeholder="Cari nama, kode (INV-xxx), merk, model, lokasi…"
+          />
+          <button
+            type="button"
+            className="inv-search-scan-btn"
+            onClick={() => alert('Scanner barcode kamera fisik aktif')}
+            aria-label="Pindai Barcode"
+          >
+            <i className="fa-solid fa-qrcode" />
+            <span className="only-desktop" style={{ marginLeft: '4px' }}>
+              Scan
+            </span>
+          </button>
         </div>
 
-        {canCreate && (
-          <Button variant="primary" size="md" onClick={handleOpenAdd}>
-            <Plus size={16} />
-            Tambah Alat Baru
-          </Button>
-        )}
+        <button
+          type="button"
+          className="inv-top-basket-btn"
+          onClick={() => setIsDaftarPinjamanOpen(true)}
+          aria-label="Daftar Pinjaman"
+          title="Daftar Pinjaman"
+        >
+          <i className="fa-solid fa-clipboard-list" />
+          {basketCount > 0 && <span className="inv-top-basket-badge">{basketCount}</span>}
+        </button>
       </div>
 
-      {/* Filter dan Pencarian */}
-      <Card style={{ padding: '0.75rem 1rem' }}>
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '220px', backgroundColor: 'var(--bg-secondary)', padding: '0.35rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--bg-card-border)' }}>
-            <Search size={16} style={{ color: 'var(--text-muted)' }} />
-            <input
-              type="text"
-              placeholder="Cari nama alat, kode INV, nomor seri, atau spesifikasi..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-primary)',
-                fontSize: 'var(--text-sm)',
-                width: '100%',
-                outline: 'none',
-              }}
-            />
+      {/* ── HERO BANNER 1:1 DARI pgInventaris() ── */}
+      <div className="inv-hero-banner">
+        <img
+          src="/assets/images/hero-bg-default.webp"
+          alt="Aset Inventaris Progresif TV Production"
+          loading="lazy"
+        />
+        <div className="inv-hero-overlay">
+          <div className="inv-hero-tag">
+            <i className="fa-solid fa-boxes-stacked" /> KATALOG INVENTARIS
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Filter size={16} style={{ color: 'var(--text-muted)' }} />
-            <select
-              value={kategori}
-              onChange={(e) => setKategori(e.target.value)}
-              style={{
-                backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--bg-card-border)',
-                borderRadius: 'var(--radius-sm)',
-                color: 'var(--text-primary)',
-                padding: '0.45rem 0.75rem',
-                fontSize: 'var(--text-xs)',
-                outline: 'none',
-              }}
-            >
-              <option value="all">Semua Kategori</option>
-              <option value="Kamera">Kamera</option>
-              <option value="Lensa">Lensa</option>
-              <option value="Audio">Audio</option>
-              <option value="Lighting">Lighting</option>
-              <option value="Stabilizer">Stabilizer</option>
-              <option value="Aksesoris">Aksesoris</option>
-            </select>
-
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as 'all' | 'tersedia' | 'habis')}
-              style={{
-                backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--bg-card-border)',
-                borderRadius: 'var(--radius-sm)',
-                color: 'var(--text-primary)',
-                padding: '0.45rem 0.75rem',
-                fontSize: 'var(--text-xs)',
-                outline: 'none',
-              }}
-            >
-              <option value="all">Semua Status</option>
-              <option value="tersedia">Unit Tersedia</option>
-              <option value="habis">Semua Dipinjam</option>
-            </select>
+          <div className="inv-hero-title">Aset Inventaris Progresif TV Production</div>
+          <div className="inv-hero-sub">
+            Kelola peminjaman, monitor ketersediaan unit, dan telusuri riwayat alat dengan mudah.
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Handling Tampilan Data */}
-      {isLoading ? (
-        <LoadingState message="Memuat katalog inventaris studio..." />
-      ) : isError ? (
-        <ErrorState
-          title="Gagal Memuat Inventaris"
-          message={error instanceof Error ? error.message : 'Terjadi kesalahan sistem saat memuat data.'}
-          onRetry={() => refetch()}
-        />
-      ) : !data || data.length === 0 ? (
-        <EmptyState
-          title="Tidak Ada Alat Inventaris"
-          description="Tidak ditemukan peralatan yang sesuai dengan kriteria filter pencarian."
-        />
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1rem' }}>
-          {data.map((item) => (
-            <Card
-              key={item.id}
+      {/* ── CATEGORY SECTION (PREMIUM CARD RAIL) ── */}
+      <div className="inv-cat-box">
+        <div className="inv-cat-box-header">
+          <div className="inv-cat-box-title">
+            <i className="fa-solid fa-layer-group" /> Kategori Alat
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="inv-cat-box-count">{ALL_CATEGORIES.length + 1} Kategori</span>
+            <div className="inv-cat-nav-btns">
+              <button
+                type="button"
+                className="inv-cat-nav-btn"
+                onClick={() => {
+                  const el = document.getElementById('invCatTrack');
+                  if (el) el.scrollBy({ left: -200, behavior: 'smooth' });
+                }}
+                aria-label="Geser Kiri"
+              >
+                <i className="fa-solid fa-chevron-left" />
+              </button>
+              <button
+                type="button"
+                className="inv-cat-nav-btn"
+                onClick={() => {
+                  const el = document.getElementById('invCatTrack');
+                  if (el) el.scrollBy({ left: 200, behavior: 'smooth' });
+                }}
+                aria-label="Geser Kanan"
+              >
+                <i className="fa-solid fa-chevron-right" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="inv-cat-scroll-track" id="invCatTrack">
+          <button
+            type="button"
+            className={`inv-cat-card ${catFilter === 'semua' ? 'on' : ''}`}
+            onClick={() => setCatFilter('semua')}
+          >
+            <div className="inv-cat-card-icon">
+              <i className="fa-solid fa-boxes-stacked" />
+            </div>
+            <div className="inv-cat-card-name">Semua</div>
+            <div className="inv-cat-card-count">{items.length} alat</div>
+          </button>
+          {ALL_CATEGORIES.map((cat) => {
+            const cnt = items.filter((x) => x.kategori.toLowerCase() === cat.toLowerCase()).length;
+            return (
+              <button
+                key={cat}
+                type="button"
+                className={`inv-cat-card ${catFilter.toLowerCase() === cat.toLowerCase() ? 'on' : ''}`}
+                onClick={() => setCatFilter(cat)}
+              >
+                <div className="inv-cat-card-icon">{getCatIconMarkup(cat)}</div>
+                <div className="inv-cat-card-name">{cat}</div>
+                <div className="inv-cat-card-count">{cnt} alat</div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── STATUS SEGMENTED TOOLBAR & ACTIONS ── */}
+      <div
+        className="inv-toolbar-row"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '10px',
+          marginTop: '14px',
+          flexWrap: 'wrap',
+        }}
+      >
+        <div className="inv-status-segment">
+          <button
+            type="button"
+            className={`inv-segment-btn ${statusFilter === 'semua' ? 'on' : ''}`}
+            onClick={() => setStatusFilter('semua')}
+          >
+            <span>Semua</span>
+            <span className="inv-segment-count">{countCatAll}</span>
+          </button>
+          <button
+            type="button"
+            className={`inv-segment-btn ${statusFilter === 'Tersedia' ? 'on' : ''}`}
+            onClick={() => setStatusFilter('Tersedia')}
+          >
+            <span className="inv-segment-dot" style={{ background: '#22c55e' }} />
+            <span>Tersedia</span>
+            <span className="inv-segment-count">{countCatAvail}</span>
+          </button>
+          <button
+            type="button"
+            className={`inv-segment-btn ${statusFilter === 'Dipinjam' ? 'on' : ''}`}
+            onClick={() => setStatusFilter('Dipinjam')}
+          >
+            <span className="inv-segment-dot" style={{ background: '#f59e0b' }} />
+            <span>Dipinjam</span>
+            <span className="inv-segment-count">{countCatBorrowed}</span>
+          </button>
+          <button
+            type="button"
+            className={`inv-segment-btn ${statusFilter === 'Rusak' ? 'on' : ''}`}
+            onClick={() => setStatusFilter('Rusak')}
+          >
+            <span className="inv-segment-dot" style={{ background: '#ef4444' }} />
+            <span>Rusak</span>
+            <span className="inv-segment-count">{countCatDamaged}</span>
+          </button>
+        </div>
+
+        <div
+          className="inv-toolbar-actions"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginLeft: 'auto',
+            flexShrink: 0,
+            flexWrap: 'wrap',
+          }}
+        >
+          {isFiltered && (
+            <button
+              type="button"
+              className="btn sm"
+              onClick={() => {
+                setCatFilter('semua');
+                setStatusFilter('semua');
+                setSearchQ('');
+              }}
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                transition: 'transform var(--transition-fast), border-color var(--transition-fast)',
+                fontSize: '11.5px',
+                padding: '3px 10px',
+                minHeight: '34px',
+                fontWeight: 650,
+                color: 'var(--warn)',
+                borderRadius: 'var(--r-m)',
+              }}
+            >
+              <i className="fa-solid fa-rotate-left" style={{ marginRight: '4px', fontSize: '10.5px' }} />
+              Reset Filter
+            </button>
+          )}
+
+          {basketCount > 0 && (
+            <button
+              type="button"
+              className="btn sm"
+              onClick={() => setIsDaftarPinjamanOpen(true)}
+              style={{
+                fontSize: '12px',
+                padding: '0 12px',
+                minHeight: '34px',
+                fontWeight: 650,
+                color: 'var(--b-700)',
+                background: 'var(--b-050)',
+                border: '1px solid var(--b-200)',
+                borderRadius: 'var(--r-full)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 4px rgba(18,115,230,0.08)',
                 cursor: 'pointer',
               }}
-              onClick={() => setSelectedItem(item)}
             >
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 'var(--text-xs)', color: 'var(--accent-cyan)' }}>
-                    {item.kode}
+              <i className="fa-solid fa-clipboard-check" style={{ fontSize: '12px' }} />
+              <span>{basketCount} dalam daftar pinjaman</span>
+            </button>
+          )}
+
+          {canCreate && (
+            <button
+              type="button"
+              className="btn sm pri"
+              onClick={() => {
+                setNewKode(`INV-${(items.length + 1).toString().padStart(3, '0')}`);
+                setNewNama('');
+                setNewKat('Kamera');
+                setNewSpec('');
+                setNewLoc('Studio PTV');
+                setNewQty('1');
+                setIsNewAssetOpen(true);
+              }}
+              style={{
+                minHeight: '34px',
+                padding: '0 14px',
+                borderRadius: 'var(--r-full)',
+                fontWeight: 700,
+                fontSize: '12.5px',
+                boxShadow: '0 2px 8px rgba(18,115,230,0.25)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              <i className="fa-solid fa-plus" />
+              <span>Alat</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── RESULT COUNT & SCOPE STATUS ── */}
+      <div className="row-b mt12 mb10" style={{ alignItems: 'center', padding: '0 1px' }}>
+        <span className="t-sm" style={{ fontWeight: 700, color: 'var(--ink)' }}>
+          {filteredRows.length} alat{catFilter !== 'semua' ? ` • ${catFilter}` : ''}
+        </span>
+      </div>
+
+      {/* ── PRODUCT CATALOG GRID 1:1 DARI renderCard() ── */}
+      {loading ? (
+        <div style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)' }}>
+          <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: '8px' }} />
+          Memuat katalog inventaris...
+        </div>
+      ) : filteredRows.length === 0 ? (
+        <div className="empty card">
+          <i className="fa-solid fa-boxes-stacked" />
+          <p>Tidak ada alat yang cocok. Ubah filter atau kata kunci.</p>
+        </div>
+      ) : (
+        <div className="inv-catalog-grid">
+          {filteredRows.map((x) => {
+            const avail = x.unit_tersedia;
+            const total = x.total_unit;
+            const borrowed = total - avail;
+            const damaged = x.units.filter((u) => u.kondisi === 'rusak').length;
+
+            let badgeTxt = 'Tersedia';
+            let badgeColor = '#15803d';
+            let dotColor = '#22c55e';
+            let badgeBorder = 'rgba(34,197,94,0.3)';
+
+            if (avail === total && total > 0) {
+              badgeTxt = 'Tersedia';
+              badgeColor = '#15803d';
+              dotColor = '#22c55e';
+              badgeBorder = 'rgba(34,197,94,0.3)';
+            } else if (avail > 0) {
+              badgeTxt = `${avail}/${total} Tersedia`;
+              badgeColor = '#047857';
+              dotColor = '#10b981';
+              badgeBorder = 'rgba(16,185,129,0.3)';
+            } else if (borrowed > 0) {
+              badgeTxt = borrowed === total ? 'Dipinjam' : `${borrowed} Dipinjam`;
+              badgeColor = '#b45309';
+              dotColor = '#f59e0b';
+              badgeBorder = 'rgba(245,158,11,0.3)';
+            } else if (damaged > 0) {
+              badgeTxt = 'Rusak';
+              badgeColor = '#b91c1c';
+              dotColor = '#ef4444';
+              badgeBorder = 'rgba(239,68,68,0.3)';
+            } else {
+              badgeTxt = 'Tidak Ada';
+              badgeColor = '#475569';
+              dotColor = '#94a3b8';
+              badgeBorder = 'rgba(148,163,184,0.3)';
+            }
+
+            const inBasket = loanBasketStore.hasAsset(x.id);
+
+            return (
+              <button
+                type="button"
+                key={x.id}
+                className="inv-prod-card"
+                onClick={() => setSelectedAsset(x)}
+                style={
+                  inBasket
+                    ? { borderColor: 'var(--b-400)', boxShadow: '0 0 0 2px var(--b-100)' }
+                    : undefined
+                }
+              >
+                {/* 1. Status ketersediaan badge & foto */}
+                <div className="inv-prod-photo">
+                  <span className="inv-prod-icon">{getCatIconMarkup(x.kategori)}</span>
+
+                  <span
+                    className="inv-prod-status-badge"
+                    style={{
+                      background: badgeColor,
+                      color: '#ffffff',
+                      borderColor: badgeBorder,
+                    }}
+                  >
+                    <span className="inv-prod-status-dot" style={{ background: dotColor }} />
+                    <span>{badgeTxt}</span>
                   </span>
-                  <Badge variant={item.unit_tersedia > 0 ? 'success' : 'danger'}>
-                    {item.unit_tersedia > 0 ? `${item.unit_tersedia} dari ${item.total_unit} Tersedia` : 'Semua Dipinjam'}
-                  </Badge>
+
+                  {avail > 0 && (
+                    <button
+                      type="button"
+                      className={`inv-prod-quick-add ${inBasket ? 'added' : ''}`}
+                      onClick={(e) => handleQuickAdd(e, x)}
+                      title={inBasket ? 'Keluarkan dari daftar pinjaman' : 'Tambah ke daftar pinjaman'}
+                    >
+                      <i className={`fa-solid ${inBasket ? 'fa-check' : 'fa-plus'}`} />
+                    </button>
+                  )}
                 </div>
 
-                <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
-                  {item.nama_alat}
-                </h3>
+                {/* 2. Info Detail Card */}
+                <div className="inv-prod-info">
+                  <div className="inv-prod-cat">
+                    <span className="chip" style={{ fontSize: '10.5px', padding: '1px 7px', fontWeight: 700 }}>
+                      {x.kode}
+                    </span>
+                    <span style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 600 }}>
+                      {x.kategori}
+                    </span>
+                  </div>
 
-                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
-                  <Badge variant="info">{item.kategori}</Badge>
-                </div>
+                  <div className="inv-prod-name">{x.nama_alat}</div>
 
-                {item.spesifikasi && (
-                  <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: 1.4, marginBottom: '1rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {item.spesifikasi}
-                  </p>
-                )}
-              </div>
+                  <div className="inv-prod-brand">
+                    {x.spesifikasi || 'Spesifikasi standar operasional studio'}
+                  </div>
 
-              <div style={{ borderTop: '1px solid var(--bg-card-border)', paddingTop: '0.75rem', marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-                  <QrCode size={14} />
-                  <span>{item.units.length} Unit Barcode</span>
+                  <div className="inv-prod-meta">
+                    <span>
+                      <i className="fa-solid fa-location-dot" style={{ marginRight: '3px' }} />
+                      Studio PTV
+                    </span>
+                    <span>&bull;</span>
+                    <span>Yayasan</span>
+                  </div>
+
+                  <div className="inv-prod-unit-status">
+                    <span
+                      style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        background: avail > 0 ? '#16a34a' : '#dc2626',
+                        display: 'inline-block',
+                      }}
+                    />
+                    <span>
+                      <b>{total} unit</b> &bull;{' '}
+                      <span style={{ color: avail > 0 ? '#16a34a' : '#dc2626', fontWeight: 700 }}>
+                        {avail} tersedia
+                      </span>
+                    </span>
+                    {borrowed > 0 && (
+                      <span style={{ color: '#d97706', fontSize: '10.5px' }}>
+                        ({borrowed} pinjam)
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: 'var(--text-xs)', color: 'var(--accent-cyan)', fontWeight: 600 }}>
-                  <span>Rincian Unit</span>
-                  <ChevronRight size={14} />
-                </div>
-              </div>
-            </Card>
-          ))}
+              </button>
+            );
+          })}
         </div>
       )}
 
-      {/* Modal Detail & Unit Barcode */}
-      {selectedItem && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem' }}>
-          <div style={{ width: '100%', maxWidth: '640px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--bg-card-border)', borderRadius: 'var(--radius-md)', padding: '1.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <div>
-                <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 'var(--text-xs)', color: 'var(--accent-cyan)' }}>
-                  {selectedItem.kode}
+      {/* ── DETAIL ALAT MODAL 1:1 DARI pgAlatDetail() ── */}
+      {selectedAsset && (
+        <>
+          <div className="scrim on" onClick={() => setSelectedAsset(null)} />
+          <section
+            className="sheet on"
+            role="dialog"
+            aria-modal="true"
+            style={{ maxHeight: '92vh', overflowY: 'auto' }}
+          >
+            <div className="sheet-grab" />
+            <div className="sheet-hd">
+              <div className="prod-breadcrumb">
+                <button type="button" onClick={() => setSelectedAsset(null)}>
+                  <i className="fa-solid fa-boxes-stacked" /> Inventaris
+                </button>
+                <span className="sep">
+                  <i className="fa-solid fa-chevron-right" />
                 </span>
-                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  {selectedItem.nama_alat}
-                </h3>
+                <span>{selectedAsset.kategori}</span>
+                <span className="sep">
+                  <i className="fa-solid fa-chevron-right" />
+                </span>
+                <span style={{ color: 'var(--ink)', fontWeight: 700 }} className="trunc">
+                  {selectedAsset.nama_alat}
+                </span>
               </div>
               <button
-                onClick={() => setSelectedItem(null)}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                type="button"
+                className="icon-btn"
+                onClick={() => setSelectedAsset(null)}
+                aria-label="Tutup"
               >
-                <X size={20} />
+                <i className="fa-solid fa-xmark" />
               </button>
             </div>
 
-            {selectedItem.spesifikasi && (
-              <div style={{ marginBottom: '1.25rem', padding: '0.75rem', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600 }}>Spesifikasi:</div>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                  {selectedItem.spesifikasi}
+            <div className="sheet-body" style={{ padding: '16px' }}>
+              <div className="prod-showcase-card">
+                {/* Left Column: Gallery & Barcode */}
+                <div className="prod-gallery-col">
+                  <div className="prod-main-photo-wrap">
+                    <div className="prod-photo-fallback">
+                      {getCatIconMarkup(selectedAsset.kategori)}
+                    </div>
+                  </div>
+
+                  {/* Section Barcode Tiap Unit */}
+                  <div className="prod-section-card" style={{ marginTop: '16px' }}>
+                    <div className="prod-section-header">
+                      <div className="prod-section-title-wrap">
+                        <div className="prod-section-icon-badge indigo">
+                          <i className="fa-solid fa-barcode" />
+                        </div>
+                        <div>
+                          <h3 className="prod-section-title">
+                            <span>Label Barcode Unit</span>
+                            <span className="prod-section-count-chip">
+                              {selectedAsset.units.length} Unit Terdaftar
+                            </span>
+                          </h3>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="unit-barcodes-grid" style={{ marginTop: '10px' }}>
+                      {selectedAsset.units.map((u, idx) => (
+                        <div
+                          key={u.id}
+                          style={{
+                            background: '#f8fafc',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '10px',
+                            padding: '10px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontWeight: 700, fontSize: '13px' }}>
+                              Unit {idx + 1}
+                            </span>
+                            <span className="chip blue" style={{ fontSize: '11px', fontFamily: 'monospace' }}>
+                              {u.kode_unit}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
+                            Kondisi: <b>{u.kondisi.toUpperCase()}</b> &bull; Status: <b>{u.status_peminjaman.toUpperCase()}</b>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Specs & Actions */}
+                <div className="prod-info-col">
+                  <div>
+                    <span className="chip blue" style={{ fontSize: '11px', fontWeight: 750, marginBottom: '6px' }}>
+                      {selectedAsset.kode}
+                    </span>
+                    <h1 className="prod-main-title">{selectedAsset.nama_alat}</h1>
+                    <div className="prod-subhead">
+                      <i className="fa-solid fa-microchip" style={{ marginRight: '5px', opacity: 0.7 }} />
+                      {selectedAsset.spesifikasi || 'Spesifikasi standar operasional'}
+                    </div>
+                  </div>
+
+                  {/* Stats Bar */}
+                  <div className="prod-stats-bar">
+                    <span className="prod-stat-pill">
+                      <i className="fa-solid fa-shield-halved" style={{ color: '#2563eb' }} />
+                      <span>Kondisi Fisik: <b>Prima</b></span>
+                    </span>
+                    <span className="prod-stat-pill">
+                      <i className="fa-solid fa-cubes-stacked" style={{ color: selectedAsset.unit_tersedia > 0 ? '#16a34a' : '#d97706' }} />
+                      <span>
+                        Ketersediaan:{' '}
+                        <b style={{ color: selectedAsset.unit_tersedia > 0 ? '#16a34a' : '#d97706' }}>
+                          {selectedAsset.unit_tersedia}/{selectedAsset.total_unit} Unit
+                        </b>
+                      </span>
+                    </span>
+                  </div>
+
+                  {/* Pricing / Readiness Box */}
+                  <div className="prod-pricing-box">
+                    <div className="prod-price-main">
+                      <span className="prod-price-label">
+                        <i className={`fa-solid ${selectedAsset.unit_tersedia > 0 ? 'fa-circle-check' : 'fa-triangle-exclamation'}`} />
+                        STATUS KESIAPAN ALAT
+                      </span>
+                      <div className="prod-price-val">
+                        {selectedAsset.unit_tersedia > 0
+                          ? `${selectedAsset.unit_tersedia} Unit Siap Digunakan`
+                          : 'Semua Unit Sedang Dipinjam'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Spec Cards Grid */}
+                  <div className="prod-spec-grid">
+                    <div className="prod-spec-card">
+                      <div className="prod-spec-card-icon"><i className="fa-solid fa-barcode" /></div>
+                      <div className="prod-spec-card-info">
+                        <span className="label">Kode Inventaris</span>
+                        <span className="val font-mono" style={{ color: 'var(--b-600)' }}>{selectedAsset.kode}</span>
+                      </div>
+                    </div>
+                    <div className="prod-spec-card">
+                      <div className="prod-spec-card-icon"><i className="fa-solid fa-layer-group" /></div>
+                      <div className="prod-spec-card-info">
+                        <span className="label">Kategori</span>
+                        <span className="val">{selectedAsset.kategori}</span>
+                      </div>
+                    </div>
+                    <div className="prod-spec-card">
+                      <div className="prod-spec-card-icon"><i className="fa-solid fa-location-dot" /></div>
+                      <div className="prod-spec-card-info">
+                        <span className="label">Lokasi</span>
+                        <span className="val">Studio PTV</span>
+                      </div>
+                    </div>
+                    <div className="prod-spec-card">
+                      <div className="prod-spec-card-icon"><i className="fa-solid fa-building-columns" /></div>
+                      <div className="prod-spec-card-info">
+                        <span className="label">Sumber Dana</span>
+                        <span className="val">Yayasan</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="prod-cta-area" style={{ marginTop: '20px' }}>
+                    <button
+                      type="button"
+                      className="prod-btn-basket"
+                      onClick={(e) => handleQuickAdd(e, selectedAsset)}
+                    >
+                      <i className={`fa-solid ${loanBasketStore.hasAsset(selectedAsset.id) ? 'fa-check' : 'fa-clipboard-list'}`} />
+                      <span>
+                        {loanBasketStore.hasAsset(selectedAsset.id)
+                          ? 'Ada di Daftar Pinjaman'
+                          : '+ Daftar Pinjaman'}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      className="prod-btn-primary-borrow"
+                      onClick={() => {
+                        const avail = selectedAsset.units.find((u) => u.status_peminjaman === 'tersedia');
+                        if (avail) {
+                          loanBasketStore.toggle({
+                            key: `${selectedAsset.id}_${avail.id}`,
+                            assetId: selectedAsset.id,
+                            unitId: avail.id,
+                            unitNo: 1,
+                            unitCode: avail.kode_unit,
+                            unitName: `Unit 01 (${avail.kode_unit})`,
+                            assetName: selectedAsset.nama_alat,
+                            invCode: selectedAsset.kode,
+                          });
+                          setIsDaftarPinjamanOpen(true);
+                          setSelectedAsset(null);
+                        } else {
+                          alert('Tidak ada unit yang tersedia untuk dipinjam saat ini.');
+                        }
+                      }}
+                    >
+                      <i className="fa-solid fa-hand-holding-hand" />
+                      <span>Pinjam Sekarang ({selectedAsset.unit_tersedia} Tersedia)</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            )}
+            </div>
+          </section>
+        </>
+      )}
 
-            <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <QrCode size={16} style={{ color: 'var(--accent-cyan)' }} />
-                Daftar Fisik Unit ({selectedItem.units.length} Unit)
-              </h4>
+      {/* ── UNIT PICKER MODAL (MULTI-UNIT SELECTOR) ── */}
+      {unitPickerAsset && (
+        <>
+          <div className="scrim on" onClick={() => setUnitPickerAsset(null)} />
+          <section className="sheet on" role="dialog" aria-modal="true">
+            <div className="sheet-grab" />
+            <div className="sheet-hd">
+              <h3>Pilih Unit Fisik — {unitPickerAsset.nama_alat}</h3>
+              <button
+                type="button"
+                className="icon-btn"
+                onClick={() => setUnitPickerAsset(null)}
+                aria-label="Tutup"
+              >
+                <i className="fa-solid fa-xmark" />
+              </button>
+            </div>
+            <div className="sheet-body" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {unitPickerAsset.units.map((u, idx) => {
+                const isAvail = u.status_peminjaman === 'tersedia';
+                const basketKey = `${unitPickerAsset.id}_${u.id}`;
+                const inBasket = loanBasketStore.has(basketKey);
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {selectedItem.units.map((unit) => (
+                return (
                   <div
-                    key={unit.id}
+                    key={u.id}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      padding: '0.75rem',
-                      backgroundColor: 'var(--bg-card)',
-                      border: '1px solid var(--bg-card-border)',
-                      borderRadius: 'var(--radius-sm)',
+                      padding: '12px 14px',
+                      border: `1.5px solid ${inBasket ? '#3b82f6' : '#e2e8f0'}`,
+                      borderRadius: '12px',
+                      background: inBasket ? '#eff6ff' : '#ffffff',
+                      gap: '12px',
                     }}
                   >
-                    <div>
-                      <div style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
-                        {unit.kode_unit}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div
+                        style={{
+                          width: '38px',
+                          height: '38px',
+                          borderRadius: '10px',
+                          background: isAvail ? '#e0f2fe' : '#f1f5f9',
+                          color: isAvail ? '#0284c7' : '#64748b',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 800,
+                        }}
+                      >
+                        #{idx + 1}
                       </div>
-                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-                        SN: {unit.nomor_seri || '-'} &bull; Lokasi: {unit.lokasi_penyimpanan || '-'}
+                      <div>
+                        <div style={{ fontWeight: 750, fontSize: '13.5px', color: '#0f172a' }}>
+                          Unit {idx + 1} &bull; <span className="font-mono">{u.kode_unit}</span>
+                        </div>
+                        <div style={{ fontSize: '11.5px', color: '#64748b' }}>
+                          Kondisi: <b>{u.kondisi}</b> &bull; Status: <b>{u.status_peminjaman}</b>
+                        </div>
                       </div>
                     </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <Badge variant={unit.kondisi === 'bagus' ? 'success' : 'warning'}>
-                        {unit.kondisi.toUpperCase()}
-                      </Badge>
-                      <Badge variant={unit.status_peminjaman === 'tersedia' ? 'success' : unit.status_peminjaman === 'dipinjam' ? 'danger' : 'warning'}>
-                        {unit.status_peminjaman === 'tersedia' ? (
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                            <CheckCircle2 size={12} /> Tersedia
-                          </span>
-                        ) : unit.status_peminjaman === 'dipinjam' ? (
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                            <AlertCircle size={12} /> Dipinjam
-                          </span>
-                        ) : (
-                          'Maintenance'
-                        )}
-                      </Badge>
-                    </div>
+                    {isAvail ? (
+                      <button
+                        type="button"
+                        className={`btn sm ${inBasket ? '' : 'pri'}`}
+                        onClick={() => {
+                          loanBasketStore.toggle({
+                            key: basketKey,
+                            assetId: unitPickerAsset.id,
+                            unitId: u.id,
+                            unitNo: idx + 1,
+                            unitCode: u.kode_unit,
+                            unitName: `Unit ${idx + 1} (${u.kode_unit})`,
+                            assetName: unitPickerAsset.nama_alat,
+                            invCode: unitPickerAsset.kode,
+                          });
+                        }}
+                        style={{ minHeight: '34px', padding: '0 12px', borderRadius: '8px' }}
+                      >
+                        <i className={`fa-solid ${inBasket ? 'fa-check' : 'fa-plus'}`} style={{ marginRight: '4px' }} />
+                        {inBasket ? 'Dipilih' : 'Pilih Unit'}
+                      </button>
+                    ) : (
+                      <span className="chip warn" style={{ fontSize: '11px' }}>
+                        Tidak Tersedia
+                      </span>
+                    )}
                   </div>
-                ))}
+                );
+              })}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '14px', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="btn sm"
+                  onClick={() => setUnitPickerAsset(null)}
+                >
+                  Selesai
+                </button>
+                <button
+                  type="button"
+                  className="btn sm pri"
+                  onClick={() => {
+                    setUnitPickerAsset(null);
+                    setIsDaftarPinjamanOpen(true);
+                  }}
+                >
+                  Lihat Daftar Pinjaman <i className="fa-solid fa-arrow-right" style={{ marginLeft: '4px' }} />
+                </button>
               </div>
             </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
-              <Button variant="secondary" onClick={() => setSelectedItem(null)}>
-                Tutup
-              </Button>
-            </div>
-          </div>
-        </div>
+          </section>
+        </>
       )}
 
-      {/* Modal Tambah Alat */}
-      {isAddModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem' }}>
-          <div style={{ width: '100%', maxWidth: '520px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--bg-card-border)', borderRadius: 'var(--radius-md)', padding: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-              <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--text-primary)' }}>
-                Tambah Alat Inventaris Baru
-              </h3>
+      {/* ── DAFTAR PINJAMAN DRAWER / CHECKOUT MODAL ── */}
+      {isDaftarPinjamanOpen && (
+        <>
+          <div className="scrim on" onClick={() => setIsDaftarPinjamanOpen(false)} />
+          <section className="sheet on" role="dialog" aria-modal="true" style={{ maxHeight: '88vh' }}>
+            <div className="sheet-grab" />
+            <div className="sheet-hd">
+              <h3>Daftar Pinjaman ({basketCount} Unit)</h3>
               <button
-                onClick={() => setIsAddModalOpen(false)}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                type="button"
+                className="icon-btn"
+                onClick={() => setIsDaftarPinjamanOpen(false)}
+                aria-label="Tutup"
               >
-                <X size={20} />
+                <i className="fa-solid fa-xmark" />
               </button>
             </div>
+            <div className="sheet-body" style={{ padding: '16px', overflowY: 'auto' }}>
+              {basketCount === 0 ? (
+                <div className="empty card">
+                  <i className="fa-solid fa-clipboard-list" />
+                  <p>Daftar pinjaman kosong. Pilih alat dari katalog terlebih dahulu.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleCheckoutSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>
+                      Alat Yang Dipilih:
+                    </div>
+                    {basketItems.map((b) => (
+                      <div
+                        key={b.key}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '10px 14px',
+                          background: '#f8fafc',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '10px',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a' }}>
+                            {b.assetName}
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#64748b' }}>
+                            {b.unitName} &bull; <span className="font-mono">{b.unitCode}</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className="icon-btn"
+                          onClick={() => loanBasketStore.remove(b.key)}
+                          title="Hapus dari daftar"
+                        >
+                          <i className="fa-solid fa-trash-can" style={{ color: '#ef4444' }} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
 
-            {formError && (
-              <div style={{ padding: '0.75rem', backgroundColor: 'var(--status-danger-bg)', color: '#fca5a5', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', marginBottom: '1rem', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                {formError}
-              </div>
-            )}
+                  <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
+                        Nama Peminjam
+                      </label>
+                      <input
+                        type="text"
+                        className="input"
+                        value={borrowerName}
+                        onChange={(e) => setBorrowerName(e.target.value)}
+                        required
+                        style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                      />
+                    </div>
 
-            <form onSubmit={handleAddSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <Input
-                  label="Kode Alat (INV-xxx)"
-                  value={formKode}
-                  onChange={(e) => setFormKode(e.target.value)}
-                  placeholder="INV-006"
-                  required
-                />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                    Kategori
-                  </label>
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
+                        Keperluan Peminjaman
+                      </label>
+                      <input
+                        type="text"
+                        className="input"
+                        value={purpose}
+                        onChange={(e) => setPurpose(e.target.value)}
+                        required
+                        style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
+                        Tenggat Pengembalian
+                      </label>
+                      <input
+                        type="date"
+                        className="input"
+                        value={dueDate}
+                        onChange={(e) => setDueDate(e.target.value)}
+                        required
+                        style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    <button
+                      type="button"
+                      className="btn sec flex-1"
+                      onClick={() => loanBasketStore.clear()}
+                      style={{ borderRadius: '8px' }}
+                    >
+                      Kosongkan
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn pri flex-1"
+                      disabled={checkoutSubmitting}
+                      style={{ borderRadius: '8px' }}
+                    >
+                      {checkoutSubmitting ? 'Memproses...' : `Ajukan Peminjaman (${basketCount} Unit)`}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* ── MODAL TAMBAH ALAT BARU ── */}
+      {isNewAssetOpen && (
+        <>
+          <div className="scrim on" onClick={() => setIsNewAssetOpen(false)} />
+          <section className="sheet on" role="dialog" aria-modal="true">
+            <div className="sheet-grab" />
+            <div className="sheet-hd">
+              <h3>Tambah Alat Baru ke Katalog</h3>
+              <button
+                type="button"
+                className="icon-btn"
+                onClick={() => setIsNewAssetOpen(false)}
+                aria-label="Tutup"
+              >
+                <i className="fa-solid fa-xmark" />
+              </button>
+            </div>
+            <div className="sheet-body" style={{ padding: '16px' }}>
+              <form onSubmit={handleNewAssetSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Kode Alat</label>
+                  <input
+                    type="text"
+                    value={newKode}
+                    onChange={(e) => setNewKode(e.target.value)}
+                    required
+                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Nama Alat</label>
+                  <input
+                    type="text"
+                    value={newNama}
+                    onChange={(e) => setNewNama(e.target.value)}
+                    required
+                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Kategori</label>
                   <select
-                    value={formKategori}
-                    onChange={(e) => setFormKategori(e.target.value)}
-                    style={{
-                      backgroundColor: 'var(--bg-secondary)',
-                      border: '1px solid var(--bg-card-border)',
-                      borderRadius: 'var(--radius-sm)',
-                      color: 'var(--text-primary)',
-                      padding: '0.55rem 0.75rem',
-                      fontSize: 'var(--text-sm)',
-                      outline: 'none',
-                    }}
+                    value={newKat}
+                    onChange={(e) => setNewKat(e.target.value)}
+                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
                   >
-                    <option value="Kamera">Kamera</option>
-                    <option value="Lensa">Lensa</option>
-                    <option value="Audio">Audio</option>
-                    <option value="Lighting">Lighting</option>
-                    <option value="Stabilizer">Stabilizer</option>
-                    <option value="Aksesoris">Aksesoris</option>
+                    {ALL_CATEGORIES.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
                   </select>
                 </div>
-              </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Spesifikasi / Keterangan</label>
+                  <input
+                    type="text"
+                    value={newSpec}
+                    onChange={(e) => setNewSpec(e.target.value)}
+                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Lokasi Penyimpanan</label>
+                    <input
+                      type="text"
+                      value={newLoc}
+                      onChange={(e) => setNewLoc(e.target.value)}
+                      style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    />
+                  </div>
+                  <div style={{ width: '100px' }}>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Jumlah Unit</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={newQty}
+                      onChange={(e) => setNewQty(e.target.value)}
+                      style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    />
+                  </div>
+                </div>
 
-              <Input
-                label="Nama Peralatan & Model"
-                value={formNama}
-                onChange={(e) => setFormNama(e.target.value)}
-                placeholder="Misal: Blackmagic Pocket Cinema 6K Pro"
-                required
-              />
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                  Spesifikasi & Rincian
-                </label>
-                <textarea
-                  value={formSpesifikasi}
-                  onChange={(e) => setFormSpesifikasi(e.target.value)}
-                  placeholder="Karakteristik teknis, resolusi, kelengkapan bawaan..."
-                  rows={3}
-                  style={{
-                    backgroundColor: 'var(--bg-secondary)',
-                    border: '1px solid var(--bg-card-border)',
-                    borderRadius: 'var(--radius-sm)',
-                    color: 'var(--text-primary)',
-                    padding: '0.55rem 0.75rem',
-                    fontSize: 'var(--text-sm)',
-                    outline: 'none',
-                    resize: 'vertical',
-                  }}
-                />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <Input
-                  label="Lokasi Penyimpanan"
-                  value={formLokasi}
-                  onChange={(e) => setFormLokasi(e.target.value)}
-                  placeholder="Lemari A1"
-                />
-                <Input
-                  label="Jumlah Unit Awal"
-                  type="number"
-                  min="1"
-                  max="50"
-                  value={formJumlah}
-                  onChange={(e) => setFormJumlah(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem' }}>
-                <Button type="button" variant="secondary" onClick={() => setIsAddModalOpen(false)}>
-                  Batal
-                </Button>
-                <Button type="submit" variant="primary" disabled={formSubmitting}>
-                  {formSubmitting ? 'Menyimpan...' : 'Simpan Alat'}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                  <button
+                    type="button"
+                    className="btn sec flex-1"
+                    onClick={() => setIsNewAssetOpen(false)}
+                    style={{ borderRadius: '8px' }}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn pri flex-1"
+                    disabled={newSubmitting}
+                    style={{ borderRadius: '8px' }}
+                  >
+                    {newSubmitting ? 'Menyimpan...' : 'Simpan Alat'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        </>
       )}
     </div>
   );
