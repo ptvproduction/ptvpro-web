@@ -23,6 +23,6 @@ export default [
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', '.history/**'],
+    ignores: ['dist/**', 'node_modules/**', '.history/**', 'legacy/**'],
   },
 ];

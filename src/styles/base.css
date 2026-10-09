@@ -1,37 +1,29 @@
-@import './tokens.css';
-@import './shell.css';
+@import './dashboard.css';
 @import './login.css';
-@import './beranda.css';
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  min-height: 100vh;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-}
-
-input, select, textarea {
-  font-family: inherit;
+:root {
+  /* Compatibility aliases for shared components */
+  --bg-primary: var(--bg);
+  --bg-secondary: var(--surface);
+  --bg-surface: var(--surface);
+  --bg-surface-hover: var(--b-050);
+  --bg-card: var(--surface);
+  --bg-card-border: var(--line);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-2);
+  --text-muted: var(--muted);
+  --accent-blue: var(--b-700);
+  --accent-cyan: var(--b-600);
+  --status-success: var(--ok);
+  --status-success-bg: var(--ok-bg);
+  --status-warning: var(--warn);
+  --status-warning-bg: var(--warn-bg);
+  --status-danger: var(--dang);
+  --status-danger-bg: var(--dang-bg);
+  --status-info: var(--info);
+  --status-info-bg: var(--info-bg);
+  --radius-sm: var(--r-xs);
+  --radius-md: var(--r-s);
+  --radius-lg: var(--r-m);
+  --radius-full: var(--r-full);
 }

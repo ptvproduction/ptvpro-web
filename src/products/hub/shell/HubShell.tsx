@@ -2,45 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useSessionStore } from '@core/session';
 import { AppCapability } from '@core/policy';
-import {
-  Home,
-  Calendar,
-  CalendarDays,
-  FileText,
-  Package,
-  CircleDollarSign,
-  ArrowLeftRight,
-  Wrench,
-  HelpCircle,
-  Users,
-  CreditCard,
-  FileCheck,
-  Phone,
-  UserCheck,
-  FileSignature,
-  ShieldAlert,
-  ShieldCheck,
-  Archive,
-  Wallet,
-  Megaphone,
-  Sparkles,
-  BarChart2,
-  Settings,
-  Search,
-  Bell,
-  Moon,
-  Sun,
-  LogOut,
-  Plus,
-  X,
-  ExternalLink,
-} from 'lucide-react';
 
 interface SidebarItemDef {
   key: string;
   label: string;
   path: string;
-  icon: React.ReactNode;
+  iconClass: string;
   capability?: AppCapability;
   isExternal?: boolean;
 }
@@ -61,7 +28,7 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
         key: 'beranda',
         label: 'Beranda',
         path: '/hub/beranda',
-        icon: <Home size={16} />,
+        iconClass: 'fa-solid fa-house',
         capability: 'hub.access',
       },
     ],
@@ -73,21 +40,21 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
         key: 'acara',
         label: 'Acara',
         path: '/hub/acara',
-        icon: <Calendar size={16} />,
+        iconClass: 'fa-solid fa-calendar-day',
         capability: 'events.view',
       },
       {
         key: 'kalender',
         label: 'Kalender',
         path: '/hub/kalender',
-        icon: <CalendarDays size={16} />,
+        iconClass: 'fa-solid fa-calendar-days',
         capability: 'calendar.view',
       },
       {
         key: 'catatan',
         label: 'Catatan Bersama',
         path: '/hub/catatan',
-        icon: <FileText size={16} />,
+        iconClass: 'fa-solid fa-note-sticky',
         capability: 'notes.view',
       },
     ],
@@ -99,35 +66,35 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
         key: 'inventaris',
         label: 'Inventaris',
         path: '/hub/inventaris',
-        icon: <Package size={16} />,
+        iconClass: 'fa-solid fa-boxes-stacked',
         capability: 'inventory.view',
       },
       {
         key: 'nilaiInventaris',
         label: 'Nilai Inventaris',
         path: '/hub/inventaris/nilai',
-        icon: <CircleDollarSign size={16} />,
+        iconClass: 'fa-solid fa-receipt',
         capability: 'inventory.valuation.view',
       },
       {
         key: 'peminjaman',
         label: 'Peminjaman',
         path: '/hub/peminjaman',
-        icon: <ArrowLeftRight size={16} />,
+        iconClass: 'fa-solid fa-right-left',
         capability: 'loans.view',
       },
       {
         key: 'kerusakan',
         label: 'Lapor Kerusakan',
         path: '/hub/kerusakan',
-        icon: <Wrench size={16} />,
+        iconClass: 'fa-solid fa-screwdriver-wrench',
         capability: 'damage.view',
       },
       {
         key: 'lostfound',
         label: 'Lost & Found',
         path: '/hub/lostfound',
-        icon: <HelpCircle size={16} />,
+        iconClass: 'fa-solid fa-magnifying-glass-location',
         capability: 'lostfound.view',
       },
     ],
@@ -139,35 +106,35 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
         key: 'kru',
         label: 'Manajemen Kru',
         path: '/hub/kru',
-        icon: <Users size={16} />,
+        iconClass: 'fa-solid fa-users',
         capability: 'crew.view',
       },
       {
         key: 'id',
         label: 'ID Digital',
         path: '/hub/id',
-        icon: <CreditCard size={16} />,
+        iconClass: 'fa-solid fa-id-card',
         capability: 'id.view',
       },
       {
         key: 'dokumen',
         label: 'Dokumen Saya',
         path: '/hub/dokumen',
-        icon: <FileCheck size={16} />,
+        iconClass: 'fa-solid fa-file-lines',
         capability: 'documents.view',
       },
       {
         key: 'kontak',
         label: 'Kontak Internal',
         path: '/hub/kontak',
-        icon: <Phone size={16} />,
+        iconClass: 'fa-solid fa-phone',
         capability: 'contacts.internal.view',
       },
       {
         key: 'kontakEksternal',
         label: 'Kontak Eksternal',
         path: '/hub/kontak-eksternal',
-        icon: <UserCheck size={16} />,
+        iconClass: 'fa-solid fa-users',
         capability: 'contacts.external.view',
       },
     ],
@@ -179,42 +146,42 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
         key: 'generatorIzin',
         label: 'Generator Surat Izin',
         path: '/hub/surat/generator',
-        icon: <FileSignature size={16} />,
+        iconClass: 'fa-solid fa-file-lines',
         capability: 'documents.generate',
       },
       {
         key: 'perizinan',
         label: 'Pengajuan Perizinan',
         path: '/hub/perizinan',
-        icon: <ShieldAlert size={16} />,
+        iconClass: 'fa-solid fa-shield-halved',
         capability: 'documents.request',
       },
       {
         key: 'verifikasiSurat',
         label: 'Keabsahan Dokumen',
         path: 'https://progresiftv.id/verifikasi-surat/',
-        icon: <ShieldCheck size={16} />,
+        iconClass: 'fa-solid fa-shield-halved',
         isExternal: true,
       },
       {
         key: 'verifikasiIdentitas',
         label: 'Verifikasi Identitas',
         path: 'https://progresiftv.id/verifikasi-identitas/',
-        icon: <CreditCard size={16} />,
+        iconClass: 'fa-solid fa-id-card',
         isExternal: true,
       },
       {
         key: 'arsip',
         label: 'Surat & Arsip',
         path: '/hub/arsip',
-        icon: <Archive size={16} />,
+        iconClass: 'fa-solid fa-box-archive',
         capability: 'documents.archive.view',
       },
       {
         key: 'keuangan',
         label: 'Keuangan',
         path: '/hub/keuangan',
-        icon: <Wallet size={16} />,
+        iconClass: 'fa-solid fa-receipt',
         capability: 'finance.view',
       },
     ],
@@ -226,21 +193,21 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
         key: 'broadcast',
         label: 'Broadcast',
         path: '/hub/broadcast',
-        icon: <Megaphone size={16} />,
+        iconClass: 'fa-solid fa-bullhorn',
         capability: 'broadcast.view',
       },
       {
         key: 'projectHaul',
         label: 'Haul & Harlah PPBS',
         path: '/hub/haul',
-        icon: <Sparkles size={16} />,
+        iconClass: 'fa-solid fa-calendar-day',
         capability: 'projecthaul.view',
       },
       {
         key: 'seo',
         label: 'SEO & Analytics',
         path: '/hub/seo',
-        icon: <BarChart2 size={16} />,
+        iconClass: 'fa-solid fa-chart-simple',
         capability: 'settings.system',
       },
     ],
@@ -252,7 +219,7 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
         key: 'pengaturan',
         label: 'Pengaturan',
         path: '/hub/pengaturan',
-        icon: <Settings size={16} />,
+        iconClass: 'fa-solid fa-gear',
         capability: 'settings.personal',
       },
     ],
@@ -290,83 +257,78 @@ export const HubShell: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Dark / Light Mode state
   const [isDark, setIsDark] = useState<boolean>(() => {
     return document.documentElement.getAttribute('data-theme') === 'dark';
   });
 
-  // Mobile Bottom Sheet states
-  const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
-  const [isQuickActionOpen, setIsQuickActionOpen] = useState(false);
-  const [fallbackModalInfo, setFallbackModalInfo] = useState<string | null>(null);
+  const [isQuickOpen, setIsQuickOpen] = useState(false);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('ptv_theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      setIsDark(true);
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light');
-      setIsDark(false);
+    const theme = isDark ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem('ptv-theme', theme);
+    } catch {
+      // ignore
     }
-  }, []);
+  }, [isDark]);
 
   const toggleTheme = () => {
-    const nextTheme = isDark ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', nextTheme);
-    localStorage.setItem('ptv_theme', nextTheme);
-    setIsDark(!isDark);
+    setIsDark((prev) => !prev);
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login', { replace: true });
+  const currentPath = location.pathname;
+  const currentCrumb = BREADCRUMB_MAP[currentPath] || 'Beranda';
+
+  const userInitials = (user?.full_name || 'PTV')
+    .split(/\s+/)
+    .filter((w) => /^[A-Za-z]/.test(w))
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase() || 'P';
+
+  const isTabActive = (tab: string) => {
+    if (tab === 'home') return currentPath === '/hub' || currentPath === '/hub/beranda';
+    if (tab === 'acara') return currentPath.startsWith('/hub/acara') || currentPath.startsWith('/hub/kalender');
+    if (tab === 'alat') return currentPath.startsWith('/hub/inventaris') || currentPath.startsWith('/hub/peminjaman');
+    if (tab === 'more') return isMoreOpen;
+    return false;
   };
-
-  const handleNavClick = (item: SidebarItemDef, e: React.MouseEvent) => {
-    if (item.isExternal) {
-      return; // Standard external anchor behavior
-    }
-
-    // Active routes in Phase 5E.1: /hub/beranda, /hub/kru, /hub/inventaris, /hub/peminjaman
-    const activeImplementedRoutes = ['/hub/beranda', '/hub/kru', '/hub/inventaris', '/hub/peminjaman'];
-    if (!activeImplementedRoutes.includes(item.path)) {
-      e.preventDefault();
-      setFallbackModalInfo(item.label);
-      setIsMoreSheetOpen(false);
-      return;
-    }
-
-    setIsMoreSheetOpen(false);
-  };
-
-  // Breadcrumb current title
-  const currentTitle = BREADCRUMB_MAP[location.pathname] || 'Dashboard';
 
   return (
-    <div className="app-shell">
-      {/* ── DESKTOP SIDEBAR (.side) ── */}
+    <>
+      {/* ── DESKTOP SIDEBAR 1:1 DARI shellHTML() ── */}
       <aside className="side" id="side">
         <div className="side-brand">
-          <NavLink to="/hub/beranda" className="brand-logo-text">
-            <span>PROGRESIF TV</span>
-          </NavLink>
+          <a
+            href="#beranda"
+            className="brand-logo-link"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/hub/beranda');
+            }}
+            aria-label="Progresif TV"
+          >
+            <span
+              className="brand-logo-gradient"
+              style={{ '--logo-url': "url('/assets/images/ptv-logo-white.webp')" } as React.CSSProperties}
+              role="img"
+              aria-label="Progresif TV"
+            />
+          </a>
         </div>
 
         <div className="side-scroll" id="sideNav">
           {SIDEBAR_GROUPS.map((grp) => {
-            const visibleItems = grp.items.filter((item) => {
-              if (item.isExternal) return true;
-              if (!item.capability) return true;
-              return can(item.capability);
-            });
-
-            if (visibleItems.length === 0) return null;
+            const accessibleItems = grp.items.filter((item) => !item.capability || can(item.capability));
+            if (!accessibleItems.length) return null;
 
             return (
               <div className="side-grp" key={grp.groupName}>
                 <p>{grp.groupName}</p>
-                {visibleItems.map((item) => {
+                {accessibleItems.map((item) => {
                   if (item.isExternal) {
                     return (
                       <a
@@ -375,26 +337,27 @@ export const HubShell: React.FC = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="snav"
-                        title={item.label}
+                        style={{ textDecoration: 'none' }}
                       >
-                        {item.icon}
+                        <i className={item.iconClass} />
                         <span>{item.label}</span>
-                        <ExternalLink size={12} style={{ marginLeft: 'auto', opacity: 0.5 }} />
+                        <i
+                          className="fa-solid fa-arrow-up-right-from-square"
+                          style={{ fontSize: '10px', marginLeft: 'auto', opacity: 0.6 }}
+                        />
                       </a>
                     );
                   }
 
-                  const isActive = location.pathname === item.path;
+                  const isActive = currentPath === item.path;
 
                   return (
                     <NavLink
                       key={item.key}
                       to={item.path}
-                      onClick={(e) => handleNavClick(item, e)}
                       className={`snav ${isActive ? 'on' : ''}`}
-                      title={item.label}
                     >
-                      {item.icon}
+                      <i className={item.iconClass} />
                       <span>{item.label}</span>
                     </NavLink>
                   );
@@ -405,36 +368,59 @@ export const HubShell: React.FC = () => {
         </div>
 
         <div className="side-foot">
-          <button type="button" className="snav" onClick={toggleTheme}>
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          <button
+            type="button"
+            className="snav"
+            onClick={toggleTheme}
+            data-act="theme"
+          >
+            <i className={isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon'} />
             <span>{isDark ? 'Mode terang' : 'Mode gelap'}</span>
           </button>
-          <button type="button" className="snav" onClick={handleLogout} style={{ color: '#ef4444' }}>
-            <LogOut size={16} />
+          <button
+            type="button"
+            className="snav"
+            onClick={logout}
+            data-act="logout"
+          >
+            <i className="fa-solid fa-arrow-right-from-bracket" />
             <span>Keluar</span>
           </button>
         </div>
       </aside>
 
-      {/* ── TOP HEADER (.hdr) ── */}
+      {/* ── HEADER 1:1 DARI shellHTML() ── */}
       <header className="hdr">
         <div className="hdr-in">
           <div className="brand">
-            <NavLink to="/hub/beranda" className="brand-logo-text">
-              <span>PTV PRO</span>
-            </NavLink>
+            <a
+              href="#beranda"
+              className="brand-logo-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/hub/beranda');
+              }}
+              aria-label="Progresif TV"
+            >
+              <span
+                className="brand-logo-gradient"
+                style={{ '--logo-url': "url('/assets/images/ptv-logo-white.webp')" } as React.CSSProperties}
+                role="img"
+                aria-label="Progresif TV"
+              />
+            </a>
           </div>
 
           <div className="crumb" id="crumb">
-            <span>{currentTitle}</span>
+            <b>{currentCrumb}</b>
           </div>
 
           <button
             type="button"
             className="hdr-search"
-            onClick={() => setFallbackModalInfo('Pencarian Global (Search Bar)')}
+            onClick={() => alert('Pencarian Universal: Ketik acara, alat, kru, atau dokumen.')}
           >
-            <Search size={14} />
+            <i className="fa-solid fa-magnifying-glass" />
             <span>Cari acara, alat, kru, surat…</span>
             <kbd>/</kbd>
           </button>
@@ -442,291 +428,291 @@ export const HubShell: React.FC = () => {
           <div className="hdr-actions">
             <button
               type="button"
-              className="icon-btn"
-              onClick={toggleTheme}
-              title={isDark ? 'Mode terang' : 'Mode gelap'}
-              aria-label="Ubah tema"
+              className="icon-btn only-mobile"
+              aria-label="Cari"
+              onClick={() => alert('Pencarian Universal')}
             >
-              {isDark ? <Sun size={17} /> : <Moon size={17} />}
+              <i className="fa-solid fa-magnifying-glass" />
             </button>
 
             <button
               type="button"
               className="icon-btn"
-              onClick={() => setFallbackModalInfo('Notifikasi Sistem')}
-              title="Notifikasi"
               aria-label="Notifikasi"
+              onClick={() => alert('Notifikasi PTV PRO')}
             >
-              <Bell size={17} />
+              <i className="fa-solid fa-bell" />
+              <span className="dot" id="notifDot" style={{ display: 'none' }} />
             </button>
 
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '4px 10px',
-                borderRadius: 'var(--r-full)',
-                backgroundColor: 'var(--b-050)',
-                color: 'var(--b-700)',
-                fontSize: '12px',
-                fontWeight: 650,
-                marginLeft: '4px',
-              }}
+            <button
+              type="button"
+              className="icon-btn"
+              aria-label="Profil"
+              style={{ width: 'auto', padding: '0 4px' }}
+              onClick={() => navigate('/hub/id')}
             >
-              <span>{user?.full_name ? user.full_name.split(' ').slice(0, 2).join(' ') : 'Kru PTV'}</span>
-            </div>
+              <span className="avatar sm">{userInitials}</span>
+            </button>
           </div>
         </div>
       </header>
 
-      {/* ── MAIN CONTENT AREA (.main) ── */}
+      {/* ── MAIN CONTENT VIEWPORT ── */}
       <main className="main" id="main">
         <div className="page-in" id="view">
           <Outlet />
         </div>
       </main>
 
-      {/* ── MOBILE BOTTOM NAVIGATION DOCK (.bnav) ── */}
+      {/* ── MOBILE BOTTOM NAVIGATION 1:1 DARI shellHTML() ── */}
       <nav className="bnav" id="bnav">
         <div className="bnav-in">
-          <NavLink
-            to="/hub/beranda"
-            className={({ isActive }) => `bitem ${isActive ? 'on' : ''}`}
+          <button
+            type="button"
+            className={`bitem ${isTabActive('home') ? 'on' : ''}`}
             data-tab="home"
+            onClick={() => {
+              setIsMoreOpen(false);
+              navigate('/hub/beranda');
+            }}
           >
-            <Home size={18} />
+            <i className="fa-solid fa-house" />
             <span>Home</span>
-          </NavLink>
+          </button>
 
           <button
             type="button"
-            className="bitem"
+            className={`bitem ${isTabActive('acara') ? 'on' : ''}`}
             data-tab="acara"
-            onClick={() => setFallbackModalInfo('Modul Acara & Agenda')}
+            onClick={() => {
+              setIsMoreOpen(false);
+              navigate('/hub/acara');
+            }}
           >
-            <Calendar size={18} />
+            <i className="fa-solid fa-calendar-day" />
             <span>Acara</span>
           </button>
 
           <button
             type="button"
             className="fab"
+            data-act="quick"
             aria-label="Aksi cepat"
-            onClick={() => setIsQuickActionOpen(true)}
+            onClick={() => setIsQuickOpen(true)}
           >
-            <Plus size={22} />
+            <i className="fa-solid fa-plus" />
           </button>
-
-          <NavLink
-            to="/hub/inventaris"
-            className={({ isActive }) => `bitem ${isActive ? 'on' : ''}`}
-            data-tab="alat"
-          >
-            <Package size={18} />
-            <span>Alat</span>
-          </NavLink>
 
           <button
             type="button"
-            className={`bitem ${isMoreSheetOpen ? 'on' : ''}`}
-            data-tab="more"
-            onClick={() => setIsMoreSheetOpen(true)}
+            className={`bitem ${isTabActive('alat') ? 'on' : ''}`}
+            data-tab="alat"
+            onClick={() => {
+              setIsMoreOpen(false);
+              navigate('/hub/inventaris');
+            }}
           >
-            <Users size={18} />
+            <i className="fa-solid fa-camera-retro" />
+            <span>Alat</span>
+          </button>
+
+          <button
+            type="button"
+            className={`bitem ${isTabActive('more') ? 'on' : ''}`}
+            data-tab="more"
+            style={{ position: 'relative' }}
+            onClick={() => setIsMoreOpen(!isMoreOpen)}
+          >
+            <i className="fa-solid fa-ellipsis" />
             <span>More</span>
+            <span className="action-dot" id="moreActionDot" style={{ display: 'none' }} />
           </button>
         </div>
       </nav>
 
-      {/* ── MOBILE QUICK ACTION SHEET ── */}
-      {isQuickActionOpen && (
-        <>
-          <div className="scrim" onClick={() => setIsQuickActionOpen(false)} />
-          <section className="sheet" role="dialog" aria-modal="true">
-            <div className="sheet-grab" />
-            <div className="sheet-hd">
-              <h3>Aksi Cepat</h3>
-              <button
-                type="button"
-                className="icon-btn"
-                onClick={() => setIsQuickActionOpen(false)}
-                aria-label="Tutup"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div className="sheet-body" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button
-                type="button"
-                className="snav"
-                onClick={() => {
-                  setIsQuickActionOpen(false);
-                  navigate('/hub/peminjaman');
-                }}
-                style={{ backgroundColor: 'var(--b-050)', color: 'var(--b-700)', fontWeight: 650 }}
-              >
-                <ArrowLeftRight size={18} />
-                <span>Pinjam Alat Inventaris</span>
-              </button>
-              <button
-                type="button"
-                className="snav"
-                onClick={() => {
-                  setIsQuickActionOpen(false);
-                  navigate('/hub/inventaris');
-                }}
-                style={{ backgroundColor: 'var(--b-050)', color: 'var(--b-700)', fontWeight: 650 }}
-              >
-                <Package size={18} />
-                <span>Lihat Katalog Inventaris</span>
-              </button>
-              <button
-                type="button"
-                className="snav"
-                onClick={() => {
-                  setIsQuickActionOpen(false);
-                  navigate('/hub/kru');
-                }}
-                style={{ backgroundColor: 'var(--b-050)', color: 'var(--b-700)', fontWeight: 650 }}
-              >
-                <Users size={18} />
-                <span>Direktori Manajemen Kru</span>
-              </button>
-            </div>
-          </section>
-        </>
-      )}
-
-      {/* ── MOBILE MORE MENU SHEET ── */}
-      {isMoreSheetOpen && (
-        <>
-          <div className="scrim" onClick={() => setIsMoreSheetOpen(false)} />
-          <section className="sheet" role="dialog" aria-modal="true" style={{ maxHeight: '88vh' }}>
-            <div className="sheet-grab" />
-            <div className="sheet-hd">
-              <h3>Menu Dasbor PTV</h3>
-              <button
-                type="button"
-                className="icon-btn"
-                onClick={() => setIsMoreSheetOpen(false)}
-                aria-label="Tutup"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div className="sheet-body">
-              {SIDEBAR_GROUPS.map((grp) => {
-                const visibleItems = grp.items.filter((item) => {
-                  if (item.isExternal) return true;
-                  if (!item.capability) return true;
-                  return can(item.capability);
-                });
-
-                if (visibleItems.length === 0) return null;
-
-                return (
-                  <div className="side-grp" key={grp.groupName} style={{ marginBottom: '16px' }}>
-                    <p style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
-                      {grp.groupName}
-                    </p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      {visibleItems.map((item) => (
-                        <button
-                          type="button"
-                          key={item.key}
-                          className="snav"
-                          onClick={(e) => handleNavClick(item, e)}
-                          style={{
-                            padding: '10px 14px',
-                            backgroundColor: location.pathname === item.path ? 'var(--b-100)' : 'transparent',
-                            color: location.pathname === item.path ? 'var(--b-700)' : 'var(--ink)',
-                            fontWeight: location.pathname === item.path ? 700 : 500,
-                          }}
-                        >
-                          {item.icon}
-                          <span>{item.label}</span>
-                          {item.isExternal && <ExternalLink size={12} style={{ marginLeft: 'auto', opacity: 0.5 }} />}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-
-              <div style={{ borderTop: '1px solid var(--line-2)', paddingTop: '16px', marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <button type="button" className="snav" onClick={toggleTheme}>
-                  {isDark ? <Sun size={18} /> : <Moon size={18} />}
-                  <span>{isDark ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}</span>
-                </button>
-                <button type="button" className="snav" onClick={handleLogout} style={{ color: '#ef4444' }}>
-                  <LogOut size={18} />
-                  <span>Keluar dari Akun</span>
-                </button>
-              </div>
-            </div>
-          </section>
-        </>
-      )}
-
-      {/* ── INFORMATIVE FALLBACK MODAL (UNTUK MODUL TAHAP BERIKUTNYA) ── */}
-      {fallbackModalInfo && (
-        <>
-          <div className="scrim" onClick={() => setFallbackModalInfo(null)} />
-          <div
-            style={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 100,
-              backgroundColor: 'var(--surface)',
-              borderRadius: 'var(--r-m)',
-              boxShadow: 'var(--shadow-m)',
-              padding: '24px',
-              maxWidth: '440px',
-              width: '90%',
-              border: '1px solid var(--line)',
-            }}
+      {/* ── AKSI CEPAT BOTTOM SHEET (FAB MODAL) ── */}
+      <div
+        className={`scrim ${isQuickOpen ? 'on' : ''}`}
+        id="quickScrim"
+        onClick={() => setIsQuickOpen(false)}
+      />
+      <section
+        className={`sheet ${isQuickOpen ? 'on' : ''}`}
+        id="quickSheet"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="sheet-grab" />
+        <div className="sheet-hd">
+          <h3 id="sheetTitle">Aksi cepat</h3>
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={() => setIsQuickOpen(false)}
+            aria-label="Tutup"
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--ink)' }}>
-                {fallbackModalInfo}
-              </h3>
-              <button
-                type="button"
-                className="icon-btn"
-                onClick={() => setFallbackModalInfo(null)}
-                aria-label="Tutup"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <p style={{ fontSize: '13px', color: 'var(--ink-2)', lineHeight: 1.6, margin: '0 0 16px 0' }}>
-              Modul <strong>{fallbackModalInfo}</strong> telah terdaftar di dalam navigasi arsitektur PTV PRO dan dijadwalkan untuk dimigrasikan pada tahapan berikutnya sesuai dokumen acuan{' '}
-              <code>docs/HUB-LEGACY-MIGRATION-MAP.md</code>.
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button
-                type="button"
-                onClick={() => setFallbackModalInfo(null)}
-                style={{
-                  padding: '8px 18px',
-                  borderRadius: 'var(--r-full)',
-                  backgroundColor: 'var(--b-600)',
-                  color: '#ffffff',
-                  fontSize: '13px',
-                  fontWeight: 650,
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                Mengerti
-              </button>
-            </div>
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="sheet-body" id="sheetBody">
+          <div className="qa-grid">
+            <button
+              type="button"
+              className="qa"
+              onClick={() => {
+                setIsQuickOpen(false);
+                navigate('/hub/surat/generator');
+              }}
+            >
+              <span className="qa-ic">
+                <i className="fa-solid fa-shield-halved" />
+              </span>
+              <span>
+                <span className="qa-t">Generator Surat Izin</span>
+                <span className="qa-s">Penerbitan surat izin resmi santri</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className="qa"
+              onClick={() => {
+                setIsQuickOpen(false);
+                navigate('/hub/peminjaman');
+              }}
+            >
+              <span className="qa-ic">
+                <i className="fa-solid fa-boxes-stacked" />
+              </span>
+              <span>
+                <span className="qa-t">Pinjam Alat</span>
+                <span className="qa-s">Ambil alat dari inventaris</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className="qa"
+              onClick={() => {
+                setIsQuickOpen(false);
+                navigate('/hub/catatan');
+              }}
+            >
+              <span className="qa-ic">
+                <i className="fa-solid fa-note-sticky" />
+              </span>
+              <span>
+                <span className="qa-t">Tambah Catatan Bersama</span>
+                <span className="qa-s">Tulis &amp; bagikan catatan kru</span>
+              </span>
+            </button>
           </div>
-        </>
-      )}
-    </div>
+          <p className="hint mt16" style={{ textAlign: 'center', fontSize: '12px' }}>
+            Semua pengajuan &amp; pencatatan otomatis tersinkronisasi.
+          </p>
+        </div>
+      </section>
+
+      {/* ── MOBILE MORE SHEET ── */}
+      <div
+        className={`scrim ${isMoreOpen ? 'on' : ''}`}
+        id="moreScrim"
+        onClick={() => setIsMoreOpen(false)}
+      />
+      <section
+        className={`sheet ${isMoreOpen ? 'on' : ''}`}
+        id="moreSheet"
+        role="dialog"
+        aria-modal="true"
+        style={{ maxHeight: '82vh' }}
+      >
+        <div className="sheet-grab" />
+        <div className="sheet-hd">
+          <h3>Menu Lainnya</h3>
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={() => setIsMoreOpen(false)}
+            aria-label="Tutup"
+          >
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="sheet-body" style={{ overflowY: 'auto', paddingBottom: '24px' }}>
+          {SIDEBAR_GROUPS.map((grp) => {
+            const accessibleItems = grp.items.filter((item) => !item.capability || can(item.capability));
+            if (!accessibleItems.length) return null;
+
+            return (
+              <div key={grp.groupName} style={{ marginBottom: '16px' }}>
+                <p
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: 'var(--muted)',
+                    margin: '0 0 6px 12px',
+                  }}
+                >
+                  {grp.groupName}
+                </p>
+                <div className="list">
+                  {accessibleItems.map((item) => {
+                    if (item.isExternal) {
+                      return (
+                        <a
+                          key={item.key}
+                          href={item.path}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="li"
+                          style={{ textDecoration: 'none' }}
+                          onClick={() => setIsMoreOpen(false)}
+                        >
+                          <span className="li-ic">
+                            <i className={item.iconClass} />
+                          </span>
+                          <span className="li-body">
+                            <span className="li-t">{item.label}</span>
+                          </span>
+                          <i
+                            className="fa-solid fa-arrow-up-right-from-square"
+                            style={{ fontSize: '12px', color: 'var(--muted)', marginLeft: 'auto', opacity: 0.7 }}
+                          />
+                        </a>
+                      );
+                    }
+
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        className="li"
+                        onClick={() => {
+                          setIsMoreOpen(false);
+                          navigate(item.path);
+                        }}
+                      >
+                        <span className="li-ic">
+                          <i className={item.iconClass} />
+                        </span>
+                        <span className="li-body">
+                          <span className="li-t">{item.label}</span>
+                        </span>
+                        <span className="chev">
+                          <i className="fa-solid fa-chevron-right" />
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    </>
   );
 };

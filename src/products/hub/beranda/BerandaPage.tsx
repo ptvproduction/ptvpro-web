@@ -1,36 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '@core/session';
-import {
-  Clock,
-  MapPin,
-  Users,
-  ShieldAlert,
-  Boxes,
-  Wrench,
-  Search,
-  FileText,
-  CreditCard,
-  ChevronRight,
-  Calendar,
-  AlertCircle,
-  Package,
-} from 'lucide-react';
 
 export const BerandaPage: React.FC = () => {
   const { user } = useSessionStore();
   const navigate = useNavigate();
 
-  // Dynamic greeting based on current local hour
-  const getGreeting = () => {
-    const hr = new Date().getHours();
-    if (hr >= 4 && hr < 11) return 'Selamat pagi';
-    if (hr >= 11 && hr < 15) return 'Selamat siang';
-    if (hr >= 15 && hr < 18) return 'Selamat sore';
-    return 'Selamat malam';
+  // Dynamic greeting based on current local hour (greet() in page-dasbor.php)
+  const greet = () => {
+    const h = new Date().getHours();
+    return h < 11 ? 'Selamat Pagi' : h < 15 ? 'Selamat Siang' : h < 18 ? 'Selamat Sore' : 'Selamat Malam';
   };
 
-  // Sample authentic data matching DB.events, DB.loans, DB.announcements, DB.docs
   const upcomingEvent = {
     id: 'ev-001',
     name: 'Dokumentasi Teaser Video Sambutan Haul Akbar 2026',
@@ -92,17 +73,15 @@ export const BerandaPage: React.FC = () => {
   };
 
   return (
-    <div className="page" style={{ paddingBottom: '32px' }}>
-      {/* ── HERO SECTION ── */}
+    <div className="page">
+      {/* ── HERO SECTION 1:1 DARI pgBeranda() ── */}
       <div className="hero">
         <div className="hero-hd">
           <div className="hero-greet">
-            <p className="hero-eyebrow">{getGreeting()},</p>
+            <p className="hero-eyebrow">{greet()},</p>
             <h1 className="hero-name">{user?.full_name || 'Kru Progresif TV'}</h1>
           </div>
         </div>
-
-        {/* Hero Card */}
         <div id="berandaHeroWrap">
           <button
             type="button"
@@ -115,13 +94,13 @@ export const BerandaPage: React.FC = () => {
               <div className="ttl">{upcomingEvent.name}</div>
               <div className="hero-meta">
                 <span>
-                  <Clock size={14} /> {upcomingEvent.time}
+                  <i className="fa-regular fa-clock" /> {upcomingEvent.time}
                 </span>
                 <span>
-                  <MapPin size={14} /> {upcomingEvent.loc}
+                  <i className="fa-solid fa-location-dot" /> {upcomingEvent.loc}
                 </span>
                 <span>
-                  <Users size={14} /> {upcomingEvent.crewCount} kru
+                  <i className="fa-solid fa-users" /> {upcomingEvent.crewCount} kru
                 </span>
               </div>
             </div>
@@ -138,7 +117,7 @@ export const BerandaPage: React.FC = () => {
           onClick={() => navigate('/hub/perizinan')}
         >
           <span className="qa-ref-btn">
-            <ShieldAlert size={22} />
+            <i className="fa-solid fa-shield-halved" />
           </span>
           <span className="qa-ref-label">Ajukan izin</span>
         </button>
@@ -150,7 +129,7 @@ export const BerandaPage: React.FC = () => {
           onClick={() => navigate('/hub/peminjaman')}
         >
           <span className="qa-ref-btn">
-            <Boxes size={22} />
+            <i className="fa-solid fa-boxes-stacked" />
           </span>
           <span className="qa-ref-label">Pinjam alat</span>
         </button>
@@ -162,9 +141,11 @@ export const BerandaPage: React.FC = () => {
           onClick={() => navigate('/hub/kerusakan')}
         >
           <span className="qa-ref-btn">
-            <Wrench size={22} />
+            <i className="fa-solid fa-screwdriver-wrench" />
           </span>
-          <span className="qa-ref-label">Lapor masalah</span>
+          <span className="qa-ref-label">
+            Lapor<br />masalah
+          </span>
         </button>
 
         <button
@@ -174,14 +155,14 @@ export const BerandaPage: React.FC = () => {
           onClick={() => navigate('/hub/lostfound')}
         >
           <span className="qa-ref-btn">
-            <Search size={22} />
+            <i className="fa-solid fa-magnifying-glass-location" />
           </span>
           <span className="qa-ref-label">Lost &amp; Found</span>
         </button>
       </div>
 
       {/* ── BENTO GRID QUICK ACCESS (KHUSUS DESKTOP) ── */}
-      <div className="sec only-desktop" style={{ padding: '16px', background: 'transparent', border: 'none', boxShadow: 'none' }}>
+      <div className="sec only-desktop">
         <div className="bento-grid">
           <button
             type="button"
@@ -189,14 +170,14 @@ export const BerandaPage: React.FC = () => {
             onClick={() => navigate('/hub/surat/generator')}
           >
             <span className="bento-ic blue">
-              <FileText size={20} />
+              <i className="fa-solid fa-file-lines" />
             </span>
             <span className="bento-body">
               <span className="bento-title">Generator Surat Izin</span>
               <span className="bento-desc">Penerbitan surat izin resmi</span>
             </span>
             <span className="bento-arrow">
-              <ChevronRight size={16} />
+              <i className="fa-solid fa-chevron-right" />
             </span>
           </button>
 
@@ -206,14 +187,14 @@ export const BerandaPage: React.FC = () => {
             onClick={() => navigate('/hub/peminjaman')}
           >
             <span className="bento-ic indigo">
-              <Boxes size={20} />
+              <i className="fa-solid fa-boxes-stacked" />
             </span>
             <span className="bento-body">
               <span className="bento-title">Pinjam Alat</span>
               <span className="bento-desc">Kamera, lensa &amp; audio</span>
             </span>
             <span className="bento-arrow">
-              <ChevronRight size={16} />
+              <i className="fa-solid fa-chevron-right" />
             </span>
           </button>
 
@@ -223,14 +204,14 @@ export const BerandaPage: React.FC = () => {
             onClick={() => navigate('/hub/kerusakan')}
           >
             <span className="bento-ic amber">
-              <Wrench size={20} />
+              <i className="fa-solid fa-screwdriver-wrench" />
             </span>
             <span className="bento-body">
               <span className="bento-title">Lapor Masalah</span>
               <span className="bento-desc">Kendala alat &amp; perbaikan</span>
             </span>
             <span className="bento-arrow">
-              <ChevronRight size={16} />
+              <i className="fa-solid fa-chevron-right" />
             </span>
           </button>
 
@@ -240,14 +221,14 @@ export const BerandaPage: React.FC = () => {
             onClick={() => navigate('/hub/lostfound')}
           >
             <span className="bento-ic teal">
-              <Search size={20} />
+              <i className="fa-solid fa-magnifying-glass-location" />
             </span>
             <span className="bento-body">
               <span className="bento-title">Lost &amp; Found</span>
               <span className="bento-desc">Barang hilang &amp; temuan</span>
             </span>
             <span className="bento-arrow">
-              <ChevronRight size={16} />
+              <i className="fa-solid fa-chevron-right" />
             </span>
           </button>
 
@@ -257,14 +238,14 @@ export const BerandaPage: React.FC = () => {
             onClick={() => navigate('/hub/perizinan')}
           >
             <span className="bento-ic emerald">
-              <FileText size={20} />
+              <i className="fa-solid fa-file-lines" />
             </span>
             <span className="bento-body">
               <span className="bento-title">Surat Tugas</span>
               <span className="bento-desc">Disposisi tugas liputan</span>
             </span>
             <span className="bento-arrow">
-              <ChevronRight size={16} />
+              <i className="fa-solid fa-chevron-right" />
             </span>
           </button>
 
@@ -274,112 +255,120 @@ export const BerandaPage: React.FC = () => {
             onClick={() => navigate('/hub/id')}
           >
             <span className="bento-ic purple">
-              <CreditCard size={20} />
+              <i className="fa-solid fa-id-card" />
             </span>
             <span className="bento-body">
               <span className="bento-title">ID Digital</span>
               <span className="bento-desc">Kartu kru &amp; verifikasi QR</span>
             </span>
             <span className="bento-arrow">
-              <ChevronRight size={16} />
+              <i className="fa-solid fa-chevron-right" />
             </span>
           </button>
         </div>
       </div>
 
-      {/* ── 2 COLUMNS SECTION ── */}
+      {/* ── 2 COLUMNS SECTION 1:1 DARI pgBeranda() ── */}
       <div className="cols mt16">
         {/* Kolom Kiri: Agenda & Alat Saya */}
         <div>
           {/* Agenda Berikutnya */}
-          <div className="sec">
-            <div className="sec-hd">
-              <h3>
-                <Calendar size={16} style={{ color: 'var(--b-600)' }} />
-                Agenda berikutnya
-              </h3>
-              <button
-                type="button"
-                className="link-btn"
-                onClick={() => navigate('/hub/acara')}
-              >
-                Lihat semua
-              </button>
-            </div>
-            <div className="list">
-              {nextAgendas.map((item) => (
+          <div id="berandaAgendaWrap">
+            <div className="sec" style={{ marginTop: '8px' }}>
+              <div className="sec-hd">
+                <h2>Agenda berikutnya</h2>
                 <button
                   type="button"
-                  key={item.id}
-                  className="li"
+                  className="link"
                   onClick={() => navigate('/hub/acara')}
                 >
-                  <span className="li-ic">
-                    <Calendar size={16} />
-                  </span>
-                  <span className="li-body">
-                    <span className="li-t">{item.name}</span>
-                    <span className="li-s">{item.time}</span>
-                  </span>
-                  <span className="chev">
-                    <ChevronRight size={16} />
-                  </span>
+                  Lihat semua
                 </button>
-              ))}
+              </div>
+              <div className="list">
+                {nextAgendas.map((item) => (
+                  <button
+                    type="button"
+                    key={item.id}
+                    className="li"
+                    onClick={() => navigate('/hub/acara')}
+                  >
+                    <span className="li-ic">
+                      <i className="fa-solid fa-calendar-day" />
+                    </span>
+                    <span className="li-body">
+                      <span className="li-t trunc">{item.name}</span>
+                      <span className="li-s trunc">{item.time}</span>
+                    </span>
+                    <span className="chev">
+                      <i className="fa-solid fa-chevron-right" />
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Alat Saya */}
-          <div className="sec">
+          <div className="sec" id="berandaLoansWrap">
             <div className="sec-hd">
-              <h3>
-                <Package size={16} style={{ color: 'var(--b-600)' }} />
-                Alat saya
-              </h3>
+              <h2>Alat saya</h2>
               <button
                 type="button"
-                className="link-btn"
+                className="link"
                 onClick={() => navigate('/hub/peminjaman')}
               >
                 Riwayat
               </button>
             </div>
-            <div className="list">
-              {myLoans.map((loan) => (
+            {myLoans.length > 0 ? (
+              <div className="list">
+                {myLoans.map((loan) => (
+                  <button
+                    type="button"
+                    key={loan.id}
+                    className="li"
+                    onClick={() => navigate('/hub/peminjaman')}
+                  >
+                    <span className="li-ic">
+                      <i className="fa-solid fa-boxes-stacked" />
+                    </span>
+                    <span className="li-body">
+                      <span className="li-t trunc">{loan.name}</span>
+                      <span className="li-s">{loan.due}</span>
+                    </span>
+                    <span className={`chip ${loan.isLate ? 'dang' : 'info'}`}>
+                      <i className={loan.isLate ? 'fa-regular fa-circle-xmark' : 'fa-solid fa-arrows-rotate'} />
+                      <span>{loan.isLate ? 'Terlambat' : 'Dipinjam'}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="empty card">
+                <i className="fa-solid fa-boxes-stacked" />
+                <p>Tidak ada alat yang sedang kamu pinjam.</p>
                 <button
                   type="button"
-                  key={loan.id}
-                  className="li"
+                  className="btn sm pri"
                   onClick={() => navigate('/hub/peminjaman')}
                 >
-                  <span className="li-ic">
-                    <Package size={16} />
-                  </span>
-                  <span className="li-body">
-                    <span className="li-t">{loan.name}</span>
-                    <span className="li-s">{loan.due}</span>
-                  </span>
-                  <span className={`chip ${loan.isLate ? 'dang' : 'info'}`}>
-                    {loan.isLate ? 'Terlambat' : 'Dipinjam'}
-                  </span>
+                  Pinjam alat
                 </button>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Kolom Kanan: Pengumuman & Dokumen Saya */}
         <div>
           {/* Pengumuman */}
-          <div className="sec">
+          <div className="sec" id="berandaAnnounceWrap" style={{ marginTop: '8px' }}>
             <div className="sec-hd">
-              <h3>
-                <AlertCircle size={16} style={{ color: 'var(--b-600)' }} />
-                Pengumuman
-              </h3>
+              <h2>Pengumuman</h2>
               <button
                 type="button"
-                className="link-btn"
+                className="link"
                 onClick={() => navigate('/hub/broadcast')}
               >
                 Semua
@@ -392,17 +381,23 @@ export const BerandaPage: React.FC = () => {
                   key={ann.id}
                   className={`ann ${ann.isImportant ? 'high' : ''}`}
                   onClick={() => navigate('/hub/broadcast')}
+                  style={{ width: '100%' }}
                 >
-                  <div className="row-b">
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div className="t-md">{ann.title}</div>
-                      <div className="t-xs clamp2" style={{ color: 'var(--muted)', marginTop: '4px' }}>
+                  <div className="row-b" style={{ alignItems: 'flex-start' }}>
+                    <div className="tight">
+                      <div className="t-md trunc">{ann.title}</div>
+                      <div className="t-xs muted clamp2" style={{ marginTop: '4px' }}>
                         {ann.body}
                       </div>
                     </div>
-                    {ann.isImportant && <span className="chip gold">Penting</span>}
+                    {ann.isImportant && (
+                      <span className="chip gold">
+                        <i className="fa-solid fa-bolt" />
+                        <span>Penting</span>
+                      </span>
+                    )}
                   </div>
-                  <div className="t-xs" style={{ color: 'var(--muted)', marginTop: '8px' }}>
+                  <div className="t-xs muted" style={{ marginTop: '9px' }}>
                     {ann.by} &bull; {ann.date}
                   </div>
                 </button>
@@ -411,15 +406,12 @@ export const BerandaPage: React.FC = () => {
           </div>
 
           {/* Dokumen Saya */}
-          <div className="sec">
+          <div className="sec" id="berandaDocsWrap">
             <div className="sec-hd">
-              <h3>
-                <FileText size={16} style={{ color: 'var(--b-600)' }} />
-                Dokumen saya
-              </h3>
+              <h2>Dokumen saya</h2>
               <button
                 type="button"
-                className="link-btn"
+                className="link"
                 onClick={() => navigate('/hub/dokumen')}
               >
                 Buka
