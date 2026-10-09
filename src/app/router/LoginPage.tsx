@@ -40,8 +40,10 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div style={{
-      width: '100vw',
+    <div
+      className="login-page-root"
+      style={{
+        width: '100vw',
       minHeight: '100dvh',
       background: '#061A36',
       color: '#FFFFFF',

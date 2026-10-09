@@ -9650,3 +9650,460 @@ span.fin-matrix-cell.unpaid {
     min-height: 44px;
   }
 }
+
+/* ============================================================
+   AUTHENTIC LEGACY LOAN PICKER MODAL & ACCORDION (page-dasbor.php: 9500-9957)
+   ============================================================ */
+.loan-picker-modal-root {
+  width: 100%;
+}
+
+.loan-picker-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+}
+@media (max-width: 860px) {
+  .loan-picker-container {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.loan-picker-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.loan-picker-right {
+  position: sticky;
+  top: 0;
+  max-height: calc(90vh - 100px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--r-m);
+  padding: 14px;
+  box-shadow: var(--shadow-xs, 0 1px 3px rgba(0,0,0,0.05));
+  min-width: 0;
+}
+@media (max-width: 860px) {
+  .loan-picker-right.desktop-only-panel {
+    display: none !important;
+  }
+}
+
+.loan-cat-chips-bar {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.loan-cat-chips-bar::-webkit-scrollbar {
+  height: 4px;
+}
+.loan-cat-chips-bar::-webkit-scrollbar-thumb {
+  background: var(--line-2);
+  border-radius: 4px;
+}
+
+.loan-inventory-scroll {
+  max-height: none;
+  overflow-y: visible;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 1. Category Accordion Card */
+.loan-cat-card {
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--r-m);
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color .15s, box-shadow .15s;
+}
+.loan-cat-card:hover {
+  border-color: var(--b-300);
+}
+.loan-cat-card.has-selected {
+  border-color: var(--b-500);
+}
+.loan-cat-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--bg-2);
+  transition: background .12s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.loan-cat-card.expanded .loan-cat-head {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--line-2);
+}
+.loan-cat-title-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.loan-cat-body {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-1, #f8fafc);
+}
+
+/* 2. Asset / Inventaris Accordion Card inside Category */
+.loan-asset-card {
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-s);
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.loan-asset-card:hover {
+  border-color: var(--b-400);
+}
+.loan-asset-card.has-selected {
+  border-color: var(--b-500);
+  background: #f8fbff;
+}
+.loan-asset-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--surface);
+  transition: background .12s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.loan-asset-card.expanded .loan-asset-head {
+  border-bottom: 1px solid var(--line-2);
+  background: var(--bg-2);
+}
+
+/* 3. Units List & Rows */
+.loan-units-container {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+}
+.loan-unit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 8px 18px;
+  border-bottom: 1px solid var(--line-2);
+  cursor: pointer;
+  user-select: none;
+  transition: background .12s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.loan-unit-item:last-child {
+  border-bottom: none;
+}
+.loan-unit-item:hover:not(.disabled) {
+  background: var(--b-050);
+}
+.loan-unit-item.selected {
+  background: #eff6ff;
+}
+.loan-unit-item.disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  background: var(--bg-2);
+}
+.loan-unit-item.match-highlight {
+  border-left: 3.5px solid var(--b-500);
+}
+.loan-unit-checkbox {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: var(--b-600);
+  flex-shrink: 0;
+}
+.loan-unit-item.disabled .loan-unit-checkbox {
+  cursor: not-allowed;
+}
+.loan-unit-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+.loan-unit-name {
+  font-size: 12.5px;
+  font-weight: 550;
+  color: var(--ink);
+  line-height: 1.25;
+}
+.loan-unit-code {
+  font-size: 11px;
+  color: var(--ink3, #64748b);
+  font-family: monospace;
+}
+
+/* Right Panel Selected Scroll */
+.selected-items-scroll {
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 2px;
+}
+.selected-asset-block {
+  background: var(--bg-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-s);
+  padding: 6px 9px;
+}
+.selected-asset-head {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.selected-unit-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.btn-remove-unit {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--dang);
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background .12s;
+}
+.btn-remove-unit:hover {
+  background: #fee2e2;
+}
+
+/* Mobile Sticky Bottom Bar */
+.loan-mobile-sticky-bar {
+  display: none;
+}
+@media (max-width: 860px) {
+  .selected-unit-tag {
+    padding: 6px 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+  .btn-remove-unit {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    margin: -8px -8px -8px auto;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--dang);
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    position: relative;
+    z-index: 20;
+    pointer-events: auto !important;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(239, 68, 68, 0.2);
+    transition: transform .12s, background .12s;
+  }
+  .btn-remove-unit:active {
+    background: #fee2e2;
+    transform: scale(0.92);
+  }
+
+  .loan-mobile-sticky-bar {
+    display: flex;
+    position: fixed;
+    bottom: 14px;
+    left: 14px;
+    right: 14px;
+    z-index: 1000;
+    align-items: center;
+    justify-content: space-between;
+    background: #1e3a8a;
+    color: #fff;
+    padding: 11px 16px;
+    border-radius: var(--r-m);
+    box-shadow: 0 8px 24px rgba(30, 58, 138, 0.4);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13.5px;
+    transition: transform .15s, opacity .15s;
+    touch-action: manipulation;
+  }
+}
+
+/* Mobile Full Bottom Sheet Drawer (Full Screen on Mobile) */
+.loan-mobile-drawer-overlay {
+  display: none;
+}
+@media (max-width: 860px) {
+  .loan-mobile-drawer-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--surface);
+    z-index: 9998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  .loan-mobile-drawer-overlay.open {
+    display: flex !important;
+    opacity: 1;
+    pointer-events: auto !important;
+  }
+  .loan-mobile-drawer-content {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    max-height: none;
+    padding-top: calc(max(14px, env(safe-area-inset-top)) + 54px);
+    background: var(--surface);
+    border-radius: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: none;
+    transform: translateY(100%);
+    transition: transform .28s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 9999;
+    pointer-events: auto !important;
+    box-sizing: border-box;
+  }
+  .loan-mobile-drawer-overlay.open .loan-mobile-drawer-content {
+    transform: translateY(0);
+  }
+
+  .loan-mobile-drawer-header {
+    position: relative;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line-2);
+    flex-shrink: 0;
+    pointer-events: auto !important;
+  }
+
+  .loan-mobile-back-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 16px;
+    border-radius: var(--r-full);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--bg-2);
+    border: 1px solid var(--line-2);
+    color: var(--ink);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    z-index: 10001;
+    pointer-events: auto !important;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: rgba(37, 99, 235, 0.15);
+    transition: transform .12s, background .12s;
+  }
+  .loan-mobile-back-btn:active {
+    background: var(--b-100);
+    color: var(--b-700);
+    transform: scale(0.96);
+  }
+
+  .loan-mobile-close-all-btn {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-2);
+    background: var(--bg-2);
+    border: 1px solid var(--line-2);
+    cursor: pointer;
+    position: relative;
+    z-index: 10001;
+    pointer-events: auto !important;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(239, 68, 68, 0.15);
+    transition: transform .12s, background .12s;
+  }
+  .loan-mobile-close-all-btn:active {
+    background: #fee2e2;
+    color: var(--dang);
+    transform: scale(0.92);
+  }
+
+  .loan-mobile-drawer-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px 16px max(30px, env(safe-area-inset-bottom)) 16px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}

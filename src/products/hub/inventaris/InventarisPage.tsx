@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import { useSessionStore } from '@core/session';
 import { inventarisService } from './inventarisService';
-import { peminjamanService } from '../peminjaman/peminjamanService';
 import { ItemInventaris } from './types';
 import { loanBasketStore } from './loanBasketStore';
+import { LoanModal } from '../peminjaman/LoanModal';
 
 export const InventarisPage: React.FC = () => {
-  const { can, user } = useSessionStore();
+  const { can } = useSessionStore();
 
   const [items, setItems] = useState<ItemInventaris[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,16 +30,6 @@ export const InventarisPage: React.FC = () => {
   const [newLoc, setNewLoc] = useState('Studio PTV');
   const [newQty, setNewQty] = useState('1');
   const [newSubmitting, setNewSubmitting] = useState(false);
-
-  // Form Checkout from Basket
-  const [borrowerName, setBorrowerName] = useState(user?.full_name || '');
-  const [purpose, setPurpose] = useState('Operasional Liputan PTV');
-  const [dueDate, setDueDate] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 2);
-    return d.toISOString().split('T')[0];
-  });
-  const [checkoutSubmitting, setCheckoutSubmitting] = useState(false);
 
   // Sync loanBasket
   const basketItems = useSyncExternalStore(
@@ -145,40 +135,6 @@ export const InventarisPage: React.FC = () => {
         assetName: asset.nama_alat,
         invCode: asset.kode,
       });
-    }
-  };
-
-  const handleCheckoutSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (basketItems.length === 0) {
-      alert('Daftar pinjaman kosong. Pilih unit terlebih dahulu.');
-      return;
-    }
-    if (!borrowerName.trim()) {
-      alert('Nama peminjam wajib diisi.');
-      return;
-    }
-    try {
-      setCheckoutSubmitting(true);
-      const unitIds = basketItems.map((b) => b.unitId);
-      await peminjamanService.checkoutLoan(
-        {
-          borrower_name: borrowerName.trim(),
-          purpose: purpose.trim(),
-          due_date: dueDate,
-          unit_ids: unitIds,
-        },
-        user?.ptv_id,
-        user?.full_name
-      );
-      loanBasketStore.clear();
-      setIsDaftarPinjamanOpen(false);
-      alert('Peminjaman multi-unit berhasil diproses!');
-      await loadData();
-    } catch (err: unknown) {
-      alert((err as Error).message || 'Gagal memproses peminjaman');
-    } finally {
-      setCheckoutSubmitting(false);
     }
   };
 
@@ -533,15 +489,21 @@ export const InventarisPage: React.FC = () => {
             const inBasket = loanBasketStore.hasAsset(x.id);
 
             return (
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={0}
                 key={x.id}
                 className="inv-prod-card"
                 onClick={() => setSelectedAsset(x)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    setSelectedAsset(x);
+                  }
+                }}
                 style={
                   inBasket
-                    ? { borderColor: 'var(--b-400)', boxShadow: '0 0 0 2px var(--b-100)' }
-                    : undefined
+                    ? { borderColor: 'var(--b-400)', boxShadow: '0 0 0 2px var(--b-100)', cursor: 'pointer' }
+                    : { cursor: 'pointer' }
                 }
               >
                 {/* 1. Status ketersediaan badge & foto */}
@@ -621,7 +583,7 @@ export const InventarisPage: React.FC = () => {
                     )}
                   </div>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
@@ -961,136 +923,13 @@ export const InventarisPage: React.FC = () => {
         </>
       )}
 
-      {/* ── DAFTAR PINJAMAN DRAWER / CHECKOUT MODAL ── */}
-      {isDaftarPinjamanOpen && (
-        <>
-          <div className="scrim on" onClick={() => setIsDaftarPinjamanOpen(false)} />
-          <section className="sheet on" role="dialog" aria-modal="true" style={{ maxHeight: '88vh' }}>
-            <div className="sheet-grab" />
-            <div className="sheet-hd">
-              <h3>Daftar Pinjaman ({basketCount} Unit)</h3>
-              <button
-                type="button"
-                className="icon-btn"
-                onClick={() => setIsDaftarPinjamanOpen(false)}
-                aria-label="Tutup"
-              >
-                <i className="fa-solid fa-xmark" />
-              </button>
-            </div>
-            <div className="sheet-body" style={{ padding: '16px', overflowY: 'auto' }}>
-              {basketCount === 0 ? (
-                <div className="empty card">
-                  <i className="fa-solid fa-clipboard-list" />
-                  <p>Daftar pinjaman kosong. Pilih alat dari katalog terlebih dahulu.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleCheckoutSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>
-                      Alat Yang Dipilih:
-                    </div>
-                    {basketItems.map((b) => (
-                      <div
-                        key={b.key}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          padding: '10px 14px',
-                          background: '#f8fafc',
-                          border: '1px solid #e2e8f0',
-                          borderRadius: '10px',
-                        }}
-                      >
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a' }}>
-                            {b.assetName}
-                          </div>
-                          <div style={{ fontSize: '11px', color: '#64748b' }}>
-                            {b.unitName} &bull; <span className="font-mono">{b.unitCode}</span>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          className="icon-btn"
-                          onClick={() => loanBasketStore.remove(b.key)}
-                          title="Hapus dari daftar"
-                        >
-                          <i className="fa-solid fa-trash-can" style={{ color: '#ef4444' }} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <div>
-                      <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
-                        Nama Peminjam
-                      </label>
-                      <input
-                        type="text"
-                        className="input"
-                        value={borrowerName}
-                        onChange={(e) => setBorrowerName(e.target.value)}
-                        required
-                        style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
-                        Keperluan Peminjaman
-                      </label>
-                      <input
-                        type="text"
-                        className="input"
-                        value={purpose}
-                        onChange={(e) => setPurpose(e.target.value)}
-                        required
-                        style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
-                        Tenggat Pengembalian
-                      </label>
-                      <input
-                        type="date"
-                        className="input"
-                        value={dueDate}
-                        onChange={(e) => setDueDate(e.target.value)}
-                        required
-                        style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <button
-                      type="button"
-                      className="btn sec flex-1"
-                      onClick={() => loanBasketStore.clear()}
-                      style={{ borderRadius: '8px' }}
-                    >
-                      Kosongkan
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn pri flex-1"
-                      disabled={checkoutSubmitting}
-                      style={{ borderRadius: '8px' }}
-                    >
-                      {checkoutSubmitting ? 'Memproses...' : `Ajukan Peminjaman (${basketCount} Unit)`}
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
-          </section>
-        </>
-      )}
+      {/* ── MODAL PINJAM ALAT 1:1 LEGACY DARI openLoanModal() ── */}
+      <LoanModal
+        isOpen={isDaftarPinjamanOpen}
+        onClose={() => setIsDaftarPinjamanOpen(false)}
+        presetAssetId={selectedAsset?.id}
+        onSuccess={() => loadData()}
+      />
 
       {/* ── MODAL TAMBAH ALAT BARU ── */}
       {isNewAssetOpen && (

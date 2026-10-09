@@ -17,8 +17,11 @@ class LoanBasketStore {
   private items: Map<string, LoanBasketItem> = new Map();
   private listeners: Set<() => void> = new Set();
 
+  private cachedItems: LoanBasketItem[] = [];
+
   constructor() {
     this.loadFromStorage();
+    this.cachedItems = Array.from(this.items.values());
   }
 
   public static getInstance(): LoanBasketStore {
@@ -36,11 +39,12 @@ class LoanBasketStore {
   }
 
   private notify(): void {
+    this.cachedItems = Array.from(this.items.values());
     this.listeners.forEach((l) => l());
   }
 
   public getItems(): LoanBasketItem[] {
-    return Array.from(this.items.values());
+    return this.cachedItems;
   }
 
   public getCount(): number {
@@ -52,33 +56,37 @@ class LoanBasketStore {
   }
 
   public hasAsset(assetId: string): boolean {
-    return Array.from(this.items.values()).some((i) => i.assetId === assetId);
+    return this.cachedItems.some((i) => i.assetId === assetId);
   }
 
   public toggle(item: LoanBasketItem): boolean {
+    let added = false;
     if (this.items.has(item.key)) {
       this.items.delete(item.key);
-      this.saveToStorage();
-      this.notify();
-      return false; // removed
+      added = false;
     } else {
       this.items.set(item.key, item);
-      this.saveToStorage();
-      this.notify();
-      return true; // added
+      added = true;
     }
+    this.saveToStorage();
+    this.notify();
+    return added;
   }
 
   public remove(key: string): void {
-    this.items.delete(key);
-    this.saveToStorage();
-    this.notify();
+    if (this.items.has(key)) {
+      this.items.delete(key);
+      this.saveToStorage();
+      this.notify();
+    }
   }
 
   public clear(): void {
-    this.items.clear();
-    this.saveToStorage();
-    this.notify();
+    if (this.items.size > 0) {
+      this.items.clear();
+      this.saveToStorage();
+      this.notify();
+    }
   }
 
   private saveToStorage(): void {

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSessionStore } from '@core/session';
 import { peminjamanService } from './peminjamanService';
-import { inventarisService } from '../inventaris/inventarisService';
 import { PeminjamanRecord, KondisiKembali } from './types';
-import { AvailableUnitItem } from '../inventaris/inventarisService';
+import { LoanModal } from './LoanModal';
 
 interface GroupedTransaction {
   transaction_id: string;
@@ -32,18 +31,6 @@ export const PeminjamanPage: React.FC = () => {
   const [returnNotes, setReturnNotes] = useState('');
   const [submittingAction, setSubmittingAction] = useState(false);
 
-  // Checkout Form State
-  const [borrowerName, setBorrowerName] = useState(user?.full_name || '');
-  const [purpose, setPurpose] = useState('');
-  const [dueDate, setDueDate] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 2);
-    return d.toISOString().split('T')[0];
-  });
-  const [availableUnits, setAvailableUnits] = useState<AvailableUnitItem[]>([]);
-  const [selectedUnitIds, setSelectedUnitIds] = useState<string[]>([]);
-  const [checkoutSubmitting, setCheckoutSubmitting] = useState(false);
-
   const loadData = async () => {
     setLoading(true);
     try {
@@ -58,10 +45,6 @@ export const PeminjamanPage: React.FC = () => {
     loadData();
   }, []);
 
-  const loadAvailableUnits = async () => {
-    const list = await inventarisService.getAvailableUnits();
-    setAvailableUnits(list);
-  };
 
   // Group all loans by transaction (1 submit = 1 card) - identical to groupLoansByTransaction()
   const groupLoansByTransaction = (loans: PeminjamanRecord[]): GroupedTransaction[] => {
@@ -182,39 +165,6 @@ export const PeminjamanPage: React.FC = () => {
     }
   };
 
-  const handleCheckoutSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (selectedUnitIds.length === 0) {
-      alert('Pilih minimal satu unit alat untuk dipinjam.');
-      return;
-    }
-    if (!borrowerName.trim()) {
-      alert('Nama peminjam wajib diisi.');
-      return;
-    }
-    try {
-      setCheckoutSubmitting(true);
-      await peminjamanService.checkoutLoan(
-        {
-          borrower_name: borrowerName.trim(),
-          purpose: purpose.trim(),
-          due_date: dueDate,
-          unit_ids: selectedUnitIds,
-        },
-        user?.ptv_id,
-        user?.full_name
-      );
-      setIsCheckoutOpen(false);
-      setSelectedUnitIds([]);
-      setPurpose('');
-      alert('Peminjaman multi-unit berhasil diproses!');
-      await loadData();
-    } catch (err: unknown) {
-      alert((err as Error).message || 'Gagal memproses peminjaman');
-    } finally {
-      setCheckoutSubmitting(false);
-    }
-  };
 
   return (
     <div className="page">
@@ -235,10 +185,7 @@ export const PeminjamanPage: React.FC = () => {
           <button
             type="button"
             className="btn pri"
-            onClick={() => {
-              loadAvailableUnits();
-              setIsCheckoutOpen(true);
-            }}
+            onClick={() => setIsCheckoutOpen(true)}
             style={{
               whiteSpace: 'nowrap',
               minHeight: '42px',
@@ -727,131 +674,12 @@ export const PeminjamanPage: React.FC = () => {
         </>
       )}
 
-      {/* ── MODAL PINJAM ALAT BARU (MULTI-UNIT CHECKOUT) ── */}
-      {isCheckoutOpen && (
-        <>
-          <div className="scrim on" onClick={() => setIsCheckoutOpen(false)} />
-          <section className="sheet on" role="dialog" aria-modal="true" style={{ maxHeight: '90vh' }}>
-            <div className="sheet-grab" />
-            <div className="sheet-hd">
-              <h3>Formulir Peminjaman Multi-Unit</h3>
-              <button
-                type="button"
-                className="icon-btn"
-                onClick={() => setIsCheckoutOpen(false)}
-                aria-label="Tutup"
-              >
-                <i className="fa-solid fa-xmark" />
-              </button>
-            </div>
-            <div className="sheet-body" style={{ padding: '16px', overflowY: 'auto' }}>
-              <form onSubmit={handleCheckoutSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Nama Peminjam</label>
-                  <input
-                    type="text"
-                    value={borrowerName}
-                    onChange={(e) => setBorrowerName(e.target.value)}
-                    required
-                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Keperluan Peminjaman</label>
-                  <input
-                    type="text"
-                    value={purpose}
-                    onChange={(e) => setPurpose(e.target.value)}
-                    placeholder="Contoh: Liputan Kegiatan Haul Akbar 2026"
-                    required
-                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Tenggat Pengembalian</label>
-                  <input
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    required
-                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)', marginBottom: '6px', display: 'block' }}>
-                    Pilih Unit Alat Yang Tersedia ({selectedUnitIds.length} dipilih):
-                  </label>
-                  <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {availableUnits.length === 0 ? (
-                      <div style={{ fontSize: '12px', color: '#64748b', textAlign: 'center', padding: '12px' }}>
-                        Tidak ada unit alat yang tersedia untuk dipinjam saat ini.
-                      </div>
-                    ) : (
-                      availableUnits.map((u) => {
-                        const isSelected = selectedUnitIds.includes(u.unit.id);
-                        return (
-                          <div
-                            key={u.unit.id}
-                            onClick={() => {
-                              setSelectedUnitIds((prev) =>
-                                prev.includes(u.unit.id)
-                                  ? prev.filter((id) => id !== u.unit.id)
-                                  : [...prev, u.unit.id]
-                              );
-                            }}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '8px 10px',
-                              borderRadius: '6px',
-                              border: `1px solid ${isSelected ? '#3b82f6' : '#e2e8f0'}`,
-                              background: isSelected ? '#eff6ff' : '#ffffff',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            <div>
-                              <div style={{ fontWeight: 700, fontSize: '12.5px', color: '#0f172a' }}>
-                                {u.item.nama_alat}
-                              </div>
-                              <div style={{ fontSize: '11px', color: '#64748b' }}>
-                                Unit: <span className="font-mono">{u.unit.kode_unit}</span> &bull; {u.item.kategori}
-                              </div>
-                            </div>
-                            <i className={`fa-solid ${isSelected ? 'fa-square-check' : 'fa-square'}`} style={{ color: isSelected ? '#2563eb' : '#94a3b8', fontSize: '16px' }} />
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                  <button
-                    type="button"
-                    className="btn sec flex-1"
-                    onClick={() => setIsCheckoutOpen(false)}
-                    style={{ borderRadius: '8px' }}
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn pri flex-1"
-                    disabled={checkoutSubmitting}
-                    style={{ borderRadius: '8px' }}
-                  >
-                    {checkoutSubmitting ? 'Memproses...' : 'Proses Peminjaman'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </section>
-        </>
-      )}
+      {/* ── MODAL PINJAM ALAT 1:1 LEGACY DARI openLoanModal() ── */}
+      <LoanModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        onSuccess={() => loadData()}
+      />
     </div>
   );
 };
