@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useSyncExternalStore } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '@core/session';
 import { inventarisService } from './inventarisService';
 import { ItemInventaris } from './types';
@@ -6,6 +7,7 @@ import { loanBasketStore } from './loanBasketStore';
 import { LoanModal } from '../peminjaman/LoanModal';
 
 export const InventarisPage: React.FC = () => {
+  const navigate = useNavigate();
   const { can } = useSessionStore();
 
   const [items, setItems] = useState<ItemInventaris[]>([]);
@@ -17,7 +19,6 @@ export const InventarisPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('semua');
 
   // Detail & Modals
-  const [selectedAsset, setSelectedAsset] = useState<ItemInventaris | null>(null);
   const [isDaftarPinjamanOpen, setIsDaftarPinjamanOpen] = useState(false);
   const [isNewAssetOpen, setIsNewAssetOpen] = useState(false);
   const [unitPickerAsset, setUnitPickerAsset] = useState<ItemInventaris | null>(null);
@@ -494,10 +495,10 @@ export const InventarisPage: React.FC = () => {
                 tabIndex={0}
                 key={x.id}
                 className="inv-prod-card"
-                onClick={() => setSelectedAsset(x)}
+                onClick={() => navigate(`/hub/inventaris/${x.id}`)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
-                    setSelectedAsset(x);
+                    navigate(`/hub/inventaris/${x.id}`);
                   }
                 }}
                 style={
@@ -508,13 +509,26 @@ export const InventarisPage: React.FC = () => {
               >
                 {/* 1. Status ketersediaan badge & foto */}
                 <div className="inv-prod-photo">
-                  <span className="inv-prod-icon">{getCatIconMarkup(x.kategori)}</span>
+                  {x.foto_url ? (
+                    <img
+                      src={x.foto_url}
+                      alt={x.nama_alat}
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = 'none';
+                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <span className="inv-prod-icon" style={{ display: x.foto_url ? 'none' : 'flex' }}>
+                    {getCatIconMarkup(x.kategori)}
+                  </span>
 
                   <span
                     className="inv-prod-status-badge"
                     style={{
-                      background: badgeColor,
-                      color: '#ffffff',
+                      color: badgeColor,
                       borderColor: badgeBorder,
                     }}
                   >
@@ -589,224 +603,7 @@ export const InventarisPage: React.FC = () => {
         </div>
       )}
 
-      {/* ── DETAIL ALAT MODAL 1:1 DARI pgAlatDetail() ── */}
-      {selectedAsset && (
-        <>
-          <div className="scrim on" onClick={() => setSelectedAsset(null)} />
-          <section
-            className="sheet on"
-            role="dialog"
-            aria-modal="true"
-            style={{ maxHeight: '92vh', overflowY: 'auto' }}
-          >
-            <div className="sheet-grab" />
-            <div className="sheet-hd">
-              <div className="prod-breadcrumb">
-                <button type="button" onClick={() => setSelectedAsset(null)}>
-                  <i className="fa-solid fa-boxes-stacked" /> Inventaris
-                </button>
-                <span className="sep">
-                  <i className="fa-solid fa-chevron-right" />
-                </span>
-                <span>{selectedAsset.kategori}</span>
-                <span className="sep">
-                  <i className="fa-solid fa-chevron-right" />
-                </span>
-                <span style={{ color: 'var(--ink)', fontWeight: 700 }} className="trunc">
-                  {selectedAsset.nama_alat}
-                </span>
-              </div>
-              <button
-                type="button"
-                className="icon-btn"
-                onClick={() => setSelectedAsset(null)}
-                aria-label="Tutup"
-              >
-                <i className="fa-solid fa-xmark" />
-              </button>
-            </div>
 
-            <div className="sheet-body" style={{ padding: '16px' }}>
-              <div className="prod-showcase-card">
-                {/* Left Column: Gallery & Barcode */}
-                <div className="prod-gallery-col">
-                  <div className="prod-main-photo-wrap">
-                    <div className="prod-photo-fallback">
-                      {getCatIconMarkup(selectedAsset.kategori)}
-                    </div>
-                  </div>
-
-                  {/* Section Barcode Tiap Unit */}
-                  <div className="prod-section-card" style={{ marginTop: '16px' }}>
-                    <div className="prod-section-header">
-                      <div className="prod-section-title-wrap">
-                        <div className="prod-section-icon-badge indigo">
-                          <i className="fa-solid fa-barcode" />
-                        </div>
-                        <div>
-                          <h3 className="prod-section-title">
-                            <span>Label Barcode Unit</span>
-                            <span className="prod-section-count-chip">
-                              {selectedAsset.units.length} Unit Terdaftar
-                            </span>
-                          </h3>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="unit-barcodes-grid" style={{ marginTop: '10px' }}>
-                      {selectedAsset.units.map((u, idx) => (
-                        <div
-                          key={u.id}
-                          style={{
-                            background: '#f8fafc',
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '10px',
-                            padding: '10px',
-                            marginBottom: '8px',
-                          }}
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 700, fontSize: '13px' }}>
-                              Unit {idx + 1}
-                            </span>
-                            <span className="chip blue" style={{ fontSize: '11px', fontFamily: 'monospace' }}>
-                              {u.kode_unit}
-                            </span>
-                          </div>
-                          <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
-                            Kondisi: <b>{u.kondisi.toUpperCase()}</b> &bull; Status: <b>{u.status_peminjaman.toUpperCase()}</b>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Column: Specs & Actions */}
-                <div className="prod-info-col">
-                  <div>
-                    <span className="chip blue" style={{ fontSize: '11px', fontWeight: 750, marginBottom: '6px' }}>
-                      {selectedAsset.kode}
-                    </span>
-                    <h1 className="prod-main-title">{selectedAsset.nama_alat}</h1>
-                    <div className="prod-subhead">
-                      <i className="fa-solid fa-microchip" style={{ marginRight: '5px', opacity: 0.7 }} />
-                      {selectedAsset.spesifikasi || 'Spesifikasi standar operasional'}
-                    </div>
-                  </div>
-
-                  {/* Stats Bar */}
-                  <div className="prod-stats-bar">
-                    <span className="prod-stat-pill">
-                      <i className="fa-solid fa-shield-halved" style={{ color: '#2563eb' }} />
-                      <span>Kondisi Fisik: <b>Prima</b></span>
-                    </span>
-                    <span className="prod-stat-pill">
-                      <i className="fa-solid fa-cubes-stacked" style={{ color: selectedAsset.unit_tersedia > 0 ? '#16a34a' : '#d97706' }} />
-                      <span>
-                        Ketersediaan:{' '}
-                        <b style={{ color: selectedAsset.unit_tersedia > 0 ? '#16a34a' : '#d97706' }}>
-                          {selectedAsset.unit_tersedia}/{selectedAsset.total_unit} Unit
-                        </b>
-                      </span>
-                    </span>
-                  </div>
-
-                  {/* Pricing / Readiness Box */}
-                  <div className="prod-pricing-box">
-                    <div className="prod-price-main">
-                      <span className="prod-price-label">
-                        <i className={`fa-solid ${selectedAsset.unit_tersedia > 0 ? 'fa-circle-check' : 'fa-triangle-exclamation'}`} />
-                        STATUS KESIAPAN ALAT
-                      </span>
-                      <div className="prod-price-val">
-                        {selectedAsset.unit_tersedia > 0
-                          ? `${selectedAsset.unit_tersedia} Unit Siap Digunakan`
-                          : 'Semua Unit Sedang Dipinjam'}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Spec Cards Grid */}
-                  <div className="prod-spec-grid">
-                    <div className="prod-spec-card">
-                      <div className="prod-spec-card-icon"><i className="fa-solid fa-barcode" /></div>
-                      <div className="prod-spec-card-info">
-                        <span className="label">Kode Inventaris</span>
-                        <span className="val font-mono" style={{ color: 'var(--b-600)' }}>{selectedAsset.kode}</span>
-                      </div>
-                    </div>
-                    <div className="prod-spec-card">
-                      <div className="prod-spec-card-icon"><i className="fa-solid fa-layer-group" /></div>
-                      <div className="prod-spec-card-info">
-                        <span className="label">Kategori</span>
-                        <span className="val">{selectedAsset.kategori}</span>
-                      </div>
-                    </div>
-                    <div className="prod-spec-card">
-                      <div className="prod-spec-card-icon"><i className="fa-solid fa-location-dot" /></div>
-                      <div className="prod-spec-card-info">
-                        <span className="label">Lokasi</span>
-                        <span className="val">Studio PTV</span>
-                      </div>
-                    </div>
-                    <div className="prod-spec-card">
-                      <div className="prod-spec-card-icon"><i className="fa-solid fa-building-columns" /></div>
-                      <div className="prod-spec-card-info">
-                        <span className="label">Sumber Dana</span>
-                        <span className="val">Yayasan</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="prod-cta-area" style={{ marginTop: '20px' }}>
-                    <button
-                      type="button"
-                      className="prod-btn-basket"
-                      onClick={(e) => handleQuickAdd(e, selectedAsset)}
-                    >
-                      <i className={`fa-solid ${loanBasketStore.hasAsset(selectedAsset.id) ? 'fa-check' : 'fa-clipboard-list'}`} />
-                      <span>
-                        {loanBasketStore.hasAsset(selectedAsset.id)
-                          ? 'Ada di Daftar Pinjaman'
-                          : '+ Daftar Pinjaman'}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      className="prod-btn-primary-borrow"
-                      onClick={() => {
-                        const avail = selectedAsset.units.find((u) => u.status_peminjaman === 'tersedia');
-                        if (avail) {
-                          loanBasketStore.toggle({
-                            key: `${selectedAsset.id}_${avail.id}`,
-                            assetId: selectedAsset.id,
-                            unitId: avail.id,
-                            unitNo: 1,
-                            unitCode: avail.kode_unit,
-                            unitName: `Unit 01 (${avail.kode_unit})`,
-                            assetName: selectedAsset.nama_alat,
-                            invCode: selectedAsset.kode,
-                          });
-                          setIsDaftarPinjamanOpen(true);
-                          setSelectedAsset(null);
-                        } else {
-                          alert('Tidak ada unit yang tersedia untuk dipinjam saat ini.');
-                        }
-                      }}
-                    >
-                      <i className="fa-solid fa-hand-holding-hand" />
-                      <span>Pinjam Sekarang ({selectedAsset.unit_tersedia} Tersedia)</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </>
-      )}
 
       {/* ── UNIT PICKER MODAL (MULTI-UNIT SELECTOR) ── */}
       {unitPickerAsset && (
@@ -927,7 +724,6 @@ export const InventarisPage: React.FC = () => {
       <LoanModal
         isOpen={isDaftarPinjamanOpen}
         onClose={() => setIsDaftarPinjamanOpen(false)}
-        presetAssetId={selectedAsset?.id}
         onSuccess={() => loadData()}
       />
 

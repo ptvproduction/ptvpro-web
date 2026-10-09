@@ -279,7 +279,9 @@ export const HubShell: React.FC = () => {
   };
 
   const currentPath = location.pathname;
-  const currentCrumb = BREADCRUMB_MAP[currentPath] || 'Beranda';
+  const currentCrumb =
+    BREADCRUMB_MAP[currentPath] ||
+    (currentPath.startsWith('/hub/inventaris/') ? 'Detail Aset Inventaris' : 'Beranda');
 
   const userInitials = (user?.full_name || 'PTV')
     .split(/\s+/)

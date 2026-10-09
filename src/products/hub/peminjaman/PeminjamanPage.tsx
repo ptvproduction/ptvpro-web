@@ -20,7 +20,7 @@ export const PeminjamanPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   // Filters from pgPeminjaman()
-  const [loanFilter, setLoanFilter] = useState<'aktif' | 'saya' | 'selesai'>('aktif');
+  const [loanFilter, setLoanFilter] = useState<'aktif' | 'saya' | 'selesai' | 'semua'>('aktif');
   const [searchQ, setSearchQ] = useState('');
 
   // Modals & Sheets
@@ -167,86 +167,85 @@ export const PeminjamanPage: React.FC = () => {
 
 
   return (
-    <div className="page">
-      {/* ── TOP SEARCH BAR & TAMBAH PINJAMAN BUTTON ── */}
-      <div className="row gap8 mb12" style={{ alignItems: 'center' }}>
-        <div className="searchbar flex-1" style={{ margin: 0 }}>
-          <i className="fa-solid fa-magnifying-glass" />
-          <input
-            id="loanSearchInput"
-            value={searchQ}
-            onChange={(e) => setSearchQ(e.target.value)}
-            placeholder="Cari peminjam, keperluan, nama alat, kode unit / inventaris…"
-            autoComplete="off"
-          />
+    <div className="page" style={{ paddingTop: '4px' }}>
+      {/* ── Search & Filter Controls (Apple-style Clean Toolbar 1:1 Legacy) ── */}
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--line-2, rgba(15,23,42,0.08))', borderRadius: '14px', padding: '10px 14px', marginBottom: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
+            <i className="fa-solid fa-magnifying-glass" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink-2)', fontSize: '12px' }} />
+            <input
+              type="text"
+              id="loanSearchInput"
+              className="input"
+              placeholder="Cari peminjam, keperluan, nama alat atau kode unit..."
+              value={searchQ}
+              onChange={(e) => setSearchQ(e.target.value)}
+              style={{ paddingLeft: '34px', paddingRight: searchQ ? '32px' : '14px', borderRadius: '10px', fontSize: '12.5px', height: '36px', background: 'var(--bg-2)', border: '1px solid var(--line-2, rgba(15,23,42,0.08))', width: '100%', boxSizing: 'border-box' }}
+            />
+            {searchQ && (
+              <button
+                type="button"
+                id="loanSearchClearBtn"
+                onClick={() => setSearchQ('')}
+                style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--ink-2)', fontSize: '13px', padding: '4px', display: 'inline-flex' }}
+                aria-label="Hapus pencarian"
+              >
+                <i className="fa-solid fa-xmark" />
+              </button>
+            )}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <div className="filters" style={{ marginBottom: 0, display: 'flex', gap: '5px' }}>
+              {(
+                [
+                  ['aktif', 'Sedang Dipinjam'],
+                  ['saya', 'Milik Saya'],
+                  ['selesai', 'Selesai'],
+                  ['semua', 'Semua'],
+                ] as const
+              ).map(([k, l]) => (
+                <button
+                  key={k}
+                  type="button"
+                  className={`fchip ${loanFilter === k ? 'on' : ''}`}
+                  onClick={() => setLoanFilter(k)}
+                  style={{ fontSize: '12px', padding: '5px 13px', borderRadius: '999px', fontWeight: 550 }}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+            {can('loans.checkout') && (
+              <button
+                type="button"
+                className="btn sm pri"
+                onClick={() => setIsCheckoutOpen(true)}
+                style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '10px', fontWeight: 650, background: 'var(--ptv-green, #0e4f40)', border: 'none', boxShadow: '0 1px 3px rgba(14,79,64,0.2)', minHeight: '34px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <i className="fa-solid fa-plus" style={{ fontSize: '11px' }} />
+                <span>Pinjam Alat</span>
+              </button>
+            )}
+          </div>
         </div>
-
-        {can('loans.checkout') && (
-          <button
-            type="button"
-            className="btn pri"
-            onClick={() => setIsCheckoutOpen(true)}
-            style={{
-              whiteSpace: 'nowrap',
-              minHeight: '42px',
-              borderRadius: 'var(--r-full)',
-              padding: '0 18px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <i className="fa-solid fa-plus" />
-            <span>Pinjam Alat</span>
-          </button>
-        )}
       </div>
 
-      {/* ── GLOBAL METRICS BAR 1:1 DARI pgPeminjaman() ── */}
-      <div className="row gap8 mb14" style={{ flexWrap: 'wrap' }}>
-        <div className="loan-metric-pill">
-          <span className="num">{activeTxnCount}</span>
-          <span className="lbl">Transaksi Aktif</span>
-        </div>
-        <div className="loan-metric-pill">
-          <span className="num">{activeUnitsCount}</span>
-          <span className="lbl">Unit Dipinjam</span>
-        </div>
-        <div className={`loan-metric-pill ${overdueCount > 0 ? 'is-danger' : ''}`}>
-          <span className="num">{overdueCount}</span>
-          <span className="lbl">Terlambat</span>
-        </div>
-      </div>
-
-      {/* ── FILTER TABS: AKTIF, SAYA, SELESAI ── */}
-      <div className="filter-tabs mb14">
-        <button
-          type="button"
-          className={`ftab ${loanFilter === 'aktif' ? 'on' : ''}`}
-          onClick={() => setLoanFilter('aktif')}
-        >
-          Aktif ({allGroups.filter((g) => g.items.some((l) => l.status !== 'dikembalikan')).length})
-        </button>
-        <button
-          type="button"
-          className={`ftab ${loanFilter === 'saya' ? 'on' : ''}`}
-          onClick={() => setLoanFilter('saya')}
-        >
-          Saya (
-          {
-            allGroups.filter((g) =>
-              g.by.toLowerCase().includes((user?.full_name || '').toLowerCase())
-            ).length
-          }
-          )
-        </button>
-        <button
-          type="button"
-          className={`ftab ${loanFilter === 'selesai' ? 'on' : ''}`}
-          onClick={() => setLoanFilter('selesai')}
-        >
-          Selesai ({allGroups.filter((g) => g.items.every((l) => l.status === 'dikembalikan')).length})
-        </button>
+      {/* ── Inline Summary Bar (Subtle & Apple-like 1:1 Legacy) ── */}
+      <div className="loan-summary-bar">
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+          <i className="fa-solid fa-clipboard-list" style={{ color: 'var(--ptv-green, #0e4f40)', fontSize: '12px' }} />
+          <span><strong style={{ fontWeight: 650, color: 'var(--ink)' }}>{activeTxnCount}</strong> peminjaman aktif</span>
+        </span>
+        <span style={{ color: 'var(--muted, #94a3b8)' }}>&bull;</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+          <i className="fa-solid fa-boxes-stacked" style={{ color: '#2563eb', fontSize: '12px' }} />
+          <span><strong style={{ fontWeight: 650, color: 'var(--ink)' }}>{activeUnitsCount}</strong> unit dipinjam</span>
+        </span>
+        <span style={{ color: 'var(--muted, #94a3b8)' }}>&bull;</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: overdueCount > 0 ? '#dc2626' : undefined }}>
+          <i className={`fa-solid fa-${overdueCount > 0 ? 'triangle-exclamation' : 'circle-check'}`} style={{ fontSize: '12px', color: overdueCount > 0 ? '#dc2626' : '#10b981' }} />
+          <span><strong style={{ fontWeight: 650, color: overdueCount > 0 ? '#dc2626' : 'var(--ink)' }}>{overdueCount}</strong> terlambat</span>
+        </span>
       </div>
 
       {/* ── RESULT COUNT ── */}

@@ -5,6 +5,7 @@ import { HubShell } from '@products/hub/shell/HubShell';
 import { BerandaPage } from '@products/hub/beranda/BerandaPage';
 import { KruPage } from '@products/hub/kru/KruPage';
 import { InventarisPage } from '@products/hub/inventaris/InventarisPage';
+import { AlatDetailPage } from '@products/hub/inventaris/AlatDetailPage';
 import { PeminjamanPage } from '@products/hub/peminjaman/PeminjamanPage';
 
 export const router = createBrowserRouter([
@@ -45,6 +46,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredCapability="inventory.view">
             <InventarisPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'inventaris/:id',
+        element: (
+          <ProtectedRoute requiredCapability="inventory.view">
+            <AlatDetailPage />
           </ProtectedRoute>
         ),
       },
