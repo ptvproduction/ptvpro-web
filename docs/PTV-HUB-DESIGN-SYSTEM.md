@@ -1,11 +1,11 @@
 # PTV PRO HUB — DESIGN SYSTEM MANUAL
-## PTV Unified Continuous Curve & SF Plus Universal Typography
+## PTV Unified Continuous Curve & Inter Universal Typography
 
 > **Status:** APPROVED & MANDATORY GLOBAL PERMANENT STANDARD  
-> **Permanent Core Standard:** **Every PTV PRO Hub component must use the canonical smoothed continuous curve system and SF Plus typography.**  
+> **Permanent Core Standard:** **Every PTV PRO Hub component must use the canonical smoothed continuous curve system and Inter universal typography.**  
 > **Target Products:** PTV PRO Hub (`/hub`), Login, HubShell, Beranda, Inventaris, Detail Alat, Nilai Inventaris, Peminjaman, Kru, PTVSelect, modal dialogs, and all future modules.  
 > **Inspirasi Visual:** Bahasa bentuk keluarga perangkat Apple premium (MacBook, iPad, iPhone) dan Google Pixel Material 3 (Continuous Squircle Alignment & Concentric Contour Geometry).  
-> **Aturan Wajib:** Seluruh halaman PTV PRO Hub yang sudah dibangun atau yang akan dimigrasikan/dibangun WAJIB mematuhi sistem sudut continuous dan tipografi universal SF Plus tanpa pengecualian.
+> **Aturan Wajib:** Seluruh halaman PTV PRO Hub yang sudah dibangun atau yang akan dimigrasikan/dibangun WAJIB mematuhi sistem sudut continuous dan tipografi universal Inter tanpa pengecualian.
 
 ---
 
@@ -157,7 +157,7 @@ Sistem dokumentasi PTV berpegang pada **integritas empiris**:
 
 ## 5. REUSABLE CUSTOM DROPDOWN: `PTVSelect`
 
-Komponen `PTVSelect` terintegrasi penuh ke dalam sistem PTV Unified Continuous Curve dan SF Plus Typography:
+Komponen `PTVSelect` terintegrasi penuh ke dalam sistem PTV Unified Continuous Curve dan Inter Universal Typography:
 - **Trigger Button:** Radius `var(--ptv-curve-md)` (12px), tinggi konsisten 40px (size `md`), 34px (size `sm`), 48px (size `lg`).
 - **Floating Menu:** Radius `var(--ptv-curve-lg)` (16px), padding 5px, backdrop blur, elevation shadow halus.
 - **Option Items:** Radius `var(--ptv-curve-sm)` (9px) untuk keselarasan konsentris terhadap menu 16px.
@@ -166,35 +166,53 @@ Komponen `PTVSelect` terintegrasi penuh ke dalam sistem PTV Unified Continuous C
 
 ---
 
-## 6. SF PLUS UNIVERSAL TYPOGRAPHY SPECIFICATION
+## 6. INTER UNIVERSAL TYPOGRAPHY SPECIFICATION
 
-> **Standar Permanen:** **SF Plus adalah font utama dan universal seluruh PTV PRO Hub.**  
-> Berlaku mutlak pada: Login Hub, HubShell, Sidebar, Header, Mobile Bottom Nav, Beranda, Inventaris, Detail Alat, Nilai Inventaris, Peminjaman, seluruh form input, dropdown, tabel, kartu, modal, drawer, dan seluruh modul Hub yang akan dibangun.
+> **Standar Permanen:** **Inter adalah satu-satunya font utama dan universal di seluruh PTV PRO Hub.**  
+> Membatalkan keputusan sebelumnya mengenai "SF Plus" dan "SF Pro" demi konsistensi tipografi absolut lintas sistem operasi, platform, dan peramban tanpa ketergantungan pada font sistem operasi.  
+> Berlaku mutlak pada: Login Hub, HubShell, Sidebar, Header, Mobile Bottom Nav, Beranda, Inventaris, Detail Alat, Nilai Inventaris, Peminjaman, seluruh form input, textarea, button, dropdown PTVSelect, tabel, kartu, modal dialog, drawer, sheet, popover, tooltip, portal React, halaman `/hub/design-system`, dan seluruh modul Hub yang akan dibangun.
 
 ### 6.1 Typography Tokens (`:root`)
 
 ```css
 :root {
   /* ── Universal PTV PRO Hub Typography Tokens ── */
-  --ptv-font-family: "SF Plus", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Plus Jakarta Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ptv-font-family: "Inter", Arial, sans-serif;
   --ptv-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   --font: var(--ptv-font-family);
   --font-sans: var(--ptv-font-family);
 }
+
+.ptv-hub-root {
+  --ptv-font-family: "Inter", Arial, sans-serif;
+  font-family: var(--ptv-font-family);
+}
 ```
 
-### 6.2 Status Aset & Strategi Pemuatan (Font Provisioning)
+### 6.2 Sumber Resmi, Lisensi & Implementasi Lokal (Self-Hosted WOFF2)
 
-Sesuai audit menyeluruh terhadap repositori dan sistem lokal:
-- **Status Empiris:** File biner webfont "SF Plus" (`.woff2` / `.woff`) belum tersedia di dalam repositori atau aset lokal proyek.
-- **Integritas Lisensi:** PTV PRO Hub **TIDAK** mengunduh font bajakan/ilegal dari sumber tidak resmi dan **TIDAK** mengganti nama font lain secara artifisial.
-- **Deklarasi `@font-face` Terstruktur:**
-  Deklarasi `@font-face` untuk bobot 400, 500, 600, 700, dan 800 telah disiapkan di `src/styles/tokens.css` dengan `font-display: swap`. Rule ini mencari instalasi lokal (`local('SF Plus')`) dan siap memuat file resmi ketika pengguna menaruh file webfont di `/public/assets/fonts/`.
-- **Cascade Fallback Anggun:**  
-  Jika file font webfont belum ada, browser secara mulus merender sistem fallback beresolusi tinggi:
-  `"SF Plus"` $\to$ `-apple-system` $\to$ `BlinkMacSystemFont` $\to$ `"SF Pro Display"` $\to$ `"SF Pro Text"` $\to$ `"SF Pro"` $\to$ `"Plus Jakarta Sans"` $\to$ `sans-serif`.
+- **Sumber Resmi:** Inter Variable (`.woff2`) bersumber langsung dari rilis resmi Rasmus Andersson / Google Fonts.
+- **Lisensi:** SIL Open Font License 1.1 (OFL-1.1) — sepenuhnya bebas, legal, dan aman untuk bundling komersial/internal.
+- **Penyimpanan Lokal:** Disimpan secara mandiri (self-hosted) di dalam repositori pada:
+  `/public/assets/fonts/InterVariable.woff2` (ukuran ~352 kB).
+- **Zero 404 & Preload Optimasi:**
+  Di `index.html`, berkas di-preload untuk menghindari FOIT (Flash of Invisible Text) maupun layout shifts:
+  ```html
+  <link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  ```
+- **Single Unified Variable `@font-face`:**
+  ```css
+  @font-face {
+    font-family: "Inter";
+    src: url("/assets/fonts/InterVariable.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+  }
+  ```
+  Satu berkas WOFF2 variabel tunggal mencakup seluruh spektrum bobot dari 100 hingga 900 secara kontinu tanpa memerlukan request font terpisah.
 
-### 6.3 Weight Mapping & Typographic Hierarchy
+### 6.3 Weight Mapping & Typographic Hierarchy (400–900)
 
 | Weight | Nama Token / CSS | Komponen & Peruntukan di PTV PRO Hub |
 |---|---|---|
@@ -202,11 +220,11 @@ Sesuai audit menyeluruh terhadap repositori dan sistem lokal:
 | **500** | Medium (`font-weight: 500`) | Input control value, placeholder trigger dropdown, sub-label metadata |
 | **600** | Semibold (`font-weight: 600`) | Tombol sekunder, header kolom tabel, pill badge status, tab aktif |
 | **700** | Bold (`font-weight: 700`) | CTA primer, judul kartu, judul seksi, judul modal dialog |
-| **800 / 900** | Heavy / Black (`font-weight: 800`) | Angka KPI display (`.num`), master brand header, hero greetings |
+| **800 / 900** | Extra Bold / Black (`font-weight: 800`) | Angka KPI display (`.num`), master brand header, hero greetings |
 
 ### 6.4 Portal & Modal Font Inheritance
 
-Komponen yang dirender di luar hierarki DOM root Hub (misalnya `PTVSelect` yang menggunakan `createPortal(..., document.body)` atau modal dialog yang di-portal) wajib memiliki aturan font eksplisit:
+Komponen yang dirender di luar hierarki DOM root Hub (misalnya `PTVSelect` yang menggunakan `createPortal(..., document.body)` atau modal dialog yang di-portal) memiliki aturan font eksplisit yang mengikat ke token `--ptv-font-family`:
 ```css
 .ptv-select-wrapper,
 .ptv-select-menu,
@@ -216,7 +234,7 @@ Komponen yang dirender di luar hierarki DOM root Hub (misalnya `PTVSelect` yang 
   font-family: var(--ptv-font-family, inherit);
 }
 ```
-Aturan ini menjamin bahwa seluruh portal dan floating surface mewarisi tipografi SF Plus tanpa mengontaminasi root launcher `/` atau WordPress legacy.
+Aturan ini menjamin bahwa seluruh portal dan floating surface mewarisi tipografi Inter tanpa mengontaminasi root launcher `/` atau produk legacy lainnya.
 
 ---
 
@@ -248,8 +266,8 @@ Kunjungi rute pengujian internal `/hub/design-system`:
    - Menguji Kasus 1 (Card $\to$ Thumb), Kasus 2 (Modal $\to$ Sub-panel $\to$ Control), dan kalkulator interaktif live slider.
 3. **Tab 3: Optical Size Matrix & Token Catalog:**
    - Demonstrasi komponen nyata Hub di setiap tingkatan token.
-4. **Tab 4: SF Plus Universal Typography & Portal Inheritance:**
-   - Visual inspection status token `--ptv-font-family`, fallback cascade, weight mapping (400, 500, 600, 700, 800), numeral alignment, dan pembuktian empiris pewarisan font pada dropdown in-DOM vs. portal `document.body`.
+4. **Tab 4: Inter Universal Typography & Portal Inheritance:**
+   - Visual inspection status token `--ptv-font-family` (`"Inter", Arial, sans-serif`), status self-hosted Inter Variable WOFF2, weight mapping (400–900), numeral alignment, dan pembuktian empiris pewarisan font pada dropdown in-DOM vs. portal `document.body`.
 
 ### 8.2 Automated Regression Audit Test
 
@@ -276,6 +294,6 @@ Sebelum modul baru (Jadwal, Produksi, Distribusi, Pengaturan) disetujui:
 - [ ] Semua kartu dan bento container memakai `var(--ptv-curve-xl)`.
 - [ ] Elemen anak di dalam kartu mengikuti formula $R_{\text{inner}} \approx \max(0, R_{\text{outer}} - \text{inset})$.
 - [ ] Dropdown menggunakan `PTVSelect`.
-- [ ] Seluruh teks dan komponen mewarisi `var(--ptv-font-family)`.
+- [ ] Seluruh teks dan komponen mewarisi `var(--ptv-font-family)` (Inter).
 - [ ] Tidak ada hardcoded `borderRadius: 'Xpx'` atau `fontFamily: '...'` inline di JSX.
 - [ ] Lulus pengujian otomatis `npm test tests/hub/continuousCurveAudit.test.ts`.

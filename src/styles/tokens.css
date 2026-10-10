@@ -3,51 +3,16 @@
  * Ported 1:1 from page-dasbor.php (Style #2)
  */
 
-/* ── SF Plus Universal Typography Specification ──
- * Webfont Asset Provisioning Notice:
- * Once official / licensed SF Plus webfont binary files (.woff2) are provided,
- * place them in /public/assets/fonts/ and the @font-face rules below will activate them.
- * Until assets are provided, local() resolution and system fallbacks gracefully apply.
+/* ── Universal Inter Variable Font Definition ──
+ * Source: Official Inter by Rasmus Andersson (SIL Open Font License 1.1)
+ * Asset: Self-hosted local variable webfont supporting weights 100-900
  */
 @font-face {
-  font-family: 'SF Plus';
+  font-family: "Inter";
+  src: url("/assets/fonts/InterVariable.woff2") format("woff2");
   font-style: normal;
-  font-weight: 400;
+  font-weight: 100 900;
   font-display: swap;
-  src: local('SF Plus Regular'), local('SF Plus'),
-       url('/assets/fonts/SFPlus-Regular.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'SF Plus';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: local('SF Plus Medium'),
-       url('/assets/fonts/SFPlus-Medium.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'SF Plus';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: local('SF Plus Semibold'), local('SF Plus SemiBold'),
-       url('/assets/fonts/SFPlus-Semibold.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'SF Plus';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: local('SF Plus Bold'),
-       url('/assets/fonts/SFPlus-Bold.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'SF Plus';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: local('SF Plus Heavy'), local('SF Plus ExtraBold'),
-       url('/assets/fonts/SFPlus-Heavy.woff2') format('woff2');
 }
 
 :root {
@@ -142,8 +107,8 @@
   --sidebar-w: 250px;
   --maxw: 1160px;
 
-  /* ── Universal PTV PRO Hub Typography Tokens (SF Plus Standard) ── */
-  --ptv-font-family: "SF Plus", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Plus Jakarta Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /* ── Universal PTV PRO Hub Typography Tokens (Inter Standard) ── */
+  --ptv-font-family: "Inter", Arial, sans-serif;
   --ptv-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   --font: var(--ptv-font-family);
   --font-sans: var(--ptv-font-family);
@@ -226,3 +191,10 @@
   --text-secondary: var(--ink-2);
   --text-muted: var(--muted);
 }
+
+/* ── Universal Root Hub Scoping ── */
+.ptv-hub-root {
+  --ptv-font-family: "Inter", Arial, sans-serif;
+  font-family: var(--ptv-font-family);
+}
+
