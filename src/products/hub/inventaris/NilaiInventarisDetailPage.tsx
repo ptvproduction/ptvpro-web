@@ -117,7 +117,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
     return (
       <div className="page subview-fade">
         <div style={{ background: '#fff', border: '1.5px solid #fee2e2', borderRadius: 'var(--ptv-curve-xl)', padding: '32px 24px', textAlign: 'center', maxWidth: '560px', margin: '40px auto' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>Akses Terbatas</h3>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>Akses Terbatas</h3>
           <p style={{ color: '#64748b', fontSize: '13.5px' }}>Anda tidak memiliki hak akses untuk melihat rincian nilai inventaris.</p>
           <button className="btn pri" onClick={() => navigate('/hub/beranda')}>Kembali ke Beranda</button>
         </div>
@@ -186,10 +186,10 @@ export const NilaiInventarisDetailPage: React.FC = () => {
             <span>Kembali</span>
           </button>
           <div style={{ minWidth: 0 }}>
-            <h1 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: 0, lineHeight: 1.25 }}>
+            <h1 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: 0, lineHeight: 1.25 }}>
               Detail Nilai Inventaris
             </h1>
-            <div style={{ fontSize: '12px', color: 'var(--muted, #64748b)', fontWeight: 550, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: '12px', color: 'var(--muted, #64748b)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {item.kode} &bull; {item.nama_alat}
             </div>
           </div>
@@ -252,7 +252,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                   <i className="fa-solid fa-receipt" />
                 </div>
                 <div style={{ minWidth: 0 }}>
-                  <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: 0, lineHeight: 1.25 }}>
+                  <h3 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: 0, lineHeight: 1.25 }}>
                     Informasi Valuasi &amp; Pembelian
                   </h3>
                   <span style={{ fontSize: '11.5px', color: 'var(--muted, #64748b)' }}>
@@ -260,14 +260,14 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                   </span>
                 </div>
               </div>
-              <span className={`chip ${hasVal ? 'ok' : 'warn'}`} style={{ fontSize: '11px', fontWeight: 750, padding: '2px 10px', flexShrink: 0 }}>
+              <span className={`chip ${hasVal ? 'ok' : 'warn'}`} style={{ fontSize: '11px', fontWeight: 700, padding: '2px 10px', flexShrink: 0 }}>
                 {statusAset}
               </span>
             </div>
 
             {/* Price Highlight Banner */}
             <div className="ptv-nilai-detail-price-box">
-              <span style={{ fontSize: '11px', fontWeight: 750, color: 'var(--muted, #64748b)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted, #64748b)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Total Nilai Inventaris
               </span>
               <div className="ptv-nilai-detail-price-val" style={{ color: hasVal ? '#047857' : '#94a3b8' }}>
@@ -291,7 +291,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                   <i className="fa-regular fa-calendar" style={{ fontSize: '10px', marginRight: '4px' }} />
                   Tanggal Perolehan
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: 750, color: 'var(--ink, #0f172a)' }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink, #0f172a)' }}>
                   {tglPerolehan}
                 </span>
               </div>
@@ -301,7 +301,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                   <i className="fa-solid fa-hand-holding-dollar" style={{ fontSize: '10px', marginRight: '4px' }} />
                   Sumber Pendanaan
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: 750, color: 'var(--ink, #0f172a)' }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink, #0f172a)' }}>
                   {sumberDana}
                 </span>
               </div>
@@ -311,7 +311,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                   <i className="fa-solid fa-store" style={{ fontSize: '10px', marginRight: '4px' }} />
                   Vendor / Toko
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: 750, color: 'var(--ink, #0f172a)' }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink, #0f172a)' }}>
                   {vendorName}
                 </span>
               </div>
@@ -321,7 +321,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                   <i className="fa-solid fa-receipt" style={{ fontSize: '10px', marginRight: '4px' }} />
                   Nomor Invoice
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: 750, color: 'var(--ink, #0f172a)' }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink, #0f172a)' }}>
                   {noInvoice}
                 </span>
               </div>
@@ -333,7 +333,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                 <span style={{ fontSize: '11px', color: 'var(--muted, #64748b)', fontWeight: 600, display: 'block', marginBottom: '2px' }}>
                   Nilai Residu
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: 750, color: 'var(--ink, #0f172a)' }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink, #0f172a)' }}>
                   {nilaiResidu}
                 </span>
               </div>
@@ -342,7 +342,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                 <span style={{ fontSize: '11px', color: 'var(--muted, #64748b)', fontWeight: 600, display: 'block', marginBottom: '2px' }}>
                   Nilai Buku / Tercatat
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: 750, color: 'var(--ink, #0f172a)' }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink, #0f172a)' }}>
                   {nilaiTercatat}
                 </span>
               </div>
@@ -350,7 +350,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
 
             {/* Catatan Administratif */}
             <div style={{ marginTop: '16px', marginBottom: '16px' }}>
-              <span style={{ fontSize: '11.5px', fontWeight: 750, color: 'var(--muted, #64748b)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '4px' }}>
+              <span style={{ fontSize: '11.5px', fontWeight: 700, color: 'var(--muted, #64748b)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '4px' }}>
                 Catatan Administratif
               </span>
               <div style={{ background: 'var(--bg-2, #f8fafc)', border: '1px solid var(--line, #e2e8f0)', borderRadius: 'var(--ptv-curve-md)', padding: '10px 12px', fontSize: '12.5px', color: 'var(--ink, #334155)', lineHeight: 1.4, wordBreak: 'break-word' }}>
@@ -394,10 +394,10 @@ export const NilaiInventarisDetailPage: React.FC = () => {
               </div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'inline-block', padding: '1px 8px', background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', borderRadius: 'var(--ptv-curve-xs)', fontSize: '11px', fontWeight: 800, letterSpacing: '0.04em', marginBottom: '4px' }}>
+                <span style={{ display: 'inline-block', padding: '1px 8px', background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', borderRadius: 'var(--ptv-curve-xs)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', marginBottom: '4px' }}>
                   {item.kode}
                 </span>
-                <h2 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: '0 0 4px 0', lineHeight: 1.3, wordBreak: 'break-word' }}>
+                <h2 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: '0 0 4px 0', lineHeight: 1.3, wordBreak: 'break-word' }}>
                   {item.nama_alat}
                 </h2>
                 <div style={{ fontSize: '11.5px', color: 'var(--muted, #64748b)', marginTop: '4px' }}>
@@ -409,7 +409,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
 
             {item.spesifikasi && (
               <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--line-2, #f1f5f9)' }}>
-                <span style={{ fontSize: '11px', fontWeight: 750, color: 'var(--muted, #64748b)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '4px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted, #64748b)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '4px' }}>
                   Spesifikasi Fisik Alat
                 </span>
                 <p style={{ fontSize: '12.5px', color: 'var(--ink, #475569)', margin: 0, lineHeight: 1.4, wordBreak: 'break-word' }}>
@@ -426,11 +426,11 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                 <div style={{ width: '32px', height: '32px', borderRadius: 'var(--ptv-curve-sm)', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
                   <i className="fa-solid fa-boxes-stacked" />
                 </div>
-                <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   Unit Fisik Terdaftar ({totalUnits})
                 </h3>
               </div>
-              <span className="chip ok" style={{ fontSize: '10.5px', fontWeight: 750, flexShrink: 0 }}>
+              <span className="chip ok" style={{ fontSize: '10.5px', fontWeight: 700, flexShrink: 0 }}>
                 {availUnits} Tersedia
               </span>
             </div>
@@ -458,7 +458,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                         }}
                       />
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: '12.5px', fontWeight: 750, color: 'var(--ink, #0f172a)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--ink, #0f172a)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           Unit {idx + 1 < 10 ? `0${idx + 1}` : idx + 1} ({u.kode_unit})
                         </div>
                         <div style={{ fontSize: '10.5px', color: 'var(--muted, #64748b)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -466,7 +466,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <span className={`chip ${statusChip}`} style={{ fontSize: '10px', padding: '1px 7px', fontWeight: 750, flexShrink: 0 }}>
+                    <span className={`chip ${statusChip}`} style={{ fontSize: '10px', padding: '1px 7px', fontWeight: 700, flexShrink: 0 }}>
                       {statusLabel}
                     </span>
                   </div>
@@ -510,7 +510,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
             {/* Modal Header */}
             <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line-2, #f1f5f9)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--ink, #0f172a)' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: 'var(--ink, #0f172a)' }}>
                   {hasVal ? 'Ubah Catatan Nilai' : 'Catat Nilai Inventaris'}
                 </h3>
                 <span style={{ fontSize: '12px', color: 'var(--muted, #64748b)' }}>

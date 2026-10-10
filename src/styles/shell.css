@@ -46,7 +46,7 @@
 }
 
 .brand-logo-text {
-  font-weight: 800;
+  font-weight: 700;
   font-size: 16px;
   letter-spacing: -0.02em;
   color: var(--b-700);
@@ -64,7 +64,7 @@
   align-items: center;
   gap: 8px;
   font-size: 13.5px;
-  font-weight: 650;
+  font-weight: 600;
   color: var(--ink);
 }
 
@@ -173,7 +173,7 @@
     padding: 0 12px;
     border-radius: var(--r-full);
     font-size: 13.5px;
-    font-weight: 550;
+    font-weight: 500;
     color: var(--ink-2);
     transition: all 0.16s ease;
     text-align: left;
@@ -205,7 +205,7 @@
   .snav.on {
     background: linear-gradient(150deg, var(--b-500), var(--b-700));
     color: #ffffff !important;
-    font-weight: 620;
+    font-weight: 600;
     box-shadow: var(--shadow-blue);
   }
 
@@ -277,7 +277,7 @@
     margin-left: auto;
     font-family: var(--ptv-font-mono, monospace);
     font-size: 10.5px;
-    font-weight: 650;
+    font-weight: 600;
     padding: 1px 6px;
     border-radius: var(--ptv-curve-xs);
     background: var(--b-050);

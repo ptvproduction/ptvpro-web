@@ -199,10 +199,10 @@ export const AlatDetailPage: React.FC = () => {
           <div className="prod-info-col">
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '6px' }}>
-                <span className="chip blue" style={{ fontSize: '11px', fontWeight: 750, letterSpacing: '0.02em', padding: '2px 8px' }}>
+                <span className="chip blue" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.02em', padding: '2px 8px' }}>
                   {asset.kode}
                 </span>
-                <span className="chip" style={{ fontSize: '11px', fontWeight: 650, color: 'var(--muted)', background: 'var(--bg-2)', border: '1px solid var(--line-2)' }}>
+                <span className="chip" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)', background: 'var(--bg-2)', border: '1px solid var(--line-2)' }}>
                   {asset.kategori}
                 </span>
               </div>
@@ -238,7 +238,7 @@ export const AlatDetailPage: React.FC = () => {
                 <div className="prod-price-val">
                   {avail > 0 ? `${avail} Unit Siap Digunakan` : (borrowed > 0 ? 'Semua Unit Sedang Dipinjam' : 'Dalam Pemeliharaan / Servis')}
                 </div>
-                <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 550, marginTop: '2px' }}>
+                <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, marginTop: '2px' }}>
                   <i className="fa-solid fa-building-columns" style={{ color: '#2563eb', marginRight: '4px' }} />
                   Sumber Dana: <b>{asset.sumber_perolehan || 'Yayasan'}</b> &bull; Lokasi: <b>{asset.units[0]?.lokasi_penyimpanan || 'Studio PTV'}</b>
                 </span>
@@ -374,10 +374,10 @@ export const AlatDetailPage: React.FC = () => {
                   <div key={u.id} className={`prod-unit-hcard${cardClass}`}>
                     <div className="prod-unit-hcard-header" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '6px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '6px' }}>
-                        <span className="chip" style={{ fontSize: '10.5px', fontWeight: 750, color: '#2563eb', background: '#eff6ff', padding: '1px 7px' }}>
+                        <span className="chip" style={{ fontSize: '10.5px', fontWeight: 700, color: '#2563eb', background: '#eff6ff', padding: '1px 7px' }}>
                           Unit {idx + 1}
                         </span>
-                        <span className={`chip ${statusChipClass}`} style={{ fontSize: '10px', padding: '1px 7px', fontWeight: 750 }}>
+                        <span className={`chip ${statusChipClass}`} style={{ fontSize: '10px', padding: '1px 7px', fontWeight: 700 }}>
                           {statusLabel}
                         </span>
                       </div>
@@ -393,7 +393,7 @@ export const AlatDetailPage: React.FC = () => {
                           }}
                         />
                         <span className="prod-unit-hcard-name">Unit #{idx + 1}</span>
-                        <span className="chip blue" style={{ fontSize: '10.5px', fontWeight: 750, letterSpacing: '0.02em', padding: '1px 7px' }}>
+                        <span className="chip blue" style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.02em', padding: '1px 7px' }}>
                           {u.kode_unit}
                         </span>
                       </div>
@@ -468,7 +468,7 @@ export const AlatDetailPage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="prod-section-title">Spesifikasi &amp; Catatan Teknis</h3>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 550, marginTop: '2px' }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, marginTop: '2px' }}>
                     Dokumentasi operasional dan rincian parameter alat
                   </div>
                 </div>
@@ -493,7 +493,7 @@ export const AlatDetailPage: React.FC = () => {
                     <span>Riwayat Aktivitas &amp; Peminjaman</span>
                     <span className="prod-section-count-chip">{loans.length} Log</span>
                   </h3>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 550, marginTop: '2px' }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, marginTop: '2px' }}>
                     Jejak sirkulasi penggunaan unit alat oleh praktikan atau teknisi
                   </div>
                 </div>
@@ -541,12 +541,12 @@ export const AlatDetailPage: React.FC = () => {
                       </div>
                       <div className="loan-hist-main" style={{ flex: 1, minWidth: 0 }}>
                         <div className="loan-hist-row-top" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                          <span className="loan-hist-name" style={{ fontSize: '13.5px', fontWeight: 750, color: '#0f172a' }}>
+                          <span className="loan-hist-name" style={{ fontSize: '13.5px', fontWeight: 700, color: '#0f172a' }}>
                             {l.peminjam_nama}
                           </span>
                           <span className="loan-hist-dot" style={{ color: '#cbd5e1' }}>&bull;</span>
-                          <span className="loan-hist-range" style={{ fontSize: '12px', color: '#64748b', fontWeight: 550 }}>
-                            {fmtDate(l.tanggal_pinjam)} &rarr; {isBack ? `${fmtDate(l.tanggal_kembali)} (Kembali)` : <span style={{ color: '#d97706', fontWeight: 650 }}>Belum kembali</span>}
+                          <span className="loan-hist-range" style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>
+                            {fmtDate(l.tanggal_pinjam)} &rarr; {isBack ? `${fmtDate(l.tanggal_kembali)} (Kembali)` : <span style={{ color: '#d97706', fontWeight: 600 }}>Belum kembali</span>}
                           </span>
                           {isBack ? (
                             <span className="chip ok" style={{ fontSize: '10.5px', padding: '2px 8px', fontWeight: 700 }}>

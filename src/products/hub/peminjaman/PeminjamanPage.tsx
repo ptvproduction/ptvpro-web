@@ -210,7 +210,7 @@ export const PeminjamanPage: React.FC = () => {
                   type="button"
                   className={`fchip ${loanFilter === k ? 'on' : ''}`}
                   onClick={() => setLoanFilter(k)}
-                  style={{ fontSize: '12px', padding: '5px 13px', borderRadius: 'var(--ptv-curve-pill)', fontWeight: 550 }}
+                  style={{ fontSize: '12px', padding: '5px 13px', borderRadius: 'var(--ptv-curve-pill)', fontWeight: 500 }}
                 >
                   {l}
                 </button>
@@ -221,7 +221,7 @@ export const PeminjamanPage: React.FC = () => {
                 type="button"
                 className="btn sm pri"
                 onClick={() => setIsCheckoutOpen(true)}
-                style={{ fontSize: '12px', padding: '6px 14px', borderRadius: 'var(--ptv-curve-md)', fontWeight: 650, background: 'var(--ptv-green, #0e4f40)', border: 'none', boxShadow: '0 1px 3px rgba(14,79,64,0.2)', minHeight: '34px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                style={{ fontSize: '12px', padding: '6px 14px', borderRadius: 'var(--ptv-curve-md)', fontWeight: 600, background: 'var(--ptv-green, #0e4f40)', border: 'none', boxShadow: '0 1px 3px rgba(14,79,64,0.2)', minHeight: '34px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
                 <i className="fa-solid fa-plus" style={{ fontSize: '11px' }} />
                 <span>Pinjam Alat</span>
@@ -235,17 +235,17 @@ export const PeminjamanPage: React.FC = () => {
       <div className="loan-summary-bar">
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
           <i className="fa-solid fa-clipboard-list" style={{ color: 'var(--ptv-green, #0e4f40)', fontSize: '12px' }} />
-          <span><strong style={{ fontWeight: 650, color: 'var(--ink)' }}>{activeTxnCount}</strong> peminjaman aktif</span>
+          <span><strong style={{ fontWeight: 600, color: 'var(--ink)' }}>{activeTxnCount}</strong> peminjaman aktif</span>
         </span>
         <span style={{ color: 'var(--muted, #94a3b8)' }}>&bull;</span>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
           <i className="fa-solid fa-boxes-stacked" style={{ color: '#2563eb', fontSize: '12px' }} />
-          <span><strong style={{ fontWeight: 650, color: 'var(--ink)' }}>{activeUnitsCount}</strong> unit dipinjam</span>
+          <span><strong style={{ fontWeight: 600, color: 'var(--ink)' }}>{activeUnitsCount}</strong> unit dipinjam</span>
         </span>
         <span style={{ color: 'var(--muted, #94a3b8)' }}>&bull;</span>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: overdueCount > 0 ? '#dc2626' : undefined }}>
           <i className={`fa-solid fa-${overdueCount > 0 ? 'triangle-exclamation' : 'circle-check'}`} style={{ fontSize: '12px', color: overdueCount > 0 ? '#dc2626' : '#10b981' }} />
-          <span><strong style={{ fontWeight: 650, color: overdueCount > 0 ? '#dc2626' : 'var(--ink)' }}>{overdueCount}</strong> terlambat</span>
+          <span><strong style={{ fontWeight: 600, color: overdueCount > 0 ? '#dc2626' : 'var(--ink)' }}>{overdueCount}</strong> terlambat</span>
         </span>
       </div>
 
@@ -329,7 +329,7 @@ export const PeminjamanPage: React.FC = () => {
                               borderRadius: 'var(--ptv-curve-pill)',
                               background: 'rgba(15,23,42,0.05)',
                               color: 'var(--ink-2)',
-                              fontWeight: 550,
+                              fontWeight: 500,
                             }}
                           >
                             {grp.transaction_id}
@@ -534,10 +534,10 @@ export const PeminjamanPage: React.FC = () => {
                   <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
                     Detail Alat & Unit
                   </div>
-                  <div style={{ fontSize: '14.5px', fontWeight: 750, color: '#0f172a', marginTop: '2px' }}>
+                  <div style={{ fontSize: '14.5px', fontWeight: 700, color: '#0f172a', marginTop: '2px' }}>
                     {returnTargetUnit.nama_alat}
                   </div>
-                  <div style={{ fontSize: '12px', color: '#0284c7', fontWeight: 650, marginTop: '2px' }}>
+                  <div style={{ fontSize: '12px', color: '#0284c7', fontWeight: 600, marginTop: '2px' }}>
                     Kode Unit: {returnTargetUnit.kode_unit}
                   </div>
                 </div>
@@ -618,7 +618,7 @@ export const PeminjamanPage: React.FC = () => {
                   <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
                     Nomor Transaksi: {returnTargetTxn.transaction_id}
                   </div>
-                  <div style={{ fontSize: '14px', fontWeight: 750, color: '#0f172a', marginTop: '3px' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginTop: '3px' }}>
                     Peminjam: {returnTargetTxn.by} ({returnTargetTxn.items.length} Unit Alat)
                   </div>
                 </div>

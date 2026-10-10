@@ -362,7 +362,7 @@ export const InventarisPage: React.FC = () => {
                 fontSize: '11.5px',
                 padding: '3px 10px',
                 minHeight: '34px',
-                fontWeight: 650,
+                fontWeight: 600,
                 color: 'var(--warn)',
                 borderRadius: 'var(--r-m)',
               }}
@@ -381,7 +381,7 @@ export const InventarisPage: React.FC = () => {
                 fontSize: '12px',
                 padding: '0 12px',
                 minHeight: '34px',
-                fontWeight: 650,
+                fontWeight: 600,
                 color: 'var(--b-700)',
                 background: 'var(--b-050)',
                 border: '1px solid var(--b-200)',
@@ -543,7 +543,7 @@ export const InventarisPage: React.FC = () => {
                   {/* 2a. Kode & Kategori */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
                     <div className="inv-prod-code">{x.kode || `INV-${String(x.id).slice(0, 5).toUpperCase()}`}</div>
-                    <span style={{ fontSize: '10.5px', color: 'var(--muted)', fontWeight: 650, textTransform: 'capitalize' }}>
+                    <span style={{ fontSize: '10.5px', color: 'var(--muted)', fontWeight: 600, textTransform: 'capitalize' }}>
                       {x.kategori || 'Alat'}
                     </span>
                   </div>
@@ -560,7 +560,7 @@ export const InventarisPage: React.FC = () => {
 
                   {/* 2c. Jumlah Unit & Ketersediaan */}
                   <div style={{ marginTop: 'auto', paddingTop: '6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 650, lineHeight: 1.25 }} className="trunc">
+                    <div style={{ fontSize: '11px', fontWeight: 600, lineHeight: 1.25 }} className="trunc">
                       {total <= 1 ? (
                         avail === 1 ? (
                           <span style={{ color: '#16a34a', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
@@ -602,7 +602,7 @@ export const InventarisPage: React.FC = () => {
                     </div>
 
                     {/* 2d. Lokasi & Quick Action Button */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', color: 'var(--muted)', fontWeight: 550, gap: '6px', paddingTop: '3px', borderTop: '1px solid var(--line-2, #f1f5f9)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', color: 'var(--muted)', fontWeight: 500, gap: '6px', paddingTop: '3px', borderTop: '1px solid var(--line-2, #f1f5f9)' }}>
                       <span className="trunc" style={{ flex: 1 }} title={`Lokasi: ${x.units?.[0]?.lokasi_penyimpanan || 'Studio PTV'}`}>
                         <i className="fa-solid fa-location-dot" style={{ fontSize: '10px', marginRight: '3px', color: '#0284c7' }} />
                         {x.units?.[0]?.lokasi_penyimpanan || 'Studio PTV'}
@@ -677,13 +677,13 @@ export const InventarisPage: React.FC = () => {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontWeight: 800,
+                          fontWeight: 700,
                         }}
                       >
                         #{idx + 1}
                       </div>
                       <div>
-                        <div style={{ fontWeight: 750, fontSize: '13.5px', color: '#0f172a' }}>
+                        <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>
                           Unit {idx + 1} &bull; <span className="font-mono">{u.kode_unit}</span>
                         </div>
                         <div style={{ fontSize: '11.5px', color: '#64748b' }}>

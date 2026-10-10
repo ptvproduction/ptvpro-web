@@ -216,7 +216,7 @@ export const NilaiInventarisPage: React.FC = () => {
           <div style={{ width: '56px', height: '56px', background: '#fef2f2', color: '#ef4444', borderRadius: 'var(--ptv-curve-circle)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '24px' }}>
             <i className="fa-solid fa-lock" />
           </div>
-          <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>Akses Modul Terbatas</h3>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>Akses Modul Terbatas</h3>
           <p style={{ fontSize: '13.5px', color: '#64748b', lineHeight: 1.5, marginBottom: '20px' }}>
             Modul <b>Nilai Inventaris PTV</b> hanya dapat diakses oleh peran <b>Eksekutif, Administrasi, dan Kru Operasional</b> aktif.
           </p>
@@ -454,7 +454,7 @@ export const NilaiInventarisPage: React.FC = () => {
             <div style={{ width: '52px', height: '52px', background: '#f1f5f9', color: '#94a3b8', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: '22px' }}>
               <i className="fa-solid fa-box-open" />
             </div>
-            <h4 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: '0 0 6px 0' }}>Tidak Ada Data Inventaris yang Cocok</h4>
+            <h4 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: '0 0 6px 0' }}>Tidak Ada Data Inventaris yang Cocok</h4>
             <p style={{ fontSize: '13px', color: 'var(--muted, #64748b)', margin: '0 0 16px 0' }}>Silakan sesuaikan kata kunci pencarian atau filter status nilai di atas.</p>
             <button type="button" className="btn sm pri" onClick={resetFilters} style={{ borderRadius: 'var(--ptv-curve-md)', padding: '6px 16px' }}>
               Reset Filter
@@ -547,11 +547,11 @@ export const NilaiInventarisPage: React.FC = () => {
                       <div className="ptv-nilai-dossier-hd">
                         <span className="ptv-nilai-dossier-title">Nilai Perolehan</span>
                         {hasVal ? (
-                          <span style={{ fontSize: '10.5px', fontWeight: 750, padding: '1px 6px', borderRadius: 'var(--ptv-curve-xs)', background: '#ecfdf5', color: '#059669' }}>
+                          <span style={{ fontSize: '10.5px', fontWeight: 700, padding: '1px 6px', borderRadius: 'var(--ptv-curve-xs)', background: '#ecfdf5', color: '#059669' }}>
                             {statusAset}
                           </span>
                         ) : (
-                          <span style={{ fontSize: '10.5px', fontWeight: 750, padding: '1px 6px', borderRadius: 'var(--ptv-curve-xs)', background: '#fef3c7', color: '#b45309' }}>
+                          <span style={{ fontSize: '10.5px', fontWeight: 700, padding: '1px 6px', borderRadius: 'var(--ptv-curve-xs)', background: '#fef3c7', color: '#b45309' }}>
                             Belum Dicatat
                           </span>
                         )}
@@ -560,7 +560,7 @@ export const NilaiInventarisPage: React.FC = () => {
                       <div className="ptv-nilai-dossier-val">{hasVal && v ? formatRupiah(v.nilai_perolehan) : 'Rp —'}</div>
 
                       {hasVal && v && totalUnits > 1 && (
-                        <div style={{ fontSize: '11px', fontWeight: 650, color: '#64748b', marginTop: '2px' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', marginTop: '2px' }}>
                           @ {formatRupiah(Math.round(v.nilai_perolehan / totalUnits))} &times; {totalUnits} Unit
                         </div>
                       )}
@@ -688,7 +688,7 @@ export const NilaiInventarisPage: React.FC = () => {
             {/* Modal Header */}
             <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line-2, #f1f5f9)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--ink, #0f172a)' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: 'var(--ink, #0f172a)' }}>
                   {editingItem.nilai_inventaris ? 'Ubah Catatan Nilai' : 'Catat Nilai Inventaris'}
                 </h3>
                 <span style={{ fontSize: '12px', color: 'var(--muted, #64748b)' }}>

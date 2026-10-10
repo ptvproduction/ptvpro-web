@@ -159,7 +159,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               background: '#e0f2fe',
               color: '#0369a1',
               fontSize: '11px',
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
             }}
@@ -193,7 +193,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
             Rasterizer Nyata: Skala Busur Lingkaran Proporsional (n=2)
           </span>
         </div>
-        <h1 style={{ fontSize: '26px', fontWeight: 900, color: 'var(--ink, #0f172a)', margin: '0 0 6px 0', letterSpacing: '-0.03em' }}>
+        <h1 style={{ fontSize: '26px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: '0 0 6px 0', letterSpacing: '-0.03em' }}>
           PTV Unified Continuous Curve — Validation &amp; Geometry Inspector
         </h1>
         <p style={{ fontSize: '13.5px', color: 'var(--muted, #64748b)', margin: 0, lineHeight: 1.5 }}>
@@ -221,7 +221,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
             border: activeTab === 'lab' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
             background: activeTab === 'lab' ? '#eff6ff' : '#ffffff',
             color: activeTab === 'lab' ? '#1d4ed8' : '#475569',
-            fontWeight: 750,
+            fontWeight: 700,
             fontSize: '12.5px',
             cursor: 'pointer',
           }}
@@ -238,7 +238,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
             border: activeTab === 'overlay' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
             background: activeTab === 'overlay' ? '#eff6ff' : '#ffffff',
             color: activeTab === 'overlay' ? '#1d4ed8' : '#475569',
-            fontWeight: 750,
+            fontWeight: 700,
             fontSize: '12.5px',
             cursor: 'pointer',
           }}
@@ -255,7 +255,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
             border: activeTab === 'nested' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
             background: activeTab === 'nested' ? '#eff6ff' : '#ffffff',
             color: activeTab === 'nested' ? '#1d4ed8' : '#475569',
-            fontWeight: 750,
+            fontWeight: 700,
             fontSize: '12.5px',
             cursor: 'pointer',
           }}
@@ -272,7 +272,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
             border: activeTab === 'comparison' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
             background: activeTab === 'comparison' ? '#eff6ff' : '#ffffff',
             color: activeTab === 'comparison' ? '#1d4ed8' : '#475569',
-            fontWeight: 750,
+            fontWeight: 700,
             fontSize: '12.5px',
             cursor: 'pointer',
           }}
@@ -289,7 +289,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
             border: activeTab === 'typography' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
             background: activeTab === 'typography' ? '#eff6ff' : '#ffffff',
             color: activeTab === 'typography' ? '#1d4ed8' : '#475569',
-            fontWeight: 750,
+            fontWeight: 700,
             fontSize: '12.5px',
             cursor: 'pointer',
           }}
@@ -360,7 +360,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                     background: '#dbeafe',
                     color: '#1d4ed8',
                     fontSize: '11px',
-                    fontWeight: 800,
+                    fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em',
                   }}
@@ -396,7 +396,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   Prototipe C: Gabriel Lamé Superellipse (n = {labSmoothing.toFixed(1)})
                 </span>
               </div>
-              <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
                 Eksperimen Perbandingan Empiris: Tiga Pendekatan Sudut Komponen
               </h2>
               <p style={{ fontSize: '13.5px', color: '#475569', margin: 0, lineHeight: 1.6 }}>
@@ -419,7 +419,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-                <span style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   <i className="fa-solid fa-sliders" style={{ marginRight: '8px', color: '#2563eb' }} />
                   Kontrol Eksperimen Interaktif
                 </span>
@@ -461,10 +461,10 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 {/* 1. Radius Slider */}
                 <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--ptv-curve-md)', padding: '14px 16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <label htmlFor="lab-radius-slider" style={{ fontSize: '12.5px', fontWeight: 750, color: '#1e293b' }}>
+                    <label htmlFor="lab-radius-slider" style={{ fontSize: '12.5px', fontWeight: 700, color: '#1e293b' }}>
                       Nominal Corner Radius (R)
                     </label>
-                    <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#2563eb', fontFamily: 'var(--ptv-font-mono)' }}>
+                    <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#2563eb', fontFamily: 'var(--ptv-font-mono)' }}>
                       {labRadius}px
                     </span>
                   </div>
@@ -504,10 +504,10 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 {/* 2. Smoothing Exponent Slider (n) */}
                 <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--ptv-curve-md)', padding: '14px 16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <label htmlFor="lab-smoothing-slider" style={{ fontSize: '12.5px', fontWeight: 750, color: '#1e293b' }}>
+                    <label htmlFor="lab-smoothing-slider" style={{ fontSize: '12.5px', fontWeight: 700, color: '#1e293b' }}>
                       Smoothing Exponent (n)
                     </label>
-                    <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#059669', fontFamily: 'var(--ptv-font-mono)' }}>
+                    <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#059669', fontFamily: 'var(--ptv-font-mono)' }}>
                       n = {labSmoothing.toFixed(1)} {labSmoothing === 2 ? '(Lingkaran Murni)' : labSmoothing === 3.5 ? '(Lamé Standar)' : ''}
                     </span>
                   </div>
@@ -553,10 +553,10 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 {/* 3. Component Dimensions Preset */}
                 <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--ptv-curve-md)', padding: '14px 16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '12.5px', fontWeight: 750, color: '#1e293b' }}>
+                    <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#1e293b' }}>
                       Dimensi Komponen
                     </span>
-                    <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#6366f1', fontFamily: 'var(--ptv-font-mono)' }}>
+                    <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#6366f1', fontFamily: 'var(--ptv-font-mono)' }}>
                       {labW} × {labH} px
                     </span>
                   </div>
@@ -614,7 +614,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
 
                 {/* 4. Contrast & Theme Environment */}
                 <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--ptv-curve-md)', padding: '14px 16px' }}>
-                  <span style={{ display: 'block', fontSize: '12.5px', fontWeight: 750, color: '#1e293b', marginBottom: '8px' }}>
+                  <span style={{ display: 'block', fontSize: '12.5px', fontWeight: 700, color: '#1e293b', marginBottom: '8px' }}>
                     Kontras &amp; Latar Belakang
                   </span>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -648,10 +648,10 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 {/* 5. Nested Inset Slider */}
                 <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--ptv-curve-md)', padding: '14px 16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <label htmlFor="lab-nested-slider" style={{ fontSize: '12.5px', fontWeight: 750, color: '#1e293b' }}>
+                    <label htmlFor="lab-nested-slider" style={{ fontSize: '12.5px', fontWeight: 700, color: '#1e293b' }}>
                       Nested Inset Padding (p)
                     </label>
-                    <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#d97706', fontFamily: 'var(--ptv-font-mono)' }}>
+                    <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#d97706', fontFamily: 'var(--ptv-font-mono)' }}>
                       {labNestedInset}px (R_inner: {innerR}px)
                     </span>
                   </div>
@@ -672,7 +672,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
 
                 {/* 6. Inspection Zoom & Display Mode */}
                 <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--ptv-curve-md)', padding: '14px 16px' }}>
-                  <span style={{ display: 'block', fontSize: '12.5px', fontWeight: 750, color: '#1e293b', marginBottom: '8px' }}>
+                  <span style={{ display: 'block', fontSize: '12.5px', fontWeight: 700, color: '#1e293b', marginBottom: '8px' }}>
                     Inspeksi Visual &amp; Zoom Sudut
                   </span>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
@@ -753,7 +753,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               }}
             >
               <div>
-                <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', marginBottom: '6px' }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
                   <i className="fa-solid fa-square-root-variable" style={{ color: '#059669', marginRight: '6px' }} />
                   Definisi Matematis Prototipe C: Gabriel Lamé Superellipse (1818)
                 </div>
@@ -780,7 +780,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               </div>
 
               <div>
-                <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', marginBottom: '6px' }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
                   <i className="fa-solid fa-chart-line" style={{ color: '#2563eb', marginRight: '6px' }} />
                   Pengukuran Diagonal &amp; Fullness Sudut Real-time (45°)
                 </div>
@@ -893,7 +893,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                           background: '#dbeafe',
                           color: '#1d4ed8',
                           fontSize: '11px',
-                          fontWeight: 800,
+                          fontWeight: 700,
                         }}
                       >
                         Komponen A: Standard border-radius
@@ -926,7 +926,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                       {/* Card Content Header */}
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '13px', fontWeight: 800 }}>Kamera Sony FX3</span>
+                          <span style={{ fontSize: '13px', fontWeight: 700 }}>Kamera Sony FX3</span>
                           <span
                             style={{
                               fontSize: '10px',
@@ -961,7 +961,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                       >
                         <div>
                           <div style={{ fontSize: '10px', color: themeCardMuted }}>Concentric Inner Child</div>
-                          <div style={{ fontSize: '12px', fontWeight: 750 }}>R_inner = {innerR}px</div>
+                          <div style={{ fontSize: '12px', fontWeight: 700 }}>R_inner = {innerR}px</div>
                         </div>
                         <i className="fa-solid fa-circle-check" style={{ color: '#2563eb' }} />
                       </div>
@@ -1008,7 +1008,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                           background: '#fef3c7',
                           color: '#92400e',
                           fontSize: '11px',
-                          fontWeight: 800,
+                          fontWeight: 700,
                         }}
                       >
                         Komponen B: CSS corner-shape (Draft)
@@ -1050,7 +1050,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                       {/* Card Content Header */}
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '13px', fontWeight: 800 }}>Lensa FE 24-70mm GM</span>
+                          <span style={{ fontSize: '13px', fontWeight: 700 }}>Lensa FE 24-70mm GM</span>
                           <span
                             style={{
                               fontSize: '10px',
@@ -1088,7 +1088,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                       >
                         <div>
                           <div style={{ fontSize: '10px', color: themeCardMuted }}>Concentric Inner Child</div>
-                          <div style={{ fontSize: '12px', fontWeight: 750 }}>
+                          <div style={{ fontSize: '12px', fontWeight: 700 }}>
                             {isSquircleSupported ? 'Squircle Inset' : `Fallback R=${innerR}px`}
                           </div>
                         </div>
@@ -1139,7 +1139,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                           background: '#dcfce7',
                           color: '#15803d',
                           fontSize: '11px',
-                          fontWeight: 800,
+                          fontWeight: 700,
                         }}
                       >
                         Komponen C: Custom Superellipse (Lamé)
@@ -1194,7 +1194,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                         {/* Card Content Header */}
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '13px', fontWeight: 800 }}>Audio Mic Wireless DJI</span>
+                            <span style={{ fontSize: '13px', fontWeight: 700 }}>Audio Mic Wireless DJI</span>
                             <span
                               style={{
                                 fontSize: '10px',
@@ -1250,7 +1250,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                           >
                             <div>
                               <div style={{ fontSize: '10px', color: themeCardMuted }}>Concentric Superellipse Child</div>
-                              <div style={{ fontSize: '12px', fontWeight: 750 }}>
+                              <div style={{ fontSize: '12px', fontWeight: 700 }}>
                                 R_inner = {innerR}px (n={labSmoothing.toFixed(1)})
                               </div>
                             </div>
@@ -1307,7 +1307,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
                   <div>
-                    <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: '0 0 4px 0' }}>
                       <i className="fa-solid fa-magnifying-glass-plus" style={{ color: '#2563eb', marginRight: '8px' }} />
                       Inspeksi Makro Sudut: Superimposed Tangent Overlay ({labZoom}× Zoom)
                     </h3>
@@ -1450,7 +1450,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 padding: '24px',
               }}
             >
-              <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#0f172a', margin: '0 0 6px 0' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#0f172a', margin: '0 0 6px 0' }}>
                 Evaluasi Kritis &amp; Konsekuensi Teknis Nyata pada Browser Engine
               </h3>
               <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px 0', lineHeight: 1.5 }}>
@@ -1461,10 +1461,10 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
-                      <th style={{ padding: '10px 12px', color: '#334155', fontWeight: 800 }}>Aspek Evaluasi</th>
-                      <th style={{ padding: '10px 12px', color: '#1d4ed8', fontWeight: 800 }}>A. Standard border-radius</th>
-                      <th style={{ padding: '10px 12px', color: '#92400e', fontWeight: 800 }}>B. Native corner-shape (Draft)</th>
-                      <th style={{ padding: '10px 12px', color: '#15803d', fontWeight: 800 }}>C. Custom Superellipse (Lamé)</th>
+                      <th style={{ padding: '10px 12px', color: '#334155', fontWeight: 700 }}>Aspek Evaluasi</th>
+                      <th style={{ padding: '10px 12px', color: '#1d4ed8', fontWeight: 700 }}>A. Standard border-radius</th>
+                      <th style={{ padding: '10px 12px', color: '#92400e', fontWeight: 700 }}>B. Native corner-shape (Draft)</th>
+                      <th style={{ padding: '10px 12px', color: '#15803d', fontWeight: 700 }}>C. Custom Superellipse (Lamé)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1566,7 +1566,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 padding: '24px',
               }}
             >
-              <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#0f172a', margin: '0 0 6px 0' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#0f172a', margin: '0 0 6px 0' }}>
                 Matriks Klasifikasi Komponen: Aman vs Tidak Aman untuk True Smoothing
               </h3>
               <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px 0' }}>
@@ -1585,7 +1585,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                     <i className="fa-solid fa-circle-check" style={{ color: '#16a34a', fontSize: '16px' }} />
-                    <span style={{ fontSize: '14px', fontWeight: 800, color: '#166534' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#166534' }}>
                       KOMPONEN AMAN (Safe for Superellipse Smoothing)
                     </span>
                   </div>
@@ -1611,7 +1611,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                     <i className="fa-solid fa-circle-xmark" style={{ color: '#dc2626', fontSize: '16px' }} />
-                    <span style={{ fontSize: '14px', fontWeight: 800, color: '#991b1b' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#991b1b' }}>
                       KOMPONEN TIDAK AMAN (Wajib Mempertahankan Standard CSS)
                     </span>
                   </div>
@@ -1638,7 +1638,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 padding: '20px 24px',
               }}
             >
-              <div style={{ fontSize: '14px', fontWeight: 800, color: '#1e3a8a', marginBottom: '6px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e3a8a', marginBottom: '6px' }}>
                 <i className="fa-solid fa-compass" style={{ marginRight: '8px' }} />
                 Rekomendasi Arsitektur Final untuk PTV PRO Hub
               </div>
@@ -1747,7 +1747,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                       border: zoomLevel === z ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
                       background: zoomLevel === z ? '#eff6ff' : '#ffffff',
                       color: zoomLevel === z ? '#1d4ed8' : '#475569',
-                      fontWeight: 800,
+                      fontWeight: 700,
                       cursor: 'pointer',
                       fontSize: '11px',
                     }}
@@ -1773,10 +1773,10 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               {/* Header & Legends */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     Outline Precision Gauge (Origin 0,0 Aligned)
                   </span>
-                  <h3 style={{ margin: '2px 0 0 0', fontSize: '18px', fontWeight: 900 }}>
+                  <h3 style={{ margin: '2px 0 0 0', fontSize: '18px', fontWeight: 700 }}>
                     Lintasan Kurva Nyata Tanpa Fill Obscuring
                   </h3>
                 </div>
@@ -1914,7 +1914,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                         pointerEvents: 'none',
                       }}
                     >
-                      <span style={{ position: 'absolute', right: '8px', top: '4px', fontSize: '9px', color: '#fb7185', fontWeight: 800 }}>
+                      <span style={{ position: 'absolute', right: '8px', top: '4px', fontSize: '9px', color: '#fb7185', fontWeight: 700 }}>
                         Drawer (34px)
                       </span>
                     </div>
@@ -1937,7 +1937,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                         pointerEvents: 'none',
                       }}
                     >
-                      <span style={{ position: 'absolute', right: '8px', top: '4px', fontSize: '9px', color: '#fbbf24', fontWeight: 800 }}>
+                      <span style={{ position: 'absolute', right: '8px', top: '4px', fontSize: '9px', color: '#fbbf24', fontWeight: 700 }}>
                         Modal (28px)
                       </span>
                     </div>
@@ -1960,7 +1960,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                         pointerEvents: 'none',
                       }}
                     >
-                      <span style={{ position: 'absolute', right: '8px', top: '4px', fontSize: '9px', color: '#34d399', fontWeight: 800 }}>
+                      <span style={{ position: 'absolute', right: '8px', top: '4px', fontSize: '9px', color: '#34d399', fontWeight: 700 }}>
                         Card (22px)
                       </span>
                     </div>
@@ -1983,7 +1983,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                         pointerEvents: 'none',
                       }}
                     >
-                      <span style={{ position: 'absolute', right: '8px', top: '4px', fontSize: '9px', color: '#c084fc', fontWeight: 800 }}>
+                      <span style={{ position: 'absolute', right: '8px', top: '4px', fontSize: '9px', color: '#c084fc', fontWeight: 700 }}>
                         Panel (16px)
                       </span>
                     </div>
@@ -2006,7 +2006,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                         pointerEvents: 'none',
                       }}
                     >
-                      <span style={{ position: 'absolute', right: '8px', top: '4px', fontSize: '9px', color: '#38bdf8', fontWeight: 800 }}>
+                      <span style={{ position: 'absolute', right: '8px', top: '4px', fontSize: '9px', color: '#38bdf8', fontWeight: 700 }}>
                         Control (12px)
                       </span>
                     </div>
@@ -2045,10 +2045,10 @@ export const PTVContinuousCurveFixture: React.FC = () => {
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     Normalized Geometry Benchmark (Scaled to R = 120px)
                   </span>
-                  <h3 style={{ margin: '2px 0 0 0', fontSize: '18px', fontWeight: 900 }}>
+                  <h3 style={{ margin: '2px 0 0 0', fontSize: '18px', fontWeight: 700 }}>
                     Uji Kesamaan Profil Kurva Lintas Ukuran
                   </h3>
                 </div>
@@ -2218,7 +2218,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   lineHeight: 1.6,
                 }}
               >
-                <div style={{ color: '#ffffff', fontWeight: 800, marginBottom: '4px' }}>
+                <div style={{ color: '#ffffff', fontWeight: 700, marginBottom: '4px' }}>
                   <i className="fa-solid fa-circle-check" style={{ color: '#34d399', marginRight: '6px' }} />
                   Hasil Audit Normalisasi Empiris (One Curve Family Proof)
                 </div>
@@ -2251,10 +2251,10 @@ export const PTVContinuousCurveFixture: React.FC = () => {
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     Empirical Engine Verification
                   </span>
-                  <h3 style={{ margin: '2px 0 0 0', fontSize: '18px', fontWeight: 900 }}>
+                  <h3 style={{ margin: '2px 0 0 0', fontSize: '18px', fontWeight: 700 }}>
                     Perbandingan Hasil Nyata CSS Browser vs. Rumus Teoretis
                   </h3>
                 </div>
@@ -2285,7 +2285,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                       onChange={(e) => setShowActualBrowserCSS(e.target.checked)}
                     />
                     <span style={{ width: '12px', height: '3px', background: '#34d399', display: 'inline-block' }} />
-                    <span style={{ color: '#34d399', fontWeight: 800 }}>3. Real Rendered CSS Curve (Browser)</span>
+                    <span style={{ color: '#34d399', fontWeight: 700 }}>3. Real Rendered CSS Curve (Browser)</span>
                   </label>
                 </div>
               </div>
@@ -2385,7 +2385,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   lineHeight: 1.6,
                 }}
               >
-                <div style={{ color: '#ffffff', fontWeight: 800, marginBottom: '4px' }}>
+                <div style={{ color: '#ffffff', fontWeight: 700, marginBottom: '4px' }}>
                   <i className="fa-solid fa-triangle-exclamation" style={{ color: '#fbbf24', marginRight: '6px' }} />
                   Laporan Integritas Render Mesin Peramban
                 </div>
@@ -2423,7 +2423,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               padding: '16px 20px',
             }}
           >
-            <div style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', marginBottom: '6px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
               Formula Keselarasan Konsentris: <code>R_inner_math = max(0, R_outer - Inset_aktual)</code>
             </div>
             <p style={{ fontSize: '13px', color: '#475569', margin: '0 0 8px 0', lineHeight: 1.5 }}>
@@ -2507,7 +2507,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   boxShadow: '0 10px 25px rgba(0,0,0,0.06)',
                 }}
               >
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', marginBottom: '8px', letterSpacing: '0.04em' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#0f172a', marginBottom: '8px', letterSpacing: '0.04em' }}>
                   KARTU INDUK: R_outer = 22px (Padding: 10px, Border: 2px)
                 </div>
                 <div
@@ -2538,7 +2538,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                     <i className="fa-solid fa-camera" />
                   </div>
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>
                       Kamera Cinema FX3 (R_inner = 12px)
                     </div>
                     <div style={{ fontSize: '11.5px', color: '#64748b' }}>
@@ -2562,7 +2562,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   fontSize: '12.5px',
                 }}
               >
-                <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '14px', marginBottom: '4px' }}>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '14px', marginBottom: '4px' }}>
                   Audit Metrik Kasus 1:
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '4px' }}>
@@ -2583,11 +2583,11 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '4px' }}>
                   <span style={{ color: '#64748b' }}>Radius Matematis Murni (22 - 10):</span>
-                  <span style={{ fontWeight: 800, color: '#059669', fontFamily: 'monospace' }}>12px</span>
+                  <span style={{ fontWeight: 700, color: '#059669', fontFamily: 'monospace' }}>12px</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '4px' }}>
                   <span style={{ color: '#64748b' }}>Token Dirender:</span>
-                  <span style={{ fontWeight: 800, color: '#2563eb', fontFamily: 'monospace' }}>--ptv-curve-md (12px)</span>
+                  <span style={{ fontWeight: 700, color: '#2563eb', fontFamily: 'monospace' }}>--ptv-curve-md (12px)</span>
                 </div>
                 <div style={{ marginTop: '4px', fontSize: '11.5px', color: '#059669', background: '#ecfdf5', padding: '6px 10px', borderRadius: 'var(--ptv-curve-sm)' }}>
                   <i className="fa-solid fa-check" style={{ marginRight: '6px' }} />
@@ -2616,7 +2616,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   boxShadow: '0 10px 25px rgba(0,0,0,0.06)',
                 }}
               >
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', marginBottom: '8px', letterSpacing: '0.04em' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#0f172a', marginBottom: '8px', letterSpacing: '0.04em' }}>
                   LEVEL 1: MODAL ENVELOPE (R = 28px, Inset = 12px)
                 </div>
                 <div
@@ -2627,7 +2627,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                     padding: '10px', /* padding = 10px */
                   }}
                 >
-                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#2563eb', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#2563eb', marginBottom: '8px' }}>
                     LEVEL 2: SUB-PANEL DOSSIER (R = 16px, Inset = 10px)
                   </div>
                   <div
@@ -2651,7 +2651,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                         background: '#ecfdf5',
                         color: '#059669',
                         fontSize: '10px',
-                        fontWeight: 800,
+                        fontWeight: 700,
                       }}
                     >
                       Kompensasi Optis
@@ -2674,7 +2674,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   fontSize: '12px',
                 }}
               >
-                <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '13.5px', marginBottom: '2px' }}>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '13.5px', marginBottom: '2px' }}>
                   Audit Metrik &amp; Penjelasan Optis:
                 </div>
                 <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '4px' }}>
@@ -2692,7 +2692,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2px' }}>
                     <span style={{ color: '#64748b' }}>Token Aktual Dirender:</span>
-                    <span style={{ fontWeight: 800, color: '#2563eb' }}>12px (--ptv-curve-md)</span>
+                    <span style={{ fontWeight: 700, color: '#2563eb' }}>12px (--ptv-curve-md)</span>
                   </div>
                 </div>
                 <div style={{ background: '#fffbeb', border: '1px solid #fef3c7', padding: '8px 10px', borderRadius: 'var(--ptv-curve-sm)', color: '#92400e', lineHeight: 1.4 }}>
@@ -2715,7 +2715,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 padding: '20px',
               }}
             >
-              <div style={{ fontWeight: 800, fontSize: '15px', color: '#0f172a', marginBottom: '14px' }}>
+              <div style={{ fontWeight: 700, fontSize: '15px', color: '#0f172a', marginBottom: '14px' }}>
                 Kalkulator Inset Konsentris Interaktif
               </div>
               <div
@@ -2731,7 +2731,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                       <span style={{ fontWeight: 700, color: '#334155' }}>Radius Induk (R_outer):</span>
-                      <span style={{ fontWeight: 800, color: '#2563eb', fontFamily: 'monospace' }}>{calcOuterR}px</span>
+                      <span style={{ fontWeight: 700, color: '#2563eb', fontFamily: 'monospace' }}>{calcOuterR}px</span>
                     </div>
                     <input
                       type="range"
@@ -2745,7 +2745,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                       <span style={{ fontWeight: 700, color: '#334155' }}>Padding Fisik:</span>
-                      <span style={{ fontWeight: 800, color: '#059669', fontFamily: 'monospace' }}>{calcPadding}px</span>
+                      <span style={{ fontWeight: 700, color: '#059669', fontFamily: 'monospace' }}>{calcPadding}px</span>
                     </div>
                     <input
                       type="range"
@@ -2759,7 +2759,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                       <span style={{ fontWeight: 700, color: '#334155' }}>Border Width:</span>
-                      <span style={{ fontWeight: 800, color: '#d97706', fontFamily: 'monospace' }}>{calcBorder}px</span>
+                      <span style={{ fontWeight: 700, color: '#d97706', fontFamily: 'monospace' }}>{calcBorder}px</span>
                     </div>
                     <input
                       type="range"
@@ -2817,7 +2817,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                         textAlign: 'center',
                       }}
                     >
-                      <span style={{ fontSize: '12px', fontWeight: 800, color: '#1d4ed8' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#1d4ed8' }}>
                         Elemen Bersarang
                       </span>
                       <span style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
@@ -2855,7 +2855,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 800, color: '#2563eb', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#2563eb', textTransform: 'uppercase' }}>
                   Micro &amp; Small Controls
                 </span>
                 <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>
@@ -2873,7 +2873,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                     background: '#f1f5f9',
                     border: '1px solid #cbd5e1',
                     fontSize: '11px',
-                    fontWeight: 800,
+                    fontWeight: 700,
                   }}
                 >
                   INV-001 (Micro 6px)
@@ -2907,7 +2907,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 800, color: '#2563eb', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#2563eb', textTransform: 'uppercase' }}>
                   Standard Controls &amp; PTVSelect
                 </span>
                 <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>
@@ -2958,7 +2958,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 800, color: '#2563eb', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#2563eb', textTransform: 'uppercase' }}>
                   Floating Panel / Sub-Card
                 </span>
                 <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>
@@ -2980,7 +2980,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 }}
               >
                 <div>
-                  <div style={{ fontSize: '12.5px', fontWeight: 750, color: '#0f172a' }}>Floating Dossier Surface</div>
+                  <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a' }}>Floating Dossier Surface</div>
                   <div style={{ fontSize: '11px', color: '#64748b' }}>R: 16px continuous contour</div>
                 </div>
                 <span className="chip ok" style={{ fontSize: '10.5px' }}>Aktif</span>
@@ -2998,7 +2998,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 800, color: '#2563eb', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#2563eb', textTransform: 'uppercase' }}>
                   Standard Card &amp; Bento Item
                 </span>
                 <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>
@@ -3017,7 +3017,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
                 }}
               >
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>Sony FX3 Cinema Line</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Sony FX3 Cinema Line</div>
                 <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '2px' }}>Surface Card Boundary: R = 22px</div>
               </div>
             </div>
@@ -3033,7 +3033,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 800, color: '#2563eb', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#2563eb', textTransform: 'uppercase' }}>
                   Modal Dialog &amp; Sheet
                 </span>
                 <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>
@@ -3051,7 +3051,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   background: '#f8fafc',
                 }}
               >
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>Modal Surface Container</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Modal Surface Container</div>
                 <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '2px' }}>Dialog Envelope: R = 28px</div>
               </div>
             </div>
@@ -3067,7 +3067,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 800, color: '#2563eb', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#2563eb', textTransform: 'uppercase' }}>
                   Drawer &amp; Bottom Sheet
                 </span>
                 <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>
@@ -3085,7 +3085,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   background: '#f8fafc',
                 }}
               >
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>Drawer Container Envelope</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Drawer Container Envelope</div>
                 <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '2px' }}>Maximum Master Surface: R = 34px</div>
               </div>
             </div>
@@ -3095,17 +3095,17 @@ export const PTVContinuousCurveFixture: React.FC = () => {
 
       {/* ── 4. Unified Token Reference Table ── */}
       <div style={{ marginTop: '30px' }}>
-        <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--ink, #0f172a)', marginBottom: '12px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ink, #0f172a)', marginBottom: '12px' }}>
           Tabel Standar Token Kurva PTV Hub
         </h3>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--ptv-curve-lg)' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', textAlign: 'left' }}>
-                <th style={{ padding: '10px 14px', fontWeight: 800 }}>Token CSS</th>
-                <th style={{ padding: '10px 14px', fontWeight: 800 }}>Radius Nilai</th>
-                <th style={{ padding: '10px 14px', fontWeight: 800 }}>Peruntukan Optis</th>
-                <th style={{ padding: '10px 14px', fontWeight: 800 }}>Contoh Komponen Hub</th>
+                <th style={{ padding: '10px 14px', fontWeight: 700 }}>Token CSS</th>
+                <th style={{ padding: '10px 14px', fontWeight: 700 }}>Radius Nilai</th>
+                <th style={{ padding: '10px 14px', fontWeight: 700 }}>Peruntukan Optis</th>
+                <th style={{ padding: '10px 14px', fontWeight: 700 }}>Contoh Komponen Hub</th>
               </tr>
             </thead>
             <tbody>
@@ -3190,7 +3190,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   background: '#dbeafe',
                   color: '#1d4ed8',
                   fontSize: '11px',
-                  fontWeight: 800,
+                  fontWeight: 700,
                   textTransform: 'uppercase',
                 }}
               >
@@ -3200,7 +3200,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 <code>--ptv-font-family: &quot;SF Pro Display&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Arial, sans-serif</code>
               </span>
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: '0 0 8px 0' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: '0 0 8px 0' }}>
               SF Pro Display Universal Typography Engine
             </h3>
             <p style={{ fontSize: '13.5px', color: '#475569', margin: '0 0 16px 0', lineHeight: 1.5 }}>
@@ -3221,14 +3221,14 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               <div style={{ marginBottom: '6px' }}>
                 <b>Sumber &amp; Lisensi Font:</b>{' '}
                 <span style={{ color: '#15803d', fontWeight: 700 }}>
-                  Apple SF Pro Display Asli (OpenType CFF converted to self-hosted WOFF2, 5 bobot inti).
+                  Apple SF Pro Display Asli (OpenType CFF converted to self-hosted WOFF2, 4 bobot inti).
                 </span>
               </div>
               <div style={{ marginBottom: '6px' }}>
-                <b>Lokasi Aset Lokal:</b> Disimpan mandiri secara lokal di <code>/public/assets/fonts/sf-pro-display/</code> (Total ~1.33 MB untuk 5 bobot) dengan HTTP 200 tanpa dependensi CDN pihak ketiga.
+                <b>Lokasi Aset Lokal:</b> Disimpan mandiri secara lokal di <code>/public/assets/fonts/sf-pro-display/</code> (Total ~1.05 MB untuk 4 bobot inti) dengan HTTP 200 tanpa dependensi CDN pihak ketiga.
               </div>
               <div>
-                <b>Spesifikasi Webfont:</b> Bobot statis diskrit 400 (Regular), 500 (Medium), 600 (Semibold), 700 (Bold), dan 800 (Heavy) dengan <code>font-display: swap</code> dan <code>font-synthesis: none</code>.
+                <b>Spesifikasi Webfont:</b> Bobot statis diskrit 400 (Regular), 500 (Medium), 600 (Semibold), dan 700 (Bold) dengan <code>font-display: swap</code> dan <code>font-synthesis: none</code>.
               </div>
             </div>
           </div>
@@ -3243,17 +3243,17 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
             }}
           >
-            <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0' }}>
-              Inter Variable Weight Mapping &amp; Typographic Hierarchy
+            <h4 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: '0 0 4px 0' }}>
+              SF Pro Display 4-Weight Mapping &amp; Typographic Hierarchy
             </h4>
             <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px 0' }}>
-              Memverifikasi render ketebalan huruf Inter dari 400 hingga 900 secara presisi dan konsisten.
+              Memverifikasi render ketebalan huruf SF Pro Display pada empat bobot terkurasi (400, 500, 600, 700) secara presisi dan konsisten.
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ padding: '12px 16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #f1f5f9' }}>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
-                  Weight 400 — Regular (Body, Deskripsi, Metadata)
+                  Weight 400 — Regular (Body, Deskripsi, Metadata, Teks Tabel)
                 </div>
                 <div style={{ fontSize: '15px', fontWeight: 400, color: '#0f172a', lineHeight: 1.5 }}>
                   The quick brown fox jumps over the lazy dog. Sistem inventaris dan peminjaman peralatan audio-visual PTV PRO Hub.
@@ -3262,7 +3262,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
 
               <div style={{ padding: '12px 16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #f1f5f9' }}>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
-                  Weight 500 — Medium (Input form, Filter chip, Sub-label)
+                  Weight 500 — Medium (Input form, Filter chip, Sub-label, Navigasi)
                 </div>
                 <div style={{ fontSize: '15px', fontWeight: 500, color: '#0f172a', lineHeight: 1.5 }}>
                   Unit Tersedia: Sony FX3 Cinema Line, Lensa FE 24-70mm f/2.8 GM II, DJI Ronin RS3 Pro Gimbal Stabilizer.
@@ -3280,19 +3280,10 @@ export const PTVContinuousCurveFixture: React.FC = () => {
 
               <div style={{ padding: '12px 16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #f1f5f9' }}>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
-                  Weight 700 — Bold (Judul modul, Card heading, Modal title)
+                  Weight 700 — Bold (Judul modul, Card heading, Modal title, KPI Numerals, Master brand)
                 </div>
-                <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', lineHeight: 1.4 }}>
-                  PTV PRO Hub &mdash; Universal Continuous Curve &amp; SF Pro Display Typography Standard
-                </div>
-              </div>
-
-              <div style={{ padding: '12px 16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #f1f5f9' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
-                  Weight 800/900 — Heavy / Black (Hero greeting, KPI display numerals, Master brand)
-                </div>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.03em' }}>
-                  Rp 142.500.000 &bull; METRIK INVENTARIS PRODUKSI 2026
+                <div style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', lineHeight: 1.35, letterSpacing: '-0.02em' }}>
+                  Rp 142.500.000 &bull; METRIK INVENTARIS PRODUKSI 2026 &mdash; PTV PRO Hub
                 </div>
               </div>
             </div>
@@ -3307,7 +3298,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               padding: '24px',
             }}
           >
-            <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0' }}>
+            <h4 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: '0 0 4px 0' }}>
               Numeral Alignment &amp; Currency Figures
             </h4>
             <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px 0' }}>
@@ -3318,7 +3309,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', marginBottom: '8px' }}>
                   Primary Font (Proportional Figures)
                 </div>
-                <div style={{ fontSize: '24px', fontWeight: 800, color: '#1e40af', letterSpacing: '-0.02em', marginBottom: '4px' }}>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: '#1e40af', letterSpacing: '-0.02em', marginBottom: '4px' }}>
                   Rp 142.500.000
                 </div>
                 <div style={{ fontSize: '13px', color: '#64748b' }}>
@@ -3348,7 +3339,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               padding: '24px',
             }}
           >
-            <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0' }}>
+            <h4 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: '0 0 4px 0' }}>
               Portal Font Inheritance Proof (In-DOM vs. Body-Portaled)
             </h4>
             <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px 0' }}>
@@ -3357,7 +3348,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
               <div style={{ padding: '16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-lg)', border: '1px solid #cbd5e1' }}>
-                <div style={{ fontSize: '12.5px', fontWeight: 750, color: '#0f172a', marginBottom: '6px' }}>
+                <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
                   Dropdown A: Standard In-DOM (usePortal = false)
                 </div>
                 <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 12px 0' }}>
@@ -3376,7 +3367,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               </div>
 
               <div style={{ padding: '16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-lg)', border: '1px solid #cbd5e1' }}>
-                <div style={{ fontSize: '12.5px', fontWeight: 750, color: '#0f172a', marginBottom: '6px' }}>
+                <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
                   Dropdown B: Portal Body (usePortal = true)
                 </div>
                 <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 12px 0' }}>

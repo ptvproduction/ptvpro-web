@@ -363,7 +363,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
         onClick={handleSubmit}
         disabled={basketCount === 0 || submitting}
         style={{
-          fontWeight: 650,
+          fontWeight: 600,
           fontSize: '13px',
           padding: '10px 14px',
           minHeight: '42px',
@@ -385,7 +385,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
   const renderSelectedPanel = () => (
     <>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-        <span style={{ fontSize: '12px', fontWeight: 650, color: 'var(--b-700)' }}>
+        <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--b-700)' }}>
           <i className="fa-solid fa-clipboard-check" style={{ marginRight: '5px' }} />
           Alat yang Dipilih
         </span>
@@ -600,7 +600,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                                 {totalCatAvail} tersedia
                               </span>
                               {hasCatSelected && (
-                                <span className="chip blue" style={{ fontSize: '10.5px', fontWeight: 650, padding: '2px 7px', background: '#dbeafe', color: '#1e40af', border: '1px solid #bfdbfe' }}>
+                                <span className="chip blue" style={{ fontSize: '10.5px', fontWeight: 600, padding: '2px 7px', background: '#dbeafe', color: '#1e40af', border: '1px solid #bfdbfe' }}>
                                   <i className="fa-solid fa-check" style={{ marginRight: '3px', fontSize: '9.5px' }} />
                                   {totalCatSelected} dipilih
                                 </span>
@@ -664,7 +664,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                                       </div>
                                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
                                         {hasSelected && (
-                                          <span className="chip blue" style={{ fontSize: '10.5px', fontWeight: 650, padding: '2px 7px', background: '#dbeafe', color: '#1e40af', border: '1px solid #bfdbfe' }}>
+                                          <span className="chip blue" style={{ fontSize: '10.5px', fontWeight: 600, padding: '2px 7px', background: '#dbeafe', color: '#1e40af', border: '1px solid #bfdbfe' }}>
                                             <i className="fa-solid fa-check" style={{ marginRight: '3px', fontSize: '9.5px' }} />
                                             {selectedCount} Dipilih
                                           </span>
@@ -789,7 +789,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                         Kosongkan
                       </button>
                     )}
-                    <span className="chip blue" style={{ fontSize: '11.5px', fontWeight: 650, padding: '3px 9px' }}>
+                    <span className="chip blue" style={{ fontSize: '11.5px', fontWeight: 600, padding: '3px 9px' }}>
                       {basketCount} Unit Dipilih
                     </span>
                     <button

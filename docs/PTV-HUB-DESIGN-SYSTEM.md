@@ -202,8 +202,7 @@ Komponen `PTVSelect` terintegrasi penuh ke dalam sistem PTV Unified Continuous C
   - `SF-Pro-Display-Medium.woff2`: 274,3 kB (Weight 500)
   - `SF-Pro-Display-Semibold.woff2`: 274,3 kB (Weight 600)
   - `SF-Pro-Display-Bold.woff2`: 266,1 kB (Weight 700)
-  - `SF-Pro-Display-Heavy.woff2`: 273,3 kB (Weight 800)
-  - *Total paket 5 bobot:* ~1,33 MB (reduksi 95,6% dibanding file OTF mentah 30,35 MB).
+  - *Total paket 4 bobot:* ~1,05 MB (reduksi efisien dibanding file OTF mentah 30,35 MB).
 - **Penyimpanan Lokal:** Disimpan secara mandiri di `/public/assets/fonts/sf-pro-display/`.
 - **Preload Selektif di `index.html`:**
   Hanya melakukan preload untuk 2 bobot kritis viewport awal (Regular 400 dan Semibold 600):
@@ -233,22 +232,16 @@ Komponen `PTVSelect` terintegrasi penuh ke dalam sistem PTV Unified Continuous C
     src: url("/assets/fonts/sf-pro-display/SF-Pro-Display-Bold.woff2") format("woff2");
     font-weight: 700; font-style: normal; font-display: swap;
   }
-  @font-face {
-    font-family: "SF Pro Display";
-    src: url("/assets/fonts/sf-pro-display/SF-Pro-Display-Heavy.woff2") format("woff2");
-    font-weight: 800; font-style: normal; font-display: swap;
-  }
   ```
 
-### 6.3 Weight Mapping & Typographic Hierarchy (400–800)
+### 6.3 Weight Mapping & Typographic Hierarchy (400–700)
 
 | Weight | Nama Token / CSS | Komponen & Peruntukan di PTV PRO Hub |
 |---|---|---|
 | **400** | Regular (`font-weight: 400`) | Body copy, deskripsi alat, data sel tabel, teks bantuan form |
-| **500** | Medium (`font-weight: 500`) | Input control value, placeholder trigger dropdown, sub-label metadata |
-| **600** | Semibold (`font-weight: 600`) | Tombol sekunder, header kolom tabel, pill badge status, tab aktif |
-| **700** | Bold (`font-weight: 700`) | CTA primer, judul kartu, judul seksi, judul modal dialog |
-| **800** | Heavy (`font-weight: 800`) | Angka KPI display (`.num`), master brand header, hero greetings |
+| **500** | Medium (`font-weight: 500`) | Input control value, placeholder trigger dropdown, sub-label metadata, navigasi |
+| **600** | Semibold (`font-weight: 600`) | Tombol sekunder & tindakan, header kolom tabel, pill badge status, tab aktif |
+| **700** | Bold (`font-weight: 700`) | CTA primer, judul kartu, judul seksi, judul modal dialog, angka KPI display (`.num`), master brand |
 
 ### 6.4 Portal & Modal Font Inheritance
 

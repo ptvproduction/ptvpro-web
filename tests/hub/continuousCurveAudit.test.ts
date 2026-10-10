@@ -76,20 +76,24 @@ describe('PTV Unified Continuous Curve — Audit & Governance Tests', () => {
       expect(tokensContent).toContain('--ptv-font-mono:');
       expect(dashContent).toContain('--ptv-font-family: "SF Pro Display"');
 
-      // Verify self-hosted SF Pro Display WOFF2 definition and local files existence
+      // Verify 4 curated SF Pro Display WOFF2 definitions (400, 500, 600, 700)
       expect(tokensContent).toContain('font-family: "SF Pro Display";');
       expect(tokensContent).toContain('url("/assets/fonts/sf-pro-display/SF-Pro-Display-Regular.woff2")');
       expect(tokensContent).toContain('url("/assets/fonts/sf-pro-display/SF-Pro-Display-Medium.woff2")');
       expect(tokensContent).toContain('url("/assets/fonts/sf-pro-display/SF-Pro-Display-Semibold.woff2")');
       expect(tokensContent).toContain('url("/assets/fonts/sf-pro-display/SF-Pro-Display-Bold.woff2")');
-      expect(tokensContent).toContain('url("/assets/fonts/sf-pro-display/SF-Pro-Display-Heavy.woff2")');
+
+      // Verify Heavy (800) is completely removed from @font-face and public assets
+      expect(tokensContent).not.toContain('SF-Pro-Display-Heavy.woff2');
+      expect(tokensContent).not.toContain('font-weight: 800');
+      const heavyFilePath = path.join(rootDir, 'public/assets/fonts/sf-pro-display/SF-Pro-Display-Heavy.woff2');
+      expect(fs.existsSync(heavyFilePath)).toBe(false);
 
       const fontFiles = [
         'SF-Pro-Display-Regular.woff2',
         'SF-Pro-Display-Medium.woff2',
         'SF-Pro-Display-Semibold.woff2',
         'SF-Pro-Display-Bold.woff2',
-        'SF-Pro-Display-Heavy.woff2',
       ];
       for (const file of fontFiles) {
         const filePath = path.join(rootDir, 'public/assets/fonts/sf-pro-display', file);
@@ -100,6 +104,9 @@ describe('PTV Unified Continuous Curve — Audit & Governance Tests', () => {
       // Verify cleanup: No SF Plus references
       expect(tokensContent).not.toContain('SF Plus');
       expect(dashContent).not.toContain('SF Plus');
+
+      // Verify font-synthesis: none is active on .ptv-hub-root to prevent synthetic bold
+      expect(tokensContent).toContain('font-synthesis: none');
     });
 
     it('2.4 Hub shell, login, and portal dropdown components must inherit --ptv-font-family', () => {
