@@ -1395,10 +1395,10 @@ html.modal-open .lk-modal-body {
   align-items:center;
   gap:13px;
   padding:15px 16px;
-  border-radius:var(--r-m);
+  border-radius:var(--ptv-curve-xl);
   background:var(--surface);
-  border:1px solid var(--line-2);
-  box-shadow:var(--shadow-s);
+  border:var(--ptv-soft-border);
+  box-shadow:var(--ptv-soft-shadow);
   text-align:left;
   cursor:pointer;
   user-select:none;
@@ -1410,7 +1410,7 @@ html.modal-open .lk-modal-body {
 .bento-card:hover{
   transform:translateY(-3px);
   border-color:var(--b-300);
-  box-shadow:0 10px 28px rgba(11,60,116,.14);
+  box-shadow:var(--ptv-soft-shadow-elevated);
   background:var(--surface);
 }
 .bento-card:active{
@@ -8060,18 +8060,18 @@ span.fin-matrix-cell.unpaid {
 .tl.now::before{background:var(--b-400);border-color:var(--b-400);box-shadow:0 0 0 4px var(--b-100)}
 
 /* statistik & pengumuman */
-.stat{display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:var(--r-m);
-  background:var(--surface);border:1px solid var(--line-2);box-shadow:var(--shadow-s);text-align:left;
+.stat{display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:var(--ptv-curve-xl);
+  background:var(--surface);border:var(--ptv-soft-border);box-shadow:var(--ptv-soft-shadow);text-align:left;
   cursor:pointer;touch-action:manipulation;
   transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease}
-.stat:hover{border-color:var(--b-300);box-shadow:0 6px 20px rgba(11,60,116,.08);transform:translateY(-1.5px)}
+.stat:hover{border-color:var(--b-300);box-shadow:var(--ptv-soft-shadow-elevated);transform:translateY(-1.5px)}
 .stat:active{transform:scale(.98)}
 .stat b{font-size:24px;font-weight:700;letter-spacing:-.04em;color:var(--b-700);transition:color .18s ease}
 .stat:hover b{color:var(--b-600)}
 .stat span{font-size:11.5px;color:var(--muted);font-weight:500}
 
-.ann{position:relative;padding:16px 18px;border-radius:var(--r-m);
-  background:var(--surface);border:1px solid var(--line-2);box-shadow:var(--shadow-s);overflow:hidden;text-align:left;
+.ann{position:relative;padding:16px 18px;border-radius:var(--ptv-curve-xl);
+  background:var(--surface);border:var(--ptv-soft-border);box-shadow:var(--ptv-soft-shadow);overflow:hidden;text-align:left;
   cursor:pointer;touch-action:manipulation;
   transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease, background .18s ease}
 .ann.high{border-color:var(--b-300);background:linear-gradient(180deg,var(--b-050),var(--surface) 60%)}
@@ -8258,7 +8258,8 @@ span.fin-matrix-cell.unpaid {
 
   .sheet{
     left:50%;right:auto;bottom:auto;top:50%;width:min(600px,92vw);
-    border-radius:var(--r-l);max-height:84vh;padding-bottom:14px;
+    border-radius:var(--ptv-curve-2xl);max-height:84vh;padding-bottom:14px;
+    border:var(--ptv-soft-border);box-shadow:var(--ptv-soft-shadow-elevated);
     transform:translate(-50%,-46%) scale(.97);opacity:0;
     transition:transform .22s ease, opacity .22s ease, visibility .22s;
     pointer-events:none !important;
@@ -8988,17 +8989,18 @@ span.fin-matrix-cell.unpaid {
 }
 .ptv-nilai-kpi-card {
   background: var(--surface, #ffffff);
-  border: 1.5px solid var(--line, #e2e8f0);
+  border: var(--ptv-soft-border);
   border-radius: var(--ptv-curve-xl);
   padding: 16px 18px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  box-shadow: var(--ptv-soft-shadow);
   min-width: 0;
   box-sizing: border-box;
   overflow: hidden;
 }
 :root[data-theme="dark"] .ptv-nilai-kpi-card {
   background: var(--surface, #0e1b2d);
-  border-color: rgba(255,255,255,0.08);
+  border: var(--ptv-soft-border);
+  box-shadow: var(--ptv-soft-shadow);
 }
 .ptv-nilai-kpi-card-hd {
   display: flex;
@@ -10167,9 +10169,34 @@ span.fin-matrix-cell.unpaid {
 .ptv-corner-pill { border-radius: var(--ptv-curve-pill); }
 .ptv-corner-circle { border-radius: var(--ptv-curve-circle); }
 
+/* ── PTV Canonical Profile D Soft Surface Classes ── */
+.ptv-soft-surface {
+  background: var(--ptv-soft-surface-bg, var(--surface, #ffffff));
+  border: var(--ptv-soft-border);
+  box-shadow: var(--ptv-soft-shadow);
+}
+.ptv-soft-surface-elevated {
+  background: var(--ptv-soft-surface-bg, var(--surface, #ffffff));
+  border: var(--ptv-soft-border);
+  box-shadow: var(--ptv-soft-shadow-elevated);
+}
+.ptv-card-hover {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ptv-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ptv-soft-shadow-elevated);
+}
+
 @supports (corner-shape: squircle) {
   .ptv-squircle,
   .ptv-continuous-curve,
+  .ptv-continuous-surface,
+  .ptv-continuous-card,
+  .ptv-continuous-panel,
+  .ptv-continuous-modal-surface,
+  .ptv-soft-surface,
+  .ptv-soft-surface-elevated,
   .ptv-curve-xs,
   .ptv-curve-sm,
   .ptv-curve-md,
