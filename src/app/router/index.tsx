@@ -6,6 +6,8 @@ import { BerandaPage } from '@products/hub/beranda/BerandaPage';
 import { KruPage } from '@products/hub/kru/KruPage';
 import { InventarisPage } from '@products/hub/inventaris/InventarisPage';
 import { AlatDetailPage } from '@products/hub/inventaris/AlatDetailPage';
+import { NilaiInventarisPage } from '@products/hub/inventaris/NilaiInventarisPage';
+import { NilaiInventarisDetailPage } from '@products/hub/inventaris/NilaiInventarisDetailPage';
 import { PeminjamanPage } from '@products/hub/peminjaman/PeminjamanPage';
 
 export const router = createBrowserRouter([
@@ -48,6 +50,26 @@ export const router = createBrowserRouter([
             <InventarisPage />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: 'inventaris/nilai',
+        element: (
+          <ProtectedRoute requiredCapability="inventory.valuation.view">
+            <NilaiInventarisPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'inventaris/nilai/:id',
+        element: (
+          <ProtectedRoute requiredCapability="inventory.valuation.view">
+            <NilaiInventarisDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'nilai-inventaris',
+        element: <Navigate to="/hub/inventaris/nilai" replace />,
       },
       {
         path: 'inventaris/:id',

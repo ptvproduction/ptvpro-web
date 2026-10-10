@@ -13,6 +13,24 @@ export interface InventarisUnit {
   updated_at: string;
 }
 
+export interface NilaiInventarisRecord {
+  id: string;
+  inventaris_id: string;
+  nilai_perolehan: number;
+  nilai_residu?: number;
+  nilai_tercatat?: number;
+  tanggal_perolehan: string;
+  sumber_perolehan: string;
+  vendor?: string;
+  nomor_invoice?: string;
+  status: 'Aktif' | 'Belum Dicatat' | 'Dihapuskan';
+  catatan?: string;
+  dokumen_url?: string;
+  created_by_name?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface ItemInventaris {
   id: string;
   kode: string;
@@ -27,6 +45,7 @@ export interface ItemInventaris {
   units: InventarisUnit[];
   total_unit: number;
   unit_tersedia: number;
+  nilai_inventaris?: NilaiInventarisRecord;
 }
 
 export interface InventarisFilterParams {

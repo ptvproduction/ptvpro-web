@@ -507,7 +507,7 @@ export const InventarisPage: React.FC = () => {
                     : { cursor: 'pointer' }
                 }
               >
-                {/* 1. Status ketersediaan badge & foto */}
+                {/* 1. Status ketersediaan (badge pada foto) 1:1 Legacy */}
                 <div className="inv-prod-photo">
                   {x.foto_url ? (
                     <img
@@ -532,69 +532,92 @@ export const InventarisPage: React.FC = () => {
                       borderColor: badgeBorder,
                     }}
                   >
-                    <span className="inv-prod-status-dot" style={{ background: dotColor }} />
+                    <span style={{ display: 'inline-block', width: '5px', height: '5px', borderRadius: '50%', background: dotColor }} />
                     <span>{badgeTxt}</span>
                   </span>
-
-                  {avail > 0 && (
-                    <button
-                      type="button"
-                      className={`inv-prod-quick-add ${inBasket ? 'added' : ''}`}
-                      onClick={(e) => handleQuickAdd(e, x)}
-                      title={inBasket ? 'Keluarkan dari daftar pinjaman' : 'Tambah ke daftar pinjaman'}
-                    >
-                      <i className={`fa-solid ${inBasket ? 'fa-check' : 'fa-plus'}`} />
-                    </button>
-                  )}
                 </div>
 
-                {/* 2. Info Detail Card */}
-                <div className="inv-prod-info">
-                  <div className="inv-prod-cat">
-                    <span className="chip" style={{ fontSize: '10.5px', padding: '1px 7px', fontWeight: 700 }}>
-                      {x.kode}
-                    </span>
-                    <span style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 600 }}>
-                      {x.kategori}
+                {/* 2. Detail Card Body 1:1 Legacy .inv-prod-body */}
+                <div className="inv-prod-body">
+                  {/* 2a. Kode & Kategori */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+                    <div className="inv-prod-code">{x.kode || `INV-${String(x.id).slice(0, 5).toUpperCase()}`}</div>
+                    <span style={{ fontSize: '10.5px', color: 'var(--muted)', fontWeight: 650, textTransform: 'capitalize' }}>
+                      {x.kategori || 'Alat'}
                     </span>
                   </div>
 
-                  <div className="inv-prod-name">{x.nama_alat}</div>
-
-                  <div className="inv-prod-brand">
-                    {x.spesifikasi || 'Spesifikasi standar operasional studio'}
+                  {/* 2b. Nama & Merk Alat */}
+                  <div className="inv-prod-name" style={{ marginTop: '2px' }}>
+                    {x.nama_alat}
                   </div>
+                  {x.spesifikasi ? (
+                    <div className="inv-prod-brand">
+                      {x.spesifikasi}
+                    </div>
+                  ) : null}
 
-                  <div className="inv-prod-meta">
-                    <span>
-                      <i className="fa-solid fa-location-dot" style={{ marginRight: '3px' }} />
-                      Studio PTV
-                    </span>
-                    <span>&bull;</span>
-                    <span>Yayasan</span>
-                  </div>
+                  {/* 2c. Jumlah Unit & Ketersediaan */}
+                  <div style={{ marginTop: 'auto', paddingTop: '6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 650, lineHeight: 1.25 }} className="trunc">
+                      {total <= 1 ? (
+                        avail === 1 ? (
+                          <span style={{ color: '#16a34a', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16a34a', display: 'inline-block', flexShrink: 0 }} />
+                            1 unit &bull; Tersedia
+                          </span>
+                        ) : borrowed === 1 ? (
+                          <span style={{ color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d97706', display: 'inline-block', flexShrink: 0 }} />
+                            1 unit &bull; Dipinjam
+                          </span>
+                        ) : damaged === 1 ? (
+                          <span style={{ color: '#dc2626', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#dc2626', display: 'inline-block', flexShrink: 0 }} />
+                            1 unit &bull; Rusak
+                          </span>
+                        ) : (
+                          <span style={{ color: '#64748b', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#64748b', display: 'inline-block', flexShrink: 0 }} />
+                            1 unit &bull; Tidak tersedia
+                          </span>
+                        )
+                      ) : (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'var(--ink, #0f172a)', flexWrap: 'wrap' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: avail > 0 ? '#16a34a' : damaged > 0 ? '#dc2626' : '#d97706', display: 'inline-block', flexShrink: 0 }} />
+                          <span>
+                            <b>{total} unit</b> &bull;{' '}
+                            <span style={{ color: avail > 0 ? '#16a34a' : '#dc2626', fontWeight: 700 }}>
+                              {avail} tersedia
+                            </span>
+                          </span>
+                          {borrowed > 0 ? (
+                            <span style={{ color: '#d97706', fontSize: '10.5px' }}>
+                              ({borrowed} pinjam)
+                            </span>
+                          ) : null}
+                        </span>
+                      )}
+                    </div>
 
-                  <div className="inv-prod-unit-status">
-                    <span
-                      style={{
-                        width: '6px',
-                        height: '6px',
-                        borderRadius: '50%',
-                        background: avail > 0 ? '#16a34a' : '#dc2626',
-                        display: 'inline-block',
-                      }}
-                    />
-                    <span>
-                      <b>{total} unit</b> &bull;{' '}
-                      <span style={{ color: avail > 0 ? '#16a34a' : '#dc2626', fontWeight: 700 }}>
-                        {avail} tersedia
+                    {/* 2d. Lokasi & Quick Action Button */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', color: 'var(--muted)', fontWeight: 550, gap: '6px', paddingTop: '3px', borderTop: '1px solid var(--line-2, #f1f5f9)' }}>
+                      <span className="trunc" style={{ flex: 1 }} title={`Lokasi: ${x.units?.[0]?.lokasi_penyimpanan || 'Studio PTV'}`}>
+                        <i className="fa-solid fa-location-dot" style={{ fontSize: '10px', marginRight: '3px', color: '#0284c7' }} />
+                        {x.units?.[0]?.lokasi_penyimpanan || 'Studio PTV'}
                       </span>
-                    </span>
-                    {borrowed > 0 && (
-                      <span style={{ color: '#d97706', fontSize: '10.5px' }}>
-                        ({borrowed} pinjam)
-                      </span>
-                    )}
+                      {avail > 0 && (
+                        <button
+                          type="button"
+                          className={`inv-prod-quick-add ${inBasket ? 'added' : ''}`}
+                          onClick={(e) => handleQuickAdd(e, x)}
+                          title={inBasket ? 'Keluarkan dari daftar pinjaman' : 'Tambah ke daftar pinjaman'}
+                          aria-label={inBasket ? 'Keluarkan dari daftar pinjaman' : 'Tambah ke daftar pinjaman'}
+                        >
+                          <i className={`fa-solid ${inBasket ? 'fa-check' : 'fa-plus'}`} />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
