@@ -36,20 +36,32 @@
   --neutral-bg:#E9F0F9; --neutral-fg:#5A7793;
   --accent-bg:#E2EDFD; --accent-fg:#0B5FBF;
 
-  /* ── Unified Continuous Corner Geometry System ── */
-  --ptv-corner-xs: 6px;
-  --ptv-corner-sm: 10px;
-  --ptv-corner-md: 14px;
-  --ptv-corner-lg: 20px;
-  --ptv-corner-xl: 28px;
-  --ptv-corner-2xl: 36px;
-  --ptv-corner-pill: 9999px;
-  --ptv-corner-circle: 50%;
+  /* ── PTV Unified Continuous Curve System ── */
+  --ptv-curve-xs: 6px;       /* Micro badges, inline tags (h: 18-24px) */
+  --ptv-curve-sm: 9px;       /* Small controls, compact buttons (h: 28-34px) */
+  --ptv-curve-md: 12px;      /* Standard controls: inputs, PTVSelect triggers, buttons (h: 38-46px) */
+  --ptv-curve-lg: 16px;      /* Floating menus, sub-panels, nested cards (h: 80-240px) */
+  --ptv-curve-xl: 22px;      /* Standard cards, bento grid items, surface panels */
+  --ptv-curve-2xl: 28px;     /* Modal dialogs, prominent bento containers, hero cards */
+  --ptv-curve-3xl: 34px;     /* Drawers, floating bottom sheets, master surfaces */
+  --ptv-curve-pill: 9999px;  /* Pill chips (.fchip), status tags */
+  --ptv-curve-circle: 50%;   /* Avatars, circular action icon buttons */
 
-  /* ── Concentric Inner Inset Approximations: R_inner ≈ max(0, R_outer - inset) ── */
+  /* Concentric Inset Offsets: R_inner ≈ max(0, R_outer - inset) */
   --ptv-concentric-inset-xs: 4px;
   --ptv-concentric-inset-sm: 6px;
-  --ptv-concentric-inset-md: 8px;
+  --ptv-concentric-inset-md: 10px;
+  --ptv-concentric-inset-lg: 12px;
+
+  /* Backward Compatibility Aliases for Phase 1 Code */
+  --ptv-corner-xs: var(--ptv-curve-xs);
+  --ptv-corner-sm: var(--ptv-curve-md);
+  --ptv-corner-md: var(--ptv-curve-lg);
+  --ptv-corner-lg: var(--ptv-curve-xl);
+  --ptv-corner-xl: var(--ptv-curve-2xl);
+  --ptv-corner-2xl: var(--ptv-curve-3xl);
+  --ptv-corner-pill: var(--ptv-curve-pill);
+  --ptv-corner-circle: var(--ptv-curve-circle);
 
   /* ── Legacy Border Radius (1:1 Compatibility) ── */
   --r-xs: 9px; --r-s: 13px; --r-m: 18px; --r-l: 24px; --r-xl: 30px; --r-full: 999px;
@@ -8973,7 +8985,7 @@ span.fin-matrix-cell.unpaid {
 .ptv-nilai-kpi-card {
   background: var(--surface, #ffffff);
   border: 1.5px solid var(--line, #e2e8f0);
-  border-radius: 16px;
+  border-radius: var(--ptv-curve-xl);
   padding: 16px 18px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.02);
   min-width: 0;
@@ -9004,7 +9016,7 @@ span.fin-matrix-cell.unpaid {
 .ptv-nilai-kpi-card-ic {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: var(--ptv-curve-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9031,7 +9043,7 @@ span.fin-matrix-cell.unpaid {
 .ptv-nilai-filter-bar {
   background: var(--surface, #ffffff);
   border: 1.5px solid var(--line, #e2e8f0);
-  border-radius: 16px;
+  border-radius: var(--ptv-curve-xl);
   padding: 14px 16px;
   margin-bottom: 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.02);
@@ -9056,7 +9068,7 @@ span.fin-matrix-cell.unpaid {
   padding-left: 36px;
   padding-right: 32px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: var(--ptv-curve-md);
   border-color: var(--line, #cbd5e1);
   font-size: 13px;
   width: 100%;
@@ -9067,7 +9079,7 @@ span.fin-matrix-cell.unpaid {
 }
 .ptv-nilai-filter-grid select {
   height: 40px;
-  border-radius: 10px;
+  border-radius: var(--ptv-curve-md);
   font-size: 12.5px;
   border-color: var(--line, #cbd5e1);
   width: 100%;
@@ -9095,7 +9107,7 @@ span.fin-matrix-cell.unpaid {
 .ptv-nilai-card {
   background: var(--surface, #ffffff);
   border: 1.5px solid #e2e8f0;
-  border-radius: 16px;
+  border-radius: var(--ptv-curve-xl);
   padding: 16px 18px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.02);
   transition: all 0.15s ease;
@@ -9131,7 +9143,7 @@ span.fin-matrix-cell.unpaid {
 .ptv-nilai-thumb {
   width: 58px;
   height: 58px;
-  border-radius: 12px;
+  border-radius: var(--ptv-curve-md);
   background: var(--bg-2, #f8fafc);
   border: 1.5px solid var(--line, #e2e8f0);
   overflow: hidden;
@@ -9163,7 +9175,7 @@ span.fin-matrix-cell.unpaid {
   background: #f1f5f9;
   color: #334155;
   border: 1px solid #cbd5e1;
-  border-radius: 6px;
+  border-radius: var(--ptv-curve-xs);
   font-size: 10.5px;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -9183,7 +9195,7 @@ span.fin-matrix-cell.unpaid {
   padding: 1px 6px;
   background: #f8fafc;
   color: #475569;
-  border-radius: 4px;
+  border-radius: var(--ptv-curve-xs);
   font-size: 11px;
   font-weight: 550;
 }
@@ -9218,7 +9230,7 @@ span.fin-matrix-cell.unpaid {
   font-size: 11px;
   font-weight: 650;
   padding: 2px 7px;
-  border-radius: 6px;
+  border-radius: var(--ptv-curve-xs);
   white-space: nowrap;
 }
 .ptv-nilai-unit-badge.total {
@@ -9259,7 +9271,7 @@ span.fin-matrix-cell.unpaid {
 .ptv-nilai-card-dossier-col {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: var(--ptv-curve-lg);
   padding: 12px 14px;
   min-width: 220px;
   flex-shrink: 0;
@@ -9360,7 +9372,7 @@ span.fin-matrix-cell.unpaid {
 .ptv-nilai-detail-card {
   background: var(--surface, #ffffff);
   border: 1.5px solid var(--line, #e2e8f0);
-  border-radius: 18px;
+  border-radius: var(--ptv-curve-xl);
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.02);
   box-sizing: border-box;
@@ -9372,7 +9384,7 @@ span.fin-matrix-cell.unpaid {
 .ptv-nilai-detail-price-box {
   background: var(--bg-2, #f8fafc);
   border: 1.5px solid var(--line, #e2e8f0);
-  border-radius: 14px;
+  border-radius: var(--ptv-curve-lg);
   padding: 16px;
   margin-bottom: 16px;
 }
@@ -9397,7 +9409,7 @@ span.fin-matrix-cell.unpaid {
 .ptv-nilai-detail-meta-cell {
   background: var(--bg-2, #f8fafc);
   border: 1px solid var(--line, #e2e8f0);
-  border-radius: 10px;
+  border-radius: var(--ptv-curve-md);
   padding: 10px 12px;
   min-width: 0;
   box-sizing: border-box;
@@ -9438,7 +9450,7 @@ span.fin-matrix-cell.unpaid {
     width: 36px;
     height: 36px;
     font-size: 16px;
-    border-radius: 10px;
+    border-radius: var(--ptv-curve-md);
   }
   .ptv-nilai-header-title {
     font-size: 17px;
@@ -9468,7 +9480,7 @@ span.fin-matrix-cell.unpaid {
   }
   .ptv-nilai-kpi-card {
     padding: 10px 12px;
-    border-radius: 12px;
+    border-radius: var(--ptv-curve-lg);
   }
   .ptv-nilai-kpi-card-hd {
     margin-bottom: 4px;
@@ -9481,7 +9493,7 @@ span.fin-matrix-cell.unpaid {
     width: 24px;
     height: 24px;
     font-size: 11px;
-    border-radius: 6px;
+    border-radius: var(--ptv-curve-xs);
   }
   .ptv-nilai-kpi-card-val {
     font-size: 15.5px;
@@ -9501,7 +9513,7 @@ span.fin-matrix-cell.unpaid {
   .ptv-nilai-filter-bar {
     padding: 10px 12px;
     margin-bottom: 14px;
-    border-radius: 14px;
+    border-radius: var(--ptv-curve-lg);
   }
   .ptv-nilai-toolbar-grid {
     display: flex;
@@ -9535,7 +9547,7 @@ span.fin-matrix-cell.unpaid {
   /* Card Item Mobile Optimization */
   .ptv-nilai-card {
     padding: 12px 14px;
-    border-radius: 14px;
+    border-radius: var(--ptv-curve-lg);
   }
   .ptv-nilai-card-inner {
     flex-direction: column;
@@ -9550,7 +9562,7 @@ span.fin-matrix-cell.unpaid {
   .ptv-nilai-thumb {
     width: 48px;
     height: 48px;
-    border-radius: 10px;
+    border-radius: var(--ptv-curve-md);
   }
   .ptv-nilai-card-name {
     font-size: 14.5px;
@@ -9566,7 +9578,7 @@ span.fin-matrix-cell.unpaid {
     min-width: 0;
     width: 100%;
     padding: 10px 12px;
-    border-radius: 10px;
+    border-radius: var(--ptv-curve-md);
   }
   .ptv-nilai-dossier-hd {
     margin-bottom: 2px;
@@ -9634,11 +9646,11 @@ span.fin-matrix-cell.unpaid {
   }
   .ptv-nilai-detail-card {
     padding: 14px 16px;
-    border-radius: 14px;
+    border-radius: var(--ptv-curve-lg);
   }
   .ptv-nilai-detail-price-box {
     padding: 12px 14px;
-    border-radius: 12px;
+    border-radius: var(--ptv-curve-md);
     margin-bottom: 12px;
   }
   .ptv-nilai-detail-meta-grid {
@@ -9647,6 +9659,7 @@ span.fin-matrix-cell.unpaid {
   }
   .ptv-nilai-detail-meta-cell {
     padding: 8px 10px;
+    border-radius: var(--ptv-curve-sm);
   }
 
   /* Modal Mobile Optimization */
@@ -10129,25 +10142,49 @@ span.fin-matrix-cell.unpaid {
    Unified Apple/Pixel-inspired geometric tokens & PTVSelect
    ============================================================ */
 
-/* Continuous Corner Geometry Classes */
-.ptv-corner-xs { border-radius: var(--ptv-corner-xs); }
-.ptv-corner-sm { border-radius: var(--ptv-corner-sm); }
-.ptv-corner-md { border-radius: var(--ptv-corner-md); }
-.ptv-corner-lg { border-radius: var(--ptv-corner-lg); }
-.ptv-corner-xl { border-radius: var(--ptv-corner-xl); }
-.ptv-corner-2xl { border-radius: var(--ptv-corner-2xl); }
-.ptv-corner-pill { border-radius: var(--ptv-corner-pill); }
-.ptv-corner-circle { border-radius: var(--ptv-corner-circle); }
+/* ── PTV Unified Continuous Curve Classes ── */
+.ptv-curve-xs { border-radius: var(--ptv-curve-xs); }
+.ptv-curve-sm { border-radius: var(--ptv-curve-sm); }
+.ptv-curve-md { border-radius: var(--ptv-curve-md); }
+.ptv-curve-lg { border-radius: var(--ptv-curve-lg); }
+.ptv-curve-xl { border-radius: var(--ptv-curve-xl); }
+.ptv-curve-2xl { border-radius: var(--ptv-curve-2xl); }
+.ptv-curve-3xl { border-radius: var(--ptv-curve-3xl); }
+.ptv-curve-pill { border-radius: var(--ptv-curve-pill); }
+.ptv-curve-circle { border-radius: var(--ptv-curve-circle); }
+
+/* Compatibility Aliases */
+.ptv-corner-xs { border-radius: var(--ptv-curve-xs); }
+.ptv-corner-sm { border-radius: var(--ptv-curve-md); }
+.ptv-corner-md { border-radius: var(--ptv-curve-lg); }
+.ptv-corner-lg { border-radius: var(--ptv-curve-xl); }
+.ptv-corner-xl { border-radius: var(--ptv-curve-2xl); }
+.ptv-corner-2xl { border-radius: var(--ptv-curve-3xl); }
+.ptv-corner-pill { border-radius: var(--ptv-curve-pill); }
+.ptv-corner-circle { border-radius: var(--ptv-curve-circle); }
 
 @supports (corner-shape: squircle) {
   .ptv-squircle,
+  .ptv-continuous-curve,
+  .ptv-curve-xs,
+  .ptv-curve-sm,
+  .ptv-curve-md,
+  .ptv-curve-lg,
+  .ptv-curve-xl,
+  .ptv-curve-2xl,
+  .ptv-curve-3xl,
   .ptv-corner-sm,
   .ptv-corner-md,
   .ptv-corner-lg,
   .ptv-corner-xl,
   .ptv-corner-2xl,
   .ptv-select-trigger,
-  .ptv-select-menu {
+  .ptv-select-menu,
+  .ptv-nilai-kpi-card,
+  .ptv-nilai-card,
+  .ptv-nilai-filter-bar,
+  .card,
+  .sheet {
     corner-shape: squircle;
   }
 }

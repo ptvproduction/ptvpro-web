@@ -371,7 +371,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           gap: '7px',
-          borderRadius: 'var(--r-m)',
+          borderRadius: 'var(--ptv-curve-md)',
           boxShadow: 'var(--shadow-s)',
           width: '100%',
         }}
@@ -420,7 +420,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
       </div>
 
       {basketCount === 0 ? (
-        <div style={{ padding: '20px 14px', textAlign: 'center', border: '1.5px dashed var(--line-2)', borderRadius: 'var(--r-m)', background: 'var(--bg-2)' }}>
+        <div style={{ padding: '20px 14px', textAlign: 'center', border: '1.5px dashed var(--line-2)', borderRadius: 'var(--ptv-curve-lg)', background: 'var(--bg-2)' }}>
           <i className="fa-solid fa-boxes-stacked" style={{ fontSize: '22px', color: 'var(--muted)', opacity: 0.5, display: 'block', marginBottom: '6px' }} />
           <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--ink)' }}>Belum ada unit dipilih</div>
           <div className="t-xs muted" style={{ marginTop: '2px' }}>Buka kategori dan centang unit fisik di sebelah kiri.</div>
@@ -545,7 +545,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                       Memuat katalog alat...
                     </div>
                   ) : resultCategories.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '30px 15px', background: 'var(--surface)', borderRadius: 'var(--r-m)', border: '1px dashed var(--line-2)' }}>
+                    <div style={{ textAlign: 'center', padding: '30px 15px', background: 'var(--surface)', borderRadius: 'var(--ptv-curve-lg)', border: '1px dashed var(--line-2)' }}>
                       <i className="fa-solid fa-box-open" style={{ fontSize: '26px', color: 'var(--muted)', opacity: 0.6, marginBottom: '8px', display: 'block' }} />
                       <p className="t-sm muted" style={{ margin: 0, fontWeight: 600 }}>Tidak ada inventaris yang cocok.</p>
                       <span className="t-xs muted">Coba kata kunci lain atau pilih filter kategori "Semua".</span>
@@ -648,7 +648,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                                           <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink)', lineHeight: 1.25 }}>
                                             {x.nama_alat}
                                           </span>
-                                          <span style={{ fontSize: '10.5px', color: 'var(--ink-2)', fontFamily: 'monospace', background: 'var(--bg-2)', padding: '1px 5px', borderRadius: '4px', border: '1px solid var(--line-2)' }}>
+                                          <span style={{ fontSize: '10.5px', color: 'var(--ink-2)', fontFamily: 'monospace', background: 'var(--bg-2)', padding: '1px 5px', borderRadius: 'var(--ptv-curve-xs)', border: '1px solid var(--line-2)' }}>
                                             {x.kode}
                                           </span>
                                         </div>

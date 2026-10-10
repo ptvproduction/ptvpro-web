@@ -50,20 +50,32 @@
   --accent-bg: #E2EDFD;
   --accent-fg: #0B5FBF;
 
-  /* ── Unified Continuous Corner Geometry System ── */
-  --ptv-corner-xs: 6px;
-  --ptv-corner-sm: 10px;
-  --ptv-corner-md: 14px;
-  --ptv-corner-lg: 20px;
-  --ptv-corner-xl: 28px;
-  --ptv-corner-2xl: 36px;
-  --ptv-corner-pill: 9999px;
-  --ptv-corner-circle: 50%;
+  /* ── PTV Unified Continuous Curve System ── */
+  --ptv-curve-xs: 6px;       /* Micro badges, inline tags (h: 18-24px) */
+  --ptv-curve-sm: 9px;       /* Small controls, compact buttons (h: 28-34px) */
+  --ptv-curve-md: 12px;      /* Standard controls: inputs, PTVSelect triggers, buttons (h: 38-46px) */
+  --ptv-curve-lg: 16px;      /* Floating menus, sub-panels, nested cards (h: 80-240px) */
+  --ptv-curve-xl: 22px;      /* Standard cards, bento grid items, surface panels */
+  --ptv-curve-2xl: 28px;     /* Modal dialogs, prominent bento containers, hero cards */
+  --ptv-curve-3xl: 34px;     /* Drawers, floating bottom sheets, master surfaces */
+  --ptv-curve-pill: 9999px;  /* Pill chips (.fchip), status tags */
+  --ptv-curve-circle: 50%;   /* Avatars, circular action icon buttons */
 
-  /* ── Concentric Inner Inset Approximations: R_inner ≈ max(0, R_outer - inset) ── */
+  /* Concentric Inset Offsets: R_inner ≈ max(0, R_outer - inset) */
   --ptv-concentric-inset-xs: 4px;
   --ptv-concentric-inset-sm: 6px;
-  --ptv-concentric-inset-md: 8px;
+  --ptv-concentric-inset-md: 10px;
+  --ptv-concentric-inset-lg: 12px;
+
+  /* Backward Compatibility Aliases for Phase 1 Code */
+  --ptv-corner-xs: var(--ptv-curve-xs);
+  --ptv-corner-sm: var(--ptv-curve-md);
+  --ptv-corner-md: var(--ptv-curve-lg);
+  --ptv-corner-lg: var(--ptv-curve-xl);
+  --ptv-corner-xl: var(--ptv-curve-2xl);
+  --ptv-corner-2xl: var(--ptv-curve-3xl);
+  --ptv-corner-pill: var(--ptv-curve-pill);
+  --ptv-corner-circle: var(--ptv-curve-circle);
 
   /* ── Legacy Border Radius (1:1 Legacy Compatibility) ── */
   --r-xs: 9px;

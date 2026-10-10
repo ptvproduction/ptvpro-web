@@ -212,15 +212,15 @@ export const NilaiInventarisPage: React.FC = () => {
   if (!canView) {
     return (
       <div className="page subview-fade">
-        <div style={{ background: '#fff', border: '1.5px solid #fee2e2', borderRadius: '18px', padding: '32px 24px', textAlign: 'center', boxShadow: '0 4px 16px rgba(239,68,68,0.06)', maxWidth: '560px', margin: '40px auto' }}>
-          <div style={{ width: '56px', height: '56px', background: '#fef2f2', color: '#ef4444', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '24px' }}>
+        <div style={{ background: '#fff', border: '1.5px solid #fee2e2', borderRadius: 'var(--ptv-curve-xl)', padding: '32px 24px', textAlign: 'center', boxShadow: '0 4px 16px rgba(239,68,68,0.06)', maxWidth: '560px', margin: '40px auto' }}>
+          <div style={{ width: '56px', height: '56px', background: '#fef2f2', color: '#ef4444', borderRadius: 'var(--ptv-curve-circle)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '24px' }}>
             <i className="fa-solid fa-lock" />
           </div>
           <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>Akses Modul Terbatas</h3>
           <p style={{ fontSize: '13.5px', color: '#64748b', lineHeight: 1.5, marginBottom: '20px' }}>
             Modul <b>Nilai Inventaris PTV</b> hanya dapat diakses oleh peran <b>Eksekutif, Administrasi, dan Kru Operasional</b> aktif.
           </p>
-          <button className="btn pri" onClick={() => navigate('/hub/beranda')} style={{ borderRadius: '12px', padding: '8px 20px' }}>
+          <button className="btn pri" onClick={() => navigate('/hub/beranda')} style={{ borderRadius: 'var(--ptv-curve-md)', padding: '8px 20px' }}>
             <i className="fa-solid fa-house" style={{ marginRight: '6px' }} /> Kembali ke Beranda
           </button>
         </div>
@@ -231,7 +231,7 @@ export const NilaiInventarisPage: React.FC = () => {
   return (
     <div className="page subview-fade ptv-nilai-page" style={{ paddingTop: '4px' }}>
       {/* Simulation Banner Notice */}
-      <div style={{ background: 'var(--b-050, #eff6ff)', border: '1px solid var(--b-200, #bfdbfe)', borderRadius: '12px', padding: '10px 14px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ background: 'var(--b-050, #eff6ff)', border: '1px solid var(--b-200, #bfdbfe)', borderRadius: 'var(--ptv-curve-md)', padding: '10px 14px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
         <i className="fa-solid fa-circle-info" style={{ color: 'var(--b-600, #2563eb)', fontSize: '16px', flexShrink: 0 }} />
         <span style={{ fontSize: '12.5px', color: 'var(--b-800, #1e40af)', lineHeight: 1.4 }}>
           <strong>Data Simulasi Finansial:</strong> Nilai perolehan dan catatan valuasi yang ditampilkan di bawah ini merupakan data simulasi untuk keperluan verifikasi antarmuka dan operasional sistem, bukan nilai buku riil aset Progresif TV.
@@ -256,7 +256,7 @@ export const NilaiInventarisPage: React.FC = () => {
             type="button"
             className="btn sm"
             onClick={() => navigate('/hub/inventaris')}
-            style={{ background: '#fff', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontWeight: 700, padding: '6px 14px', color: '#334155', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{ background: '#fff', border: '1.5px solid #e2e8f0', borderRadius: 'var(--ptv-curve-md)', fontWeight: 700, padding: '6px 14px', color: '#334155', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
             <i className="fa-solid fa-boxes-stacked" style={{ color: '#2563eb' }} />
             <span>Katalog Alat</span>
@@ -294,8 +294,8 @@ export const NilaiInventarisPage: React.FC = () => {
             <span className="ptv-nilai-kpi-card-val" style={{ color: '#1e40af' }}>{coveragePercent}%</span>
             <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>({itemsWithValueCount}/{totalRegisteredItems})</span>
           </div>
-          <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden', marginTop: '8px' }}>
-            <div style={{ width: `${coveragePercent}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #10b981)', borderRadius: '4px' }} />
+          <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: 'var(--ptv-curve-pill)', overflow: 'hidden', marginTop: '8px' }}>
+            <div style={{ width: `${coveragePercent}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #10b981)', borderRadius: 'var(--ptv-curve-pill)' }} />
           </div>
         </div>
 
@@ -434,7 +434,7 @@ export const NilaiInventarisPage: React.FC = () => {
               type="button"
               className="btn sm"
               onClick={resetFilters}
-              style={{ background: '#fee2e2', color: '#b91c1c', border: 'none', borderRadius: '8px', padding: '3px 10px', fontWeight: 700, fontSize: '11.5px', cursor: 'pointer' }}
+              style={{ background: '#fee2e2', color: '#b91c1c', border: 'none', borderRadius: 'var(--ptv-curve-sm)', padding: '3px 10px', fontWeight: 700, fontSize: '11.5px', cursor: 'pointer' }}
             >
               <i className="fa-solid fa-rotate-left" style={{ marginRight: '4px' }} /> Reset Filter
             </button>
@@ -450,13 +450,13 @@ export const NilaiInventarisPage: React.FC = () => {
             Memuat data nilai inventaris...
           </div>
         ) : displayItems.length === 0 ? (
-          <div style={{ background: 'var(--surface, #ffffff)', border: '1.5px solid var(--line, #e2e8f0)', borderRadius: '16px', padding: '48px 24px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+          <div style={{ background: 'var(--surface, #ffffff)', border: '1.5px solid var(--line, #e2e8f0)', borderRadius: 'var(--ptv-curve-xl)', padding: '48px 24px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
             <div style={{ width: '52px', height: '52px', background: '#f1f5f9', color: '#94a3b8', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: '22px' }}>
               <i className="fa-solid fa-box-open" />
             </div>
             <h4 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: '0 0 6px 0' }}>Tidak Ada Data Inventaris yang Cocok</h4>
             <p style={{ fontSize: '13px', color: 'var(--muted, #64748b)', margin: '0 0 16px 0' }}>Silakan sesuaikan kata kunci pencarian atau filter status nilai di atas.</p>
-            <button type="button" className="btn sm pri" onClick={resetFilters} style={{ borderRadius: '10px', padding: '6px 16px' }}>
+            <button type="button" className="btn sm pri" onClick={resetFilters} style={{ borderRadius: 'var(--ptv-curve-md)', padding: '6px 16px' }}>
               Reset Filter
             </button>
           </div>
@@ -547,11 +547,11 @@ export const NilaiInventarisPage: React.FC = () => {
                       <div className="ptv-nilai-dossier-hd">
                         <span className="ptv-nilai-dossier-title">Nilai Perolehan</span>
                         {hasVal ? (
-                          <span style={{ fontSize: '10.5px', fontWeight: 750, padding: '1px 6px', borderRadius: '4px', background: '#ecfdf5', color: '#059669' }}>
+                          <span style={{ fontSize: '10.5px', fontWeight: 750, padding: '1px 6px', borderRadius: 'var(--ptv-curve-xs)', background: '#ecfdf5', color: '#059669' }}>
                             {statusAset}
                           </span>
                         ) : (
-                          <span style={{ fontSize: '10.5px', fontWeight: 750, padding: '1px 6px', borderRadius: '4px', background: '#fef3c7', color: '#b45309' }}>
+                          <span style={{ fontSize: '10.5px', fontWeight: 750, padding: '1px 6px', borderRadius: 'var(--ptv-curve-xs)', background: '#fef3c7', color: '#b45309' }}>
                             Belum Dicatat
                           </span>
                         )}
@@ -610,7 +610,7 @@ export const NilaiInventarisPage: React.FC = () => {
                         type="button"
                         className="btn sm ptv-nilai-btn-detail"
                         onClick={() => navigate(`/hub/inventaris/nilai/${x.id}`)}
-                        style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '8px', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '6px' }}
+                        style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: 'var(--ptv-curve-md)', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '6px' }}
                       >
                         <i className="fa-solid fa-eye" style={{ color: '#2563eb' }} />
                         <span>Detail</span>
@@ -622,7 +622,7 @@ export const NilaiInventarisPage: React.FC = () => {
                           className="btn sm pri ptv-nilai-btn-edit"
                           onClick={() => handleOpenEdit(x)}
                           style={{
-                            borderRadius: '8px',
+                            borderRadius: 'var(--ptv-curve-md)',
                             fontWeight: 700,
                             display: 'flex',
                             alignItems: 'center',
@@ -640,7 +640,7 @@ export const NilaiInventarisPage: React.FC = () => {
                           type="button"
                           className="btn sm ptv-nilai-btn-del"
                           onClick={() => handleDeleteNilai(x.id, x.nama_alat)}
-                          style={{ background: '#fff', border: '1px solid #fee2e2', color: '#dc2626', borderRadius: '8px', fontWeight: 700, fontSize: '11px' }}
+                          style={{ background: '#fff', border: '1px solid #fee2e2', color: '#dc2626', borderRadius: 'var(--ptv-curve-md)', fontWeight: 700, fontSize: '11px' }}
                           title="Hapus catatan nilai finansial saja (alat fisik tetap ada)"
                         >
                           <i className="fa-regular fa-trash-can" />
@@ -675,7 +675,7 @@ export const NilaiInventarisPage: React.FC = () => {
           <div
             style={{
               background: 'var(--surface, #ffffff)',
-              borderRadius: '16px',
+              borderRadius: 'var(--ptv-curve-2xl)',
               width: '100%',
               maxWidth: '520px',
               boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
@@ -805,7 +805,7 @@ export const NilaiInventarisPage: React.FC = () => {
                   type="button"
                   className="btn sm"
                   onClick={() => setEditingItem(null)}
-                  style={{ background: '#f1f5f9', border: 'none', borderRadius: '10px', padding: '8px 16px', fontWeight: 700 }}
+                  style={{ background: '#f1f5f9', border: 'none', borderRadius: 'var(--ptv-curve-md)', padding: '8px 16px', fontWeight: 700 }}
                 >
                   Batal
                 </button>
@@ -813,7 +813,7 @@ export const NilaiInventarisPage: React.FC = () => {
                   type="submit"
                   disabled={submitting}
                   className="btn sm pri"
-                  style={{ borderRadius: '10px', padding: '8px 20px', fontWeight: 700 }}
+                  style={{ borderRadius: 'var(--ptv-curve-md)', padding: '8px 20px', fontWeight: 700 }}
                 >
                   {submitting ? 'Menyimpan...' : 'Simpan Catatan Nilai'}
                 </button>

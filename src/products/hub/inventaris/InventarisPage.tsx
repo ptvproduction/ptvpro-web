@@ -661,7 +661,7 @@ export const InventarisPage: React.FC = () => {
                       justifyContent: 'space-between',
                       padding: '12px 14px',
                       border: `1.5px solid ${inBasket ? '#3b82f6' : '#e2e8f0'}`,
-                      borderRadius: '12px',
+                      borderRadius: 'var(--ptv-curve-md)',
                       background: inBasket ? '#eff6ff' : '#ffffff',
                       gap: '12px',
                     }}
@@ -671,7 +671,7 @@ export const InventarisPage: React.FC = () => {
                         style={{
                           width: '38px',
                           height: '38px',
-                          borderRadius: '10px',
+                          borderRadius: 'var(--ptv-curve-sm)',
                           background: isAvail ? '#e0f2fe' : '#f1f5f9',
                           color: isAvail ? '#0284c7' : '#64748b',
                           display: 'flex',
@@ -707,7 +707,7 @@ export const InventarisPage: React.FC = () => {
                             invCode: unitPickerAsset.kode,
                           });
                         }}
-                        style={{ minHeight: '34px', padding: '0 12px', borderRadius: '8px' }}
+                        style={{ minHeight: '34px', padding: '0 12px', borderRadius: 'var(--ptv-curve-md)' }}
                       >
                         <i className={`fa-solid ${inBasket ? 'fa-check' : 'fa-plus'}`} style={{ marginRight: '4px' }} />
                         {inBasket ? 'Dipilih' : 'Pilih Unit'}
@@ -777,7 +777,7 @@ export const InventarisPage: React.FC = () => {
                     value={newKode}
                     onChange={(e) => setNewKode(e.target.value)}
                     required
-                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
                   />
                 </div>
                 <div>
@@ -787,7 +787,7 @@ export const InventarisPage: React.FC = () => {
                     value={newNama}
                     onChange={(e) => setNewNama(e.target.value)}
                     required
-                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
                   />
                 </div>
                 <div>
@@ -806,7 +806,7 @@ export const InventarisPage: React.FC = () => {
                     type="text"
                     value={newSpec}
                     onChange={(e) => setNewSpec(e.target.value)}
-                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
                   />
                 </div>
                 <div style={{ display: 'flex', gap: '10px' }}>
@@ -816,7 +816,7 @@ export const InventarisPage: React.FC = () => {
                       type="text"
                       value={newLoc}
                       onChange={(e) => setNewLoc(e.target.value)}
-                      style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                      style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
                     />
                   </div>
                   <div style={{ width: '100px' }}>
@@ -826,7 +826,7 @@ export const InventarisPage: React.FC = () => {
                       min="1"
                       value={newQty}
                       onChange={(e) => setNewQty(e.target.value)}
-                      style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                      style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
                     />
                   </div>
                 </div>
@@ -836,7 +836,7 @@ export const InventarisPage: React.FC = () => {
                     type="button"
                     className="btn sec flex-1"
                     onClick={() => setIsNewAssetOpen(false)}
-                    style={{ borderRadius: '8px' }}
+                    style={{ borderRadius: 'var(--ptv-curve-md)' }}
                   >
                     Batal
                   </button>
@@ -844,7 +844,7 @@ export const InventarisPage: React.FC = () => {
                     type="submit"
                     className="btn pri flex-1"
                     disabled={newSubmitting}
-                    style={{ borderRadius: '8px' }}
+                    style={{ borderRadius: 'var(--ptv-curve-md)' }}
                   >
                     {newSubmitting ? 'Menyimpan...' : 'Simpan Alat'}
                   </button>

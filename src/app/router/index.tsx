@@ -9,6 +9,7 @@ import { AlatDetailPage } from '@products/hub/inventaris/AlatDetailPage';
 import { NilaiInventarisPage } from '@products/hub/inventaris/NilaiInventarisPage';
 import { NilaiInventarisDetailPage } from '@products/hub/inventaris/NilaiInventarisDetailPage';
 import { PeminjamanPage } from '@products/hub/peminjaman/PeminjamanPage';
+import { PTVContinuousCurveFixture } from '@products/hub/designSystem/PTVContinuousCurveFixture';
 
 export const router = createBrowserRouter([
   {
@@ -84,6 +85,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredCapability="loans.view">
             <PeminjamanPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'design-system',
+        element: (
+          <ProtectedRoute requiredCapability="hub.access">
+            <PTVContinuousCurveFixture />
           </ProtectedRoute>
         ),
       },

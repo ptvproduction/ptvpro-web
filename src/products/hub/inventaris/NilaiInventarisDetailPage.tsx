@@ -116,7 +116,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
   if (!canView) {
     return (
       <div className="page subview-fade">
-        <div style={{ background: '#fff', border: '1.5px solid #fee2e2', borderRadius: '18px', padding: '32px 24px', textAlign: 'center', maxWidth: '560px', margin: '40px auto' }}>
+        <div style={{ background: '#fff', border: '1.5px solid #fee2e2', borderRadius: 'var(--ptv-curve-xl)', padding: '32px 24px', textAlign: 'center', maxWidth: '560px', margin: '40px auto' }}>
           <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>Akses Terbatas</h3>
           <p style={{ color: '#64748b', fontSize: '13.5px' }}>Anda tidak memiliki hak akses untuk melihat rincian nilai inventaris.</p>
           <button className="btn pri" onClick={() => navigate('/hub/beranda')}>Kembali ke Beranda</button>
@@ -166,7 +166,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
   return (
     <div className="page subview-fade ptv-nilai-detail-page" style={{ paddingTop: '4px' }}>
       {/* Simulation Banner Notice */}
-      <div style={{ background: 'var(--b-050, #eff6ff)', border: '1px solid var(--b-200, #bfdbfe)', borderRadius: '12px', padding: '10px 14px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ background: 'var(--b-050, #eff6ff)', border: '1px solid var(--b-200, #bfdbfe)', borderRadius: 'var(--ptv-curve-md)', padding: '10px 14px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
         <i className="fa-solid fa-circle-info" style={{ color: 'var(--b-600, #2563eb)', fontSize: '16px', flexShrink: 0 }} />
         <span style={{ fontSize: '12.5px', color: 'var(--b-800, #1e40af)', lineHeight: 1.4 }}>
           <strong>Data Simulasi Finansial:</strong> Nilai perolehan dan catatan valuasi di bawah ini merupakan data simulasi untuk keperluan verifikasi antarmuka dan operasional sistem, bukan nilai buku riil aset Progresif TV.
@@ -180,7 +180,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
             type="button"
             className="btn sm"
             onClick={() => navigate('/hub/inventaris/nilai')}
-            style={{ background: '#fff', border: '1.5px solid #e2e8f0', borderRadius: '10px', padding: '6px 12px', fontWeight: 700, color: '#334155', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{ background: '#fff', border: '1.5px solid #e2e8f0', borderRadius: 'var(--ptv-curve-md)', padding: '6px 12px', fontWeight: 700, color: '#334155', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
             <i className="fa-solid fa-arrow-left" />
             <span>Kembali</span>
@@ -200,7 +200,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
             type="button"
             className="btn sm"
             onClick={() => navigate(`/hub/inventaris/${item.id}`)}
-            style={{ background: '#f1f5f9', border: '1.5px solid #cbd5e1', borderRadius: '10px', fontWeight: 700, color: '#1e293b', padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{ background: '#f1f5f9', border: '1.5px solid #cbd5e1', borderRadius: 'var(--ptv-curve-md)', fontWeight: 700, color: '#1e293b', padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
             <i className="fa-solid fa-box" style={{ color: '#2563eb' }} />
             <span>Detail Fisik Alat</span>
@@ -212,7 +212,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
               className="btn sm pri"
               onClick={() => setIsEditOpen(true)}
               style={{
-                borderRadius: '10px',
+                borderRadius: 'var(--ptv-curve-md)',
                 padding: '6px 14px',
                 fontWeight: 700,
                 display: 'inline-flex',
@@ -231,7 +231,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
               type="button"
               className="btn sm"
               onClick={handleDeleteNilai}
-              style={{ background: '#fff', border: '1.5px solid #fee2e2', color: '#dc2626', borderRadius: '10px', padding: '6px 12px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              style={{ background: '#fff', border: '1.5px solid #fee2e2', color: '#dc2626', borderRadius: 'var(--ptv-curve-md)', padding: '6px 12px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
               <i className="fa-regular fa-trash-can" />
               <span>Hapus</span>
@@ -248,7 +248,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
             {/* Header Box */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--line-2, #f1f5f9)', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#ecfdf5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: 'var(--ptv-curve-md)', background: '#ecfdf5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>
                   <i className="fa-solid fa-receipt" />
                 </div>
                 <div style={{ minWidth: 0 }}>
@@ -274,7 +274,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                 {nilaiPerolehan}
               </div>
               {hasVal && v && totalUnits > 1 && (
-                <div style={{ marginTop: '8px', padding: '6px 12px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#166534', fontWeight: 700, flexWrap: 'wrap' }}>
+                <div style={{ marginTop: '8px', padding: '6px 12px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 'var(--ptv-curve-sm)', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#166534', fontWeight: 700, flexWrap: 'wrap' }}>
                   <span>Harga 1 Unit: <b>{formatRupiah(Math.round(v.nilai_perolehan / totalUnits))}</b></span>
                   <span style={{ color: '#86efac' }}>&bull;</span>
                   <span>Jumlah: <b>{totalUnits} Unit</b></span>
@@ -353,7 +353,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
               <span style={{ fontSize: '11.5px', fontWeight: 750, color: 'var(--muted, #64748b)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '4px' }}>
                 Catatan Administratif
               </span>
-              <div style={{ background: 'var(--bg-2, #f8fafc)', border: '1px solid var(--line, #e2e8f0)', borderRadius: '10px', padding: '10px 12px', fontSize: '12.5px', color: 'var(--ink, #334155)', lineHeight: 1.4, wordBreak: 'break-word' }}>
+              <div style={{ background: 'var(--bg-2, #f8fafc)', border: '1px solid var(--line, #e2e8f0)', borderRadius: 'var(--ptv-curve-md)', padding: '10px 12px', fontSize: '12.5px', color: 'var(--ink, #334155)', lineHeight: 1.4, wordBreak: 'break-word' }}>
                 {catatanVal}
               </div>
             </div>
@@ -383,7 +383,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
           {/* Asset Overview Card */}
           <div className="ptv-nilai-detail-card">
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '14px', background: 'var(--bg-2, #f8fafc)', border: '1.5px solid var(--line, #e2e8f0)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '64px', height: '64px', borderRadius: 'var(--ptv-curve-lg)', background: 'var(--bg-2, #f8fafc)', border: '1.5px solid var(--line, #e2e8f0)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {item.foto_url ? (
                   <img src={item.foto_url} alt={item.nama_alat} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
@@ -394,7 +394,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
               </div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'inline-block', padding: '1px 8px', background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '11px', fontWeight: 800, letterSpacing: '0.04em', marginBottom: '4px' }}>
+                <span style={{ display: 'inline-block', padding: '1px 8px', background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', borderRadius: 'var(--ptv-curve-xs)', fontSize: '11px', fontWeight: 800, letterSpacing: '0.04em', marginBottom: '4px' }}>
                   {item.kode}
                 </span>
                 <h2 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: '0 0 4px 0', lineHeight: 1.3, wordBreak: 'break-word' }}>
@@ -423,7 +423,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
           <div className="ptv-nilai-detail-card">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: 'var(--ptv-curve-sm)', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
                   <i className="fa-solid fa-boxes-stacked" />
                 </div>
                 <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -445,7 +445,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                 return (
                   <div
                     key={u.id}
-                    style={{ background: 'var(--bg-2, #f8fafc)', border: '1px solid var(--line, #e2e8f0)', borderRadius: '10px', padding: '10px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
+                    style={{ background: 'var(--bg-2, #f8fafc)', border: '1px solid var(--line, #e2e8f0)', borderRadius: 'var(--ptv-curve-md)', padding: '10px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                       <span
@@ -497,7 +497,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
           <div
             style={{
               background: 'var(--surface, #ffffff)',
-              borderRadius: '16px',
+              borderRadius: 'var(--ptv-curve-2xl)',
               width: '100%',
               maxWidth: '520px',
               boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
@@ -627,7 +627,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                   type="button"
                   className="btn sm"
                   onClick={() => setIsEditOpen(false)}
-                  style={{ background: '#f1f5f9', border: 'none', borderRadius: '10px', padding: '8px 16px', fontWeight: 700 }}
+                  style={{ background: '#f1f5f9', border: 'none', borderRadius: 'var(--ptv-curve-md)', padding: '8px 16px', fontWeight: 700 }}
                 >
                   Batal
                 </button>
@@ -635,7 +635,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                   type="submit"
                   disabled={submitting}
                   className="btn sm pri"
-                  style={{ borderRadius: '10px', padding: '8px 20px', fontWeight: 700 }}
+                  style={{ borderRadius: 'var(--ptv-curve-md)', padding: '8px 20px', fontWeight: 700 }}
                 >
                   {submitting ? 'Menyimpan...' : 'Simpan Catatan Nilai'}
                 </button>

@@ -427,7 +427,7 @@ export const AlatDetailPage: React.FC = () => {
                             fontSize: '11.5px',
                             padding: '5px 10px',
                             minHeight: '30px',
-                            borderRadius: '8px',
+                            borderRadius: 'var(--ptv-curve-sm)',
                             fontWeight: 700,
                             whiteSpace: 'nowrap',
                           }}
@@ -444,7 +444,7 @@ export const AlatDetailPage: React.FC = () => {
                         type="button"
                         className="btn sm"
                         onClick={() => navigate('/hub/kerusakan')}
-                        style={{ fontSize: '11.5px', padding: '5px 9px', minHeight: '30px', color: '#d97706', borderRadius: '8px' }}
+                        style={{ fontSize: '11.5px', padding: '5px 9px', minHeight: '30px', color: '#d97706', borderRadius: 'var(--ptv-curve-sm)' }}
                         title="Lapor Kerusakan"
                       >
                         <i className="fa-solid fa-wrench" />
@@ -514,7 +514,7 @@ export const AlatDetailPage: React.FC = () => {
                       style={{
                         background: '#ffffff',
                         border: '1.5px solid #e2e8f0',
-                        borderRadius: '14px',
+                        borderRadius: 'var(--ptv-curve-lg)',
                         padding: '14px 16px',
                         boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
                         display: 'flex',
@@ -527,7 +527,7 @@ export const AlatDetailPage: React.FC = () => {
                         style={{
                           width: '40px',
                           height: '40px',
-                          borderRadius: '10px',
+                          borderRadius: 'var(--ptv-curve-md)',
                           background: '#f8fafc',
                           border: '1px solid #e2e8f0',
                           display: 'flex',

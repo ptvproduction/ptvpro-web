@@ -170,7 +170,7 @@ export const PeminjamanPage: React.FC = () => {
   return (
     <div className="page" style={{ paddingTop: '4px' }}>
       {/* ── Search & Filter Controls (Apple-style Clean Toolbar 1:1 Legacy) ── */}
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--line-2, rgba(15,23,42,0.08))', borderRadius: '14px', padding: '10px 14px', marginBottom: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--line-2, rgba(15,23,42,0.08))', borderRadius: 'var(--ptv-curve-lg)', padding: '10px 14px', marginBottom: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
           <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
             <i className="fa-solid fa-magnifying-glass" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink-2)', fontSize: '12px' }} />
@@ -181,7 +181,7 @@ export const PeminjamanPage: React.FC = () => {
               placeholder="Cari peminjam, keperluan, nama alat atau kode unit..."
               value={searchQ}
               onChange={(e) => setSearchQ(e.target.value)}
-              style={{ paddingLeft: '34px', paddingRight: searchQ ? '32px' : '14px', borderRadius: '10px', fontSize: '12.5px', height: '36px', background: 'var(--bg-2)', border: '1px solid var(--line-2, rgba(15,23,42,0.08))', width: '100%', boxSizing: 'border-box' }}
+              style={{ paddingLeft: '34px', paddingRight: searchQ ? '32px' : '14px', borderRadius: 'var(--ptv-curve-md)', fontSize: '12.5px', height: '36px', background: 'var(--bg-2)', border: '1px solid var(--line-2, rgba(15,23,42,0.08))', width: '100%', boxSizing: 'border-box' }}
             />
             {searchQ && (
               <button
@@ -210,7 +210,7 @@ export const PeminjamanPage: React.FC = () => {
                   type="button"
                   className={`fchip ${loanFilter === k ? 'on' : ''}`}
                   onClick={() => setLoanFilter(k)}
-                  style={{ fontSize: '12px', padding: '5px 13px', borderRadius: '999px', fontWeight: 550 }}
+                  style={{ fontSize: '12px', padding: '5px 13px', borderRadius: 'var(--ptv-curve-pill)', fontWeight: 550 }}
                 >
                   {l}
                 </button>
@@ -221,7 +221,7 @@ export const PeminjamanPage: React.FC = () => {
                 type="button"
                 className="btn sm pri"
                 onClick={() => setIsCheckoutOpen(true)}
-                style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '10px', fontWeight: 650, background: 'var(--ptv-green, #0e4f40)', border: 'none', boxShadow: '0 1px 3px rgba(14,79,64,0.2)', minHeight: '34px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                style={{ fontSize: '12px', padding: '6px 14px', borderRadius: 'var(--ptv-curve-md)', fontWeight: 650, background: 'var(--ptv-green, #0e4f40)', border: 'none', boxShadow: '0 1px 3px rgba(14,79,64,0.2)', minHeight: '34px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
                 <i className="fa-solid fa-plus" style={{ fontSize: '11px' }} />
                 <span>Pinjam Alat</span>
@@ -326,7 +326,7 @@ export const PeminjamanPage: React.FC = () => {
                             style={{
                               fontSize: '10px',
                               padding: '1.5px 7px',
-                              borderRadius: '999px',
+                              borderRadius: 'var(--ptv-curve-pill)',
                               background: 'rgba(15,23,42,0.05)',
                               color: 'var(--ink-2)',
                               fontWeight: 550,
@@ -530,7 +530,7 @@ export const PeminjamanPage: React.FC = () => {
             </div>
             <div className="sheet-body" style={{ padding: '16px' }}>
               <form onSubmit={handleReturnSingleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '12px' }}>
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 'var(--ptv-curve-lg)', padding: '12px' }}>
                   <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
                     Detail Alat & Unit
                   </div>
@@ -567,7 +567,7 @@ export const PeminjamanPage: React.FC = () => {
                     value={returnNotes}
                     onChange={(e) => setReturnNotes(e.target.value)}
                     placeholder="Contoh: Lengkap dengan tas & charger."
-                    style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
                   />
                 </div>
 
@@ -576,7 +576,7 @@ export const PeminjamanPage: React.FC = () => {
                     type="button"
                     className="btn sec flex-1"
                     onClick={() => setReturnTargetUnit(null)}
-                    style={{ borderRadius: '8px' }}
+                    style={{ borderRadius: 'var(--ptv-curve-md)' }}
                   >
                     Batal
                   </button>
@@ -584,7 +584,7 @@ export const PeminjamanPage: React.FC = () => {
                     type="submit"
                     className="btn pri flex-1"
                     disabled={submittingAction}
-                    style={{ borderRadius: '8px', background: '#0e4f40' }}
+                    style={{ borderRadius: 'var(--ptv-curve-md)', background: '#0e4f40' }}
                   >
                     {submittingAction ? 'Menyimpan...' : 'Ya, Kembalikan Unit'}
                   </button>
@@ -614,7 +614,7 @@ export const PeminjamanPage: React.FC = () => {
             </div>
             <div className="sheet-body" style={{ padding: '16px' }}>
               <form onSubmit={handleReturnTxnSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '12px' }}>
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 'var(--ptv-curve-lg)', padding: '12px' }}>
                   <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
                     Nomor Transaksi: {returnTargetTxn.transaction_id}
                   </div>
@@ -648,7 +648,7 @@ export const PeminjamanPage: React.FC = () => {
                     value={returnNotes}
                     onChange={(e) => setReturnNotes(e.target.value)}
                     placeholder="Contoh: Seluruh unit telah diverifikasi oleh technical."
-                    style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
                   />
                 </div>
 
@@ -657,7 +657,7 @@ export const PeminjamanPage: React.FC = () => {
                     type="button"
                     className="btn sec flex-1"
                     onClick={() => setReturnTargetTxn(null)}
-                    style={{ borderRadius: '8px' }}
+                    style={{ borderRadius: 'var(--ptv-curve-md)' }}
                   >
                     Batal
                   </button>
@@ -665,7 +665,7 @@ export const PeminjamanPage: React.FC = () => {
                     type="submit"
                     className="btn pri flex-1"
                     disabled={submittingAction}
-                    style={{ borderRadius: '8px', background: '#0e4f40' }}
+                    style={{ borderRadius: 'var(--ptv-curve-md)', background: '#0e4f40' }}
                   >
                     {submittingAction ? 'Menyimpan...' : 'Kembalikan Semua Unit'}
                   </button>
