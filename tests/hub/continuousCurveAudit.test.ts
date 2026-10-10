@@ -67,6 +67,45 @@ describe('PTV Unified Continuous Curve — Audit & Governance Tests', () => {
       expect(content).toContain('.ptv-curve-2xl');
       expect(content).toContain('@supports (corner-shape: squircle)');
     });
+
+    it('2.3 tokens.css and dashboard.css must define --ptv-font-family with SF Plus as universal font family', () => {
+      const tokensContent = fs.readFileSync(tokensCssPath, 'utf-8');
+      const dashContent = fs.readFileSync(dashboardCssPath, 'utf-8');
+
+      expect(tokensContent).toContain('--ptv-font-family: "SF Plus"');
+      expect(tokensContent).toContain('--ptv-font-mono:');
+      expect(dashContent).toContain('--ptv-font-family: "SF Plus"');
+
+      // Check fallback stack presence
+      expect(tokensContent).toContain('Plus Jakarta Sans');
+      expect(tokensContent).toContain('SF Pro Display');
+    });
+
+    it('2.4 Hub shell, login, and portal dropdown components must inherit --ptv-font-family', () => {
+      const shellCss = fs.readFileSync(path.join(rootDir, 'src/styles/shell.css'), 'utf-8');
+      const loginCss = fs.readFileSync(path.join(rootDir, 'src/styles/login.css'), 'utf-8');
+      const dashCss = fs.readFileSync(dashboardCssPath, 'utf-8');
+
+      expect(shellCss).toContain('font-family: var(--ptv-font-family');
+      expect(loginCss).toContain('font-family: var(--ptv-font-family');
+      expect(dashCss).toContain('.ptv-select-menu');
+      expect(dashCss).toContain('font-family: var(--ptv-font-family');
+    });
+
+    it('2.5 Legacy border radius tokens (--r-*) must map to canonical continuous curve scale', () => {
+      const tokensContent = fs.readFileSync(tokensCssPath, 'utf-8');
+      const dashContent = fs.readFileSync(dashboardCssPath, 'utf-8');
+
+      expect(tokensContent).toContain('--r-xs: var(--ptv-curve-xs);');
+      expect(tokensContent).toContain('--r-s: var(--ptv-curve-sm);');
+      expect(tokensContent).toContain('--r-m: var(--ptv-curve-lg);');
+      expect(tokensContent).toContain('--r-l: var(--ptv-curve-xl);');
+      expect(tokensContent).toContain('--r-xl: var(--ptv-curve-2xl);');
+      expect(tokensContent).toContain('--r-full: var(--ptv-curve-pill);');
+
+      expect(dashContent).toContain('--r-xs: var(--ptv-curve-xs);');
+      expect(dashContent).toContain('--r-m: var(--ptv-curve-lg);');
+    });
   });
 
   describe('3. Automated Hub Component Radius Governance Audit', () => {

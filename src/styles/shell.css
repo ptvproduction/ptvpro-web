@@ -8,7 +8,7 @@
   min-height: 100vh;
   background-color: var(--bg);
   color: var(--ink);
-  font-family: var(--font);
+  font-family: var(--ptv-font-family, var(--font));
   position: relative;
   box-sizing: border-box;
 }
@@ -275,11 +275,11 @@
 
   .hdr-search kbd {
     margin-left: auto;
-    font-family: var(--font);
+    font-family: var(--ptv-font-mono, monospace);
     font-size: 10.5px;
     font-weight: 650;
     padding: 1px 6px;
-    border-radius: 6px;
+    border-radius: var(--ptv-curve-xs);
     background: var(--b-050);
     color: var(--b-700);
     border: 1px solid var(--line);
@@ -349,7 +349,7 @@
     height: var(--dock-h);
     align-items: center;
     padding: 0 6px;
-    border-radius: 24px;
+    border-radius: var(--ptv-curve-xl);
     border: 1px solid rgba(255, 255, 255, 0.6);
     box-shadow: 0 6px 18px rgba(11, 60, 116, 0.12), 0 20px 48px rgba(11, 60, 116, 0.16);
     max-width: 460px;
@@ -434,7 +434,7 @@
   bottom: 0;
   max-height: 85vh;
   background: var(--surface);
-  border-radius: 24px 24px 0 0;
+  border-radius: var(--ptv-curve-3xl) var(--ptv-curve-3xl) 0 0;
   box-shadow: var(--shadow-l);
   z-index: 90;
   display: flex;
@@ -456,7 +456,7 @@
 .sheet-grab {
   width: 36px;
   height: 4px;
-  border-radius: 99px;
+  border-radius: var(--ptv-curve-pill);
   background: var(--line);
   margin: 10px auto 4px;
 }

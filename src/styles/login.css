@@ -2,7 +2,7 @@
           width: 100%;
           min-height: 100vh;
           min-height: 100dvh;
-          font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+          font-family: var(--ptv-font-family);
           background: #061A36;
           color: #FFFFFF;
           display: flex;
@@ -132,7 +132,7 @@
           border: 1px solid #FCA5A5;
           color: #B02B23;
           padding: 11px 18px;
-          border-radius: 999px;
+          border-radius: var(--ptv-curve-pill);
           font-size: 13px;
           font-weight: 600;
           margin-bottom: 16px;
@@ -159,7 +159,7 @@
         .lk-input {
           width: 100%;
           height: 48px;
-          border-radius: 999px;
+          border-radius: var(--ptv-curve-pill);
           border: none;
           background: #FFFFFF;
           color: #072A52;
@@ -232,7 +232,7 @@
         .lk-btn-login {
           height: 44px;
           padding: 0 36px;
-          border-radius: 999px;
+          border-radius: var(--ptv-curve-pill);
           background: #FFFFFF;
           color: #0B5FBF;
           font-family: inherit;
@@ -283,7 +283,7 @@
         .lk-btn-google {
           width: 100%;
           height: 46px;
-          border-radius: 999px;
+          border-radius: var(--ptv-curve-pill);
           background: rgba(255, 255, 255, 0.95);
           backdrop-filter: blur(16px);
           color: #072A52;
@@ -335,7 +335,8 @@
           width: min(440px, calc(100vw - 32px));
           max-height: min(88vh, 88dvh);
           background: #FFFFFF;
-          border-radius: 24px;
+          border-radius: var(--ptv-curve-2xl);
+          font-family: var(--ptv-font-family, inherit);
           padding: 24px 22px 20px;
           box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1);
           z-index: 101;
@@ -369,7 +370,7 @@
         .lk-modal-ic {
           width: 36px;
           height: 36px;
-          border-radius: 11px;
+          border-radius: var(--ptv-curve-sm);
           background: rgba(10, 102, 194, 0.10);
           color: #0A66C2;
           display: grid;
@@ -410,7 +411,7 @@
         .lk-help-card {
           background: #F8FAFD;
           border: 1px solid #E2ECF8;
-          border-radius: 14px;
+          border-radius: var(--ptv-curve-lg);
           padding: 13px 15px;
         }
         .lk-help-card h4 {
@@ -429,9 +430,9 @@
           background: #E8F0FB;
           color: #0B5FBF;
           padding: 1px 5px;
-          border-radius: 5px;
+          border-radius: var(--ptv-curve-xs);
           font-size: 12px;
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-family: var(--ptv-font-mono, monospace);
         }
         .lk-modal-footer {
           display: flex;
@@ -443,7 +444,7 @@
           flex: 1;
           min-height: 42px;
           padding: 0 16px;
-          border-radius: 999px;
+          border-radius: var(--ptv-curve-pill);
           font-size: 13.5px;
           font-weight: 650;
           border: none;

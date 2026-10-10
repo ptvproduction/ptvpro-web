@@ -63,8 +63,8 @@
   --ptv-corner-pill: var(--ptv-curve-pill);
   --ptv-corner-circle: var(--ptv-curve-circle);
 
-  /* ── Legacy Border Radius (1:1 Compatibility) ── */
-  --r-xs: 9px; --r-s: 13px; --r-m: 18px; --r-l: 24px; --r-xl: 30px; --r-full: 999px;
+  /* ── Legacy Border Radius (Mapped to Canonical Continuous Curve Scale) ── */
+  --r-xs: var(--ptv-curve-xs); --r-s: var(--ptv-curve-sm); --r-m: var(--ptv-curve-lg); --r-l: var(--ptv-curve-xl); --r-xl: var(--ptv-curve-2xl); --r-full: var(--ptv-curve-pill);
 
   --header-h:58px;
   --dock-h:64px;
@@ -75,7 +75,11 @@
   --sidebar-w:250px;
   --maxw:1160px;
 
-  --font:-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /* ── Universal PTV PRO Hub Typography Tokens (SF Plus Standard) ── */
+  --ptv-font-family: "SF Plus", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Plus Jakarta Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ptv-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --font: var(--ptv-font-family);
+  --font-sans: var(--ptv-font-family);
 }
 :root[data-theme="dark"]{
   --bg:#060F1C; --bg-2:#0A1626; --surface:#0E1B2D; --surface-2:#122238;
@@ -10180,11 +10184,18 @@ span.fin-matrix-cell.unpaid {
   .ptv-corner-2xl,
   .ptv-select-trigger,
   .ptv-select-menu,
+  .ptv-select-menu-portal,
   .ptv-nilai-kpi-card,
   .ptv-nilai-card,
   .ptv-nilai-filter-bar,
+  .hero-card,
+  .bnav-in,
   .card,
-  .sheet {
+  .sheet,
+  .modal,
+  .modal-box,
+  .lk-modal,
+  .lk-help-card {
     corner-shape: squircle;
   }
 }
@@ -10195,7 +10206,7 @@ span.fin-matrix-cell.unpaid {
   display: block;
   width: 100%;
   box-sizing: border-box;
-  font-family: inherit;
+  font-family: var(--ptv-font-family, inherit);
 }
 
 .ptv-select-trigger {
@@ -10334,6 +10345,7 @@ span.fin-matrix-cell.unpaid {
   box-shadow: 0 10px 28px rgba(11, 60, 116, 0.12), 0 4px 10px rgba(11, 60, 116, 0.06);
   z-index: 1050;
   box-sizing: border-box;
+  font-family: var(--ptv-font-family, inherit);
   animation: ptvSelectMenuIn .18s cubic-bezier(0.16, 1, 0.3, 1);
   -webkit-overflow-scrolling: touch;
 }
@@ -10341,6 +10353,7 @@ span.fin-matrix-cell.unpaid {
 .ptv-select-menu-portal {
   position: fixed;
   z-index: 99999;
+  font-family: var(--ptv-font-family, inherit);
 }
 
 .ptv-select-menu.placement-bottom {

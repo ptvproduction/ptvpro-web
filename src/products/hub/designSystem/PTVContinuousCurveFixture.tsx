@@ -12,7 +12,7 @@ import { PTVSelect } from '@shared/components/PTVSelect';
  */
 export const PTVContinuousCurveFixture: React.FC = () => {
   const [selectedDropdown, setSelectedDropdown] = useState('kamera');
-  const [activeTab, setActiveTab] = useState<'comparison' | 'nested' | 'overlay'>('overlay');
+  const [activeTab, setActiveTab] = useState<'comparison' | 'nested' | 'overlay' | 'typography'>('overlay');
 
   // Tab 2: Concentric Nested Alignment State
   const [nestedScenario, setNestedScenario] = useState<'card' | 'modal' | 'calculator'>('card');
@@ -202,6 +202,23 @@ export const PTVContinuousCurveFixture: React.FC = () => {
         >
           <i className="fa-solid fa-shapes" style={{ marginRight: '6px' }} />
           3. Optical Size Matrix &amp; Token Catalog
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('typography')}
+          style={{
+            padding: '7px 16px',
+            borderRadius: 'var(--ptv-curve-md)',
+            border: activeTab === 'typography' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
+            background: activeTab === 'typography' ? '#eff6ff' : '#ffffff',
+            color: activeTab === 'typography' ? '#1d4ed8' : '#475569',
+            fontWeight: 750,
+            fontSize: '12.5px',
+            cursor: 'pointer',
+          }}
+        >
+          <i className="fa-solid fa-font" style={{ marginRight: '6px' }} />
+          4. SF Plus Universal Typography &amp; Portal Inheritance
         </button>
       </div>
 
@@ -1713,6 +1730,239 @@ export const PTVContinuousCurveFixture: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── TAB 4: SF PLUS UNIVERSAL TYPOGRAPHY & PORTAL INHERITANCE ── */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'typography' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* Status & Cascade Strategy Card */}
+          <div
+            style={{
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              borderRadius: 'var(--ptv-curve-xl)',
+              padding: '20px 24px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <span
+                style={{
+                  padding: '3px 10px',
+                  borderRadius: 'var(--ptv-curve-pill)',
+                  background: '#fef3c7',
+                  color: '#92400e',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                }}
+              >
+                Universal Typography Token
+              </span>
+              <span style={{ fontSize: '13px', color: '#64748b' }}>
+                <code>--ptv-font-family: &quot;SF Plus&quot;, ...fallback</code>
+              </span>
+            </div>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: '0 0 8px 0' }}>
+              SF Plus Universal Typography Engine
+            </h3>
+            <p style={{ fontSize: '13.5px', color: '#475569', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+              Seluruh komponen PTV PRO Hub (Login, Shell, Header, Sidebar, Bottom Dock, Inventaris, Nilai Inventaris, Peminjaman, PTVSelect, modal, dan drawer) diwajibkan menggunakan token <code>--ptv-font-family</code> secara universal.
+            </p>
+
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1px solid #cbd5e1',
+                borderRadius: 'var(--ptv-curve-lg)',
+                padding: '14px 16px',
+                fontSize: '12.5px',
+                lineHeight: 1.6,
+                color: '#334155',
+              }}
+            >
+              <div style={{ marginBottom: '6px' }}>
+                <b>Status Aset Font SF Plus:</b>{' '}
+                <span style={{ color: '#b45309', fontWeight: 700 }}>
+                  Aset lokal file webfont (.woff2) belum tersedia di repositori.
+                </span>
+              </div>
+              <div style={{ marginBottom: '6px' }}>
+                <b>Aturan Integritas:</b> Tidak mengunduh font dari sumber tidak resmi dan tidak mengganti nama font lain. Konfigurasi <code>@font-face</code> telah disiapkan untuk mengaktifkan file font berlisensi saat diunggah ke <code>/public/assets/fonts/</code>.
+              </div>
+              <div>
+                <b>Cascade Fallback Aktif:</b>{' '}
+                <code style={{ fontSize: '11.5px', color: '#0369a1' }}>
+                  &quot;SF Plus&quot; &rarr; -apple-system &rarr; BlinkMacSystemFont &rarr; &quot;SF Pro Display&quot; &rarr; &quot;SF Pro Text&quot; &rarr; &quot;SF Pro&quot; &rarr; &quot;Plus Jakarta Sans&quot; &rarr; sans-serif
+                </code>
+              </div>
+            </div>
+          </div>
+
+          {/* Weight Mapping & Hierarchy Showcase */}
+          <div
+            style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: 'var(--ptv-curve-xl)',
+              padding: '24px',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+            }}
+          >
+            <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0' }}>
+              Weight Mapping &amp; Typographic Hierarchy
+            </h4>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px 0' }}>
+              Memverifikasi render ketebalan huruf tanpa synthetic faux-bold.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ padding: '12px 16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #f1f5f9' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  Weight 400 — Regular (Body, Deskripsi, Metadata)
+                </div>
+                <div style={{ fontSize: '15px', fontWeight: 400, color: '#0f172a', lineHeight: 1.5 }}>
+                  The quick brown fox jumps over the lazy dog. Sistem inventaris dan peminjaman peralatan audio-visual PTV PRO Hub.
+                </div>
+              </div>
+
+              <div style={{ padding: '12px 16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #f1f5f9' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  Weight 500 — Medium (Input form, Filter chip, Sub-label)
+                </div>
+                <div style={{ fontSize: '15px', fontWeight: 500, color: '#0f172a', lineHeight: 1.5 }}>
+                  Unit Tersedia: Sony FX3 Cinema Line, Lensa FE 24-70mm f/2.8 GM II, DJI Ronin RS3 Pro Gimbal Stabilizer.
+                </div>
+              </div>
+
+              <div style={{ padding: '12px 16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #f1f5f9' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  Weight 600 — Semibold (Tombol tindakan, Header tabel, Status badge)
+                </div>
+                <div style={{ fontSize: '15px', fontWeight: 600, color: '#0f172a', lineHeight: 1.5 }}>
+                  Total 18 Unit Siap Pakai &bull; Nilai Aset Rp 142.500.000 &bull; Pengembalian Tepat Waktu 98.4%
+                </div>
+              </div>
+
+              <div style={{ padding: '12px 16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #f1f5f9' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  Weight 700 — Bold (Judul modul, Card heading, Modal title)
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', lineHeight: 1.4 }}>
+                  PTV PRO Hub &mdash; Universal Continuous Curve &amp; SF Plus Typography Standard
+                </div>
+              </div>
+
+              <div style={{ padding: '12px 16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #f1f5f9' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  Weight 800/900 — Heavy / Black (Hero greeting, KPI display numerals, Master brand)
+                </div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.03em' }}>
+                  Rp 142.500.000 &bull; METRIK INVENTARIS PRODUKSI 2026
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Numeral Alignment & Tabular Figures */}
+          <div
+            style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: 'var(--ptv-curve-xl)',
+              padding: '24px',
+            }}
+          >
+            <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0' }}>
+              Numeral Alignment &amp; Currency Figures
+            </h4>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px 0' }}>
+              Pengujian stabilitas perataan angka numerik pada KPI dan tabel nilai inventaris.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+              <div style={{ padding: '16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-lg)', border: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', marginBottom: '8px' }}>
+                  Primary Font (Proportional Figures)
+                </div>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: '#1e40af', letterSpacing: '-0.02em', marginBottom: '4px' }}>
+                  Rp 142.500.000
+                </div>
+                <div style={{ fontSize: '13px', color: '#64748b' }}>
+                  + Rp 12.800.000 (Simulasi Penyesuaian Nilai)
+                </div>
+              </div>
+              <div style={{ padding: '16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-lg)', border: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', marginBottom: '8px' }}>
+                  Monospace Token (<code>--ptv-font-mono</code>)
+                </div>
+                <div style={{ fontFamily: 'var(--ptv-font-mono)', fontSize: '22px', fontWeight: 700, color: '#0e7490', marginBottom: '4px' }}>
+                  INV-2026-FX3-001
+                </div>
+                <div style={{ fontFamily: 'var(--ptv-font-mono)', fontSize: '12.5px', color: '#64748b' }}>
+                  ID: 741c2592-d274-4723-8f83-e38e1cefc0bb
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Portal Dropdown & Modal Inheritance Test */}
+          <div
+            style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: 'var(--ptv-curve-xl)',
+              padding: '24px',
+            }}
+          >
+            <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0' }}>
+              Portal Font Inheritance Proof (In-DOM vs. Body-Portaled)
+            </h4>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px 0' }}>
+              Membuktikan secara empiris bahwa dropdown yang dirender di portal <code>document.body</code> mewarisi <code>--ptv-font-family</code> dan continuous curve yang identik dengan dropdown in-DOM.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+              <div style={{ padding: '16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-lg)', border: '1px solid #cbd5e1' }}>
+                <div style={{ fontSize: '12.5px', fontWeight: 750, color: '#0f172a', marginBottom: '6px' }}>
+                  Dropdown A: Standard In-DOM (usePortal = false)
+                </div>
+                <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 12px 0' }}>
+                  Menu dirender bersarang di dalam hierarki komponen induk.
+                </p>
+                <PTVSelect
+                  value={selectedDropdown}
+                  onChange={setSelectedDropdown}
+                  options={[
+                    { value: 'kamera', label: 'Kamera Cinema Sony FX3' },
+                    { value: 'lensa', label: 'Lensa FE 24-70mm GM II' },
+                    { value: 'audio', label: 'Sennheiser Wireless Mic' },
+                  ]}
+                  usePortal={false}
+                />
+              </div>
+
+              <div style={{ padding: '16px', background: '#f8fafc', borderRadius: 'var(--ptv-curve-lg)', border: '1px solid #cbd5e1' }}>
+                <div style={{ fontSize: '12.5px', fontWeight: 750, color: '#0f172a', marginBottom: '6px' }}>
+                  Dropdown B: Portal Body (usePortal = true)
+                </div>
+                <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 12px 0' }}>
+                  Menu dirender langsung di <code>document.body</code> via React Portal.
+                </p>
+                <PTVSelect
+                  value={selectedDropdown}
+                  onChange={setSelectedDropdown}
+                  options={[
+                    { value: 'kamera', label: 'Kamera Cinema Sony FX3' },
+                    { value: 'lensa', label: 'Lensa FE 24-70mm GM II' },
+                    { value: 'audio', label: 'Sennheiser Wireless Mic' },
+                  ]}
+                  usePortal={true}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

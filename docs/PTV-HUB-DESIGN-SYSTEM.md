@@ -1,10 +1,11 @@
 # PTV PRO HUB — DESIGN SYSTEM MANUAL
-## PTV Unified Continuous Curve & Reusable Custom Dropdown System
+## PTV Unified Continuous Curve & SF Plus Universal Typography
 
-> **Status:** APPROVED & MANDATORY GLOBAL STANDARD  
-> **Target Products:** PTV PRO Hub (`/hub`), Inventaris, Peminjaman, Nilai Inventaris, Kru, and all future modules.  
-> **Inspirasi Visual:** Bahasa bentuk keluarga perangkat Apple (MacBook, iPad, iPhone) dan Google Pixel Material 3 (Continuous Squircle Alignment & Concentric Contour Geometry).  
-> **Aturan Wajib:** **Seluruh halaman PTV PRO Hub yang akan dibangun atau dimigrasikan harus mengikuti PTV Unified Continuous Curve.**
+> **Status:** APPROVED & MANDATORY GLOBAL PERMANENT STANDARD  
+> **Permanent Core Standard:** **Every PTV PRO Hub component must use the canonical smoothed continuous curve system and SF Plus typography.**  
+> **Target Products:** PTV PRO Hub (`/hub`), Login, HubShell, Beranda, Inventaris, Detail Alat, Nilai Inventaris, Peminjaman, Kru, PTVSelect, modal dialogs, and all future modules.  
+> **Inspirasi Visual:** Bahasa bentuk keluarga perangkat Apple premium (MacBook, iPad, iPhone) dan Google Pixel Material 3 (Continuous Squircle Alignment & Concentric Contour Geometry).  
+> **Aturan Wajib:** Seluruh halaman PTV PRO Hub yang sudah dibangun atau yang akan dimigrasikan/dibangun WAJIB mematuhi sistem sudut continuous dan tipografi universal SF Plus tanpa pengecualian.
 
 ---
 
@@ -156,15 +157,70 @@ Sistem dokumentasi PTV berpegang pada **integritas empiris**:
 
 ## 5. REUSABLE CUSTOM DROPDOWN: `PTVSelect`
 
-Komponen `PTVSelect` terintegrasi penuh ke dalam sistem PTV Unified Continuous Curve:
+Komponen `PTVSelect` terintegrasi penuh ke dalam sistem PTV Unified Continuous Curve dan SF Plus Typography:
 - **Trigger Button:** Radius `var(--ptv-curve-md)` (12px), tinggi konsisten 40px (size `md`), 34px (size `sm`), 48px (size `lg`).
-- **Floating Menu:** Radius `var(--ptv-curve-lg)` (16px), padding 6px, backdrop blur, elevation shadow halus.
-- **Option Items:** Radius `var(--ptv-curve-sm)` (10px / 9px) untuk keselarasan konsentris terhadap menu 16px.
-- **W3C Accessiblity:** ARIA combobox/listbox, auto-flip positioning, full keyboard navigation (Tab, ArrowKeys, Enter, Escape).
+- **Floating Menu:** Radius `var(--ptv-curve-lg)` (16px), padding 5px, backdrop blur, elevation shadow halus.
+- **Option Items:** Radius `var(--ptv-curve-sm)` (9px) untuk keselarasan konsentris terhadap menu 16px.
+- **Universal Typography Inheritance:** Trigger, menu, search input, dan item opsi mewarisi `--ptv-font-family` secara eksplisit, baik saat dirender in-DOM maupun saat dirender melalui React Portal ke `document.body`.
+- **W3C Accessibility:** ARIA combobox/listbox, auto-flip positioning, full keyboard navigation (Tab, ArrowKeys, Enter, Escape).
 
 ---
 
-## 6. ATURAN PENGECUALIAN YANG DIPERBOLEHKAN
+## 6. SF PLUS UNIVERSAL TYPOGRAPHY SPECIFICATION
+
+> **Standar Permanen:** **SF Plus adalah font utama dan universal seluruh PTV PRO Hub.**  
+> Berlaku mutlak pada: Login Hub, HubShell, Sidebar, Header, Mobile Bottom Nav, Beranda, Inventaris, Detail Alat, Nilai Inventaris, Peminjaman, seluruh form input, dropdown, tabel, kartu, modal, drawer, dan seluruh modul Hub yang akan dibangun.
+
+### 6.1 Typography Tokens (`:root`)
+
+```css
+:root {
+  /* ── Universal PTV PRO Hub Typography Tokens ── */
+  --ptv-font-family: "SF Plus", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Plus Jakarta Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ptv-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --font: var(--ptv-font-family);
+  --font-sans: var(--ptv-font-family);
+}
+```
+
+### 6.2 Status Aset & Strategi Pemuatan (Font Provisioning)
+
+Sesuai audit menyeluruh terhadap repositori dan sistem lokal:
+- **Status Empiris:** File biner webfont "SF Plus" (`.woff2` / `.woff`) belum tersedia di dalam repositori atau aset lokal proyek.
+- **Integritas Lisensi:** PTV PRO Hub **TIDAK** mengunduh font bajakan/ilegal dari sumber tidak resmi dan **TIDAK** mengganti nama font lain secara artifisial.
+- **Deklarasi `@font-face` Terstruktur:**
+  Deklarasi `@font-face` untuk bobot 400, 500, 600, 700, dan 800 telah disiapkan di `src/styles/tokens.css` dengan `font-display: swap`. Rule ini mencari instalasi lokal (`local('SF Plus')`) dan siap memuat file resmi ketika pengguna menaruh file webfont di `/public/assets/fonts/`.
+- **Cascade Fallback Anggun:**  
+  Jika file font webfont belum ada, browser secara mulus merender sistem fallback beresolusi tinggi:
+  `"SF Plus"` $\to$ `-apple-system` $\to$ `BlinkMacSystemFont` $\to$ `"SF Pro Display"` $\to$ `"SF Pro Text"` $\to$ `"SF Pro"` $\to$ `"Plus Jakarta Sans"` $\to$ `sans-serif`.
+
+### 6.3 Weight Mapping & Typographic Hierarchy
+
+| Weight | Nama Token / CSS | Komponen & Peruntukan di PTV PRO Hub |
+|---|---|---|
+| **400** | Regular (`font-weight: 400`) | Body copy, deskripsi alat, data sel tabel, teks bantuan form |
+| **500** | Medium (`font-weight: 500`) | Input control value, placeholder trigger dropdown, sub-label metadata |
+| **600** | Semibold (`font-weight: 600`) | Tombol sekunder, header kolom tabel, pill badge status, tab aktif |
+| **700** | Bold (`font-weight: 700`) | CTA primer, judul kartu, judul seksi, judul modal dialog |
+| **800 / 900** | Heavy / Black (`font-weight: 800`) | Angka KPI display (`.num`), master brand header, hero greetings |
+
+### 6.4 Portal & Modal Font Inheritance
+
+Komponen yang dirender di luar hierarki DOM root Hub (misalnya `PTVSelect` yang menggunakan `createPortal(..., document.body)` atau modal dialog yang di-portal) wajib memiliki aturan font eksplisit:
+```css
+.ptv-select-wrapper,
+.ptv-select-menu,
+.ptv-select-menu-portal,
+.modal,
+.sheet {
+  font-family: var(--ptv-font-family, inherit);
+}
+```
+Aturan ini menjamin bahwa seluruh portal dan floating surface mewarisi tipografi SF Plus tanpa mengontaminasi root launcher `/` atau WordPress legacy.
+
+---
+
+## 7. ATURAN PENGECUALIAN YANG DIPERBOLEHKAN
 
 Bentuk khusus yang diperbolehkan di luar skala continuous curve standar:
 1. **Pill (`--ptv-curve-pill: 9999px`):**
@@ -178,22 +234,24 @@ Bentuk khusus yang diperbolehkan di luar skala continuous curve standar:
 
 ---
 
-## 7. CARA MEMVALIDASI KONSISTENSI VISUAL
+## 8. CARA MEMVALIDASI KONSISTENSI VISUAL
 
-### 7.1 Visual Fixture Inspection (`/hub/design-system`)
+### 8.1 Visual Fixture Inspection (`/hub/design-system`)
 
 Kunjungi rute pengujian internal `/hub/design-system`:
 1. **Tab 1: Corner Superimposed Overlay & Normalized Validation:**
-   - **Mode 1 (Outline-Only Origin Overlay):** Membandingkan lintasan lengkungan Control (12px, cyan), Panel (16px, purple), Card (22px, emerald), Modal (28px, amber), dan Drawer (34px, rose) pada titik origin $(0,0)$ dengan background transparan (tanpa fill yang mengaburkan) dan kontrol zoom ($1\times, 2\times, 3\times$).
-   - **Mode 2 (Normalized Curve Comparison):** Menormalkan kurva dari Control, Panel, Card, dan Modal ke skala referensi seragam ($R = 120\text{px}$) pada origin $(0,0)$. Membuktikan secara empiris bahwa seluruh kurva berimpit sempurna pada profil geometris yang identik.
+   - **Mode 1 (Outline-Only Origin Overlay):** Membandingkan lintasan lengkungan Control (12px, cyan), Panel (16px, purple), Card (22px, emerald), Modal (28px, amber), dan Drawer (34px, rose) pada titik origin $(0,0)$ dengan background transparan dan kontrol zoom ($1\times, 2\times, 3\times$).
+   - **Mode 2 (Normalized Curve Comparison):** Menormalkan kurva ke skala referensi seragam ($R = 120\text{px}$) pada origin $(0,0)$. Membuktikan secara empiris bahwa seluruh kurva berimpit sempurna pada profil geometris yang identik.
    - **Mode 3 (Empirical Browser Rendering vs. Theory):** Membandingkan secara langsung kurva teoretis Apple squircle ($n = 3.5$, garis putus-putus emas), kurva teoretis busur lingkaran ($n = 2.0$, garis putus-putus biru), dan kurva CSS nyata yang dirender peramban (garis solid hijau).
 2. **Tab 2: Concentric Nested Alignment (Actual Inset Breakdown):**
    - Menampilkan audit inset aktual ($\text{padding} + \text{border}$) vs. $R_{\text{inner}}$ matematis.
    - Menguji Kasus 1 (Card $\to$ Thumb), Kasus 2 (Modal $\to$ Sub-panel $\to$ Control), dan kalkulator interaktif live slider.
 3. **Tab 3: Optical Size Matrix & Token Catalog:**
    - Demonstrasi komponen nyata Hub di setiap tingkatan token.
+4. **Tab 4: SF Plus Universal Typography & Portal Inheritance:**
+   - Visual inspection status token `--ptv-font-family`, fallback cascade, weight mapping (400, 500, 600, 700, 800), numeral alignment, dan pembuktian empiris pewarisan font pada dropdown in-DOM vs. portal `document.body`.
 
-### 7.2 Automated Regression Audit Test
+### 8.2 Automated Regression Audit Test
 
 Jalankan:
 ```bash
@@ -205,15 +263,19 @@ Uji otomatis mencakup:
 - Deteksi pelanggaran hardcoded radius inline di seluruh kode Hub TSX
 - Uji faktor skala normalisasi geometris ($120/12, 120/16, 120/22, 120/28$)
 - Uji penyimpangan matematis kurva superellips ($n=2$ vs $n=3.5$)
+- Ekspor token `--ptv-font-family` dan `--ptv-font-mono` di `tokens.css` dan `dashboard.css`
+- Pewarisan font universal pada `.app-shell`, `.login-page-root`, `.ptv-select-menu`, dan portal
+- Pemetaan terpusat legacy border radius `--r-*` ke continuous curve tokens
 
 ---
 
-## 8. CHECKLIST MIGRASI MODUL BARU
+## 9. CHECKLIST MIGRASI MODUL BARU
 
 Sebelum modul baru (Jadwal, Produksi, Distribusi, Pengaturan) disetujui:
 - [ ] Semua input, trigger dropdown, dan button form memakai `var(--ptv-curve-md)` (atau `sm` untuk aksi sekunder mini).
 - [ ] Semua kartu dan bento container memakai `var(--ptv-curve-xl)`.
 - [ ] Elemen anak di dalam kartu mengikuti formula $R_{\text{inner}} \approx \max(0, R_{\text{outer}} - \text{inset})$.
 - [ ] Dropdown menggunakan `PTVSelect`.
-- [ ] Tidak ada hardcoded `borderRadius: 'Xpx'` inline di JSX.
+- [ ] Seluruh teks dan komponen mewarisi `var(--ptv-font-family)`.
+- [ ] Tidak ada hardcoded `borderRadius: 'Xpx'` atau `fontFamily: '...'` inline di JSX.
 - [ ] Lulus pengujian otomatis `npm test tests/hub/continuousCurveAudit.test.ts`.
