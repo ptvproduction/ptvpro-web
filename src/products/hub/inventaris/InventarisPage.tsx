@@ -5,6 +5,7 @@ import { inventarisService } from './inventarisService';
 import { ItemInventaris } from './types';
 import { loanBasketStore } from './loanBasketStore';
 import { LoanModal } from '../peminjaman/LoanModal';
+import { PTVSelect } from '@shared/components';
 
 export const InventarisPage: React.FC = () => {
   const navigate = useNavigate();
@@ -791,17 +792,13 @@ export const InventarisPage: React.FC = () => {
                 </div>
                 <div>
                   <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Kategori</label>
-                  <select
+                  <PTVSelect
                     value={newKat}
-                    onChange={(e) => setNewKat(e.target.value)}
-                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                  >
-                    {ALL_CATEGORIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setNewKat(val)}
+                    options={ALL_CATEGORIES.map((c) => ({ value: c, label: c }))}
+                    ariaLabel="Kategori Alat"
+                    size="sm"
+                  />
                 </div>
                 <div>
                   <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Spesifikasi / Keterangan</label>

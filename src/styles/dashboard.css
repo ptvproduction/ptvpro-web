@@ -36,7 +36,23 @@
   --neutral-bg:#E9F0F9; --neutral-fg:#5A7793;
   --accent-bg:#E2EDFD; --accent-fg:#0B5FBF;
 
-  --r-xs:9px; --r-s:13px; --r-m:18px; --r-l:24px; --r-xl:30px; --r-full:999px;
+  /* ── Unified Continuous Corner Geometry System ── */
+  --ptv-corner-xs: 6px;
+  --ptv-corner-sm: 10px;
+  --ptv-corner-md: 14px;
+  --ptv-corner-lg: 20px;
+  --ptv-corner-xl: 28px;
+  --ptv-corner-2xl: 36px;
+  --ptv-corner-pill: 9999px;
+  --ptv-corner-circle: 50%;
+
+  /* ── Concentric Inner Inset Approximations: R_inner ≈ max(0, R_outer - inset) ── */
+  --ptv-concentric-inset-xs: 4px;
+  --ptv-concentric-inset-sm: 6px;
+  --ptv-concentric-inset-md: 8px;
+
+  /* ── Legacy Border Radius (1:1 Compatibility) ── */
+  --r-xs: 9px; --r-s: 13px; --r-m: 18px; --r-l: 24px; --r-xl: 30px; --r-full: 999px;
 
   --header-h:58px;
   --dock-h:64px;
@@ -10106,4 +10122,365 @@ span.fin-matrix-cell.unpaid {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
+}
+
+/* ============================================================
+   PTV PRO HUB — CONTINUOUS CORNER GEOMETRY & CUSTOM DROPDOWN
+   Unified Apple/Pixel-inspired geometric tokens & PTVSelect
+   ============================================================ */
+
+/* Continuous Corner Geometry Classes */
+.ptv-corner-xs { border-radius: var(--ptv-corner-xs); }
+.ptv-corner-sm { border-radius: var(--ptv-corner-sm); }
+.ptv-corner-md { border-radius: var(--ptv-corner-md); }
+.ptv-corner-lg { border-radius: var(--ptv-corner-lg); }
+.ptv-corner-xl { border-radius: var(--ptv-corner-xl); }
+.ptv-corner-2xl { border-radius: var(--ptv-corner-2xl); }
+.ptv-corner-pill { border-radius: var(--ptv-corner-pill); }
+.ptv-corner-circle { border-radius: var(--ptv-corner-circle); }
+
+@supports (corner-shape: squircle) {
+  .ptv-squircle,
+  .ptv-corner-sm,
+  .ptv-corner-md,
+  .ptv-corner-lg,
+  .ptv-corner-xl,
+  .ptv-corner-2xl,
+  .ptv-select-trigger,
+  .ptv-select-menu {
+    corner-shape: squircle;
+  }
+}
+
+/* ── PTVSelect Custom Dropdown System ── */
+.ptv-select-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.ptv-select-trigger {
+  width: 100%;
+  min-height: 40px;
+  height: 40px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--bg-2, #ffffff);
+  border: 1px solid var(--line, #cbd5e1);
+  border-radius: var(--ptv-corner-sm);
+  color: var(--ink, #0b2a4a);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  touch-action: manipulation;
+}
+
+.ptv-select-trigger:hover:not(:disabled) {
+  border-color: var(--b-400, #6fb0ff);
+  background: var(--surface, #ffffff);
+}
+
+.ptv-select-trigger:focus-visible,
+.ptv-select-trigger.is-open {
+  outline: none;
+  border-color: var(--b-500, #3b8ef7);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--b-500) 18%, transparent);
+}
+
+.ptv-select-trigger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--neutral-bg, #e9f0f9);
+}
+
+.ptv-select-trigger.is-error {
+  border-color: var(--dang, #b02b23);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dang) 18%, transparent);
+}
+
+/* Sizes */
+.ptv-select-sm .ptv-select-trigger {
+  height: 34px;
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+.ptv-select-lg .ptv-select-trigger {
+  height: 48px;
+  min-height: 48px;
+  padding: 0 16px;
+  font-size: 14.5px;
+}
+
+/* Trigger content & icons */
+.ptv-select-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ptv-select-placeholder {
+  color: var(--muted, #6e8cae);
+}
+
+.ptv-select-icon-lead {
+  color: var(--muted, #6e8cae);
+  font-size: 12px;
+  flex: none;
+}
+
+.ptv-select-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.ptv-select-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted, #6e8cae);
+  padding: 2px 4px;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .12s, transform .12s;
+}
+
+.ptv-select-clear-btn:hover {
+  color: var(--dang, #b02b23);
+  transform: scale(1.1);
+}
+
+.ptv-select-chevron {
+  color: var(--muted, #6e8cae);
+  font-size: 11px;
+  transition: transform .22s cubic-bezier(0.16, 1, 0.3, 1), color .15s ease;
+  pointer-events: none;
+}
+
+.ptv-select-trigger.is-open .ptv-select-chevron {
+  transform: rotate(180deg);
+  color: var(--b-600, #1273e6);
+}
+
+/* ── Floating Options Menu Panel ── */
+.ptv-select-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  min-width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line-2, rgba(11, 42, 74, 0.08));
+  border-radius: var(--ptv-corner-md);
+  padding: 5px;
+  box-shadow: 0 10px 28px rgba(11, 60, 116, 0.12), 0 4px 10px rgba(11, 60, 116, 0.06);
+  z-index: 1050;
+  box-sizing: border-box;
+  animation: ptvSelectMenuIn .18s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-overflow-scrolling: touch;
+}
+
+.ptv-select-menu-portal {
+  position: fixed;
+  z-index: 99999;
+}
+
+.ptv-select-menu.placement-bottom {
+  top: calc(100% + 5px);
+  transform-origin: top center;
+}
+
+.ptv-select-menu.placement-top {
+  bottom: calc(100% + 5px);
+  top: auto;
+  transform-origin: bottom center;
+}
+
+@keyframes ptvSelectMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Search input inside dropdown */
+.ptv-select-search-wrap {
+  padding: 4px 4px 6px 4px;
+  border-bottom: 1px solid var(--line-2, rgba(11, 42, 74, 0.06));
+  margin-bottom: 4px;
+}
+
+.ptv-select-search-input {
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: calc(var(--ptv-corner-md) - 5px);
+  border: 1px solid var(--line, #cbd5e1);
+  background: var(--bg, #f8fafd);
+  color: var(--ink, #0b2a4a);
+  font-size: 12.5px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.ptv-select-search-input:focus {
+  border-color: var(--b-500, #3b8ef7);
+  background: var(--surface, #ffffff);
+}
+
+/* Options List & Items: Concentric Radius R_inner = 14px - 5px = 9px ≈ --ptv-corner-sm */
+.ptv-select-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ptv-select-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--ptv-corner-sm);
+  color: var(--ink, #0b2a4a);
+  font-size: 12.5px;
+  font-weight: 480;
+  line-height: 1.35;
+  cursor: pointer;
+  user-select: none;
+  transition: background .12s ease, color .12s ease;
+  box-sizing: border-box;
+}
+
+.ptv-select-item:hover,
+.ptv-select-item.is-focused {
+  background: var(--b-050, #edf4ff);
+  color: var(--b-800, #0a3c74);
+}
+
+.ptv-select-item.is-selected {
+  background: var(--b-050, #edf4ff);
+  color: var(--b-700, #0b5fbf);
+  font-weight: 600;
+}
+
+.ptv-select-item.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.ptv-select-item-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ptv-select-item-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ptv-select-item-desc {
+  font-size: 11px;
+  color: var(--muted, #6e8cae);
+  margin-top: 1px;
+}
+
+.ptv-select-check-icon {
+  color: var(--b-600, #1273e6);
+  font-size: 11px;
+  flex: none;
+  margin-left: 6px;
+}
+
+.ptv-select-empty {
+  padding: 16px 12px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted, #6e8cae);
+}
+
+/* Custom Scrollbar for floating menu */
+.ptv-select-menu::-webkit-scrollbar {
+  width: 5px;
+}
+.ptv-select-menu::-webkit-scrollbar-thumb {
+  background: var(--line, rgba(11, 42, 74, 0.15));
+  border-radius: 999px;
+}
+.ptv-select-menu::-webkit-scrollbar-thumb:hover {
+  background: var(--muted, rgba(11, 42, 74, 0.3));
+}
+
+/* Dark Mode Overrides for PTVSelect */
+:root[data-theme="dark"] .ptv-select-trigger {
+  background: var(--bg-2, #0a1626);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--ink, #e6f0fc);
+}
+:root[data-theme="dark"] .ptv-select-trigger:hover:not(:disabled) {
+  border-color: var(--b-500, #4e9bfb);
+  background: var(--surface, #0e1b2d);
+}
+:root[data-theme="dark"] .ptv-select-trigger:focus-visible,
+:root[data-theme="dark"] .ptv-select-trigger.is-open {
+  border-color: var(--b-600, #4e9bfb);
+  box-shadow: 0 0 0 3px rgba(78, 155, 251, 0.22);
+}
+:root[data-theme="dark"] .ptv-select-menu {
+  background: var(--surface, #0e1b2d);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+:root[data-theme="dark"] .ptv-select-search-input {
+  background: var(--bg, #060f1c);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--ink, #e6f0fc);
+}
+:root[data-theme="dark"] .ptv-select-item {
+  color: var(--ink, #e6f0fc);
+}
+:root[data-theme="dark"] .ptv-select-item:hover,
+:root[data-theme="dark"] .ptv-select-item.is-focused {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+:root[data-theme="dark"] .ptv-select-item.is-selected {
+  background: var(--b-100, #12314f);
+  color: var(--b-400, #6fb0ff);
+}
+:root[data-theme="dark"] .ptv-select-check-icon {
+  color: var(--b-400, #6fb0ff);
 }

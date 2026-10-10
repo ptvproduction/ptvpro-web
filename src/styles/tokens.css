@@ -50,7 +50,22 @@
   --accent-bg: #E2EDFD;
   --accent-fg: #0B5FBF;
 
-  /* ── Border Radius ── */
+  /* ── Unified Continuous Corner Geometry System ── */
+  --ptv-corner-xs: 6px;
+  --ptv-corner-sm: 10px;
+  --ptv-corner-md: 14px;
+  --ptv-corner-lg: 20px;
+  --ptv-corner-xl: 28px;
+  --ptv-corner-2xl: 36px;
+  --ptv-corner-pill: 9999px;
+  --ptv-corner-circle: 50%;
+
+  /* ── Concentric Inner Inset Approximations: R_inner ≈ max(0, R_outer - inset) ── */
+  --ptv-concentric-inset-xs: 4px;
+  --ptv-concentric-inset-sm: 6px;
+  --ptv-concentric-inset-md: 8px;
+
+  /* ── Legacy Border Radius (1:1 Legacy Compatibility) ── */
   --r-xs: 9px;
   --r-s: 13px;
   --r-m: 18px;
@@ -92,10 +107,14 @@
   --status-danger-bg: var(--dang-bg);
   --status-info: var(--info);
   --status-info-bg: var(--info-bg);
-  --radius-sm: var(--r-xs);
-  --radius-md: var(--r-s);
-  --radius-lg: var(--r-m);
-  --radius-full: var(--r-full);
+  --radius-xs: var(--ptv-corner-xs);
+  --radius-sm: var(--ptv-corner-sm);
+  --radius-md: var(--ptv-corner-md);
+  --radius-lg: var(--ptv-corner-lg);
+  --radius-xl: var(--ptv-corner-xl);
+  --radius-2xl: var(--ptv-corner-2xl);
+  --radius-pill: var(--ptv-corner-pill);
+  --radius-full: var(--ptv-corner-pill);
   --transition-fast: 150ms ease-in-out;
   --transition-normal: 250ms ease-in-out;
 }

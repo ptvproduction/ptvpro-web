@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '@core/session';
 import { inventarisService, NilaiFilterParams } from './inventarisService';
 import { ItemInventaris } from './types';
+import { PTVSelect } from '@shared/components';
 
 export const formatRupiah = (val: number | string | undefined | null): string => {
   const n = typeof val === 'number' ? val : parseFloat(String(val || 0).replace(/[^0-9.-]/g, '')) || 0;
@@ -364,66 +365,62 @@ export const NilaiInventarisPage: React.FC = () => {
           <div className="ptv-nilai-filter-grid">
             {/* Status */}
             <div>
-              <select
-                className="input"
+              <PTVSelect
                 id="nilaiFilterStatusSel"
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-              >
-                <option value="semua">Semua Status Nilai</option>
-                <option value="Aktif">Aktif</option>
-                <option value="Belum Dicatat">Belum Dicatat</option>
-              </select>
+                onChange={(val) => setFilterStatus(val)}
+                options={[
+                  { value: 'semua', label: 'Semua Status Nilai' },
+                  { value: 'Aktif', label: 'Aktif' },
+                  { value: 'Belum Dicatat', label: 'Belum Dicatat' },
+                ]}
+                ariaLabel="Semua Status Nilai"
+              />
             </div>
 
             {/* Kategori */}
             <div>
-              <select
-                className="input"
+              <PTVSelect
                 id="nilaiFilterCatSel"
                 value={filterCat}
-                onChange={(e) => setFilterCat(e.target.value)}
-              >
-                <option value="semua">Semua Kategori</option>
-                {activeCats.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setFilterCat(val)}
+                options={[
+                  { value: 'semua', label: 'Semua Kategori' },
+                  ...activeCats.map((c) => ({ value: c, label: c })),
+                ]}
+                ariaLabel="Semua Kategori"
+              />
             </div>
 
             {/* Sumber Dana */}
             <div>
-              <select
-                className="input"
+              <PTVSelect
                 id="nilaiFilterSourceSel"
                 value={filterSource}
-                onChange={(e) => setFilterSource(e.target.value)}
-              >
-                <option value="semua">Semua Sumber Dana</option>
-                {availableSources.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setFilterSource(val)}
+                options={[
+                  { value: 'semua', label: 'Semua Sumber Dana' },
+                  ...availableSources.map((s) => ({ value: s, label: s })),
+                ]}
+                ariaLabel="Semua Sumber Dana"
+              />
             </div>
 
             {/* Urutkan */}
             <div>
-              <select
-                className="input"
+              <PTVSelect
                 id="nilaiSortBySel"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-              >
-                <option value="default">Urutan: Kategori &amp; Nama</option>
-                <option value="val_desc">Nilai Tertinggi &rarr; Terendah</option>
-                <option value="val_asc">Nilai Terendah &rarr; Tertinggi</option>
-                <option value="date_desc">Tanggal Perolehan Terbaru</option>
-                <option value="name_asc">Nama Alat (A-Z)</option>
-              </select>
+                onChange={(val) => setSortBy(val as any)}
+                options={[
+                  { value: 'default', label: 'Urutan: Kategori & Nama' },
+                  { value: 'val_desc', label: 'Nilai Tertinggi → Terendah' },
+                  { value: 'val_asc', label: 'Nilai Terendah → Tertinggi' },
+                  { value: 'date_desc', label: 'Tanggal Perolehan Terbaru' },
+                  { value: 'name_asc', label: 'Nama Alat (A-Z)' },
+                ]}
+                ariaLabel="Urutan Filter Nilai Inventaris"
+              />
             </div>
           </div>
         </div>
@@ -745,17 +742,17 @@ export const NilaiInventarisPage: React.FC = () => {
                   <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
                     Sumber Dana *
                   </label>
-                  <select
-                    className="input"
+                  <PTVSelect
                     value={editForm.sumber_perolehan}
-                    onChange={(e) => setEditForm({ ...editForm, sumber_perolehan: e.target.value })}
-                    style={{ width: '100%', boxSizing: 'border-box' }}
-                  >
-                    <option value="Yayasan">Yayasan</option>
-                    <option value="Kas PTV">Kas PTV</option>
-                    <option value="Hibah Alumni">Hibah Alumni</option>
-                    <option value="Donasi">Donasi</option>
-                  </select>
+                    onChange={(val) => setEditForm({ ...editForm, sumber_perolehan: val })}
+                    options={[
+                      { value: 'Yayasan', label: 'Yayasan' },
+                      { value: 'Kas PTV', label: 'Kas PTV' },
+                      { value: 'Hibah Alumni', label: 'Hibah Alumni' },
+                      { value: 'Donasi', label: 'Donasi' },
+                    ]}
+                    ariaLabel="Sumber Dana Perolehan"
+                  />
                 </div>
               </div>
 

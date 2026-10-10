@@ -22,8 +22,12 @@
   --status-danger-bg: var(--dang-bg);
   --status-info: var(--info);
   --status-info-bg: var(--info-bg);
-  --radius-sm: var(--r-xs);
-  --radius-md: var(--r-s);
-  --radius-lg: var(--r-m);
-  --radius-full: var(--r-full);
+  --radius-xs: var(--ptv-corner-xs);
+  --radius-sm: var(--ptv-corner-sm);
+  --radius-md: var(--ptv-corner-md);
+  --radius-lg: var(--ptv-corner-lg);
+  --radius-xl: var(--ptv-corner-xl);
+  --radius-2xl: var(--ptv-corner-2xl);
+  --radius-pill: var(--ptv-corner-pill);
+  --radius-full: var(--ptv-corner-pill);
 }

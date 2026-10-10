@@ -3,6 +3,7 @@ import { useSessionStore } from '@core/session';
 import { peminjamanService } from './peminjamanService';
 import { PeminjamanRecord, KondisiKembali } from './types';
 import { LoanModal } from './LoanModal';
+import { PTVSelect } from '@shared/components';
 
 interface GroupedTransaction {
   transaction_id: string;
@@ -545,15 +546,16 @@ export const PeminjamanPage: React.FC = () => {
                   <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
                     Kondisi Fisik Saat Dikembalikan
                   </label>
-                  <select
+                  <PTVSelect
                     value={returnCondition}
-                    onChange={(e) => setReturnCondition(e.target.value as KondisiKembali)}
-                    style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                  >
-                    <option value="bagus">Bagus / Normal (Siap Pakai)</option>
-                    <option value="perlu_servis">Perlu Servis / Pembersihan</option>
-                    <option value="rusak">Rusak / Bermasalah (Kunci ke Maintenance)</option>
-                  </select>
+                    onChange={(val) => setReturnCondition(val as KondisiKembali)}
+                    options={[
+                      { value: 'bagus', label: 'Bagus / Normal (Siap Pakai)' },
+                      { value: 'perlu_servis', label: 'Perlu Servis / Pembersihan' },
+                      { value: 'rusak', label: 'Rusak / Bermasalah (Kunci ke Maintenance)' },
+                    ]}
+                    ariaLabel="Kondisi Fisik Saat Dikembalikan"
+                  />
                 </div>
 
                 <div>
@@ -625,15 +627,16 @@ export const PeminjamanPage: React.FC = () => {
                   <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>
                     Kondisi Fisik Pengembalian
                   </label>
-                  <select
+                  <PTVSelect
                     value={returnCondition}
-                    onChange={(e) => setReturnCondition(e.target.value as KondisiKembali)}
-                    style={{ width: '100%', marginTop: '4px', height: '40px', padding: '0 10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                  >
-                    <option value="bagus">Semua Unit Bagus / Normal</option>
-                    <option value="perlu_servis">Perlu Servis / Pengecekan Ulang</option>
-                    <option value="rusak">Terdapat Kerusakan</option>
-                  </select>
+                    onChange={(val) => setReturnCondition(val as KondisiKembali)}
+                    options={[
+                      { value: 'bagus', label: 'Semua Unit Bagus / Normal' },
+                      { value: 'perlu_servis', label: 'Perlu Servis / Pengecekan Ulang' },
+                      { value: 'rusak', label: 'Terdapat Kerusakan' },
+                    ]}
+                    ariaLabel="Kondisi Fisik Pengembalian"
+                  />
                 </div>
 
                 <div>

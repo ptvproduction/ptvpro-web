@@ -4,6 +4,7 @@ import { useSessionStore } from '@core/session';
 import { inventarisService } from './inventarisService';
 import { ItemInventaris } from './types';
 import { formatRupiah, formatDateIndo } from './NilaiInventarisPage';
+import { PTVSelect } from '@shared/components';
 
 export const NilaiInventarisDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -563,17 +564,17 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                   <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
                     Sumber Dana *
                   </label>
-                  <select
-                    className="input"
+                  <PTVSelect
                     value={editForm.sumber_perolehan}
-                    onChange={(e) => setEditForm({ ...editForm, sumber_perolehan: e.target.value })}
-                    style={{ width: '100%', boxSizing: 'border-box' }}
-                  >
-                    <option value="Yayasan">Yayasan</option>
-                    <option value="Kas PTV">Kas PTV</option>
-                    <option value="Hibah Alumni">Hibah Alumni</option>
-                    <option value="Donasi">Donasi</option>
-                  </select>
+                    onChange={(val) => setEditForm({ ...editForm, sumber_perolehan: val })}
+                    options={[
+                      { value: 'Yayasan', label: 'Yayasan' },
+                      { value: 'Kas PTV', label: 'Kas PTV' },
+                      { value: 'Hibah Alumni', label: 'Hibah Alumni' },
+                      { value: 'Donasi', label: 'Donasi' },
+                    ]}
+                    ariaLabel="Sumber Dana Perolehan"
+                  />
                 </div>
               </div>
 

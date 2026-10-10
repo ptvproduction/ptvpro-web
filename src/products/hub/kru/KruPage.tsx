@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useKruList } from './useKru';
 import { useSessionStore } from '@core/session';
-import { Card, Button, Badge, LoadingState, ErrorState, EmptyState } from '@shared/components';
+import { Card, Button, Badge, LoadingState, ErrorState, EmptyState, PTVSelect } from '@shared/components';
 import { Users, UserPlus, Search, Filter } from 'lucide-react';
 
 export const KruPage: React.FC = () => {
@@ -63,26 +63,21 @@ export const KruPage: React.FC = () => {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Filter size={16} style={{ color: 'var(--text-muted)' }} />
-            <select
+            <PTVSelect
               value={division}
-              onChange={(e) => setDivision(e.target.value)}
-              style={{
-                backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--bg-card-border)',
-                borderRadius: 'var(--radius-sm)',
-                color: 'var(--text-primary)',
-                padding: '0.45rem 0.75rem',
-                fontSize: 'var(--text-xs)',
-                outline: 'none',
-              }}
-            >
-              <option value="all">Semua Divisi</option>
-              <option value="Leadership">Leadership</option>
-              <option value="Technical">Technical</option>
-              <option value="Editor">Editor</option>
-              <option value="Layouter">Layouter</option>
-              <option value="Master Control">Master Control</option>
-            </select>
+              onChange={(val) => setDivision(val)}
+              options={[
+                { value: 'all', label: 'Semua Divisi' },
+                { value: 'Leadership', label: 'Leadership' },
+                { value: 'Technical', label: 'Technical' },
+                { value: 'Editor', label: 'Editor' },
+                { value: 'Layouter', label: 'Layouter' },
+                { value: 'Master Control', label: 'Master Control' },
+              ]}
+              ariaLabel="Filter Divisi Kru"
+              size="sm"
+              className="kru-division-select"
+            />
           </div>
         </div>
       </Card>
