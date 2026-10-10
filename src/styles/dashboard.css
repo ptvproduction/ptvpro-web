@@ -75,8 +75,8 @@
   --sidebar-w:250px;
   --maxw:1160px;
 
-  /* ── Universal PTV PRO Hub Typography Tokens (Inter Standard) ── */
-  --ptv-font-family: "Inter", Arial, sans-serif;
+  /* ── Universal PTV PRO Hub Typography Tokens (SF Pro Display Standard) ── */
+  --ptv-font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   --ptv-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   --font: var(--ptv-font-family);
   --font-sans: var(--ptv-font-family);

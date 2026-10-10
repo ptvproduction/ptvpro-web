@@ -3,15 +3,44 @@
  * Ported 1:1 from page-dasbor.php (Style #2)
  */
 
-/* ── Universal Inter Variable Font Definition ──
- * Source: Official Inter by Rasmus Andersson (SIL Open Font License 1.1)
- * Asset: Self-hosted local variable webfont supporting weights 100-900
+/* ── Universal SF Pro Display Webfont Definitions ──
+ * Source: Official Apple SF Pro Display (OpenType PostScript CFF converted to WOFF2)
+ * Weights: 400 (Regular), 500 (Medium), 600 (Semibold), 700 (Bold), 800 (Heavy)
+ * Coverage: Full Latin, Latin Extended, Indonesian glyphs, Currency, Symbols, OpenType features
  */
 @font-face {
-  font-family: "Inter";
-  src: url("/assets/fonts/InterVariable.woff2") format("woff2");
+  font-family: "SF Pro Display";
+  src: url("/assets/fonts/sf-pro-display/SF-Pro-Display-Regular.woff2") format("woff2");
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/assets/fonts/sf-pro-display/SF-Pro-Display-Medium.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/assets/fonts/sf-pro-display/SF-Pro-Display-Semibold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/assets/fonts/sf-pro-display/SF-Pro-Display-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/assets/fonts/sf-pro-display/SF-Pro-Display-Heavy.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 800;
   font-display: swap;
 }
 
@@ -107,8 +136,8 @@
   --sidebar-w: 250px;
   --maxw: 1160px;
 
-  /* ── Universal PTV PRO Hub Typography Tokens (Inter Standard) ── */
-  --ptv-font-family: "Inter", Arial, sans-serif;
+  /* ── Universal PTV PRO Hub Typography Tokens (SF Pro Display Standard) ── */
+  --ptv-font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   --ptv-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   --font: var(--ptv-font-family);
   --font-sans: var(--ptv-font-family);
@@ -194,7 +223,10 @@
 
 /* ── Universal Root Hub Scoping ── */
 .ptv-hub-root {
-  --ptv-font-family: "Inter", Arial, sans-serif;
+  --ptv-font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   font-family: var(--ptv-font-family);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 

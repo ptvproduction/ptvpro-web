@@ -295,7 +295,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
           }}
         >
           <i className="fa-solid fa-font" style={{ marginRight: '6px' }} />
-          4. Inter Universal Typography &amp; Portal Inheritance
+          4. SF Pro Display Universal Typography &amp; Portal Inheritance
         </button>
       </div>
 
@@ -3169,7 +3169,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* ── TAB 4: INTER UNIVERSAL TYPOGRAPHY & PORTAL INHERITANCE ── */}
+      {/* ── TAB 4: SF PRO DISPLAY UNIVERSAL TYPOGRAPHY & PORTAL INHERITANCE ── */}
       {/* ══════════════════════════════════════════════════════════════════ */}
       {activeTab === 'typography' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -3187,24 +3187,24 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                 style={{
                   padding: '3px 10px',
                   borderRadius: 'var(--ptv-curve-pill)',
-                  background: '#dcfce7',
-                  color: '#15803d',
+                  background: '#dbeafe',
+                  color: '#1d4ed8',
                   fontSize: '11px',
                   fontWeight: 800,
                   textTransform: 'uppercase',
                 }}
               >
-                Universal Typography: Inter
+                Universal Typography: SF Pro Display
               </span>
               <span style={{ fontSize: '13px', color: '#64748b' }}>
-                <code>--ptv-font-family: &quot;Inter&quot;, Arial, sans-serif</code>
+                <code>--ptv-font-family: &quot;SF Pro Display&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Arial, sans-serif</code>
               </span>
             </div>
             <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: '0 0 8px 0' }}>
-              Inter Universal Typography Engine
+              SF Pro Display Universal Typography Engine
             </h3>
             <p style={{ fontSize: '13.5px', color: '#475569', margin: '0 0 16px 0', lineHeight: 1.5 }}>
-              Seluruh komponen PTV PRO Hub (Login, Shell, Header, Sidebar, Bottom Dock, Inventaris, Nilai Inventaris, Peminjaman, PTVSelect, modal, dan drawer) diwajibkan menggunakan font universal <strong>Inter</strong> untuk konsistensi 100% lintas OS dan browser tanpa dependensi font sistem operasi.
+              Seluruh komponen PTV PRO Hub (Login, Shell, Header, Sidebar, Bottom Dock, Inventaris, Nilai Inventaris, Peminjaman, PTVSelect, modal, dan drawer) diwajibkan menggunakan font universal <strong>SF Pro Display</strong> (self-hosted WOFF2) untuk memastikan tampilan autentik Apple di Windows, Android, macOS, dan iOS.
             </p>
 
             <div
@@ -3221,14 +3221,14 @@ export const PTVContinuousCurveFixture: React.FC = () => {
               <div style={{ marginBottom: '6px' }}>
                 <b>Sumber &amp; Lisensi Font:</b>{' '}
                 <span style={{ color: '#15803d', fontWeight: 700 }}>
-                  Inter Variable WOFF2 (Official by Rasmus Andersson, SIL Open Font License 1.1).
+                  Apple SF Pro Display Asli (OpenType CFF converted to self-hosted WOFF2, 5 bobot inti).
                 </span>
               </div>
               <div style={{ marginBottom: '6px' }}>
-                <b>Lokasi Aset Lokal:</b> Tersedia mandiri secara lokal di <code>/public/assets/fonts/InterVariable.woff2</code> (352 kB) dengan HTTP 200 tanpa dependensi CDN pihak ketiga.
+                <b>Lokasi Aset Lokal:</b> Disimpan mandiri secara lokal di <code>/public/assets/fonts/sf-pro-display/</code> (Total ~1.33 MB untuk 5 bobot) dengan HTTP 200 tanpa dependensi CDN pihak ketiga.
               </div>
               <div>
-                <b>Spesifikasi Variable Font:</b> Rentang bobot <code>100–900</code> dalam satu file variable terpadu dengan <code>font-display: swap</code>.
+                <b>Spesifikasi Webfont:</b> Bobot statis diskrit 400 (Regular), 500 (Medium), 600 (Semibold), 700 (Bold), dan 800 (Heavy) dengan <code>font-display: swap</code> dan <code>font-synthesis: none</code>.
               </div>
             </div>
           </div>
@@ -3283,7 +3283,7 @@ export const PTVContinuousCurveFixture: React.FC = () => {
                   Weight 700 — Bold (Judul modul, Card heading, Modal title)
                 </div>
                 <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', lineHeight: 1.4 }}>
-                  PTV PRO Hub &mdash; Universal Continuous Curve &amp; Inter Typography Standard
+                  PTV PRO Hub &mdash; Universal Continuous Curve &amp; SF Pro Display Typography Standard
                 </div>
               </div>
 
