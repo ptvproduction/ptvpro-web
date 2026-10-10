@@ -482,3 +482,42 @@
 .chip.dang { background: var(--dang-bg); color: var(--dang); }
 .chip.gold { background: #fef3c7; color: #b45309; }
 .chip.muted { background: var(--line-2); color: var(--muted); }
+
+/* ── Universal Continuous Profile D Surface Overrides ── */
+.hero-card.hero-continuous,
+.bento-card.bento-continuous,
+.bento-ic.ptv-continuous-surface,
+.qa-ref-btn-continuous,
+.li.li-continuous,
+.li-ic.ptv-continuous-surface,
+.ann.ann-continuous,
+.stat.stat-continuous,
+.sec.sec-continuous {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+.hero-card.hero-continuous:focus-visible,
+.bento-card.bento-continuous:focus-visible,
+.li.li-continuous:focus-visible,
+.ann.ann-continuous:focus-visible,
+.stat.stat-continuous:focus-visible {
+  outline: 2px solid var(--b-500);
+  outline-offset: 3px;
+}
+
+/* Ensure inner content layer of fixed icon buttons is perfectly centered */
+.qa-ref-btn-continuous > div,
+.bento-ic.ptv-continuous-surface > div,
+.li-ic.ptv-continuous-surface > div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
