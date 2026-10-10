@@ -313,7 +313,7 @@ export const AlatDetailPage: React.FC = () => {
                   type="button"
                   className="btn block"
                   disabled
-                  style={{ opacity: 0.65, minHeight: '44px', borderRadius: 'var(--r-m)' }}
+                  style={{ opacity: 0.65, minHeight: '44px', borderRadius: 'var(--ptv-curve-md)' }}
                 >
                   <i className="fa-solid fa-ban" style={{ marginRight: '6px' }} />
                   Seluruh Unit Sedang Tidak Tersedia

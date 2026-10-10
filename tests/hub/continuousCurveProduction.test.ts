@@ -11,7 +11,12 @@ import {
   calculateNestedRadius,
   PTV_CURVE_TOKENS,
   PROFILE_D_LAMBDA,
+  getProportionalRadius,
+  getProportionalRadiusCssVar,
+  getNestedCornerRadius,
 } from '../../src/design-system/geometry/continuousCurve';
+import fs from 'fs';
+import path from 'path';
 import {
   getSurfaceStyle,
   SOFT_SURFACE_LIGHT,
@@ -258,6 +263,74 @@ describe('PTV PRO Hub — Profile D Production Geometry & Soft Surface Tests', (
       expect(html).toContain('active');
       expect(html).toContain('Inventaris');
       expect(html).toContain('fa-boxes-stacked');
+    });
+  });
+
+  describe('6. Universal Continuous Corner Coverage & Proportional Scale', () => {
+    it('6.1 Proportional radius scale maps each component category to its canonical continuous scale', () => {
+      expect(getProportionalRadius('badge')).toBe(PTV_CURVE_TOKENS.xs); // 6px
+      expect(getProportionalRadius('button-sm')).toBe(PTV_CURVE_TOKENS.sm); // 9px
+      expect(getProportionalRadius('input')).toBe(PTV_CURVE_TOKENS.md); // 12px
+      expect(getProportionalRadius('button-md')).toBe(PTV_CURVE_TOKENS.md); // 12px
+      expect(getProportionalRadius('select-trigger')).toBe(PTV_CURVE_TOKENS.md); // 12px
+      expect(getProportionalRadius('dropdown-menu')).toBe(PTV_CURVE_TOKENS.lg); // 16px
+      expect(getProportionalRadius('card-sm')).toBe(PTV_CURVE_TOKENS.lg); // 16px
+      expect(getProportionalRadius('card')).toBe(PTV_CURVE_TOKENS.xl); // 22px
+      expect(getProportionalRadius('panel')).toBe(PTV_CURVE_TOKENS.xl); // 22px
+      expect(getProportionalRadius('modal')).toBe(PTV_CURVE_TOKENS['2xl']); // 28px
+      expect(getProportionalRadius('sheet')).toBe(PTV_CURVE_TOKENS['3xl']); // 34px
+
+      // Verify token variable mappings
+      expect(getProportionalRadiusCssVar('input')).toBe('var(--ptv-curve-md)');
+      expect(getProportionalRadiusCssVar('card')).toBe('var(--ptv-curve-xl)');
+      expect(getProportionalRadiusCssVar('modal')).toBe('var(--ptv-curve-2xl)');
+    });
+
+    it('6.2 getNestedCornerRadius accounts for both padding and border thickness', () => {
+      // Card (22px) -> Thumbnail with padding 8px + border 2px (total inset 10px) => 12px
+      expect(getNestedCornerRadius(22, 8, 2)).toBe(12);
+
+      // Modal (28px) -> Subpanel with padding 10px + border 2px (total inset 12px) => 16px
+      expect(getNestedCornerRadius(28, 10, 2)).toBe(16);
+
+      // Inset larger than outer radius clamps safely to 0
+      expect(getNestedCornerRadius(10, 12, 1)).toBe(0);
+    });
+
+    it('6.3 CSS dashboard.css squircle support covers universal components', () => {
+      const dashboardCssPath = path.resolve(__dirname, '../../src/styles/dashboard.css');
+      const content = fs.readFileSync(dashboardCssPath, 'utf-8');
+
+      // Check key universal component classes inside squircle support
+      expect(content).toContain('.btn,');
+      expect(content).toContain('.ptv-input,');
+      expect(content).toContain('.ptv-select-trigger,');
+      expect(content).toContain('.ptv-select-menu,');
+      expect(content).toContain('.bento-card,');
+      expect(content).toContain('.hero-card,');
+      expect(content).toContain('.sheet,');
+      expect(content).toContain('.modal,');
+      expect(content).toContain('.table-container,');
+      expect(content).toContain('.snav,');
+    });
+
+    it('6.4 No disallowed raw pixel border-radius remains in dashboard.css', () => {
+      const dashboardCssPath = path.resolve(__dirname, '../../src/styles/dashboard.css');
+      const content = fs.readFileSync(dashboardCssPath, 'utf-8');
+      const lines = content.split('\n');
+
+      // Should not contain hardcoded pixel border radius like border-radius: 12px;
+      const rawPxRegex = /border-radius:\s*[0-9]+px;/;
+      const violations: { line: number; text: string }[] = [];
+
+      lines.forEach((line, idx) => {
+        // Skip definition of canonical tokens like --ptv-curve-xs: 6px;
+        if (!line.includes('--ptv-curve-') && !line.includes('--ptv-soft-') && rawPxRegex.test(line)) {
+          violations.push({ line: idx + 1, text: line.trim() });
+        }
+      });
+
+      expect(violations).toEqual([]);
     });
   });
 });

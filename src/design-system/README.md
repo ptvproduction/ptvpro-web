@@ -1,8 +1,10 @@
-# PTV PRO Hub — Continuous Corner Design System
+# PTV PRO Hub — Universal Continuous Corner Design System
 
 ## Canonical Standard: Profile D (Curvature-Optimized G2 Quintic) & Soft Surface
 
-Sistem continuous corners resmi PTV PRO Hub mengadopsi **Profile D (Curvature-Optimized G2 Quintic Bézier)** dengan **Soft Surface Treatment** sebagai standar tunggal untuk kartu, panel, kontrol, dan modal dialog.
+Sistem continuous corners resmi PTV PRO Hub mengadopsi **Profile D (Curvature-Optimized G2 Quintic Bézier)** dengan **Soft Surface Treatment** sebagai standar tunggal untuk **SELURUH** antarmuka Hub (kartu, panel, tombol, input, dropdown, tabel, navigasi, badge, dan modal dialog).
+
+Profile D adalah **standar geometri**, bukan efek dekoratif opsional.
 
 ---
 
@@ -30,41 +32,51 @@ Kurva sudut menggunakan kurva parametrik Bézier orde-5 (Quintic) yang menjamin 
 
 ---
 
-### 2. Hierarki Radius & Nested Offset Kanonikal
+### 2. Universal Proportional Radius Matrix
 
-| Token | Radius | Inset Default | Target Penggunaan |
-|---|---|---|---|
-| `--ptv-curve-xs` | 6px | 4px | Micro badge, status indicator |
-| `--ptv-curve-sm` | 9px | 4px | Small button, compact control |
-| `--ptv-curve-md` | 12px | 6px | Input field, dropdown trigger, standard button |
-| `--ptv-curve-lg` | 16px | 10px | Floating menu, nested card, sub-panel |
-| `--ptv-curve-xl` | 22px | 10px | Standard card, bento grid item, main surface |
-| `--ptv-curve-2xl`| 28px | 12px | Modal dialog, hero banner card |
-| `--ptv-curve-3xl`| 34px | 16px | Master sheet, drawer |
+Radius disesuaikan secara proporsional terhadap hierarki dan dimensi fisik komponen:
 
-#### Formula Nested Corners
-$$R_{\text{inner}} = \max(0, R_{\text{outer}} - \text{inset})$$
+| Kategori Komponen | Token CSS | Radius Nominal | Inset Default | Target Komponen Hub |
+|---|---|---|---|---|
+| **Micro Badge / Tag** | `--ptv-curve-xs` | 6px | 2px | Status badge, keyboard shortcut `<kbd>`, inline indicator |
+| **Small Button / Control** | `--ptv-curve-sm` | 9px | 4px | Tombol filter kecil, icon button compact, chip search |
+| **Input / Select / Nav** | `--ptv-curve-md` | 12px | 6px | Input field, trigger select, search bar, item sidebar `.snav` |
+| **Subpanel / Dropdown / Thumb** | `--ptv-curve-lg` | 16px | 8px | Dropdown menu, table wrapper, thumbnail gambar, nested subpanel |
+| **Standard Card / Panel** | `--ptv-curve-xl` | 22px | 10px | Bento cards, KPI card, stat card, announcement card |
+| **Modal / Dialog / Hero** | `--ptv-curve-2xl`| 28px | 12px | Dialog modal desktop, popup bantuan login, hero banner |
+| **Drawer / Bottom Sheet** | `--ptv-curve-3xl`| 34px | 16px | Sheet modal mobile, drawer peminjaman |
+| **Pill Tag / Capsule** | `--ptv-curve-pill`| 9999px | — | Capsule filter `.fchip`, status tag pil |
+| **Circular Indicator** | `--ptv-curve-circle`| 50% | — | Avatar kru, circular action icon buttons (lingkaran murni) |
 
 ---
 
-### 3. Soft Surface Treatment
+### 3. Formula Concentric Nested Corners
+
+Outer dan inner rounded corners dihitung dengan formula geometris konsisten:
+$$R_{\text{inner}} = \max(0, R_{\text{outer}} - (\text{padding} + \text{border}))$$
+
+Contoh hubungan hierarki aktual:
+- **Card (22px) $\to$ Thumbnail (12px):** Inset padding 8px + border 2px = 10px ($22 - 10 = 12\text{px}$).
+- **Modal (28px) $\to$ Subpanel (16px):** Inset padding 10px + border 2px = 12px ($28 - 12 = 16\text{px}$).
+- **Dropdown Panel (16px) $\to$ Menu Item (9px):** Inset padding 5px + border 2px = 7px ($16 - 7 = 9\text{px}$).
+
+---
+
+### 4. Soft Surface Treatment
 
 Perlakuan permukaan kanonikal dari Surface Treatment Lab V3:
-- **Fill:** `#ffffff` (Dark mode: `#0e1b2d`)
-- **Border Stroke:** `0.75px` `rgba(226, 232, 240, 0.85)` (Dark mode: `rgba(255, 255, 255, 0.12)`)
+- **Fill:** `#ffffff` (Mode gelap: `#0e1b2d`)
+- **Border Stroke:** `0.75px` `rgba(226, 232, 240, 0.85)` (Mode gelap: `rgba(255, 255, 255, 0.12)`)
 - **Multi-tiered Ambient Shadow:**
   ```css
-  drop-shadow(0 10px 22px rgba(15, 23, 42, 0.06)) drop-shadow(0 2px 5px rgba(15, 23, 42, 0.03))
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06), 0 2px 5px rgba(15, 23, 42, 0.03);
+  /* SVG filter */
+  filter: drop-shadow(0 10px 22px rgba(15, 23, 42, 0.06)) drop-shadow(0 2px 5px rgba(15, 23, 42, 0.03));
   ```
 
 ---
 
-### 4. Reusable Primitives
+### 5. Strategi Rendering & Accessibility
 
-- `ContinuousSurface`: Container permukaan utama dengan SVG path underlay murni atau CSS squircle fallback. Menghindari clipping popover/dropdown.
-- `ContinuousCard`: Kartu konten dan bento grid item ($R=22\text{px}$).
-- `ContinuousPanel`: Panel dan section dengan nested inner harmony ($R=16\text{px}$).
-- `ContinuousModalSurface`: Dialog modal melayang ($R=28\text{px}$) dengan ARIA dialog semantics.
-- `ContinuousButton`: Tombol semantik dengan native accessibility dan visible focus ring.
-- `ContinuousInputWrapper`: Pembungkus form input tanpa clipping dropdown.
-- `ContinuousNavItem`: Item navigasi sidebar dengan active state continuous curve.
+1. **Vector Underlay Mode (`ContinuousSurface`):** Digunakan untuk kontainer surface visual khusus. Menempatkan SVG path di layer background terpisah (`z-index: 0, pointer-events: none`) tanpa `overflow: hidden`, menjamin dropdown dan popover di dalamnya tidak pernah terpotong (*zero clipping*).
+2. **Progressive Squircle Mode:** Seluruh elemen interaktif semantik (`button`, `input`, `.snav`, `.bnav`, `.tbl-wrap`, dll.) menggunakan token CSS `--ptv-curve-*` dan progressive enhancement `@supports (corner-shape: squircle)`, mempertahankan native keyboard navigation, accessible focus ring (`:focus-visible`), dan performa render 60fps.

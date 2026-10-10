@@ -171,7 +171,7 @@
     width: 100%;
     min-height: 40px;
     padding: 0 12px;
-    border-radius: var(--r-full);
+    border-radius: var(--ptv-curve-md);
     font-size: 13.5px;
     font-weight: 500;
     color: var(--ink-2);
@@ -222,7 +222,7 @@
     background: var(--b-100);
     color: var(--b-700);
     padding: 1px 7px;
-    border-radius: 99px;
+    border-radius: var(--ptv-curve-pill);
   }
 
   .snav.on .cnt {
@@ -259,8 +259,8 @@
     gap: 10px;
     height: 38px;
     padding: 0 14px;
-    border-radius: var(--r-full);
-    border: 1px solid var(--line);
+    border-radius: var(--ptv-curve-pill);
+    border: var(--ptv-soft-border);
     background: var(--surface);
     color: var(--muted);
     font-size: 13px;

@@ -364,7 +364,7 @@ export const InventarisPage: React.FC = () => {
                 minHeight: '34px',
                 fontWeight: 600,
                 color: 'var(--warn)',
-                borderRadius: 'var(--r-m)',
+                borderRadius: 'var(--ptv-curve-sm)',
               }}
             >
               <i className="fa-solid fa-rotate-left" style={{ marginRight: '4px', fontSize: '10.5px' }} />
@@ -385,7 +385,7 @@ export const InventarisPage: React.FC = () => {
                 color: 'var(--b-700)',
                 background: 'var(--b-050)',
                 border: '1px solid var(--b-200)',
-                borderRadius: 'var(--r-full)',
+                borderRadius: 'var(--ptv-curve-pill)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
@@ -414,7 +414,7 @@ export const InventarisPage: React.FC = () => {
               style={{
                 minHeight: '34px',
                 padding: '0 14px',
-                borderRadius: 'var(--r-full)',
+                borderRadius: 'var(--ptv-curve-pill)',
                 fontWeight: 700,
                 fontSize: '12.5px',
                 boxShadow: '0 2px 8px rgba(18,115,230,0.25)',

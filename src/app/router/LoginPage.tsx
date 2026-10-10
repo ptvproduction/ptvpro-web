@@ -230,7 +230,7 @@ export const LoginPage: React.FC = () => {
                 background: 'rgba(7, 42, 82, 0.75)',
                 backdropFilter: 'blur(10px)',
                 padding: '10px',
-                borderRadius: '16px',
+                borderRadius: 'var(--ptv-curve-lg)',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
               }}
             >
@@ -244,7 +244,7 @@ export const LoginPage: React.FC = () => {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '6px 10px',
-                    borderRadius: '8px',
+                    borderRadius: 'var(--ptv-curve-sm)',
                     background: 'rgba(255, 255, 255, 0.08)',
                     color: '#ffffff',
                     border: 'none',

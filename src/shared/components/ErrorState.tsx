@@ -23,9 +23,9 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         padding: '2.5rem 1.5rem',
         textAlign: 'center',
         gap: '0.75rem',
-        borderRadius: 'var(--radius-md)',
-        border: '1px solid rgba(239, 68, 68, 0.3)',
-        backgroundColor: 'var(--status-danger-bg)',
+        borderRadius: 'var(--ptv-curve-xl)',
+        border: '0.75px solid rgba(239, 68, 68, 0.3)',
+        backgroundColor: 'var(--dang-bg, #fde8e6)',
       }}
     >
       <AlertTriangle size={32} style={{ color: 'var(--status-danger)' }} />

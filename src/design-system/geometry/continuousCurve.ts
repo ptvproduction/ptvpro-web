@@ -66,6 +66,90 @@ export const PTV_CURVE_TOKENS = {
 
 export type PtvCurveTokenKey = keyof typeof PTV_CURVE_TOKENS;
 
+export type ComponentCategory =
+  | 'badge' // Micro badges, status tags (6px)
+  | 'chip' // Pill tags, chip filters (9999px)
+  | 'button-sm' // Compact buttons, icon buttons (9px)
+  | 'button-md' // Standard buttons (12px)
+  | 'button-lg' // Large hero/CTA buttons (16px)
+  | 'input' // Input fields, search bars (12px)
+  | 'select-trigger' // Custom select triggers (12px)
+  | 'dropdown-menu' // Popover and select dropdown menus (16px)
+  | 'thumbnail' // Image containers, square thumbnails (12px)
+  | 'card-sm' // Compact summary widgets, stat boxes (16px)
+  | 'card' // Standard content cards, bento cards (22px)
+  | 'card-lg' // Prominent feature cards, hero cards (28px)
+  | 'panel' // Main content sections, side panels (22px)
+  | 'modal' // Centered modal dialogs (28px)
+  | 'sheet' // Bottom sheets, floating action drawers (34px)
+  | 'table-container' // Table surface wrappers (16px)
+  | 'toast' // Toast notifications, banner alerts (12px)
+  | 'skeleton'; // Loading placeholders (12px)
+
+export const COMPONENT_RADIUS_MAP: Record<ComponentCategory, number> = {
+  badge: PTV_CURVE_TOKENS.xs, // 6px
+  chip: 9999, // Pill
+  'button-sm': PTV_CURVE_TOKENS.sm, // 9px
+  'button-md': PTV_CURVE_TOKENS.md, // 12px
+  'button-lg': PTV_CURVE_TOKENS.lg, // 16px
+  input: PTV_CURVE_TOKENS.md, // 12px
+  'select-trigger': PTV_CURVE_TOKENS.md, // 12px
+  'dropdown-menu': PTV_CURVE_TOKENS.lg, // 16px
+  thumbnail: PTV_CURVE_TOKENS.md, // 12px
+  'card-sm': PTV_CURVE_TOKENS.lg, // 16px
+  card: PTV_CURVE_TOKENS.xl, // 22px
+  'card-lg': PTV_CURVE_TOKENS['2xl'], // 28px
+  panel: PTV_CURVE_TOKENS.xl, // 22px
+  modal: PTV_CURVE_TOKENS['2xl'], // 28px
+  sheet: PTV_CURVE_TOKENS['3xl'], // 34px
+  'table-container': PTV_CURVE_TOKENS.lg, // 16px
+  toast: PTV_CURVE_TOKENS.md, // 12px
+  skeleton: PTV_CURVE_TOKENS.md, // 12px
+};
+
+export const COMPONENT_TOKEN_VAR_MAP: Record<ComponentCategory, string> = {
+  badge: 'var(--ptv-curve-xs)',
+  chip: 'var(--ptv-curve-pill)',
+  'button-sm': 'var(--ptv-curve-sm)',
+  'button-md': 'var(--ptv-curve-md)',
+  'button-lg': 'var(--ptv-curve-lg)',
+  input: 'var(--ptv-curve-md)',
+  'select-trigger': 'var(--ptv-curve-md)',
+  'dropdown-menu': 'var(--ptv-curve-lg)',
+  thumbnail: 'var(--ptv-curve-md)',
+  'card-sm': 'var(--ptv-curve-lg)',
+  card: 'var(--ptv-curve-xl)',
+  'card-lg': 'var(--ptv-curve-2xl)',
+  panel: 'var(--ptv-curve-xl)',
+  modal: 'var(--ptv-curve-2xl)',
+  sheet: 'var(--ptv-curve-3xl)',
+  'table-container': 'var(--ptv-curve-lg)',
+  toast: 'var(--ptv-curve-md)',
+  skeleton: 'var(--ptv-curve-md)',
+};
+
+/**
+ * Get proportional radius for a specific UI component
+ */
+export function getProportionalRadius(category: ComponentCategory): number {
+  return COMPONENT_RADIUS_MAP[category] ?? PTV_CURVE_TOKENS.md;
+}
+
+/**
+ * Get CSS variable string for a component category
+ */
+export function getProportionalRadiusCssVar(category: ComponentCategory): string {
+  return COMPONENT_TOKEN_VAR_MAP[category] ?? 'var(--ptv-curve-md)';
+}
+
+/**
+ * Calculate concentric nested inner radius: R_inner = max(0, R_outer - (padding + border))
+ */
+export function getNestedCornerRadius(outerRadius: number, padding: number, borderWidth = 0): number {
+  const totalInset = padding + borderWidth;
+  return Math.max(0, outerRadius - totalInset);
+}
+
 /**
  * Clamp radius to maximum permissible value within bounding box [0, w] x [0, h]
  */

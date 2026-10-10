@@ -21,10 +21,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         justifyContent: 'center',
         padding: '3rem 1.5rem',
         textAlign: 'center',
-        gap: '0.75rem',
-        border: '1px dashed var(--bg-card-border)',
-        borderRadius: 'var(--radius-md)',
-        backgroundColor: 'var(--bg-card)',
+        border: '1px dashed rgba(11, 42, 74, 0.15)',
+        borderRadius: 'var(--ptv-curve-xl)',
+        backgroundColor: 'var(--surface, #ffffff)',
+        boxShadow: 'var(--ptv-soft-shadow)',
       }}
     >
       <Inbox size={36} style={{ color: 'var(--text-muted)' }} />
