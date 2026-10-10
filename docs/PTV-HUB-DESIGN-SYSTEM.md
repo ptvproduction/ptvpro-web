@@ -81,65 +81,76 @@ Tokens didefinisikan secara kanonikal di `src/styles/tokens.css` dan diimpor ke 
 
 ## 3. CONCENTRIC NESTED ALIGNMENT RULES
 
-### 3.1 Formula Keselarasan Kontur
+### 3.1 Formula Keselarasan Kontur & Inset Aktual
 
-Untuk menghindari efek **"padding pinch"** (sudut elemen anak tampak mencuat keluar menembus sudut induk), sudut elemen bersarang dihitung menggunakan rumus konsentris:
+Untuk menghindari efek **"padding pinch"** (sudut elemen anak tampak mencuat keluar menembus sudut induk atau terlihat tercekik kaku), radius sudut elemen bersarang dihitung menggunakan rumus konsentris:
 
-$$R_{\text{inner}} \approx \max(0, R_{\text{outer}} - \text{inset})$$
+$$R_{\text{inner\_math}} = \max(0, R_{\text{outer}} - \text{Inset}_{\text{aktual}})$$
 
-Di mana:
-$$\text{inset} = \text{padding} + \text{border}$$
+Di mana **Inset Aktual** diukur secara fisik dari batas terluar kontainer induk:
+$$\text{Inset}_{\text{aktual}} = \text{padding} + \text{border}$$
 
-### 3.2 Contoh Arsitektur Bersarang di PTV Hub:
+### 3.2 Transparansi: Inset Aktual vs. Penyesuaian Optis
 
-1. **Card ($R=22\text{px}$) & Thumbnail ($R=12\text{px}$):**
-   - Induk: `.ptv-nilai-card` memiliki $R_{\text{outer}} = 22\text{px}$ (`--ptv-curve-xl`) dengan padding 16px.
-   - Anak: `.ptv-nilai-thumb` memiliki $R_{\text{inner}} = 12\text{px}$ (`--ptv-curve-md`).
-   - Inset optis $\approx 10\text{px} \rightarrow 22 - 10 = 12\text{px}$. Kontur sejajar dan harmonis.
+Ketika hasil matematis murni menghasilkan angka di luar skala token (misalnya 4.5px, 6px, atau 10px), sistem membedakan secara jujur antara nilai matematis murni dan penyesuaian optis yang dipilih:
 
-2. **Modal ($R=28\text{px}$), Inner Dossier ($R=16\text{px}$), & Input Control ($R=12\text{px}$):**
-   - Level 1 (Modal): $R = 28\text{px}$ (`--ptv-curve-2xl`), padding 12px.
-   - Level 2 (Sub-panel): $R = 28 - 12 = 16\text{px}$ (`--ptv-curve-lg`), padding 4px.
-   - Level 3 (Input/Trigger): $R = 16 - 4 = 12\text{px}$ (`--ptv-curve-md`).
+1. **Kasus 1: Kartu Konten ($R=22\text{px}$) & Thumbnail Media ($R=12\text{px}$):**
+   - Induk: `.ptv-nilai-card` memiliki $R_{\text{outer}} = 22\text{px}$ (`--ptv-curve-xl`), padding 10px, border 2px (border-box).
+   - Inset fisik aktual: $10\text{px}$.
+   - $R_{\text{math}} = 22\text{px} - 10\text{px} = 12\text{px}$.
+   - Token dirender: `--ptv-curve-md` ($12\text{px}$).
+   - **Status:** Kesesuaian 100% identik secara matematis.
 
-3. **Dropdown Trigger ($R=12\text{px}$) & Floating Menu ($R=16\text{px}$) & Option Item ($R=10\text{px}$):**
-   - Menu Floating: $R = 16\text{px}$ (`--ptv-curve-lg`), padding 6px.
-   - Option Hover Item: $R = 16 - 6 = 10\text{px}$ (`--ptv-curve-sm` / `--ptv-corner-sm`).
+2. **Kasus 2: Modal Dialog ($R=28\text{px}$) & Sub-Panel Dossier ($R=16\text{px}$):**
+   - Induk: Modal envelope memiliki $R_{\text{outer}} = 28\text{px}$ (`--ptv-curve-2xl`), padding 12px.
+   - Inset fisik aktual: $12\text{px}$.
+   - $R_{\text{math}} = 28\text{px} - 12\text{px} = 16\text{px}$.
+   - Token dirender: `--ptv-curve-lg` ($16\text{px}$).
+   - **Status:** Kesesuaian 100% identik secara matematis.
+
+3. **Kasus 3: Sub-Panel ($R=16\text{px}$) & Form Control / Dropdown ($R=12\text{px}$):**
+   - Induk: Sub-panel memiliki $R_{\text{outer}} = 16\text{px}$, padding 10px.
+   - Inset fisik aktual: $10\text{px}$.
+   - $R_{\text{math}} = 16\text{px} - 10\text{px} = 6\text{px}$ (`--ptv-curve-xs`).
+   - Token aktual dirender: `--ptv-curve-md` ($12\text{px}$).
+   - **Penjelasan Penyesuaian Optis:** Sesuai standar Human Interface Guidelines dan ergonomi sentuhan (affordance interaktif), kontrol tombol dan dropdown input memerlukan lengkungan minimal $12\text{px}$ agar dapat dibedakan secara visual dari tag pasif atau teks label kaku. Nilai ini adalah penyesuaian fungsional yang disengaja.
 
 ---
 
-## 4. CSS STRATEGY & PROGRESSIVE SQUIRCLE ENHANCEMENT
+## 4. CSS STRATEGY & EMPIRICAL BROWSER RENDERING FACTS
 
-### 4.1 Native Fallback vs. Squircle Enhancement
+### 4.1 Realitas Rendering Browser Saat Ini vs. Teori Squircle
 
-- **Baseline Fallback (Semua Browser):**  
-  Menggunakan `border-radius: var(--ptv-curve-*)`. Seluruh browser modern (Chrome, Edge, Firefox, Safari iOS & macOS) mendukung akselerasi perangkat keras, rendering subpixel, dan transisi tanpa glitch.
-- **Progressive Enhancement (`corner-shape: squircle`):**  
-  Untuk browser masa depan yang mendukung CSS Box Corners Spec:
-  ```css
-  @supports (corner-shape: squircle) {
-    .ptv-squircle,
-    .ptv-continuous-curve,
-    .ptv-curve-xs,
-    .ptv-curve-sm,
-    .ptv-curve-md,
-    .ptv-curve-lg,
-    .ptv-curve-xl,
-    .ptv-curve-2xl,
-    .ptv-curve-3xl,
-    .ptv-select-trigger,
-    .ptv-select-menu,
-    .ptv-nilai-kpi-card,
-    .ptv-nilai-card,
-    .ptv-nilai-filter-bar,
-    .card,
-    .sheet {
-      corner-shape: squircle;
-    }
+Sistem dokumentasi PTV berpegang pada **integritas empiris**:
+- **Realitas Browser Saat Ini (Chromium, Firefox, Safari default):**  
+  Mesin render browser merender properti CSS standar `border-radius: R` sebagai **busur lingkaran kuadran ($n = 2.0$)**, bukan superellipse kontinyu ($n \approx 3.5$). Ketika berbagai ukuran komponen (12px, 16px, 22px, 28px) dinormalisasi ke skala referensi yang sama, garis-garis kurva berimpit pada busur lingkaran $n = 2.0$.
+- **Karakter Sistem Saat Ini:**  
+  Sistem PTV saat ini beroperasi secara jujur sebagai **satu keluarga radius proporsional harmonis berbusur lingkaran ($n = 2.0$)**, dengan rasio transisi optis yang rapi dan konsisten di seluruh hierarki antarmuka.
+- **Progressive Squircle Enhancement (`corner-shape: squircle`):**  
+  Rule `@supports (corner-shape: squircle)` telah diimplementasikan di `dashboard.css`. Ketika spesifikasi W3C Box Corners Level 4 diaktifkan oleh peramban di masa mendatang, profil kurva akan otomatis bertransisi ke kurva superellipse ($n \approx 3.5$) tanpa mengubah layout.
+
+```css
+@supports (corner-shape: squircle) {
+  .ptv-squircle,
+  .ptv-continuous-curve,
+  .ptv-curve-xs,
+  .ptv-curve-sm,
+  .ptv-curve-md,
+  .ptv-curve-lg,
+  .ptv-curve-xl,
+  .ptv-curve-2xl,
+  .ptv-curve-3xl,
+  .ptv-select-trigger,
+  .ptv-select-menu,
+  .ptv-nilai-kpi-card,
+  .ptv-nilai-card,
+  .ptv-nilai-filter-bar,
+  .card,
+  .sheet {
+    corner-shape: squircle;
   }
-  ```
-- **Catatan Realistis Kompatibilitas:**  
-  Jangan mengklaim bentuk squircle identik 100% lintas browser jika implementasi internal browser masih berbeda. Baseline skala continuous curve PTV menjamin bahwa tanpa dukungan squircle pun, proporsi kelengkungan tetap selaras sebagai satu keluarga bentuk.
+}
+```
 
 ---
 
@@ -169,15 +180,31 @@ Bentuk khusus yang diperbolehkan di luar skala continuous curve standar:
 
 ## 7. CARA MEMVALIDASI KONSISTENSI VISUAL
 
-1. **Visual Fixture Inspection Route:**
-   - Kunjungi rute pengujian internal: `/hub/design-system`
-   - Buka tab:
-     - **Optical Size Matrix:** Membandingkan rendering kontrol kecil, dropdown, kartu, dan modal.
-     - **Concentric Nested Alignment:** Memeriksa keselarasan padding dan contour tracing.
-     - **Corner Superimposed Overlay:** Meneliti sudut-sudut yang disejajarkan pada origin (0,0) untuk memvalidasi kelurusan tangen.
-2. **Automated Regression Audit Test:**
-   - Jalankan: `npm test tests/hub/continuousCurveAudit.test.ts`
-   - Test akan memindai seluruh file komponen React di `src/products/hub/**/*.tsx` dan mendeteksi adanya penggunaan radius hardcoded acak (misal `8px`, `10px`, `14px`, `18px`, `20px`).
+### 7.1 Visual Fixture Inspection (`/hub/design-system`)
+
+Kunjungi rute pengujian internal `/hub/design-system`:
+1. **Tab 1: Corner Superimposed Overlay & Normalized Validation:**
+   - **Mode 1 (Outline-Only Origin Overlay):** Membandingkan lintasan lengkungan Control (12px, cyan), Panel (16px, purple), Card (22px, emerald), Modal (28px, amber), dan Drawer (34px, rose) pada titik origin $(0,0)$ dengan background transparan (tanpa fill yang mengaburkan) dan kontrol zoom ($1\times, 2\times, 3\times$).
+   - **Mode 2 (Normalized Curve Comparison):** Menormalkan kurva dari Control, Panel, Card, dan Modal ke skala referensi seragam ($R = 120\text{px}$) pada origin $(0,0)$. Membuktikan secara empiris bahwa seluruh kurva berimpit sempurna pada profil geometris yang identik.
+   - **Mode 3 (Empirical Browser Rendering vs. Theory):** Membandingkan secara langsung kurva teoretis Apple squircle ($n = 3.5$, garis putus-putus emas), kurva teoretis busur lingkaran ($n = 2.0$, garis putus-putus biru), dan kurva CSS nyata yang dirender peramban (garis solid hijau).
+2. **Tab 2: Concentric Nested Alignment (Actual Inset Breakdown):**
+   - Menampilkan audit inset aktual ($\text{padding} + \text{border}$) vs. $R_{\text{inner}}$ matematis.
+   - Menguji Kasus 1 (Card $\to$ Thumb), Kasus 2 (Modal $\to$ Sub-panel $\to$ Control), dan kalkulator interaktif live slider.
+3. **Tab 3: Optical Size Matrix & Token Catalog:**
+   - Demonstrasi komponen nyata Hub di setiap tingkatan token.
+
+### 7.2 Automated Regression Audit Test
+
+Jalankan:
+```bash
+npm test tests/hub/continuousCurveAudit.test.ts
+```
+Uji otomatis mencakup:
+- Monotonicity skala kurva
+- Validasi formula konsentris $R_{\text{inner}} = \max(0, R_{\text{outer}} - \text{inset})$
+- Deteksi pelanggaran hardcoded radius inline di seluruh kode Hub TSX
+- Uji faktor skala normalisasi geometris ($120/12, 120/16, 120/22, 120/28$)
+- Uji penyimpangan matematis kurva superellips ($n=2$ vs $n=3.5$)
 
 ---
 

@@ -121,4 +121,72 @@ describe('PTV Unified Continuous Curve — Audit & Governance Tests', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  describe('4. Normalized Geometry & Actual Inset Verification', () => {
+    it('4.1 Normalized scale factors should accurately normalize component radii to reference 120px', () => {
+      const targetRef = 120;
+      const componentRadii = {
+        control: 12,
+        panel: 16,
+        card: 22,
+        modal: 28,
+      };
+
+      const scaleFactors = {
+        control: targetRef / componentRadii.control,
+        panel: targetRef / componentRadii.panel,
+        card: targetRef / componentRadii.card,
+        modal: targetRef / componentRadii.modal,
+      };
+
+      expect(scaleFactors.control).toBe(10.0);
+      expect(scaleFactors.panel).toBe(7.5);
+      expect(scaleFactors.card).toBeCloseTo(5.4545, 4);
+      expect(scaleFactors.modal).toBeCloseTo(4.2857, 4);
+
+      // Verify each scaled radius equals the normalized reference
+      Object.entries(componentRadii).forEach(([key, r]) => {
+        const factor = scaleFactors[key as keyof typeof scaleFactors];
+        expect(r * factor).toBeCloseTo(targetRef, 5);
+      });
+    });
+
+    it('4.2 Actual inset formula should account for both padding and border', () => {
+      const calcActualInset = (padding: number, border: number) => padding + border;
+      const calcInnerConcentric = (rOuter: number, padding: number, border: number) => {
+        const inset = calcActualInset(padding, border);
+        return Math.max(0, rOuter - inset);
+      };
+
+      // Case: Card (22px) with padding 10px + border 2px
+      expect(calcActualInset(10, 2)).toBe(12);
+      expect(calcInnerConcentric(22, 10, 2)).toBe(10);
+
+      // Case: Modal (28px) with padding 10px + border 2px
+      expect(calcActualInset(10, 2)).toBe(12);
+      expect(calcInnerConcentric(28, 10, 2)).toBe(16);
+    });
+
+    it('4.3 Mathematical superellipse comparison: n=2 (circle) vs n=3.5 (squircle)', () => {
+      // Evaluate diagonal corner radius at theta = 45 deg (t = pi / 4)
+      const r = 140;
+      const t = Math.PI / 4;
+      const cosT = Math.cos(t);
+
+      // x coordinate at diagonal: r * (1 - cos^(2/n)(t))
+      const getDiagonalOffset = (n: number) => r * (1 - Math.pow(cosT, 2 / n));
+
+      const circleDiag = getDiagonalOffset(2.0); // Standard CSS arc
+      const squircleDiag = getDiagonalOffset(3.5); // Apple squircle
+
+      // Circle diagonal offset: r * (1 - 1/sqrt(2)) ≈ 0.2929 * 140 ≈ 41.00px
+      expect(circleDiag).toBeCloseTo(41.005, 2);
+
+      // Squircle diagonal offset: flatter corner, smaller offset from corner bounding box
+      expect(squircleDiag).toBeCloseTo(25.17, 1);
+
+      // There is an honest geometric difference of ~15.8px at R=140px
+      expect(circleDiag - squircleDiag).toBeGreaterThan(15);
+    });
+  });
 });
