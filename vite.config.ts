@@ -15,8 +15,15 @@ export default defineConfig({
       '@app': path.resolve(__dirname, './src/app'),
     },
   },
+  server: {
+    watch: {
+      ignored: ['**/scratch/**', '**/.system_generated/**', '**/legacy/**'],
+    },
+  },
   test: {
     globals: true,
     environment: 'node',
+    include: ['tests/**/*.{test,spec}.?(c|m)[jt]s?(x)', 'src/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/scratch/**', '**/.system_generated/**', '**/legacy/**'],
   },
 });
