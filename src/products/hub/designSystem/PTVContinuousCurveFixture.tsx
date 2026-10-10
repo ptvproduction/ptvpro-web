@@ -1,18 +1,34 @@
 import React, { useState } from 'react';
 import { PTVSelect } from '@shared/components/PTVSelect';
+import { CurvatureExplorerV2 } from './components/CurvatureExplorerV2';
+import { FairComparisonSuite } from './components/FairComparisonSuite';
+import { ConcentricLabView } from './components/ConcentricLabView';
+import { ComponentSpecimenGallery } from './components/ComponentSpecimenGallery';
+import { SafetyAuditView } from './components/SafetyAuditView';
+import { PreviousAuditReportView } from './components/PreviousAuditReportView';
+import { LaboratoryV3Suite } from './components/LaboratoryV3Suite';
 
 /**
  * PTVContinuousCurveFixture
  * Visual inspection fixture for "PTV Unified Continuous Curve"
- * Demonstrating:
- *  1. One Curve Family Across Every Component (Optical Sizing)
- *  2. Concentric Nested Alignment (Actual Inset: Padding + Border vs. Optical Adjustments)
- *  3. Real Browser Rendering vs. Theoretical Reference Curves
- *  4. Superimposed Outline-Only Corner Overlay & Normalized Trajectory Verification
+ * Laboratory V2: Continuous Corner Geometry Research & Inspection
  */
 export const PTVContinuousCurveFixture: React.FC = () => {
   const [selectedDropdown, setSelectedDropdown] = useState('kamera');
-  const [activeTab, setActiveTab] = useState<'lab' | 'comparison' | 'nested' | 'overlay' | 'typography'>('lab');
+  const [activeTab, setActiveTab] = useState<
+    | 'v3-suite'
+    | 'v2-explorer'
+    | 'v2-fair'
+    | 'v2-concentric'
+    | 'v2-specimens'
+    | 'v2-safety'
+    | 'v2-audit'
+    | 'lab'
+    | 'comparison'
+    | 'nested'
+    | 'overlay'
+    | 'typography'
+  >('v3-suite');
 
   // ── Tab 0: True Corner Smoothing Laboratory State ──
   const [labRadius, setLabRadius] = useState<number>(24);
@@ -201,103 +217,311 @@ export const PTVContinuousCurveFixture: React.FC = () => {
         </p>
       </div>
 
-      {/* ── 2. Interactive Navigation Tabs ── */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          marginBottom: '24px',
-          borderBottom: '1px solid var(--line-2, #e2e8f0)',
-          paddingBottom: '10px',
-          flexWrap: 'wrap',
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => setActiveTab('lab')}
+      {/* ── 2. Interactive Navigation Tabs (Three Tiers) ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
+        {/* Tier 0: V3 Optical Precision & Differentiation Suite */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 800,
+              color: '#1d4ed8',
+              background: '#eff6ff',
+              padding: '4px 10px',
+              borderRadius: 'var(--ptv-curve-xs)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+              border: '1px solid #bfdbfe',
+            }}
+          >
+            Laboratory V3
+          </span>
+          <button
+            type="button"
+            onClick={() => setActiveTab('v3-suite')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: 'var(--ptv-curve-md)',
+              border: activeTab === 'v3-suite' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
+              background: activeTab === 'v3-suite' ? '#eff6ff' : '#ffffff',
+              color: activeTab === 'v3-suite' ? '#1d4ed8' : '#1e293b',
+              fontWeight: 800,
+              fontSize: '12px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: activeTab === 'v3-suite' ? '0 1px 3px rgba(37,99,235,0.15)' : 'none',
+            }}
+          >
+            <i className="fa-solid fa-sparkles" style={{ color: '#2563eb' }} />
+            Master Suite: Optical Precision &amp; Curve Differentiation
+          </button>
+        </div>
+
+        {/* Tier 1: V2 Core Laboratory Suite */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              color: '#059669',
+              background: '#ecfdf5',
+              padding: '4px 8px',
+              borderRadius: 'var(--ptv-curve-xs)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+            }}
+          >
+            V2 Laboratory
+          </span>
+          <button
+            type="button"
+            onClick={() => setActiveTab('v2-explorer')}
+            style={{
+              padding: '7px 14px',
+              borderRadius: 'var(--ptv-curve-md)',
+              border: activeTab === 'v2-explorer' ? '1.5px solid #059669' : '1px solid #cbd5e1',
+              background: activeTab === 'v2-explorer' ? '#ecfdf5' : '#ffffff',
+              color: activeTab === 'v2-explorer' ? '#065f46' : '#475569',
+              fontWeight: 700,
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            <i className="fa-solid fa-compass-drafting" style={{ marginRight: '6px' }} />
+            0. Curvature Explorer V2
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('v2-fair')}
+            style={{
+              padding: '7px 14px',
+              borderRadius: 'var(--ptv-curve-md)',
+              border: activeTab === 'v2-fair' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
+              background: activeTab === 'v2-fair' ? '#eff6ff' : '#ffffff',
+              color: activeTab === 'v2-fair' ? '#1d4ed8' : '#475569',
+              fontWeight: 700,
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            <i className="fa-solid fa-scale-balanced" style={{ marginRight: '6px' }} />
+            1. Fair Comparison (A vs B vs C vs D)
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('v2-concentric')}
+            style={{
+              padding: '7px 14px',
+              borderRadius: 'var(--ptv-curve-md)',
+              border: activeTab === 'v2-concentric' ? '1.5px solid #d97706' : '1px solid #cbd5e1',
+              background: activeTab === 'v2-concentric' ? '#fffbeb' : '#ffffff',
+              color: activeTab === 'v2-concentric' ? '#92400e' : '#475569',
+              fontWeight: 700,
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            <i className="fa-solid fa-circle-notch" style={{ marginRight: '6px' }} />
+            2. Concentric Geometry &amp; Offset Lab
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('v2-specimens')}
+            style={{
+              padding: '7px 14px',
+              borderRadius: 'var(--ptv-curve-md)',
+              border: activeTab === 'v2-specimens' ? '1.5px solid #7c3aed' : '1px solid #cbd5e1',
+              background: activeTab === 'v2-specimens' ? '#f5f3ff' : '#ffffff',
+              color: activeTab === 'v2-specimens' ? '#5b21b6' : '#475569',
+              fontWeight: 700,
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            <i className="fa-solid fa-cubes" style={{ marginRight: '6px' }} />
+            3. 8-Specimen Suite
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('v2-safety')}
+            style={{
+              padding: '7px 14px',
+              borderRadius: 'var(--ptv-curve-md)',
+              border: activeTab === 'v2-safety' ? '1.5px solid #dc2626' : '1px solid #cbd5e1',
+              background: activeTab === 'v2-safety' ? '#fef2f2' : '#ffffff',
+              color: activeTab === 'v2-safety' ? '#991b1b' : '#475569',
+              fontWeight: 700,
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            <i className="fa-solid fa-shield-halved" style={{ marginRight: '6px' }} />
+            4. Implementation Safety
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('v2-audit')}
+            style={{
+              padding: '7px 14px',
+              borderRadius: 'var(--ptv-curve-md)',
+              border: activeTab === 'v2-audit' ? '1.5px solid #0f172a' : '1px solid #cbd5e1',
+              background: activeTab === 'v2-audit' ? '#f1f5f9' : '#ffffff',
+              color: activeTab === 'v2-audit' ? '#0f172a' : '#475569',
+              fontWeight: 700,
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            <i className="fa-solid fa-file-invoice" style={{ marginRight: '6px' }} />
+            5. Audit Forensik V1
+          </button>
+        </div>
+
+        {/* Tier 2: Legacy Research & System Standards */}
+        <div
           style={{
-            padding: '7px 16px',
-            borderRadius: 'var(--ptv-curve-md)',
-            border: activeTab === 'lab' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
-            background: activeTab === 'lab' ? '#eff6ff' : '#ffffff',
-            color: activeTab === 'lab' ? '#1d4ed8' : '#475569',
-            fontWeight: 700,
-            fontSize: '12.5px',
-            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            borderBottom: '1px solid var(--line-2, #e2e8f0)',
+            paddingBottom: '10px',
+            flexWrap: 'wrap',
           }}
         >
-          <i className="fa-solid fa-flask" style={{ marginRight: '6px' }} />
-          0. True Corner Smoothing Laboratory (A vs B vs C)
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('overlay')}
-          style={{
-            padding: '7px 16px',
-            borderRadius: 'var(--ptv-curve-md)',
-            border: activeTab === 'overlay' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
-            background: activeTab === 'overlay' ? '#eff6ff' : '#ffffff',
-            color: activeTab === 'overlay' ? '#1d4ed8' : '#475569',
-            fontWeight: 700,
-            fontSize: '12.5px',
-            cursor: 'pointer',
-          }}
-        >
-          <i className="fa-solid fa-crosshairs" style={{ marginRight: '6px' }} />
-          1. Corner Superimposed Overlay &amp; Normalized Validation
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('nested')}
-          style={{
-            padding: '7px 16px',
-            borderRadius: 'var(--ptv-curve-md)',
-            border: activeTab === 'nested' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
-            background: activeTab === 'nested' ? '#eff6ff' : '#ffffff',
-            color: activeTab === 'nested' ? '#1d4ed8' : '#475569',
-            fontWeight: 700,
-            fontSize: '12.5px',
-            cursor: 'pointer',
-          }}
-        >
-          <i className="fa-solid fa-vector-square" style={{ marginRight: '6px' }} />
-          2. Concentric Nested Alignment (Actual Inset Breakdown)
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('comparison')}
-          style={{
-            padding: '7px 16px',
-            borderRadius: 'var(--ptv-curve-md)',
-            border: activeTab === 'comparison' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
-            background: activeTab === 'comparison' ? '#eff6ff' : '#ffffff',
-            color: activeTab === 'comparison' ? '#1d4ed8' : '#475569',
-            fontWeight: 700,
-            fontSize: '12.5px',
-            cursor: 'pointer',
-          }}
-        >
-          <i className="fa-solid fa-shapes" style={{ marginRight: '6px' }} />
-          3. Optical Size Matrix &amp; Token Catalog
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('typography')}
-          style={{
-            padding: '7px 16px',
-            borderRadius: 'var(--ptv-curve-md)',
-            border: activeTab === 'typography' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
-            background: activeTab === 'typography' ? '#eff6ff' : '#ffffff',
-            color: activeTab === 'typography' ? '#1d4ed8' : '#475569',
-            fontWeight: 700,
-            fontSize: '12.5px',
-            cursor: 'pointer',
-          }}
-        >
-          <i className="fa-solid fa-font" style={{ marginRight: '6px' }} />
-          4. SF Pro Display Universal Typography &amp; Portal Inheritance
-        </button>
+          <span
+            style={{
+              fontSize: '10.5px',
+              fontWeight: 600,
+              color: '#64748b',
+              padding: '3px 6px',
+            }}
+          >
+            Arsip &amp; Riwayat:
+          </span>
+          <button
+            type="button"
+            onClick={() => setActiveTab('lab')}
+            style={{
+              padding: '5px 12px',
+              borderRadius: 'var(--ptv-curve-xs)',
+              border: activeTab === 'lab' ? '1px solid #2563eb' : '1px solid #e2e8f0',
+              background: activeTab === 'lab' ? '#eff6ff' : '#ffffff',
+              color: activeTab === 'lab' ? '#1d4ed8' : '#64748b',
+              fontWeight: 600,
+              fontSize: '11px',
+              cursor: 'pointer',
+            }}
+          >
+            Legacy Lab V1
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('overlay')}
+            style={{
+              padding: '5px 12px',
+              borderRadius: 'var(--ptv-curve-xs)',
+              border: activeTab === 'overlay' ? '1px solid #2563eb' : '1px solid #e2e8f0',
+              background: activeTab === 'overlay' ? '#eff6ff' : '#ffffff',
+              color: activeTab === 'overlay' ? '#1d4ed8' : '#64748b',
+              fontWeight: 600,
+              fontSize: '11px',
+              cursor: 'pointer',
+            }}
+          >
+            Legacy Overlay (Normalized)
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('nested')}
+            style={{
+              padding: '5px 12px',
+              borderRadius: 'var(--ptv-curve-xs)',
+              border: activeTab === 'nested' ? '1px solid #2563eb' : '1px solid #e2e8f0',
+              background: activeTab === 'nested' ? '#eff6ff' : '#ffffff',
+              color: activeTab === 'nested' ? '#1d4ed8' : '#64748b',
+              fontWeight: 600,
+              fontSize: '11px',
+              cursor: 'pointer',
+            }}
+          >
+            Legacy Nested Inset
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('comparison')}
+            style={{
+              padding: '5px 12px',
+              borderRadius: 'var(--ptv-curve-xs)',
+              border: activeTab === 'comparison' ? '1px solid #2563eb' : '1px solid #e2e8f0',
+              background: activeTab === 'comparison' ? '#eff6ff' : '#ffffff',
+              color: activeTab === 'comparison' ? '#1d4ed8' : '#64748b',
+              fontWeight: 600,
+              fontSize: '11px',
+              cursor: 'pointer',
+            }}
+          >
+            Optical Matrix
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('typography')}
+            style={{
+              padding: '5px 12px',
+              borderRadius: 'var(--ptv-curve-xs)',
+              border: activeTab === 'typography' ? '1px solid #2563eb' : '1px solid #e2e8f0',
+              background: activeTab === 'typography' ? '#eff6ff' : '#ffffff',
+              color: activeTab === 'typography' ? '#1d4ed8' : '#64748b',
+              fontWeight: 600,
+              fontSize: '11px',
+              cursor: 'pointer',
+            }}
+          >
+            SF Pro Display Universal
+          </button>
+        </div>
       </div>
+
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── TAB V3: OPTICAL PRECISION & DIFFERENTIATION SUITE ──────────── */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'v3-suite' && <LaboratoryV3Suite />}
+
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── TAB V2: INTERACTIVE CURVATURE EXPLORER ─────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'v2-explorer' && <CurvatureExplorerV2 />}
+
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── TAB V2: FAIR COMPARISON SUITE (A vs B vs C vs D) ───────────── */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'v2-fair' && (
+        <FairComparisonSuite
+          nominalRadius={labRadius}
+          params={{ exponent: labSmoothing, smoothing: 0.6, transitionRatio: 0.45 }}
+        />
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── TAB V2: CONCENTRIC GEOMETRY & NORMAL OFFSET LAB ────────────── */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'v2-concentric' && <ConcentricLabView />}
+
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── TAB V2: 8 SPECIMEN CONSISTENCY SUITE ───────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'v2-specimens' && <ComponentSpecimenGallery />}
+
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── TAB V2: IMPLEMENTATION SAFETY & BROWSER COMPATIBILITY ──────── */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'v2-safety' && <SafetyAuditView />}
+
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── TAB V2: FORENSIC AUDIT OF PREVIOUS LAB ─────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'v2-audit' && <PreviousAuditReportView />}
 
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* ── TAB 0: TRUE CORNER SMOOTHING LABORATORY (A vs B vs C) ─────── */}
