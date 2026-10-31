@@ -4,6 +4,7 @@ import { hash } from 'bcryptjs';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { resolveLiveAccess } from './auth/_utils/liveAccess';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 import { isOperationalCrew, CANONICAL_OPERATIONAL_DIVISIONS } from '../../src/products/hub/kru/types';
 import type { CrewMember, CrewRole } from '../../src/products/hub/kru/types';
 import { mapLegacyKruRowToCrewMember, type RawLegacyKruDbRow } from '../../src/products/hub/kru/kruMapper';
@@ -49,35 +50,6 @@ export interface RawLoginHistoryDbRow {
   login_at: string;
 }
 
-async function parseJsonBody(req: IncomingMessage): Promise<any> {
-  const parsed = (req as IncomingMessage & { body?: unknown }).body;
-  if (parsed !== undefined) {
-    const value = typeof parsed === 'string' ? JSON.parse(parsed) : parsed;
-    if (!value || Array.isArray(value) || typeof value !== 'object') throw new Error('Payload personel tidak valid.');
-    return value;
-  }
-  return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        reject(new Error('Payload terlalu besar (maksimal 2MB).'));
-      }
-    });
-    req.on('end', () => {
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error('Format data JSON tidak valid.'));
-      }
-    });
-    req.on('error', reject);
-  });
-}
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   res.setHeader('Content-Type', 'application/json');

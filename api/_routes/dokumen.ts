@@ -1,6 +1,7 @@
 ﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
@@ -19,29 +20,8 @@ export function calculateNextNomorSurat(
   return calculateNextLetterNumber(allDocs, typeParam, dateParam);
 }
 
-export function parseJsonRequestBody(req: IncomingMessage): Promise<any> {
-  if ((req as any).body !== undefined && typeof (req as any).body === 'object') {
-    return Promise.resolve((req as any).body);
-  }
-  return new Promise((resolve, reject) => {
-    let raw = '';
-    req.on('data', (chunk) => {
-      raw += chunk;
-      if (raw.length > 2 * 1024 * 1024) {
-        reject(new Error('Ukuran payload request melebihi batas 2MB.'));
-      }
-    });
-    req.on('end', () => {
-      if (!raw || !raw.trim()) return resolve({});
-      try {
-        resolve(JSON.parse(raw));
-      } catch (e: any) {
-        reject(new Error(`Format JSON body tidak valid: ${e.message}`));
-      }
-    });
-    req.on('error', (err) => reject(err));
-  });
-}
+
+export const parseJsonRequestBody = (req: IncomingMessage) => parseJsonBody(req);
 
 export interface RawSuratIzinDbRow {
   id: string;

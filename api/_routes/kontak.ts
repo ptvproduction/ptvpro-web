@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 import { safeRandomUuid } from '../../src/shared/utils/uuid';
 
 import {
@@ -23,32 +24,6 @@ export { categorizeExternalContact, classifyInternalContact };
 const KNOWN_TEST_RECORD_PTV_IDS = new Set(['PTV-UJI-2712']);
 
 
-async function parseJsonBody(req: IncomingMessage): Promise<any> {
-  if ((req as any).body !== undefined && typeof (req as any).body === 'object') {
-    return (req as any).body;
-  }
-  return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        reject(new Error('Payload terlalu besar (maksimal 2MB).'));
-      }
-    });
-    req.on('end', () => {
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error('Format data JSON tidak valid.'));
-      }
-    });
-    req.on('error', reject);
-  });
-}
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   res.setHeader('Content-Type', 'application/json');

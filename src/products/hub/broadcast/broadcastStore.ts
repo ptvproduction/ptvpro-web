@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Announcement, CreateAnnouncementInput, UpdateAnnouncementInput } from './types';
 import { broadcastService } from './broadcastService';
+import { useSessionStore } from '@/core/session';
 
 const STORAGE_KEY = 'ptv_broadcast_announcements_v2';
 
@@ -43,7 +44,19 @@ class BroadcastStore {
 
   constructor() {
     this.load();
-    this.syncCloud();
+    useSessionStore.subscribe((state, prevState) => {
+      const prevUserId = prevState?.user?.id || prevState?.user?.ptv_id || null;
+      const currentUserId = state?.user?.id || state?.user?.ptv_id || null;
+
+      if (currentUserId && currentUserId !== prevUserId) {
+        void this.syncCloud();
+      }
+    });
+
+    const { user, isLoading } = useSessionStore.getState();
+    if (!isLoading && user) {
+      void this.syncCloud();
+    }
   }
 
   private load(): void {
@@ -71,6 +84,10 @@ class BroadcastStore {
   }
 
   public async syncCloud(): Promise<void> {
+    const { user, isLoading } = useSessionStore.getState();
+    if (isLoading || !user) {
+      return;
+    }
     try {
       const cloudItems = await broadcastService.getAnnouncements(true);
       if (Array.isArray(cloudItems) && cloudItems.length > 0) {

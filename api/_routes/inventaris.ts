@@ -2,6 +2,7 @@
 import { createHmac, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { parseCookies } from './auth/_utils/cookies';
+import { readRawBody, BodyParserError } from './auth/_utils/bodyParser';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { lifecycleClient } from './auth/_utils/portalLifecycle';
 import { resolveLiveAccess, LiveAccessUnavailableError } from './auth/_utils/liveAccess';
@@ -53,20 +54,14 @@ class InventoryError extends Error {
 }
 
 async function readBody(req: IncomingMessage & { body?: unknown }, limit: number): Promise<Buffer> {
-  if (Number(req.headers['content-length']) > limit) throw new InventoryError(413, 'Ukuran permintaan melebihi batas.');
-  if (req.body !== undefined) {
-    const data = Buffer.isBuffer(req.body) ? req.body : Buffer.from(typeof req.body === 'string' ? req.body : JSON.stringify(req.body));
-    if (data.length > limit) throw new InventoryError(413, 'Ukuran permintaan melebihi batas.');
-    return data;
+  try {
+    return await readRawBody(req, { maxBytes: limit });
+  } catch (err: any) {
+    if (err instanceof BodyParserError) {
+      throw new InventoryError(err.statusCode, err.message, err.code);
+    }
+    throw new InventoryError(400, err?.message || 'Gagal membaca payload.');
   }
-  const chunks: Buffer[] = []; let length = 0;
-  for await (const chunk of req) {
-    const data = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-    length += data.length;
-    if (length > limit) throw new InventoryError(413, 'Ukuran permintaan melebihi batas.');
-    chunks.push(data);
-  }
-  return Buffer.concat(chunks);
 }
 
 export default async function handler(req: IncomingMessage & { body?: unknown }, res: ServerResponse) {

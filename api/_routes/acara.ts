@@ -1,10 +1,11 @@
-﻿import type { IncomingMessage, ServerResponse } from 'node:http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import crypto from 'node:crypto';
 import { normalizeAcaraColor } from '../../src/products/hub/acara/utils/acaraColors';
 import { createClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 
 export interface RawAcaraDbRow {
   id: string;
@@ -212,53 +213,6 @@ function sanitizeAcaraCrew(crewInput: any): any[] {
   return sanitized;
 }
 
-async function parseJsonBody(req: IncomingMessage): Promise<any> {
-  const existingBody = (req as any).body;
-  if (existingBody !== undefined) {
-    if (typeof existingBody === 'object' && existingBody !== null) {
-      return existingBody;
-    }
-    if (typeof existingBody === 'string') {
-      if (!existingBody.trim()) return {};
-      try {
-        return JSON.parse(existingBody);
-      } catch {
-        throw new Error('Format data JSON tidak valid.');
-      }
-    }
-    if (Buffer.isBuffer(existingBody)) {
-      const str = existingBody.toString('utf8');
-      if (!str.trim()) return {};
-      try {
-        return JSON.parse(str);
-      } catch {
-        throw new Error('Format data JSON tidak valid.');
-      }
-    }
-  }
-
-  return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        reject(new Error('Payload too large'));
-      }
-    });
-    req.on('end', () => {
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error('Format data JSON tidak valid.'));
-      }
-    });
-    req.on('error', reject);
-  });
-}
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   res.setHeader('Content-Type', 'application/json');

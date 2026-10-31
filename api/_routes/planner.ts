@@ -4,47 +4,12 @@ import crypto from 'node:crypto';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 import { parsePlannerDbRow, RawPlannerDbRow } from '../../src/products/hub/kalender/kalenderService';
 
 export { parsePlannerDbRow };
 export type { RawPlannerDbRow };
 
-async function parseJsonBody(req: IncomingMessage): Promise<any> {
-  if ((req as any).body) {
-    if (typeof (req as any).body === 'object') return (req as any).body;
-    try {
-      return JSON.parse((req as any).body);
-    } catch {
-      throw new Error('Format data JSON tidak valid.');
-    }
-  }
-
-  if (typeof req.on !== 'function') {
-    return {};
-  }
-
-  return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        reject(new Error('Payload too large'));
-      }
-    });
-    req.on('end', () => {
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error('Format data JSON tidak valid.'));
-      }
-    });
-    req.on('error', reject);
-  });
-}
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

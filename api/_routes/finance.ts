@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
+import { parseBody } from './auth/_utils/bodyParser';
 import type { SessionPayload } from './auth/_utils/types';
 import { resolveFinanceAccess, type FinanceAccess } from './financeAccess';
 import type { FinanceSnapshot, FinanceEntry } from '../../src/products/hub/keuangan/financeFoundation';
@@ -197,26 +198,6 @@ export async function readFinance(db: SupabaseClient, access: FinanceAccess, ses
   return snapshot;
 }
 
-async function parseBody(req: IncomingMessage): Promise<any> {
-  let body = (req as IncomingMessage & { body?: unknown }).body;
-  if (body !== undefined && body !== null) {
-    if (Buffer.byteLength(JSON.stringify(body)) > 65536) throw new Error('Ukuran payload melebihi batas 64KB.');
-    return body;
-  }
-  const chunks: Buffer[] = [];
-  let length = 0;
-  for await (const chunk of req) {
-    length += Buffer.byteLength(chunk);
-    if (length > 65536) throw new Error('Ukuran payload melebihi batas 64KB.');
-    chunks.push(Buffer.from(chunk));
-  }
-  if (!chunks.length) return {};
-  try {
-    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
-  } catch {
-    throw new Error('Format JSON tidak valid.');
-  }
-}
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   res.setHeader('Content-Type', 'application/json');

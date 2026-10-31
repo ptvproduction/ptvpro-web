@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 import { parseCookies } from './_utils/cookies';
 import { verifySessionToken } from './_utils/crypto';
+import { parseJsonBody } from './_utils/bodyParser';
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -36,26 +37,12 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   // 2. Parse request body
   let body: any;
-  if ((req as any).body !== undefined && typeof (req as any).body === 'object') {
-    body = (req as any).body;
-  } else {
-    let rawBody = '';
-    for await (const chunk of req) {
-      rawBody += chunk;
-      if (rawBody.length > 8192) {
-        res.statusCode = 413;
-        res.end(JSON.stringify({ error: 'Ukuran payload melebihi batas.' }));
-        return;
-      }
-    }
-
-    try {
-      body = JSON.parse(rawBody);
-    } catch {
-      res.statusCode = 400;
-      res.end(JSON.stringify({ error: 'Format JSON permintaan tidak valid.' }));
-      return;
-    }
+  try {
+    body = await parseJsonBody(req, { maxBytes: 8192 });
+  } catch (err: any) {
+    res.statusCode = err.statusCode || 400;
+    res.end(JSON.stringify({ error: err.message || 'Format JSON permintaan tidak valid.' }));
+    return;
   }
 
   const oldPassword = typeof body.old_password === 'string' ? body.old_password : '';

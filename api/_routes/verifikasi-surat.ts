@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createClient } from '@supabase/supabase-js';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 
 export const VALID_INSTANSI_LIST = [
   'PTV',
@@ -232,22 +233,12 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   // 2. POST: Catat identitas pemeriksa lalu kembalikan daftar santri
   if (req.method === 'POST') {
-    let rawBody = '';
-    for await (const chunk of req) {
-      rawBody += chunk;
-      if (rawBody.length > 32768) {
-        res.statusCode = 413;
-        res.end(JSON.stringify({ error: 'Payload terlalu besar.', code: 'payload_too_large' }));
-        return;
-      }
-    }
-
     let body: any;
     try {
-      body = JSON.parse(rawBody);
-    } catch {
-      res.statusCode = 400;
-      res.end(JSON.stringify({ error: 'Body JSON tidak valid.', code: 'invalid_json' }));
+      body = await parseJsonBody(req, { maxBytes: 32768 });
+    } catch (err: any) {
+      res.statusCode = err.statusCode || 400;
+      res.end(JSON.stringify({ error: err.message || 'Body JSON tidak valid.', code: err.code || 'invalid_json' }));
       return;
     }
 

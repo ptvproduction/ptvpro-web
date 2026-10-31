@@ -1,6 +1,7 @@
 ﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { safeRandomUuid } from '../../src/shared/utils/uuid';
 
@@ -137,26 +138,12 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
 
     let body: any;
-    if ((req as any).body !== undefined && typeof (req as any).body === 'object') {
-      body = (req as any).body;
-    } else {
-      let rawBody = '';
-      for await (const chunk of req) {
-        rawBody += chunk;
-        if (rawBody.length > 65536) {
-          res.statusCode = 413;
-          res.end(JSON.stringify({ error: 'Payload terlalu besar.', code: 'payload_too_large' }));
-          return;
-        }
-      }
-
-      try {
-        body = JSON.parse(rawBody);
-      } catch {
-        res.statusCode = 400;
-        res.end(JSON.stringify({ error: 'Body JSON tidak valid.', code: 'invalid_json' }));
-        return;
-      }
+    try {
+      body = await parseJsonBody(req, { maxBytes: 65536 });
+    } catch (err: any) {
+      res.statusCode = err.statusCode || 400;
+      res.end(JSON.stringify({ error: err.message || 'Body JSON tidak valid.', code: err.code || 'invalid_json' }));
+      return;
     }
 
     const effectivePtvId = sessionUser.ptv_id || sessionUser.username;

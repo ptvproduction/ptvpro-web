@@ -99,10 +99,38 @@ class CrewStore {
       this.notify();
       void this.init(true);
     });
-    void this.init();
+
+    useSessionStore.subscribe((state, prevState) => {
+      const prevUserId = prevState?.user?.id || prevState?.user?.ptv_id || null;
+      const currentUserId = state?.user?.id || state?.user?.ptv_id || null;
+
+      if (currentUserId && currentUserId !== prevUserId) {
+        void this.init(true);
+      } else if (!currentUserId && prevUserId) {
+        this.members = [];
+        this.loading = false;
+        this.error = null;
+        this.notify();
+      }
+    });
+
+    const { user, isLoading } = useSessionStore.getState();
+    if (!isLoading && user) {
+      void this.init();
+    }
   }
 
   public async init(forceRefresh = false) {
+    const { user, isLoading } = useSessionStore.getState();
+    if (isLoading || !user) {
+      this.loading = false;
+      if (!user) {
+        this.members = [];
+      }
+      this.notify();
+      return;
+    }
+
     const scope = ptvCache.getScopeToken();
     const requestId = ++this.requestId;
 

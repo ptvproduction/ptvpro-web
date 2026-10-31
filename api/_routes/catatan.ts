@@ -4,49 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 
-async function parseJsonBody(req: IncomingMessage): Promise<any> {
-  if ((req as any).body !== undefined && (req as any).body !== null) {
-    if (typeof (req as any).body === 'object') return (req as any).body;
-    try {
-      return JSON.parse((req as any).body);
-    } catch {
-      throw new Error('Format data JSON tidak valid.');
-    }
-  }
-
-  if (typeof req.on !== 'function' || (req as any).readableEnded) {
-    return {};
-  }
-
-  return new Promise((resolve, reject) => {
-    let body = '';
-    const timer = setTimeout(() => resolve({}), 4000);
-    req.on('data', (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        clearTimeout(timer);
-        reject(new Error('Payload too large'));
-      }
-    });
-    req.on('end', () => {
-      clearTimeout(timer);
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error('Format data JSON tidak valid.'));
-      }
-    });
-    req.on('error', (err) => {
-      clearTimeout(timer);
-      reject(err);
-    });
-  });
-}
 
 const COLOR_TO_KATEGORI: Record<string, string> = {
   orange: 'Penting & Prioritas',

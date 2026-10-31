@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 
 export interface RawPengumumanDbRow {
   id: string;
@@ -57,42 +58,6 @@ export function mapDbPengumumanToDTO(row: RawPengumumanDbRow): BroadcastAnnounce
   };
 }
 
-async function parseJsonBody(req: IncomingMessage): Promise<any> {
-  if ((req as any).body) {
-    if (typeof (req as any).body === 'object') return Promise.resolve((req as any).body);
-    try {
-      return Promise.resolve(JSON.parse((req as any).body));
-    } catch {
-      return Promise.reject(new Error('Format data JSON tidak valid.'));
-    }
-  }
-
-  if (typeof req.on !== 'function') {
-    return Promise.resolve({});
-  }
-
-  return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        reject(new Error('Payload melebihi batas ukuran 2MB.'));
-      }
-    });
-    req.on('end', () => {
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error('Format data JSON tidak valid.'));
-      }
-    });
-    req.on('error', reject);
-  });
-}
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   res.setHeader('Content-Type', 'application/json');

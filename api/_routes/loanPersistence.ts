@@ -1,6 +1,7 @@
 ﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { SessionPayload } from './auth/_utils/types';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 
 const operations: Record<string, { rpc: string; fields: string[] }> = {
   rpc_checkout_loan: { rpc: 'rpc_checkout_loan_server', fields: ['p_transaction_id', 'p_borrower_name', 'p_purpose', 'p_out_date', 'p_due_date', 'p_event_name', 'p_unit_ids'] },
@@ -21,16 +22,7 @@ export async function handleLoanWrite(req: IncomingMessage, res: ServerResponse,
       res.statusCode = 403; res.end(JSON.stringify({ error: 'Asal permintaan peminjaman tidak diizinkan.' })); return;
     }
     if (!req.headers['content-type']?.includes('application/json')) throw new Error('Permintaan harus berupa JSON.');
-    let body = (req as IncomingMessage & { body?: unknown }).body;
-    if (body === undefined) {
-      const chunks: Buffer[] = []; let length = 0;
-      for await (const chunk of req) {
-        length += Buffer.byteLength(chunk);
-        if (length > 65536) throw new Error('Permintaan peminjaman terlalu besar.');
-        chunks.push(Buffer.from(chunk));
-      }
-      body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
-    }
+    const body = await parseJsonBody(req, { maxBytes: 65536, strictObject: true });
     if (!body || typeof body !== 'object' || Array.isArray(body)) throw new Error('Permintaan tidak valid.');
     if (Buffer.byteLength(JSON.stringify(body)) > 65536) throw new Error('Permintaan peminjaman terlalu besar.');
     const { operation, args } = body as Record<string, unknown>;

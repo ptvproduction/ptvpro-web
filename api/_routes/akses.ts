@@ -1,6 +1,7 @@
 ﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { resolveLiveAccess } from './auth/_utils/liveAccess';
 import { accessChangeSchema, type AccessAccount } from '../../src/products/hub/akses/accessContract';
@@ -169,16 +170,11 @@ export default async function handler(req: IncomingMessage & { body?: unknown },
     }
 
     // === METHOD POST ===
-    let body: any = req.body;
-    if (body === undefined) {
-      const chunks: Buffer[] = [];
-      let size = 0;
-      for await (const chunk of req) {
-        size += Buffer.byteLength(chunk);
-        if (size > 65536) return send(413, { error: 'Payload terlalu besar.' });
-        chunks.push(Buffer.from(chunk));
-      }
-      body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    let body: any;
+    try {
+      body = await parseJsonBody(req, { maxBytes: 65536 });
+    } catch (err: any) {
+      return send(err.statusCode || 400, { error: err.message || 'Payload tidak valid.' });
     }
 
     const action = actionParam || body.action || '';

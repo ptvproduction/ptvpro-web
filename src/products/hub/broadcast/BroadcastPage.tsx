@@ -15,6 +15,7 @@ interface BroadcastPageProps {
 }
 
 export const BroadcastPage: React.FC<BroadcastPageProps> = ({ currentUser }) => {
+  const sessionLoading = useSessionStore((s) => s.isLoading);
   const sessionUser = useSessionStore((s) => s.user);
   const can = useSessionStore((s) => s.can);
   const user = currentUser !== undefined ? currentUser : sessionUser;
@@ -26,6 +27,11 @@ export const BroadcastPage: React.FC<BroadcastPageProps> = ({ currentUser }) => 
 
   // Live Staging fetch
   useEffect(() => {
+    if (sessionLoading || !user) {
+      setIsLoading(false);
+      return;
+    }
+
     let isMounted = true;
     const fetchAnnouncements = async () => {
       setIsLoading(true);
@@ -45,7 +51,7 @@ export const BroadcastPage: React.FC<BroadcastPageProps> = ({ currentUser }) => 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [sessionLoading, user]);
 
   // Modal states
   const [isCreateOpen, setIsCreateOpen] = useState(false);

@@ -1,5 +1,32 @@
 # ROADMAP UTAMA & KONSOLIDASI SISTEM PTVPRO / PTV HUB
 
+## PTV-DEV-259 | Backend Foundation Hardening: Centralized Body Parser & Frontend Session Readiness (31 Oktober 2026, zidnal / Antigravity)
+
+- **Status: SELESAI (100% COMPLETE & VERIFIED).** Mengatasi dua isu sistemik yang ditemukan pada audit `docs/audits/PTVPRO_BACKEND_FOUNDATION_R01.md`:
+- **1. Centralized Request Body Parser (`bodyParser.ts`):**
+  - Membuat satu modul `api/_routes/auth/_utils/bodyParser.ts` yang menangani semua skenario edge case:
+    * Body yang sudah diparsing oleh runtime serverless middleware (object, string, buffer).
+    * Stream yang sudah berakhir (`readableEnded` / `complete`) tanpa me-read stream yang hang.
+    * Request tanpa body (`GET` / `HEAD` / `content-length: 0`) mengembalikan `{}` seketika.
+    * Upfront & rolling payload limit enforcement (HTTP 413 `payload_too_large`).
+    * Format JSON tidak valid (HTTP 400 `invalid_json`).
+    * Fallback timeout terkontrol (5000ms) dengan jaminan penyelesaian tepat satu kali (`settled`).
+    * Penanganan abort client dan stream error secara bersih.
+    * Ekspor fungsi `parseJsonBody`, `readRawBody`, dan alias `parseBody`.
+  - Menggantikan 16 duplikasi parser lokal dan perulangan `for await` yang rentan blocking di: `catatan.ts`, `acara.ts`, `broadcast.ts`, `dokumen.ts`, `finance.ts`, `kontak.ts`, `kru.ts`, `planner.ts`, `portal.ts`, `akses.ts`, `auth/change-password.ts`, `portofolio.ts`, `verifikasi-surat.ts`, `inventaris.ts`, `loanPersistence.ts`, `reportPersistence.ts`.
+- **2. Frontend Session Readiness:**
+  - Menghentikan pemanggilan endpoint privat sebelum sesi kru selesai diverifikasi (`!isLoading && !!user`).
+  - Mengamankan singleton constructor `kruStore.ts` dan `broadcastStore.ts` agar tidak memicu fetch saat guest/belum login, serta mengikat inisialisasi/reset store ke subscription `useSessionStore`.
+  - Mengamankan `BroadcastPage.tsx` agar tidak memicu fetching saat `sessionLoading || !user`.
+  - Mengamankan `LiveBerandaService.executeAggregatedFetch` agar tidak menembak `/api/broadcast`, `/api/peminjaman`, dan `/api/dokumen?mode=my` saat user bernilai `null` (mengeliminasi banjir HTTP 401 palsu pada initial load).
+- **3. Quality Gates & Bukti Verifikasi:**
+  - `npm run typecheck`: PASS (0 errors).
+  - Unit test terarah `tests/api/bodyParser.test.ts`: PASS 100% (17/17 tests passing, 185ms).
+  - Bundling universal router `node scripts/bundle-api.cjs`: PASS (`api/index.js` tersinkronisasi).
+  - Production build `npm run build`: PASS (built in 18.61s, 0 errors).
+
+---
+
 ## PTV-DEV-247 | Final Mass Migration ID PTV (31 Oktober 2026, zidnal / Antigravity)
 
 - **Status: SELESAI (100% COMPLETE & LIVE CLOUD VERIFIED).** Penyelenggaraan migrasi massal seluruh ID PTV pada Supabase Staging `swadgljnyelsjstqqxbm` mengacu pada spreadsheet final:

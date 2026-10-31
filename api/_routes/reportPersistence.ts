@@ -1,6 +1,7 @@
 ﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { SessionPayload } from './auth/_utils/types';
+import { parseJsonBody } from './auth/_utils/bodyParser';
 
 export async function reportCanRead(client: SupabaseClient, session: SessionPayload, module: 'lostfound' | 'damage') {
   const { data, error } = await client.rpc('rpc_report_can_read', {
@@ -21,17 +22,7 @@ export async function handleReportWrite(req: IncomingMessage, res: ServerRespons
       return;
     }
     if (!req.headers['content-type']?.includes('application/json')) throw new Error('Format permintaan harus JSON.');
-    let body = (req as IncomingMessage & { body?: unknown }).body;
-    if (body === undefined) {
-      const chunks: Buffer[] = [];
-      let size = 0;
-      for await (const chunk of req) {
-        size += Buffer.byteLength(chunk);
-        if (size > 3100000) throw new Error('Ukuran laporan melebihi batas.');
-        chunks.push(Buffer.from(chunk));
-      }
-      body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
-    }
+    const body = await parseJsonBody(req, { maxBytes: 3100000, strictObject: true });
     if (!body || typeof body !== 'object') throw new Error('Permintaan laporan tidak valid.');
     if (Buffer.byteLength(JSON.stringify(body)) > 3100000) throw new Error('Ukuran laporan melebihi batas.');
     const { action, id, payload } = body as Record<string, unknown>;

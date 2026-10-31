@@ -1963,6 +1963,210 @@ init_cookies();
 init_crypto();
 init_identity();
 import { createClient as createClient3 } from "@supabase/supabase-js";
+
+// api/_routes/auth/_utils/bodyParser.ts
+var BodyParserError = class extends Error {
+  statusCode;
+  code;
+  constructor(message, statusCode = 400, code = "invalid_json") {
+    super(message);
+    this.name = "BodyParserError";
+    this.statusCode = statusCode;
+    this.code = code;
+  }
+};
+function formatBytes(bytes) {
+  if (bytes >= 1024 * 1024) {
+    const mb = bytes / (1024 * 1024);
+    return `${Number.isInteger(mb) ? mb : mb.toFixed(1)}MB`;
+  }
+  if (bytes >= 1024) {
+    const kb = bytes / 1024;
+    return `${Number.isInteger(kb) ? kb : kb.toFixed(1)}KB`;
+  }
+  return `${bytes} bytes`;
+}
+async function readRawBody(req, options) {
+  const maxBytes = options?.maxBytes ?? 2 * 1024 * 1024;
+  const timeoutMs = options?.timeoutMs ?? 5e3;
+  const method = req.method ? String(req.method).toUpperCase() : "";
+  if (method === "GET" || method === "HEAD") {
+    return Buffer.alloc(0);
+  }
+  const rawCl = req.headers?.["content-length"];
+  if (rawCl === "0") {
+    return Buffer.alloc(0);
+  }
+  const existingBody = req.body;
+  if (existingBody !== void 0 && existingBody !== null) {
+    if (Buffer.isBuffer(existingBody)) {
+      if (existingBody.length > maxBytes) {
+        throw new BodyParserError(`Ukuran payload melebihi batas ${formatBytes(maxBytes)}.`, 413, "payload_too_large");
+      }
+      return existingBody;
+    }
+    if (typeof existingBody === "string") {
+      const buf2 = Buffer.from(existingBody, "utf8");
+      if (buf2.length > maxBytes) {
+        throw new BodyParserError(`Ukuran payload melebihi batas ${formatBytes(maxBytes)}.`, 413, "payload_too_large");
+      }
+      return buf2;
+    }
+    const buf = Buffer.from(JSON.stringify(existingBody), "utf8");
+    if (buf.length > maxBytes) {
+      throw new BodyParserError(`Ukuran payload melebihi batas ${formatBytes(maxBytes)}.`, 413, "payload_too_large");
+    }
+    return buf;
+  }
+  const contentLength = Number(rawCl);
+  if (!Number.isNaN(contentLength) && contentLength > maxBytes) {
+    throw new BodyParserError(
+      `Ukuran payload melebihi batas ${formatBytes(maxBytes)}.`,
+      413,
+      "payload_too_large"
+    );
+  }
+  if (typeof req.on !== "function" || req.readableEnded || req.complete) {
+    return Buffer.alloc(0);
+  }
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let timer = null;
+    const chunks = [];
+    let receivedBytes = 0;
+    const cleanup = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      req.removeListener("data", onData);
+      req.removeListener("end", onEnd);
+      req.removeListener("error", onError);
+      req.removeListener("aborted", onAbort);
+    };
+    const settleResolve = (value) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(value);
+    };
+    const settleReject = (err) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(err);
+    };
+    timer = setTimeout(() => {
+      if (req.readableEnded || req.complete) {
+        settleResolve(Buffer.concat(chunks));
+      } else {
+        settleReject(new BodyParserError("Request timeout: pembacaan body stream melebihi batas waktu.", 408, "request_timeout"));
+      }
+    }, timeoutMs);
+    const onData = (chunk) => {
+      const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      receivedBytes += buf.length;
+      if (receivedBytes > maxBytes) {
+        settleReject(new BodyParserError(`Ukuran payload melebihi batas ${formatBytes(maxBytes)}.`, 413, "payload_too_large"));
+        return;
+      }
+      chunks.push(buf);
+    };
+    const onEnd = () => {
+      settleResolve(Buffer.concat(chunks));
+    };
+    const onError = (err) => {
+      settleReject(new BodyParserError(err?.message || "Gagal membaca data request.", 400, "stream_error"));
+    };
+    const onAbort = () => {
+      settleReject(new BodyParserError("Koneksi request diputus oleh client.", 400, "request_aborted"));
+    };
+    req.on("data", onData);
+    req.on("end", onEnd);
+    req.on("error", onError);
+    req.on("aborted", onAbort);
+  });
+}
+async function parseJsonBody(req, options) {
+  const maxBytes = options?.maxBytes ?? 2 * 1024 * 1024;
+  const method = req.method ? String(req.method).toUpperCase() : "";
+  if (method === "GET" || method === "HEAD") {
+    return {};
+  }
+  const rawCl = req.headers?.["content-length"];
+  if (rawCl === "0") {
+    return {};
+  }
+  const existingBody = req.body;
+  if (existingBody !== void 0 && existingBody !== null) {
+    if (typeof existingBody === "object" && !Buffer.isBuffer(existingBody)) {
+      if (options?.strictObject && (Array.isArray(existingBody) || existingBody === null)) {
+        throw new BodyParserError("Payload harus berupa objek JSON.", 400, "invalid_json");
+      }
+      const serialized = JSON.stringify(existingBody);
+      if (Buffer.byteLength(serialized, "utf8") > maxBytes) {
+        throw new BodyParserError(`Ukuran payload melebihi batas ${formatBytes(maxBytes)}.`, 413, "payload_too_large");
+      }
+      return existingBody;
+    }
+    if (typeof existingBody === "string") {
+      const trimmed = existingBody.trim();
+      if (!trimmed) {
+        return {};
+      }
+      if (Buffer.byteLength(existingBody, "utf8") > maxBytes) {
+        throw new BodyParserError(`Ukuran payload melebihi batas ${formatBytes(maxBytes)}.`, 413, "payload_too_large");
+      }
+      try {
+        const parsed = JSON.parse(existingBody);
+        if (options?.strictObject && (typeof parsed !== "object" || parsed === null || Array.isArray(parsed))) {
+          throw new BodyParserError("Payload harus berupa objek JSON.", 400, "invalid_json");
+        }
+        return parsed;
+      } catch (err) {
+        if (err instanceof BodyParserError) throw err;
+        throw new BodyParserError("Format data JSON tidak valid.", 400, "invalid_json");
+      }
+    }
+    if (Buffer.isBuffer(existingBody)) {
+      if (existingBody.length > maxBytes) {
+        throw new BodyParserError(`Ukuran payload melebihi batas ${formatBytes(maxBytes)}.`, 413, "payload_too_large");
+      }
+      const str = existingBody.toString("utf8").trim();
+      if (!str) {
+        return {};
+      }
+      try {
+        const parsed = JSON.parse(str);
+        if (options?.strictObject && (typeof parsed !== "object" || parsed === null || Array.isArray(parsed))) {
+          throw new BodyParserError("Payload harus berupa objek JSON.", 400, "invalid_json");
+        }
+        return parsed;
+      } catch (err) {
+        if (err instanceof BodyParserError) throw err;
+        throw new BodyParserError("Format data JSON tidak valid.", 400, "invalid_json");
+      }
+    }
+  }
+  const buf = await readRawBody(req, options);
+  const text2 = buf.toString("utf8").trim();
+  if (!text2) {
+    return {};
+  }
+  try {
+    const parsed = JSON.parse(text2);
+    if (options?.strictObject && (typeof parsed !== "object" || parsed === null || Array.isArray(parsed))) {
+      throw new BodyParserError("Payload harus berupa objek JSON.", 400, "invalid_json");
+    }
+    return parsed;
+  } catch (err) {
+    if (err instanceof BodyParserError) throw err;
+    throw new BodyParserError("Format data JSON tidak valid.", 400, "invalid_json");
+  }
+}
+var parseBody = parseJsonBody;
+
+// api/_routes/acara.ts
 function extractValidSqlTime(raw) {
   if (!raw) return null;
   const match = String(raw).match(/(\d{1,2})[:.](\d{2})(?:[:.](\d{2}))?/);
@@ -2130,52 +2334,6 @@ function sanitizeAcaraCrew(crewInput) {
     });
   }
   return sanitized;
-}
-async function parseJsonBody(req) {
-  const existingBody = req.body;
-  if (existingBody !== void 0) {
-    if (typeof existingBody === "object" && existingBody !== null) {
-      return existingBody;
-    }
-    if (typeof existingBody === "string") {
-      if (!existingBody.trim()) return {};
-      try {
-        return JSON.parse(existingBody);
-      } catch {
-        throw new Error("Format data JSON tidak valid.");
-      }
-    }
-    if (Buffer.isBuffer(existingBody)) {
-      const str = existingBody.toString("utf8");
-      if (!str.trim()) return {};
-      try {
-        return JSON.parse(str);
-      } catch {
-        throw new Error("Format data JSON tidak valid.");
-      }
-    }
-  }
-  return new Promise((resolve, reject) => {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        reject(new Error("Payload too large"));
-      }
-    });
-    req.on("end", () => {
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error("Format data JSON tidak valid."));
-      }
-    });
-    req.on("error", reject);
-  });
 }
 async function handler(req, res) {
   res.setHeader("Content-Type", "application/json");
@@ -2548,9 +2706,9 @@ ${finalNotes}`.trim();
 
 // api/_routes/akses.ts
 init_cookies();
+import { createClient as createClient4 } from "@supabase/supabase-js";
 init_crypto();
 init_liveAccess();
-import { createClient as createClient4 } from "@supabase/supabase-js";
 
 // src/products/hub/akses/accessContract.ts
 import { z } from "zod";
@@ -2698,16 +2856,11 @@ async function handler2(req, res) {
         isRoot: actor.profiles.includes("root_executive")
       });
     }
-    let body = req.body;
-    if (body === void 0) {
-      const chunks = [];
-      let size = 0;
-      for await (const chunk of req) {
-        size += Buffer.byteLength(chunk);
-        if (size > 65536) return send(413, { error: "Payload terlalu besar." });
-        chunks.push(Buffer.from(chunk));
-      }
-      body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+    let body;
+    try {
+      body = await parseJsonBody(req, { maxBytes: 65536 });
+    } catch (err) {
+      return send(err.statusCode || 400, { error: err.message || "Payload tidak valid." });
     }
     const action = actionParam || body.action || "";
     if (action === "save_position_mapping") {
@@ -2858,40 +3011,6 @@ function mapDbPengumumanToDTO(row) {
     berlaku_sampai: row.berlaku_sampai || null
   };
 }
-async function parseJsonBody2(req) {
-  if (req.body) {
-    if (typeof req.body === "object") return Promise.resolve(req.body);
-    try {
-      return Promise.resolve(JSON.parse(req.body));
-    } catch {
-      return Promise.reject(new Error("Format data JSON tidak valid."));
-    }
-  }
-  if (typeof req.on !== "function") {
-    return Promise.resolve({});
-  }
-  return new Promise((resolve, reject) => {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        reject(new Error("Payload melebihi batas ukuran 2MB."));
-      }
-    });
-    req.on("end", () => {
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error("Format data JSON tidak valid."));
-      }
-    });
-    req.on("error", reject);
-  });
-}
 async function handler3(req, res) {
   res.setHeader("Content-Type", "application/json");
   const method = req.method || "GET";
@@ -3024,7 +3143,7 @@ async function handler3(req, res) {
       return;
     }
     try {
-      const body = await parseJsonBody2(req);
+      const body = await parseJsonBody(req);
       const action = body.action || urlObj.searchParams.get("action") || (method === "DELETE" ? "delete" : "create");
       const actorName = session.full_name || session.username || "Redaksi PTV";
       const now = (/* @__PURE__ */ new Date()).toISOString();
@@ -3180,46 +3299,6 @@ init_crypto();
 init_identity();
 import crypto3 from "node:crypto";
 import { createClient as createClient6 } from "@supabase/supabase-js";
-async function parseJsonBody3(req) {
-  if (req.body !== void 0 && req.body !== null) {
-    if (typeof req.body === "object") return req.body;
-    try {
-      return JSON.parse(req.body);
-    } catch {
-      throw new Error("Format data JSON tidak valid.");
-    }
-  }
-  if (typeof req.on !== "function" || req.readableEnded) {
-    return {};
-  }
-  return new Promise((resolve, reject) => {
-    let body = "";
-    const timer = setTimeout(() => resolve({}), 4e3);
-    req.on("data", (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        clearTimeout(timer);
-        reject(new Error("Payload too large"));
-      }
-    });
-    req.on("end", () => {
-      clearTimeout(timer);
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error("Format data JSON tidak valid."));
-      }
-    });
-    req.on("error", (err) => {
-      clearTimeout(timer);
-      reject(err);
-    });
-  });
-}
 var COLOR_TO_KATEGORI = {
   orange: "Penting & Prioritas",
   yellow: "Ide & Rencana",
@@ -3359,7 +3438,7 @@ async function handler4(req, res) {
       return;
     }
     if (method === "POST") {
-      const payload2 = await parseJsonBody3(req);
+      const payload2 = await parseJsonBody(req);
       const judul = String(payload2.judul || "").trim();
       let rawIsi = String(payload2.isi || "").trim();
       if (!judul) {
@@ -3434,7 +3513,7 @@ ${rawIsi}`;
       const urlObj = new URL(req.url || "", "http://localhost");
       noteId2 = urlObj.searchParams.get("id") || "";
       if (!noteId2) {
-        const payload2 = await parseJsonBody3(req);
+        const payload2 = await parseJsonBody(req);
         noteId2 = String(payload2.id || "").trim();
       }
       if (!noteId2) {
@@ -3479,7 +3558,7 @@ ${rawIsi}`;
       );
       return;
     }
-    const payload = await parseJsonBody3(req);
+    const payload = await parseJsonBody(req);
     const noteId = String(payload.id || "").trim();
     if (!noteId) {
       res.statusCode = 400;
@@ -3568,11 +3647,11 @@ ${nextIsi}`;
 }
 
 // api/_routes/dokumen.ts
+import { randomUUID as randomUUID3 } from "node:crypto";
+import { createClient as createClient7 } from "@supabase/supabase-js";
 init_cookies();
 init_crypto();
 init_identity();
-import { randomUUID as randomUUID3 } from "node:crypto";
-import { createClient as createClient7 } from "@supabase/supabase-js";
 
 // src/products/hub/dokumen-saya/utils/documentOwnership.ts
 function filterUserDocuments(docs, user) {
@@ -3764,29 +3843,7 @@ function calculateNextLetterNumber(existingDocs, typeParam, dateParam) {
 function calculateNextNomorSurat(allDocs, typeParam, dateParam) {
   return calculateNextLetterNumber(allDocs, typeParam, dateParam);
 }
-function parseJsonRequestBody(req) {
-  if (req.body !== void 0 && typeof req.body === "object") {
-    return Promise.resolve(req.body);
-  }
-  return new Promise((resolve, reject) => {
-    let raw = "";
-    req.on("data", (chunk) => {
-      raw += chunk;
-      if (raw.length > 2 * 1024 * 1024) {
-        reject(new Error("Ukuran payload request melebihi batas 2MB."));
-      }
-    });
-    req.on("end", () => {
-      if (!raw || !raw.trim()) return resolve({});
-      try {
-        resolve(JSON.parse(raw));
-      } catch (e) {
-        reject(new Error(`Format JSON body tidak valid: ${e.message}`));
-      }
-    });
-    req.on("error", (err) => reject(err));
-  });
-}
+var parseJsonRequestBody = (req) => parseJsonBody(req);
 function mapDbStatusToDocStatus(statusRaw) {
   const s = (statusRaw || "").toLowerCase().trim();
   if (["diarsipkan", "archived"].includes(s)) return "Diarsipkan";
@@ -5602,26 +5659,6 @@ async function readFinance(db, access, session) {
   }
   return snapshot;
 }
-async function parseBody(req) {
-  let body = req.body;
-  if (body !== void 0 && body !== null) {
-    if (Buffer.byteLength(JSON.stringify(body)) > 65536) throw new Error("Ukuran payload melebihi batas 64KB.");
-    return body;
-  }
-  const chunks = [];
-  let length = 0;
-  for await (const chunk of req) {
-    length += Buffer.byteLength(chunk);
-    if (length > 65536) throw new Error("Ukuran payload melebihi batas 64KB.");
-    chunks.push(Buffer.from(chunk));
-  }
-  if (!chunks.length) return {};
-  try {
-    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
-  } catch {
-    throw new Error("Format JSON tidak valid.");
-  }
-}
 async function handler6(req, res) {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Cache-Control", "no-store");
@@ -6051,11 +6088,11 @@ async function handler6(req, res) {
 
 // api/_routes/inventaris.ts
 init_cookies();
+import { createHmac as createHmac3, randomUUID as randomUUID4 } from "node:crypto";
+import { z as z3 } from "zod";
 init_crypto();
 init_portalLifecycle();
 init_liveAccess();
-import { createHmac as createHmac3, randomUUID as randomUUID4 } from "node:crypto";
-import { z as z3 } from "zod";
 var uuid2 = z3.string().uuid();
 var text = z3.string().trim().max(5e3);
 var optionalText = text.nullish();
@@ -6151,21 +6188,14 @@ var InventoryError = class extends Error {
   }
 };
 async function readBody(req, limit) {
-  if (Number(req.headers["content-length"]) > limit) throw new InventoryError(413, "Ukuran permintaan melebihi batas.");
-  if (req.body !== void 0) {
-    const data = Buffer.isBuffer(req.body) ? req.body : Buffer.from(typeof req.body === "string" ? req.body : JSON.stringify(req.body));
-    if (data.length > limit) throw new InventoryError(413, "Ukuran permintaan melebihi batas.");
-    return data;
+  try {
+    return await readRawBody(req, { maxBytes: limit });
+  } catch (err) {
+    if (err instanceof BodyParserError) {
+      throw new InventoryError(err.statusCode, err.message, err.code);
+    }
+    throw new InventoryError(400, err?.message || "Gagal membaca payload.");
   }
-  const chunks = [];
-  let length = 0;
-  for await (const chunk of req) {
-    const data = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-    length += data.length;
-    if (length > limit) throw new InventoryError(413, "Ukuran permintaan melebihi batas.");
-    chunks.push(data);
-  }
-  return Buffer.concat(chunks);
 }
 async function handler7(req, res) {
   const send = (status, body) => {
@@ -6429,36 +6459,10 @@ function classifyInternalContact(c) {
 
 // api/_routes/kontak.ts
 var KNOWN_TEST_RECORD_PTV_IDS = /* @__PURE__ */ new Set(["PTV-UJI-2712"]);
-async function parseJsonBody4(req) {
-  if (req.body !== void 0 && typeof req.body === "object") {
-    return req.body;
-  }
-  return new Promise((resolve, reject) => {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        reject(new Error("Payload terlalu besar (maksimal 2MB)."));
-      }
-    });
-    req.on("end", () => {
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error("Format data JSON tidak valid."));
-      }
-    });
-    req.on("error", reject);
-  });
-}
 async function handler8(req, res) {
   res.setHeader("Content-Type", "application/json");
   const method = (req.method || "GET").toUpperCase();
-  const bodyPromise = ["POST", "PUT", "PATCH"].includes(method) ? parseJsonBody4(req) : Promise.resolve({});
+  const bodyPromise = ["POST", "PUT", "PATCH"].includes(method) ? parseJsonBody(req) : Promise.resolve({});
   if (!["GET", "POST", "PUT", "PATCH", "DELETE"].includes(method)) {
     res.statusCode = 405;
     res.end(
@@ -6889,7 +6893,7 @@ async function handler8(req, res) {
       const urlTargetId = urlObj.searchParams.get("id");
       let targetId = (urlTargetId || "").trim();
       if (!targetId) {
-        const payload = await parseJsonBody4(req).catch(() => ({}));
+        const payload = await parseJsonBody(req).catch(() => ({}));
         targetId = (payload.id || "").trim();
       }
       if (!targetId) {
@@ -7068,35 +7072,6 @@ function normalizePersonnelAliases(value) {
   if (payload.status_kru === "aktif") payload.status_kru = "Aktif";
   if (payload.status_kru === "nonaktif") payload.status_kru = "Nonaktif";
   return payload;
-}
-async function parseJsonBody5(req) {
-  const parsed = req.body;
-  if (parsed !== void 0) {
-    const value = typeof parsed === "string" ? JSON.parse(parsed) : parsed;
-    if (!value || Array.isArray(value) || typeof value !== "object") throw new Error("Payload personel tidak valid.");
-    return value;
-  }
-  return new Promise((resolve, reject) => {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        reject(new Error("Payload terlalu besar (maksimal 2MB)."));
-      }
-    });
-    req.on("end", () => {
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error("Format data JSON tidak valid."));
-      }
-    });
-    req.on("error", reject);
-  });
 }
 async function handler9(req, res) {
   res.setHeader("Content-Type", "application/json");
@@ -7296,7 +7271,7 @@ async function handler9(req, res) {
       return;
     }
     if (method === "POST") {
-      const payload = normalizePersonnelAliases(await parseJsonBody5(req));
+      const payload = normalizePersonnelAliases(await parseJsonBody(req));
       const sensitive = ["username", "role", "status_akun", "assigned_profiles", "allowed_overrides", "denied_overrides", "password", "oauth_uid", "oauth_email", "oauth_provider", "auth_user_id", "canonical_identity_id", "metadata_json"];
       if (sensitive.some((key) => Object.prototype.hasOwnProperty.call(payload, key))) {
         res.statusCode = 403;
@@ -7430,7 +7405,7 @@ async function handler9(req, res) {
     if (method === "PATCH" || method === "PUT") {
       const urlObj = new URL(req.url || "", "http://localhost");
       const action = urlObj.searchParams.get("action") || "";
-      const rawBody = await parseJsonBody5(req);
+      const rawBody = await parseJsonBody(req);
       if (action === "toggle_account" || rawBody.action === "toggle_account") {
         if (!access.can("crew.status.manage")) {
           res.statusCode = 403;
@@ -8036,17 +8011,7 @@ async function handleReportWrite(req, res, client, session, module) {
       return;
     }
     if (!req.headers["content-type"]?.includes("application/json")) throw new Error("Format permintaan harus JSON.");
-    let body = req.body;
-    if (body === void 0) {
-      const chunks = [];
-      let size = 0;
-      for await (const chunk of req) {
-        size += Buffer.byteLength(chunk);
-        if (size > 31e5) throw new Error("Ukuran laporan melebihi batas.");
-        chunks.push(Buffer.from(chunk));
-      }
-      body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-    }
+    const body = await parseJsonBody(req, { maxBytes: 31e5, strictObject: true });
     if (!body || typeof body !== "object") throw new Error("Permintaan laporan tidak valid.");
     if (Buffer.byteLength(JSON.stringify(body)) > 31e5) throw new Error("Ukuran laporan melebihi batas.");
     const { action, id, payload } = body;
@@ -8493,17 +8458,7 @@ async function handleLoanWrite(req, res, client, session) {
       return;
     }
     if (!req.headers["content-type"]?.includes("application/json")) throw new Error("Permintaan harus berupa JSON.");
-    let body = req.body;
-    if (body === void 0) {
-      const chunks = [];
-      let length = 0;
-      for await (const chunk of req) {
-        length += Buffer.byteLength(chunk);
-        if (length > 65536) throw new Error("Permintaan peminjaman terlalu besar.");
-        chunks.push(Buffer.from(chunk));
-      }
-      body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-    }
+    const body = await parseJsonBody(req, { maxBytes: 65536, strictObject: true });
     if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("Permintaan tidak valid.");
     if (Buffer.byteLength(JSON.stringify(body)) > 65536) throw new Error("Permintaan peminjaman terlalu besar.");
     const { operation, args } = body;
@@ -9051,40 +9006,6 @@ var KalenderService = class {
 var kalenderService = new KalenderService();
 
 // api/_routes/planner.ts
-async function parseJsonBody6(req) {
-  if (req.body) {
-    if (typeof req.body === "object") return req.body;
-    try {
-      return JSON.parse(req.body);
-    } catch {
-      throw new Error("Format data JSON tidak valid.");
-    }
-  }
-  if (typeof req.on !== "function") {
-    return {};
-  }
-  return new Promise((resolve, reject) => {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        reject(new Error("Payload too large"));
-      }
-    });
-    req.on("end", () => {
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error("Format data JSON tidak valid."));
-      }
-    });
-    req.on("error", reject);
-  });
-}
 var UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 async function handler13(req, res) {
   res.setHeader("Content-Type", "application/json");
@@ -9192,7 +9113,7 @@ async function handler13(req, res) {
     }
     let body = {};
     try {
-      body = await parseJsonBody6(req);
+      body = await parseJsonBody(req);
     } catch (parseErr) {
       res.statusCode = 400;
       res.end(JSON.stringify({ error: parseErr.message || "Format JSON tidak valid." }));
@@ -9373,40 +9294,6 @@ init_crypto();
 init_identity();
 import { randomUUID as randomUUID5 } from "node:crypto";
 import { createClient as createClient15 } from "@supabase/supabase-js";
-function parseJsonBody7(req) {
-  if (req.body) {
-    if (typeof req.body === "object") return Promise.resolve(req.body);
-    try {
-      return Promise.resolve(JSON.parse(req.body));
-    } catch {
-      return Promise.reject(new Error("Format data JSON tidak valid."));
-    }
-  }
-  if (typeof req.on !== "function") {
-    return Promise.resolve({});
-  }
-  return new Promise((resolve, reject) => {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
-        reject(new Error("Payload melebihi batas ukuran 2MB."));
-      }
-    });
-    req.on("end", () => {
-      if (!body.trim()) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch {
-        reject(new Error("Format data JSON tidak valid."));
-      }
-    });
-    req.on("error", reject);
-  });
-}
 var PORTAL_SERVER_TIMEOUT_MS = 8e3;
 function getSupabase(signal) {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
@@ -9681,7 +9568,7 @@ async function handlePortal(req, res, signal) {
       return;
     }
     try {
-      const body = await parseJsonBody7(req);
+      const body = await parseJsonBody(req);
       const action = body.action || urlObj.searchParams.get("action");
       const actorName = session?.full_name || session?.username || "Operator Hub";
       const actorId = session?.account_id || "system";
@@ -10152,8 +10039,8 @@ async function handlePortal(req, res, signal) {
 
 // api/_routes/portofolio.ts
 init_cookies();
-init_crypto();
 import { createClient as createClient16 } from "@supabase/supabase-js";
+init_crypto();
 async function handler15(req, res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
@@ -10222,25 +10109,12 @@ async function handler15(req, res) {
       return;
     }
     let body;
-    if (req.body !== void 0 && typeof req.body === "object") {
-      body = req.body;
-    } else {
-      let rawBody = "";
-      for await (const chunk of req) {
-        rawBody += chunk;
-        if (rawBody.length > 65536) {
-          res.statusCode = 413;
-          res.end(JSON.stringify({ error: "Payload terlalu besar.", code: "payload_too_large" }));
-          return;
-        }
-      }
-      try {
-        body = JSON.parse(rawBody);
-      } catch {
-        res.statusCode = 400;
-        res.end(JSON.stringify({ error: "Body JSON tidak valid.", code: "invalid_json" }));
-        return;
-      }
+    try {
+      body = await parseJsonBody(req, { maxBytes: 65536 });
+    } catch (err) {
+      res.statusCode = err.statusCode || 400;
+      res.end(JSON.stringify({ error: err.message || "Body JSON tidak valid.", code: err.code || "invalid_json" }));
+      return;
     }
     const effectivePtvId = sessionUser.ptv_id || sessionUser.username;
     if (!effectivePtvId) {
@@ -10647,21 +10521,12 @@ async function handler17(req, res) {
     }
   }
   if (req.method === "POST") {
-    let rawBody = "";
-    for await (const chunk of req) {
-      rawBody += chunk;
-      if (rawBody.length > 32768) {
-        res.statusCode = 413;
-        res.end(JSON.stringify({ error: "Payload terlalu besar.", code: "payload_too_large" }));
-        return;
-      }
-    }
     let body;
     try {
-      body = JSON.parse(rawBody);
-    } catch {
-      res.statusCode = 400;
-      res.end(JSON.stringify({ error: "Body JSON tidak valid.", code: "invalid_json" }));
+      body = await parseJsonBody(req, { maxBytes: 32768 });
+    } catch (err) {
+      res.statusCode = err.statusCode || 400;
+      res.end(JSON.stringify({ error: err.message || "Body JSON tidak valid.", code: err.code || "invalid_json" }));
       return;
     }
     const nomorSurat = String(body.nomor_surat || "").trim();
@@ -10987,25 +10852,12 @@ async function handler19(req, res) {
     return;
   }
   let body;
-  if (req.body !== void 0 && typeof req.body === "object") {
-    body = req.body;
-  } else {
-    let rawBody = "";
-    for await (const chunk of req) {
-      rawBody += chunk;
-      if (rawBody.length > 8192) {
-        res.statusCode = 413;
-        res.end(JSON.stringify({ error: "Ukuran payload melebihi batas." }));
-        return;
-      }
-    }
-    try {
-      body = JSON.parse(rawBody);
-    } catch {
-      res.statusCode = 400;
-      res.end(JSON.stringify({ error: "Format JSON permintaan tidak valid." }));
-      return;
-    }
+  try {
+    body = await parseJsonBody(req, { maxBytes: 8192 });
+  } catch (err) {
+    res.statusCode = err.statusCode || 400;
+    res.end(JSON.stringify({ error: err.message || "Format JSON permintaan tidak valid." }));
+    return;
   }
   const oldPassword = typeof body.old_password === "string" ? body.old_password : "";
   const newPassword = typeof body.new_password === "string" ? body.new_password : "";
@@ -11098,7 +10950,7 @@ var LoginInputError = class extends Error {
     this.statusCode = statusCode;
   }
 };
-async function parseJsonBody8(req) {
+async function parseJsonBody2(req) {
   const limit = 4096;
   let value = req.body;
   if (value === void 0) {
@@ -11156,7 +11008,7 @@ async function handler20(req, res) {
     return;
   }
   try {
-    const body = await parseJsonBody8(req);
+    const body = await parseJsonBody2(req);
     const identifier = typeof body?.identifier === "string" ? body.identifier.trim() : "";
     const password = typeof body?.password === "string" ? body.password : "";
     if (!identifier || identifier.length > 254 || !password || Buffer.byteLength(password, "utf8") > 72 || password.length < 4) {

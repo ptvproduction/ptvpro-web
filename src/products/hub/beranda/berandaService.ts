@@ -49,6 +49,21 @@ export class LiveBerandaService implements IBerandaService {
   private async executeAggregatedFetch(user?: AuthUser | null): Promise<BerandaAggregatedData> {
     const { todayIso, tomorrowIso } = getWibCurrentInfo();
 
+    if (!user) {
+      return {
+        events: [],
+        announcements: broadcastStore.getAnnouncements(),
+        myLoans: [],
+        docStats: { total: 0, izin: 0, tugas: 0, barang: 0, disetujui: 0, menunggu: 0, revisi: 0, ditolak: 0 },
+        summary: {
+          activeCrewCount: 0,
+          ongoingEventsCount: 0,
+          activeLoansCount: 0,
+          upcomingAgenda: [],
+        },
+      };
+    }
+
     // 1. Parallel fetch from all authentic services with individual fail-safes
     const [eventsRes, announcementsRes, loansRes, docsRes] = await Promise.allSettled([
       acaraService.getEvents(),
