@@ -1217,9 +1217,37 @@ var init_positionMapping = __esm({
 var liveAccess_exports = {};
 __export(liveAccess_exports, {
   LiveAccessUnavailableError: () => LiveAccessUnavailableError,
+  clearLiveAccessCache: () => clearLiveAccessCache,
   resolveLiveAccess: () => resolveLiveAccess
 });
+function clearLiveAccessCache(accountId) {
+  if (accountId) {
+    for (const key of LIVE_ACCESS_MEMO_CACHE.keys()) {
+      if (key.startsWith(accountId + ":")) {
+        LIVE_ACCESS_MEMO_CACHE.delete(key);
+      }
+    }
+  } else {
+    LIVE_ACCESS_MEMO_CACHE.clear();
+  }
+}
 async function resolveLiveAccess(db, session, options = {}) {
+  const cacheKey = `${session.account_id}:${session.iat}`;
+  const now = Date.now();
+  if (!options.issuingSession) {
+    const cached = LIVE_ACCESS_MEMO_CACHE.get(cacheKey);
+    if (cached && now - cached.cachedAt < LIVE_ACCESS_MEMO_TTL_MS) {
+      return cached.data;
+    }
+  }
+  const live = await internalResolveLiveAccess(db, session, options);
+  LIVE_ACCESS_MEMO_CACHE.set(cacheKey, {
+    data: live,
+    cachedAt: now
+  });
+  return live;
+}
+async function internalResolveLiveAccess(db, session, options = {}) {
   if (sessionNeedsRegistry(session) && !options.issuingSession) {
     try {
       if (!await portalSessionValid(db, session)) throw new Error("forbidden");
@@ -1279,7 +1307,7 @@ async function resolveLiveAccess(db, session, options = {}) {
     can: (cap) => hasCapability(context, cap)
   };
 }
-var LiveAccessUnavailableError;
+var LiveAccessUnavailableError, LIVE_ACCESS_MEMO_CACHE, LIVE_ACCESS_MEMO_TTL_MS;
 var init_liveAccess = __esm({
   "api/_routes/auth/_utils/liveAccess.ts"() {
     "use strict";
@@ -1292,6 +1320,8 @@ var init_liveAccess = __esm({
         this.name = "LiveAccessUnavailableError";
       }
     };
+    LIVE_ACCESS_MEMO_CACHE = /* @__PURE__ */ new Map();
+    LIVE_ACCESS_MEMO_TTL_MS = 2e4;
   }
 });
 
@@ -2900,6 +2930,7 @@ async function handler(req, res) {
       if (!body.mappings || typeof body.mappings !== "object") {
         return send(400, { error: "Format data mapping jabatan tidak valid." });
       }
+      clearLiveAccessCache();
       await savePositionCapabilityMappings(db, body.mappings, session.account_id);
       await db.from("auth_audit_log").insert([{
         actor_id: actor.identity.id,
@@ -4072,7 +4103,8 @@ async function handler2(req, res) {
         return;
       }
       supabase = createClient7(supabaseUrl, serviceRoleKey, {
-        auth: { persistSession: false, autoRefreshToken: false }
+        auth: { persistSession: false, autoRefreshToken: false },
+        global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(1e4) }) }
       });
       try {
         const [resIzin, resTugas, resBarang, resReg, resLogsQuery] = await Promise.all([
@@ -7355,6 +7387,7 @@ async function handler5(req, res) {
         return;
       }
       const createdMember = mapLegacyKruRowToCrewMember(createdRow);
+      clearLiveAccessCache();
       res.statusCode = 201;
       res.end(
         JSON.stringify({
@@ -8093,7 +8126,10 @@ async function handler6(req, res) {
     res.end(JSON.stringify({ error: "Endpoint laporan hanya tersedia pada Staging." }));
     return;
   }
-  const supabase = createClient11(supabaseUrl, serviceRoleKey);
+  const supabase = createClient11(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(1e4) }) }
+  });
   const accountActive = await verifyAccountStatusLive(session.account_id, session.iat, session);
   if (!accountActive) {
     res.statusCode = 403;
@@ -8310,7 +8346,10 @@ async function handler7(req, res) {
     res.end(JSON.stringify({ error: "Endpoint laporan hanya tersedia pada Staging." }));
     return;
   }
-  const supabase = createClient12(supabaseUrl, serviceRoleKey);
+  const supabase = createClient12(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(1e4) }) }
+  });
   const accountActive = await verifyAccountStatusLive(session.account_id, session.iat, session);
   if (!accountActive) {
     res.statusCode = 403;
@@ -8542,7 +8581,10 @@ async function handler8(req, res) {
     res.end(JSON.stringify({ error: "Endpoint peminjaman dibatasi pada Staging." }));
     return;
   }
-  const supabase = createClient13(supabaseUrl, serviceRoleKey);
+  const supabase = createClient13(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(1e4) }) }
+  });
   const accountActive = await verifyAccountStatusLive(session.account_id, session.iat, session);
   if (!accountActive) {
     res.statusCode = 403;
@@ -9987,7 +10029,10 @@ async function handler10(req, res) {
     res.end(JSON.stringify({ error: "Database portofolio belum tersedia.", code: "service_unavailable" }));
     return;
   }
-  const supabase = createClient16(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  const supabase = createClient16(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(1e4) }) }
+  });
   const cookies = parseCookies(req.headers.cookie);
   const sessionToken = cookies["ptv_hub_session"];
   const authSecret = process.env.AUTH_SECRET || "";

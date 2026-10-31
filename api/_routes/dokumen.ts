@@ -359,6 +359,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
     supabase = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false, autoRefreshToken: false },
+      global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(10000) }) },
     });
 
     try {

@@ -112,7 +112,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     res.end(JSON.stringify({ error: 'Endpoint peminjaman dibatasi pada Staging.' }));
     return;
   }
-  const supabase = createClient(supabaseUrl, serviceRoleKey);
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(10000) }) },
+  });
 
   const accountActive = await verifyAccountStatusLive(session.account_id, session.iat, session);
   if (!accountActive) {

@@ -8,7 +8,51 @@ export class LiveAccessUnavailableError extends Error {
   constructor() { super('forbidden'); this.name = 'LiveAccessUnavailableError'; }
 }
 
-export async function resolveLiveAccess(db: SupabaseClient, session: Pick<SessionPayload, 'account_id' | 'iat'> & Partial<SessionPayload>, options: { issuingSession?: boolean } = {}) {
+
+interface CachedLiveAccess {
+  data: Awaited<ReturnType<typeof internalResolveLiveAccess>>;
+  cachedAt: number;
+}
+
+const LIVE_ACCESS_MEMO_CACHE = new Map<string, CachedLiveAccess>();
+const LIVE_ACCESS_MEMO_TTL_MS = 20000; // 20 detik in-memory memoization per serverless worker
+
+export function clearLiveAccessCache(accountId?: string): void {
+  if (accountId) {
+    for (const key of LIVE_ACCESS_MEMO_CACHE.keys()) {
+      if (key.startsWith(accountId + ':')) {
+        LIVE_ACCESS_MEMO_CACHE.delete(key);
+      }
+    }
+  } else {
+    LIVE_ACCESS_MEMO_CACHE.clear();
+  }
+}
+
+export async function resolveLiveAccess(
+  db: SupabaseClient,
+  session: Pick<SessionPayload, 'account_id' | 'iat'> & Partial<SessionPayload>,
+  options: { issuingSession?: boolean } = {}
+) {
+  const cacheKey = `${session.account_id}:${session.iat}`;
+  const now = Date.now();
+
+  if (!options.issuingSession) {
+    const cached = LIVE_ACCESS_MEMO_CACHE.get(cacheKey);
+    if (cached && now - cached.cachedAt < LIVE_ACCESS_MEMO_TTL_MS) {
+      return cached.data;
+    }
+  }
+
+  const live = await internalResolveLiveAccess(db, session, options);
+  LIVE_ACCESS_MEMO_CACHE.set(cacheKey, {
+    data: live,
+    cachedAt: now,
+  });
+  return live;
+}
+
+async function internalResolveLiveAccess(db: SupabaseClient, session: Pick<SessionPayload, 'account_id' | 'iat'> & Partial<SessionPayload>, options: { issuingSession?: boolean } = {}) {
   if (sessionNeedsRegistry(session) && !options.issuingSession) {
     try { if (!await portalSessionValid(db, session as SessionPayload)) throw new Error('forbidden'); }
     catch (error) { if (error instanceof Error && error.message === 'forbidden') throw error; throw new LiveAccessUnavailableError(); }

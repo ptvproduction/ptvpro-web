@@ -56,7 +56,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return;
   }
 
-  const supabase = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  const supabase = createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(10000) }) },
+  });
 
   // Optional Session Parsing
   const cookies = parseCookies(req.headers.cookie);

@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
 import { parseJsonBody } from './auth/_utils/bodyParser';
 import { verifySessionToken } from './auth/_utils/crypto';
-import { resolveLiveAccess } from './auth/_utils/liveAccess';
+import { resolveLiveAccess, clearLiveAccessCache } from './auth/_utils/liveAccess';
 import { accessChangeSchema, type AccessAccount } from '../../src/products/hub/akses/accessContract';
 import { getPositionCapabilityMappings, savePositionCapabilityMappings, formatPositionMappingsAsArray } from './positionMapping';
 import { hash } from 'bcryptjs';
@@ -184,6 +184,7 @@ export default async function handler(req: IncomingMessage & { body?: unknown },
       if (!body.mappings || typeof body.mappings !== 'object') {
         return send(400, { error: 'Format data mapping jabatan tidak valid.' });
       }
+      clearLiveAccessCache();
       await savePositionCapabilityMappings(db, body.mappings, session.account_id);
       await db.from('auth_audit_log').insert([{
         actor_id: actor.identity.id,

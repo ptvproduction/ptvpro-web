@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { hash } from 'bcryptjs';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
-import { resolveLiveAccess } from './auth/_utils/liveAccess';
+import { resolveLiveAccess, clearLiveAccessCache } from './auth/_utils/liveAccess';
 import { parseJsonBody } from './auth/_utils/bodyParser';
 import { isOperationalCrew, CANONICAL_OPERATIONAL_DIVISIONS } from '../../src/products/hub/kru/types';
 import type { CrewMember, CrewRole } from '../../src/products/hub/kru/types';
@@ -411,6 +411,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       }
 
       const createdMember = mapLegacyKruRowToCrewMember(createdRow);
+      clearLiveAccessCache();
       res.statusCode = 201;
       res.end(
         JSON.stringify({
