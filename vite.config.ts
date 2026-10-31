@@ -43,7 +43,7 @@ function vercelApiDevPlugin(mode: string): Plugin {
           if (fs.existsSync(targetTsFile)) {
             handlerModule = await server.ssrLoadModule(`/api/_routes/${subpath}.ts`);
           } else {
-            handlerModule = await server.ssrLoadModule('/api/index.ts');
+            handlerModule = await server.ssrLoadModule('/api/_router.ts');
           }
 
           if (handlerModule && typeof handlerModule.default === 'function') {

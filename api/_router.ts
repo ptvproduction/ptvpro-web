@@ -3,36 +3,60 @@
 // to stay strictly within the Vercel Hobby 12-function cap while preserving 100%
 // of route contracts, auth, and backend capabilities.
 
+import acaraHandler from './_routes/acara';
+import aksesHandler from './_routes/akses';
+import broadcastHandler from './_routes/broadcast';
+import catatanHandler from './_routes/catatan';
+import dokumenHandler from './_routes/dokumen';
+import financeHandler from './_routes/finance';
+import inventarisHandler from './_routes/inventaris';
+import kontakHandler from './_routes/kontak';
+import kruHandler from './_routes/kru';
+import laporKerusakanHandler from './_routes/lapor-kerusakan';
+import lostFoundHandler from './_routes/lost-found';
+import peminjamanHandler from './_routes/peminjaman';
+import plannerHandler from './_routes/planner';
+import portalHandler from './_routes/portal';
+import portofolioHandler from './_routes/portofolio';
+import uploadAvatarHandler from './_routes/upload-avatar';
+import verifikasiSuratHandler from './_routes/verifikasi-surat';
+import changePasswordHandler from './_routes/auth/change-password';
+import loginHandler from './_routes/auth/login';
+import logoutHandler from './_routes/auth/logout';
+import sessionHandler from './_routes/auth/session';
+import googleCallbackHandler from './_routes/auth/google/callback';
+import googleLoginHandler from './_routes/auth/google/login';
+import googleStatusHandler from './_routes/auth/google/status';
+import googleUnlinkHandler from './_routes/auth/google/unlink';
+
 type RouteHandler = (req: any, res: any) => Promise<unknown> | unknown;
 
-// Static string imports inside functions allow @vercel/nft to trace and bundle each file,
-// while lazy evaluation prevents top-level crashes and isolates failures.
-export const routeLoaders: Record<string, () => Promise<{ default: RouteHandler }>> = {
-  'acara': () => import('./_routes/acara'),
-  'akses': () => import('./_routes/akses'),
-  'broadcast': () => import('./_routes/broadcast'),
-  'catatan': () => import('./_routes/catatan'),
-  'dokumen': () => import('./_routes/dokumen'),
-  'finance': () => import('./_routes/finance'),
-  'inventaris': () => import('./_routes/inventaris'),
-  'kontak': () => import('./_routes/kontak'),
-  'kru': () => import('./_routes/kru'),
-  'lapor-kerusakan': () => import('./_routes/lapor-kerusakan'),
-  'lost-found': () => import('./_routes/lost-found'),
-  'peminjaman': () => import('./_routes/peminjaman'),
-  'planner': () => import('./_routes/planner'),
-  'portal': () => import('./_routes/portal'),
-  'portofolio': () => import('./_routes/portofolio'),
-  'upload-avatar': () => import('./_routes/upload-avatar'),
-  'verifikasi-surat': () => import('./_routes/verifikasi-surat'),
-  'auth/change-password': () => import('./_routes/auth/change-password'),
-  'auth/login': () => import('./_routes/auth/login'),
-  'auth/logout': () => import('./_routes/auth/logout'),
-  'auth/session': () => import('./_routes/auth/session'),
-  'auth/google/callback': () => import('./_routes/auth/google/callback'),
-  'auth/google/login': () => import('./_routes/auth/google/login'),
-  'auth/google/status': () => import('./_routes/auth/google/status'),
-  'auth/google/unlink': () => import('./_routes/auth/google/unlink'),
+export const routes: Record<string, RouteHandler> = {
+  'acara': acaraHandler,
+  'akses': aksesHandler,
+  'broadcast': broadcastHandler,
+  'catatan': catatanHandler,
+  'dokumen': dokumenHandler,
+  'finance': financeHandler,
+  'inventaris': inventarisHandler,
+  'kontak': kontakHandler,
+  'kru': kruHandler,
+  'lapor-kerusakan': laporKerusakanHandler,
+  'lost-found': lostFoundHandler,
+  'peminjaman': peminjamanHandler,
+  'planner': plannerHandler,
+  'portal': portalHandler,
+  'portofolio': portofolioHandler,
+  'upload-avatar': uploadAvatarHandler,
+  'verifikasi-surat': verifikasiSuratHandler,
+  'auth/change-password': changePasswordHandler,
+  'auth/login': loginHandler,
+  'auth/logout': logoutHandler,
+  'auth/session': sessionHandler,
+  'auth/google/callback': googleCallbackHandler,
+  'auth/google/login': googleLoginHandler,
+  'auth/google/status': googleStatusHandler,
+  'auth/google/unlink': googleUnlinkHandler,
 };
 
 /**
@@ -112,13 +136,13 @@ export default async function handler(req: any, res: any) {
       status: 'ok',
       service: 'ptvpro-api',
       version: '1.0.0',
-      routes: Object.keys(routeLoaders),
+      routes: Object.keys(routes),
     }));
     return;
   }
 
-  const loader = routeLoaders[routeKey];
-  if (!loader) {
+  const routeHandler = routes[routeKey];
+  if (!routeHandler) {
     res.statusCode = 404;
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({
@@ -129,11 +153,6 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const module = await loader();
-    const routeHandler = module.default || module;
-    if (typeof routeHandler !== 'function') {
-      throw new Error(`Handler for /api/${routeKey} is not a function`);
-    }
     await routeHandler(req, res);
   } catch (err: any) {
     console.error(`[Router Error] Failure in route /api/${routeKey}:`, err);
@@ -144,7 +163,6 @@ export default async function handler(req: any, res: any) {
         error: err?.message || 'Terjadi kesalahan internal server.',
         code: 'internal_server_error',
         route: routeKey,
-        stack: process.env.NODE_ENV !== 'production' ? err?.stack : undefined,
       }));
     }
   }

@@ -2,16 +2,15 @@
 
 # PIKET DEV — PTV PRO
 
-- **PTV-DEV-250 / zidnal / Selesai (HOTFIX URGENT: Perbaikan Catch-All Rewrite & Path Resolution Production API).**
+- **PTV-DEV-250 / zidnal / Selesai (HOTFIX URGENT: Pre-bundled Standalone Router api/index.js & Live Production Success).**
   - **Akar Masalah:**
-    1. Pada commit `e342e67`, file `api/index.ts` mengimpor `'./[...route]'` yang memicu `ERR_MODULE_NOT_FOUND` pada runtime Node.js ESM Vercel (karakter bracket pada URL module resolution), menyebabkan `/api` mengembalikan `HTTP 500 FUNCTION_INVOCATION_FAILED`.
-    2. Pada `vercel.json`, aturan rewrite `/api/:path*` mengarah ke `/api/:path*`, padahal file individual di root `api/` telah dipindahkan ke `_routes/`. Tanpa file fisik `api/:path*.ts` dan tanpa mapping catch-all, Vercel merespons `HTTP 404 NOT_FOUND` pada `/api/kru`, `/api/broadcast`, `/api/portal`, dan `/api/auth/session`.
+    1. Node.js ESM pada runtime Linux Vercel mewajibkan ekstensi berkas eksplisit (`.js`) pada impor relatif. Saat Vercel mengeksekusi router TypeScript secara dinamis atau transpilasi parsial, pemanggilan `import('./_routes/...')` memicu `ERR_MODULE_NOT_FOUND: Cannot find module '/var/task/api/_routes/...'`.
   - **Solusi & Implementasi:**
-    1. *Router Mandiri `api/index.ts`:* Memindahkan seluruh logika router universal langsung ke dalam `api/index.ts` tanpa dependensi eksternal bracket `[...route].ts` (file `api/[...route].ts` dihapus).
-    2. *Rewrite Presisi `vercel.json`:* Memperbarui aturan rewrite menjadi `/api/:path* -> /api?__route=:path*` dan `/api -> /api`. Vercel kini secara deterministik mengarahkan seluruh permintaan `/api/*` ke fungsi serverless `api/index.ts`.
-    3. *Sanitasi & Rekonstruksi URL:* `api/index.ts` secara otomatis merekonstruksi `req.url` dan membersihkan `__route` dari query parameter sehingga semua pemanggil handler (`searchParams`, method, body) tetap menerima kontrak path asli tanpa distorsi.
-  - **File:** `api/index.ts`, `vercel.json`, `tests/apiRouter.test.ts`, `piketdev.md` (dan penghapusan `api/[...route].ts`).
-  - **Validasi:** `npm run typecheck` PASS (0 errors), `tests/apiRouter.test.ts` PASS (8/8 tests), live verification pada `https://ptvpro.com` dan `https://www.ptvpro.com`.
+    1. *Pre-bundled Standalone Router `api/index.js`:* Menambahkan skrip build [`scripts/bundle-api.cjs`](file:///c:/Users/zidna/ptvpro/scripts/bundle-api.cjs) menggunakan `esbuild` yang mengompilasi seluruh 25 handler dan modul internal dari `api/_router.ts` ke dalam satu berkas mandiri `api/index.js` (481 KB) tanpa dependensi impor relatif di runtime.
+    2. *Isolasi Sumber TypeScript:* Memindahkan sumber router ke `api/_router.ts` (awalan `_`) sehingga Vercel hanya mendeteksi tepat 1 fungsi serverless mandiri (`api/index.js`).
+    3. *Pipeline Build:* Menyelaraskan script `"build"` di `package.json` (`vite build && node scripts/bundle-api.cjs`).
+  - **File:** `api/index.js`, `api/_router.ts`, `scripts/bundle-api.cjs`, `package.json`, `vercel.json`, `vite.config.ts`, `tests/apiRouter.test.ts`, `piketdev.md`.
+  - **Validasi:** `npm run typecheck` PASS (0 errors), `npm run build` PASS, pengujian live curl pada `https://ptvpro.com` dan `https://www.ptvpro.com`.
   - **Code Hygiene:** CLN-277.
 
 - **PTV-DEV-249 / zidnal / Selesai (HOTFIX: Restorasi Penuh Production API & Universal Serverless Router).**
