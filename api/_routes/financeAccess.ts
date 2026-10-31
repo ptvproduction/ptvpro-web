@@ -1,9 +1,25 @@
-﻿import type { SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { SessionPayload } from './auth/_utils/types';
 import { sessionNeedsRegistry, portalSessionValid } from './auth/_utils/portalLifecycle';
 
-export interface FinanceAccess { identityId: string; canManage: boolean; global: boolean }
+export interface FinanceAccess { identityId: string; ptvId?: string; canManage: boolean; global: boolean }
+
+interface CachedFinanceAccess {
+  access: FinanceAccess;
+  expiresAt: number;
+}
+const financeAccessCache = new Map<string, CachedFinanceAccess>();
+
+export function clearFinanceAccessCache(accountId?: string) {
+  if (accountId) financeAccessCache.delete(accountId);
+  else financeAccessCache.clear();
+}
 export async function resolveFinanceAccess(db: SupabaseClient, session: SessionPayload): Promise<FinanceAccess> {
+  const cacheKey = `${session.account_id}:${session.iat}`;
+  const cached = financeAccessCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.access;
+  }
   if (sessionNeedsRegistry(session) && !await portalSessionValid(db, session)) throw new Error('forbidden');
   const account = await db.from('user_account').select('identity_id,status_akun,tokens_valid_after,lockout_until').eq('id', session.account_id).single();
   if (account.error || !account.data || account.data.status_akun !== 'active'
@@ -45,6 +61,9 @@ export async function resolveFinanceAccess(db: SupabaseClient, session: SessionP
   const global = canManage || can('finance.view') || can('finance.operator');
   const own = !deny.has('finance.view_own') && (ids.includes('crew') || ids.includes('eksekutif') || ids.includes('root_executive') || can('finance.view_own'));
   if (!global && !own) throw new Error('forbidden');
-  return { identityId, canManage, global };
+  const ptvId = identityRec.data?.ptv_id || undefined;
+  const access: FinanceAccess = { identityId, ptvId, canManage, global };
+  financeAccessCache.set(cacheKey, { access, expiresAt: Date.now() + 20_000 });
+  return access;
 }
 

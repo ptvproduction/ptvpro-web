@@ -4845,7 +4845,17 @@ import { createClient as createClient8 } from "@supabase/supabase-js";
 
 // api/_routes/financeAccess.ts
 init_portalLifecycle();
+var financeAccessCache = /* @__PURE__ */ new Map();
+function clearFinanceAccessCache(accountId) {
+  if (accountId) financeAccessCache.delete(accountId);
+  else financeAccessCache.clear();
+}
 async function resolveFinanceAccess(db, session) {
+  const cacheKey = `${session.account_id}:${session.iat}`;
+  const cached = financeAccessCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.access;
+  }
   if (sessionNeedsRegistry(session) && !await portalSessionValid(db, session)) throw new Error("forbidden");
   const account = await db.from("user_account").select("identity_id,status_akun,tokens_valid_after,lockout_until").eq("id", session.account_id).single();
   if (account.error || !account.data || account.data.status_akun !== "active" || !Number.isFinite(session.iat) || session.iat <= 0 || session.iat * 1e3 > Date.now() || !account.data.identity_id || account.data.lockout_until && (!Number.isFinite(Date.parse(account.data.lockout_until)) || Date.parse(account.data.lockout_until) > Date.now()) || account.data.tokens_valid_after && (!Number.isFinite(Date.parse(account.data.tokens_valid_after)) || session.iat * 1e3 < Date.parse(account.data.tokens_valid_after))) throw new Error("forbidden");
@@ -4879,7 +4889,10 @@ async function resolveFinanceAccess(db, session) {
   const global = canManage || can("finance.view") || can("finance.operator");
   const own = !deny.has("finance.view_own") && (ids.includes("crew") || ids.includes("eksekutif") || ids.includes("root_executive") || can("finance.view_own"));
   if (!global && !own) throw new Error("forbidden");
-  return { identityId, canManage, global };
+  const ptvId = identityRec.data?.ptv_id || void 0;
+  const access = { identityId, ptvId, canManage, global };
+  financeAccessCache.set(cacheKey, { access, expiresAt: Date.now() + 2e4 });
+  return access;
 }
 
 // src/products/hub/keuangan/financeCanonical.ts
@@ -5445,7 +5458,7 @@ async function readFinanceOperational(db, access, session) {
   }
   const identity = await db.from("canonical_identity").select("ptv_id").eq("id", access.identityId).single();
   if (identity.error || !identity.data?.ptv_id) throw new Error("read_failed");
-  const ownerPtvId = identity.data.ptv_id;
+  const ownerPtvId = access.ptvId || identity.data.ptv_id;
   const [semesters, records, loans, crewRoster, tariffConfig, settings] = await Promise.all([
     fetchSemestersCloudWithClient(db),
     fetchKasRecordsCloudWithClient(db, void 0, manager ? void 0 : ownerPtvId),
@@ -5492,11 +5505,7 @@ async function readFinance(db, access, session) {
   const verified = initialScope.data;
   if (initialScope.error || !verified || verified.identityId !== access.identityId || typeof verified.canManage !== "boolean" || typeof verified.global !== "boolean") throw new Error("read_failed");
   access = { identityId: verified.identityId, canManage: verified.canManage, global: verified.global };
-  let kasQuery = db.from("ptv_kas_kru").select("id,bulan_tahun,nominal,status_bayar").order("bulan_tahun", { ascending: false }).limit(100);
-  if (!access.global) kasQuery = kasQuery.eq("identity_id", access.identityId);
-  const kas = await kasQuery;
-  if (kas.error && kas.error.code !== "PGRST205" && kas.error.code !== "42P01") throw new Error("read_failed");
-  const kasRows = kas.data || [];
+  const kasRows = [];
   const snapshot = {
     source: "staging",
     canManage: access.canManage,
@@ -5693,6 +5702,7 @@ async function handler3(req, res) {
       send(200, await readFinance(db, access, session));
       return;
     }
+    clearFinanceAccessCache(session.account_id);
     if (!access.canManage) {
       send(403, { error: "Akses ditolak: Operasi penulisan keuangan memerlukan hak Bendahara, Eksekutif, atau Root." });
       return;
@@ -11599,6 +11609,7 @@ var routes = {
   "catatan": catatan_default,
   "dokumen": handler2,
   "finance": handler3,
+  "keuangan": handler3,
   "inventaris": handler4,
   "kontak": kontak_default,
   "kru": handler5,
@@ -11626,6 +11637,17 @@ function resolveRouteKey(req) {
     const raw = Array.isArray(paramRoute) ? paramRoute.join("/") : String(paramRoute);
     const cleaned = raw.split("?")[0].replace(/^\/+|\/+$/g, "");
     if (cleaned) return cleaned;
+  }
+  if (req.url && req.url.includes("__route=")) {
+    try {
+      const parsedUrl = new URL(req.url, "http://localhost");
+      const urlRoute = parsedUrl.searchParams.get("__route");
+      if (urlRoute) {
+        const cleaned = urlRoute.split("?")[0].replace(/^\/+|\/+$/g, "");
+        if (cleaned) return cleaned;
+      }
+    } catch {
+    }
   }
   const routeParam = req.query?.route || req.query?.path;
   if (routeParam) {

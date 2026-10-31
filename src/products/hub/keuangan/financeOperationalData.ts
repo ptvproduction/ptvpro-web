@@ -19,7 +19,16 @@ export async function loadFinanceOperational(signal: AbortSignal): Promise<Finan
   const response = await fetch('/api/finance?operational=1', {
     credentials: 'same-origin', cache: 'no-store', signal,
   });
-  const body = await response.json();
+  let body: any;
+  const rawText = await response.text();
+  try {
+    body = JSON.parse(rawText);
+  } catch {
+    if (response.status === 504) {
+      throw new Error('Gateway Timeout (504): Sambungan ke server operasional melampaui batas waktu.');
+    }
+    throw new Error(`Gagal memuat data operasional keuangan (HTTP ${response.status}).`);
+  }
   if (!response.ok) throw new Error(body.error || 'Gagal memuat data operasional keuangan.');
   if (body.source !== 'staging' || !['global', 'own'].includes(body.scope)
     || typeof body.ownerPtvId !== 'string' || body.writesEnabled !== false

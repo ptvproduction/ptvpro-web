@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Wallet, CheckCircle2, History, ArrowRight, QrCode, Users, FileText } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Wallet, History, ArrowRight, QrCode, Users, FileText } from 'lucide-react';
 import { Button } from '@shared/components/Button';
 import type { FinanceSnapshot } from './financeFoundation';
 import type { FinanceOperationalData } from './financeOperationalData';
@@ -26,8 +26,7 @@ export function Finance3Overview({
     t => !isTestTransaction(t)
   );
 
-  const mainPocket = pockets.find(p => p.name.includes('Kas Utama') && !p.archived) || pockets[0];
-  const saldoKas = mainPocket ? (Number(mainPocket.balanceMinor) || 0) / 100 : 0;
+  const totalSemuaKantong = pockets.reduce((sum, p) => sum + (Number(p.balanceMinor) || 0) / 100, 0);
 
   // Calculate posted cashflow metrics
   const postedTxs = transactions.filter(t => t.status === 'posted');
@@ -53,12 +52,8 @@ export function Finance3Overview({
       <section className="finance3-hero">
         <div className="finance3-hero-top">
           <div>
-            <div className="finance3-hero-label">Saldo Kas Utama Studio</div>
-            <div className="finance3-hero-balance">Rp {saldoKas.toLocaleString('id-ID')}</div>
-            <div className="finance3-hero-sub">
-              <CheckCircle2 size={14} style={{ color: '#059669' }} />
-              <span>Terverifikasi PostgreSQL Cloud Staging · 100% Terekonsiliasi Dasbor PTV</span>
-            </div>
+            <div className="finance3-hero-label">Semua Kantong</div>
+            <div className="finance3-hero-balance">Rp {totalSemuaKantong.toLocaleString('id-ID')}</div>
           </div>
 
           {/* Quick Actions */}

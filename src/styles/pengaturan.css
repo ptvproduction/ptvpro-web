@@ -565,8 +565,9 @@
 .set-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(7, 32, 62, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -577,14 +578,14 @@
 
 .set-modal-card {
   background: var(--surface, #ffffff);
-  border-radius: var(--r-xl, 20px);
-  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--ptv-curve-2xl, 24px);
+  border: 1px solid var(--line-2, #e2e8f0);
   width: 100%;
   max-width: 540px;
   max-height: 88vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 24px 48px -12px rgba(11, 42, 74, 0.25);
   overflow: hidden;
   animation: setZoomIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -908,5 +909,21 @@
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
+  }
+
+  .set-modal-overlay {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  .set-modal-card {
+    max-height: 90dvh !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-left-radius: var(--ptv-curve-2xl, 24px) !important;
+    border-top-right-radius: var(--ptv-curve-2xl, 24px) !important;
+    margin-top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }

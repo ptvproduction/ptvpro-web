@@ -40,7 +40,7 @@ export async function readFinanceOperational(
   }
   const identity = await db.from('canonical_identity').select('ptv_id').eq('id', access.identityId).single();
   if (identity.error || !identity.data?.ptv_id) throw new Error('read_failed');
-  const ownerPtvId = identity.data.ptv_id;
+  const ownerPtvId = access.ptvId || identity.data.ptv_id;
   const [semesters, records, loans, crewRoster, tariffConfig, settings] = await Promise.all([
     fetchSemestersCloudWithClient(db),
     fetchKasRecordsCloudWithClient(db, undefined, manager ? undefined : ownerPtvId),

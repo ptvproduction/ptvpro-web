@@ -28,6 +28,7 @@ import { Finance3Laporan } from './Finance3Laporan';
 import { CatatTransaksiModal } from './components/CatatTransaksiModal';
 import { TransactionDetailDrawer } from './components/TransactionDetailDrawer';
 import { PengaturanKeuanganModal } from './components/PengaturanKeuanganModal';
+import { FinanceSectionSkeleton } from './components/skeletons/FinanceSectionSkeleton';
 import './finance3.css';
 
 export type Finance3Tab =
@@ -321,23 +322,11 @@ export function Finance3Page({ initialData, initialOperationalData }: Finance3Pa
             'Belum terhubung'
           )}
         </div>
-
-        <div>
-          Target Database: <code>swadgljnyelsjstqqxbm</code>
-        </div>
       </div>
 
       {/* 4. Konten Aktif Berdasarkan Tab */}
       {loading && !data ? (
-        <div className="finance3-card" style={{ padding: '48px 0', textAlign: 'center' }}>
-          <RefreshCw size={24} className="animate-spin" style={{ color: '#0b5fbf', margin: '0 auto 12px' }} />
-          <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--ink, #0b2a4a)' }}>
-            Memuat Data Keuangan Studio...
-          </div>
-          <div style={{ fontSize: '12px', color: 'var(--muted, #6e8cae)', marginTop: '4px' }}>
-            Menghubungkan ke buku besar dan verifikasi ledger staging cloud.
-          </div>
-        </div>
+        <FinanceSectionSkeleton section={activeTab} />
       ) : error && !data ? (
         <div className="finance3-card" style={{ padding: '36px 20px', textAlign: 'center' }}>
           <AlertCircle size={32} style={{ color: '#dc2626', margin: '0 auto 12px' }} />

@@ -65,13 +65,14 @@ function drawRoundedRectPath(
 /**
  * Menggambar gambar ke dalam bounding box secara object-contain
  */
-function drawContainedImage(
+function drawTintedContainedImage(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement | null,
   x: number,
   y: number,
   w: number,
-  h: number
+  h: number,
+  tintColor: string = '#0f172a'
 ): boolean {
   if (!img || !img.naturalWidth || !img.naturalHeight) return false;
   const nw = img.naturalWidth;
@@ -81,7 +82,20 @@ function drawContainedImage(
   const dh = nh * scale;
   const dx = x + (w - dw) / 2;
   const dy = y + (h - dh) / 2;
-  ctx.drawImage(img, dx, dy, dw, dh);
+
+  const offscreen = document.createElement('canvas');
+  offscreen.width = Math.ceil(dw);
+  offscreen.height = Math.ceil(dh);
+  const offCtx = offscreen.getContext('2d');
+  if (!offCtx) {
+    ctx.drawImage(img, dx, dy, dw, dh);
+    return true;
+  }
+  offCtx.drawImage(img, 0, 0, dw, dh);
+  offCtx.globalCompositeOperation = 'source-in';
+  offCtx.fillStyle = tintColor;
+  offCtx.fillRect(0, 0, dw, dh);
+  ctx.drawImage(offscreen, dx, dy);
   return true;
 }
 
@@ -194,7 +208,7 @@ export async function renderBarcodeCardToCanvas(
     ctx.stroke();
 
     // Draw PTV Logo
-    const ptvOk = drawContainedImage(ctx, ptvImg, 10, 18, 76, 76);
+    const ptvOk = drawTintedContainedImage(ctx, ptvImg, 10, 18, 76, 76);
     if (!ptvOk) {
       ctx.fillStyle = '#0f172a';
       ctx.font = '900 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -396,7 +410,7 @@ export function printUnitBarcode(
         ` : `
           <div class="label-card">
             <div class="label-logo-col">
-              <img src="${PTV_LOGO_PATH}" alt="PROGRESIF TV" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:16px;\\'>PTV</span>';">
+              <img src="${PTV_LOGO_PATH}" alt="PROGRESIF TV" style="filter:brightness(0);-webkit-filter:brightness(0);" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:16px;\\'>PTV</span>';">
             </div>
             <div class="label-right-col">
               <div class="label-barcode-box">
@@ -454,7 +468,7 @@ export function printAllUnitBarcodes(
         ` : `
           <div class="label-card">
             <div class="label-logo-col">
-              <img src="${PTV_LOGO_PATH}" alt="PROGRESIF TV" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:14px;\\'>PTV</span>';">
+              <img src="${PTV_LOGO_PATH}" alt="PROGRESIF TV" style="filter:brightness(0);-webkit-filter:brightness(0);" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:14px;\\'>PTV</span>';">
             </div>
             <div class="label-right-col">
               <div class="label-barcode-box">

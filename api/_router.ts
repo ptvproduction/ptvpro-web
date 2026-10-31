@@ -39,6 +39,7 @@ export const routes: Record<string, RouteHandler> = {
   'catatan': catatanHandler,
   'dokumen': dokumenHandler,
   'finance': financeHandler,
+  'keuangan': financeHandler,
   'inventaris': inventarisHandler,
   'kontak': kontakHandler,
   'kru': kruHandler,
@@ -71,6 +72,20 @@ export function resolveRouteKey(req: any): string {
     const raw = Array.isArray(paramRoute) ? paramRoute.join('/') : String(paramRoute);
     const cleaned = raw.split('?')[0].replace(/^\/+|\/+$/g, '');
     if (cleaned) return cleaned;
+  }
+
+  // 1b. From raw req.url searchParams (?__route=...) if req.query is unavailable
+  if (req.url && req.url.includes('__route=')) {
+    try {
+      const parsedUrl = new URL(req.url, 'http://localhost');
+      const urlRoute = parsedUrl.searchParams.get('__route');
+      if (urlRoute) {
+        const cleaned = urlRoute.split('?')[0].replace(/^\/+|\/+$/g, '');
+        if (cleaned) return cleaned;
+      }
+    } catch {
+      // ignore
+    }
   }
 
   // 2. From Vercel catch-all route query parameter

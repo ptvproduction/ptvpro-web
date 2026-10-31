@@ -648,9 +648,15 @@ export const InventarisPage: React.FC = () => {
       {/* ── 5. RESULT COUNT LABEL ── */}
       <div style={{ marginTop: '14px', marginBottom: '12px', padding: '0 2px' }}>
         <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--ink, #0B2A4A)' }}>
-          {filteredRows.length} alat
-          {catFilter !== 'semua' ? ` • ${catFilter}` : ''}
-          {statusFilter !== 'semua' ? ` (${statusFilter})` : ''}
+          {loading ? (
+            <span style={{ color: 'var(--muted, #64748b)', fontWeight: 500 }}>Memuat katalog inventaris...</span>
+          ) : (
+            <>
+              {filteredRows.length} alat
+              {catFilter !== 'semua' ? ` • ${catFilter}` : ''}
+              {statusFilter !== 'semua' ? ` (${statusFilter})` : ''}
+            </>
+          )}
         </span>
       </div>
 

@@ -290,6 +290,7 @@ export const UnitBarcodesSection: React.FC<UnitBarcodesSectionProps> = ({ asset 
                     <img
                       src={PTV_LOGO_PATH}
                       alt="Progresif TV"
+                      style={{ filter: 'brightness(0)' }}
                       onError={(e) => {
                         (e.currentTarget as HTMLElement).outerHTML = "<span style='font-size:11px;font-weight:900;color:#0f172a;'>PTV</span>";
                       }}

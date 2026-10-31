@@ -4,7 +4,7 @@ import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { parseBody } from './auth/_utils/bodyParser';
 import type { SessionPayload } from './auth/_utils/types';
-import { resolveFinanceAccess, type FinanceAccess } from './financeAccess';
+import { resolveFinanceAccess, clearFinanceAccessCache, type FinanceAccess } from './financeAccess';
 import type { FinanceSnapshot, FinanceEntry } from '../../src/products/hub/keuangan/financeFoundation';
 import { multiPocketCommandSchema } from '../../src/products/hub/keuangan/financeCanonical';
 import { financeBackendUrl } from './auth/_utils/financeLocalHarness';
@@ -37,11 +37,12 @@ export async function readFinance(db: SupabaseClient, access: FinanceAccess, ses
   if (initialScope.error || !verified || verified.identityId !== access.identityId
     || typeof verified.canManage !== 'boolean' || typeof verified.global !== 'boolean') throw new Error('read_failed');
   access = { identityId: verified.identityId, canManage: verified.canManage, global: verified.global };
-  let kasQuery = db.from('ptv_kas_kru').select('id,bulan_tahun,nominal,status_bayar').order('bulan_tahun', { ascending: false }).limit(100);
-  if (!access.global) kasQuery = kasQuery.eq('identity_id', access.identityId);
-  const kas = await kasQuery;
-  if (kas.error && kas.error.code !== 'PGRST205' && kas.error.code !== '42P01') throw new Error('read_failed');
-  const kasRows = kas.data || [];
+  // ptv_kas_kru is superseded by ptv_finance_kas_records in staging
+  const kasRows: any[] = [];
+
+
+
+
 
   const snapshot: FinanceSnapshot = {
     source: 'staging',
@@ -261,7 +262,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       return;
     }
 
-    // POST handling (Requires canManage: Bendahara / Eksekutif / Root)
+    clearFinanceAccessCache(session.account_id);
     if (!access.canManage) {
       send(403, { error: 'Akses ditolak: Operasi penulisan keuangan memerlukan hak Bendahara, Eksekutif, atau Root.' });
       return;

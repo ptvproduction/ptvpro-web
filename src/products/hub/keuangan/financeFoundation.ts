@@ -33,7 +33,16 @@ export async function loadFinance(signal?: AbortSignal): Promise<FinanceSnapshot
     return await Promise.race([
       (async () => {
         const response = await fetch('/api/finance', { credentials: 'same-origin', cache: 'no-store', signal: controller.signal });
-        const body = await response.json();
+        let body: any;
+        const rawText = await response.text();
+        try {
+          body = JSON.parse(rawText);
+        } catch {
+          if (response.status === 504) {
+            throw new Error('Gateway Timeout (504): Sambungan ke server keuangan melampaui batas waktu. Silakan muat ulang.');
+          }
+          throw new Error(`Gagal memuat keuangan (HTTP ${response.status}).`);
+        }
         if (!response.ok) throw new Error(body.error || 'Gagal memuat keuangan.');
         if (body.source !== 'staging' || !Array.isArray(body.entries) || !Array.isArray(body.kas)
           || typeof body.canManage !== 'boolean' || !['global', 'own'].includes(body.scope) || typeof body.writesEnabled !== 'boolean'

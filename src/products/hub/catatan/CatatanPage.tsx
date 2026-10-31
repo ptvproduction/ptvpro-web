@@ -14,7 +14,6 @@ import { useModalScrollLock } from './hooks/useModalScrollLock';
 import { sanitizeHtml, stripHtml } from './utils/htmlSanitizer';
 import { NoteRichEditor } from './components/NoteRichEditor';
 import { NoteCategoryDropdown } from './components/NoteCategoryDropdown';
-import { CardListSkeleton } from '@/shared/components';
 import { useInstantData } from '@/shared/hooks/useInstantData';
 
 // Format waktu relatif Bahasa Indonesia
@@ -73,6 +72,51 @@ function extractTitleFromContent(html: string): string {
   const plain = clean.replace(/<[^>]+>/g, ' ').trim();
   return plain.split('\n')[0]?.trim().substring(0, 90) || 'Tanpa Judul';
 }
+
+
+// Skeleton khusus kisi catatan docket
+function CatatanGridSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <div className="notes-grid" aria-busy="true" aria-label="Memuat catatan">
+      {Array.from({ length: count }).map((_, idx) => (
+        <div
+          key={idx}
+          className="note-card-docket"
+          style={{
+            background: 'var(--card-bg, #ffffff)',
+            border: '1px solid var(--border-color, rgba(0, 0, 0, 0.08))',
+            pointerEvents: 'none',
+            minHeight: '220px'
+          }}
+        >
+          {/* Header Skeleton */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <div className="skeleton" style={{ width: '80px', height: '22px', borderRadius: '9999px' }} />
+            <div className="skeleton" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
+          </div>
+
+          {/* Body Skeleton */}
+          <div style={{ flex: 1, marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="skeleton" style={{ width: '75%', height: '20px', borderRadius: '6px' }} />
+            <div className="skeleton" style={{ width: '100%', height: '14px', borderRadius: '4px' }} />
+            <div className="skeleton" style={{ width: '90%', height: '14px', borderRadius: '4px' }} />
+            <div className="skeleton" style={{ width: '60%', height: '14px', borderRadius: '4px' }} />
+          </div>
+
+          {/* Footer Skeleton */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--border-color, rgba(0,0,0,0.06))', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="skeleton" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
+              <div className="skeleton" style={{ width: '60px', height: '12px', borderRadius: '4px' }} />
+            </div>
+            <div className="skeleton" style={{ width: '50px', height: '12px', borderRadius: '4px' }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 
 export const CatatanPage: React.FC = () => {
   // State data utama dari Supabase Staging dengan Instant-First Cache
@@ -562,7 +606,7 @@ export const CatatanPage: React.FC = () => {
       {/* Kontainer Grid Catatan */}
       <div className="catatan-container">
         {loading && notes.length === 0 ? (
-          <CardListSkeleton count={4} />
+          <CatatanGridSkeleton count={6} />
         ) : error ? (
           <div className="catatan-empty-state" style={{ borderColor: 'var(--dang-border, rgba(201,42,42,0.3))' }}>
             <div className="catatan-empty-icon" style={{ color: 'var(--dang, #C92A2A)' }}>

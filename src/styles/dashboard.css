@@ -6868,6 +6868,7 @@ span.fin-matrix-cell.unpaid {
   max-height: 76px;
   object-fit: contain;
   display: block;
+  filter: brightness(0);
 }
 
 /* Bagian Kanan: Terbagi 2 (Atas Barcode, Bawah PROGRESIF TV) */
