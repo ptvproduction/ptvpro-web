@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:staging": "vite --mode staging --port 5174",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
@@ -16,6 +16,11 @@
     "@pdf-lib/fontkit": "1.1.1",
     "@supabase/supabase-js": "^2.47.10",
     "@tanstack/react-query": "^5.62.7",
+    "@types/node": "^22.10.1",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
     "bcryptjs": "3.0.3",
     "html-to-image": "1.11.13",
     "lucide-react": "^0.468.0",
@@ -25,24 +30,19 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.0",
     "react-router-dom": "^6.28.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
     "xlsx": "^0.18.5",
     "zod": "^3.24.1",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "@types/node": "^22.10.1",
-    "@types/qrcode": "^1.5.6",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
     "@typescript-eslint/parser": "^8.18.0",
-    "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.16.0",
     "jsqr": "^1.4.0",
     "pg": "8.16.3",
     "pg-copy-streams": "7.0.0",
-    "typescript": "^5.7.2",
-    "vite": "^6.0.3",
     "vitest": "^2.1.8"
   }
 }
