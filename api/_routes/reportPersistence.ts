@@ -1,4 +1,4 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
+﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { SessionPayload } from './auth/_utils/types';
 
@@ -62,9 +62,3 @@ export async function handleReportWrite(req: IncomingMessage, res: ServerRespons
   }
 }
 
-
-export default function handler(_req: unknown, res: { status: (c: number) => { json: (d: unknown) => void } }) {
-  if (res && typeof res.status === 'function') {
-    return res.status(404).json({ error: 'Endpoint not found' });
-  }
-}

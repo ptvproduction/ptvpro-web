@@ -1,5 +1,5 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { RawLegacyKruDbRow } from '../src/products/hub/kru/kruMapper';
+﻿import type { SupabaseClient } from '@supabase/supabase-js';
+import type { RawLegacyKruDbRow } from '../../src/products/hub/kru/kruMapper';
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const divisions:Record<string,string>={editor:'Editor',layouter:'Layouter',technical:'Technical',engagements:'Engagement'};
@@ -59,9 +59,3 @@ export async function readPhase1PersonnelRows(db:SupabaseClient,rows:RawLegacyKr
  })};
 }
 
-
-export default function handler(_req: unknown, res: { status: (c: number) => { json: (d: unknown) => void } }) {
-  if (res && typeof res.status === 'function') {
-    return res.status(404).json({ error: 'Endpoint not found' });
-  }
-}

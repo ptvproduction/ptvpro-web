@@ -1,14 +1,14 @@
-import { EventEmitter } from 'node:events';
+﻿import { EventEmitter } from 'node:events';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import handler, { PORTAL_SERVER_TIMEOUT_MS } from '../../api/portal';
-import { verifyAccountStatusLive, refreshLiveSession } from '../../api/auth/_utils/identity';
+import handler, { PORTAL_SERVER_TIMEOUT_MS } from '../../api/_routes/portal';
+import { verifyAccountStatusLive, refreshLiveSession } from '../../api/_routes/auth/_utils/identity';
 
-vi.mock('../../api/auth/_utils/identity', () => ({
+vi.mock('../../api/_routes/auth/_utils/identity', () => ({
   verifyAccountStatusLive: vi.fn(),
   refreshLiveSession: vi.fn(),
 }));
-vi.mock('../../api/auth/_utils/crypto', () => ({ verifySessionToken: vi.fn(() => ({ account_id: 'fixture' })) }));
+vi.mock('../../api/_routes/auth/_utils/crypto', () => ({ verifySessionToken: vi.fn(() => ({ account_id: 'fixture' })) }));
 
 function response() {
   const res = new EventEmitter() as ServerResponse;

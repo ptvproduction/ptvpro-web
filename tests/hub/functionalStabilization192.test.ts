@@ -1,14 +1,14 @@
-import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
+﻿import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { Readable } from 'node:stream';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { filterUserDocuments } from '../../src/products/hub/dokumen-saya/utils/documentOwnership';
 import type { PtvDocument } from '../../src/products/hub/dokumen-saya/mock/docsMockData';
 
 const db = vi.hoisted(() => ({ error: null as unknown, rows: [] as unknown[], writeError: null as unknown }));
-vi.mock('../../api/auth/_utils/crypto', () => ({ verifySessionToken: () => ({
+vi.mock('../../api/_routes/auth/_utils/crypto', () => ({ verifySessionToken: () => ({
   account_id: 'account-test', identity_id: 'identity-test', full_name: 'Test Person', username: 'test-person', ptv_id: 'PTV-TEST',
 }) }));
-vi.mock('../../api/auth/_utils/identity', () => ({
+vi.mock('../../api/_routes/auth/_utils/identity', () => ({
   refreshLiveSession: async () => ['hub.access', 'documents.view', 'documents.archive.manage'],
   verifyAccountStatusLive: async () => true,
 }));
@@ -21,7 +21,7 @@ vi.mock('@supabase/supabase-js', () => ({ createClient: () => ({
   }),
   rpc: async () => ({ error: { message: 'RPC unavailable' }, data: null }),
 }) }));
-import handler from '../../api/dokumen';
+import handler from '../../api/_routes/dokumen';
 
 const document = (owner: string): PtvDocument => ({
   id: owner, owner, no: '—', subject: 'Test', type: 'Surat Tugas', date: '2026-10-28',

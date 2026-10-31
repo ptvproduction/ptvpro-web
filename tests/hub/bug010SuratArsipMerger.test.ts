@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { mapDbStatusToDocStatus } from '../../api/dokumen';
-import { determineDocumentStatus } from '../../api/verifikasi-surat';
+﻿import { describe, it, expect } from 'vitest';
+import { mapDbStatusToDocStatus } from '../../api/_routes/dokumen';
+import { determineDocumentStatus } from '../../api/_routes/verifikasi-surat';
 import { calculateNextLetterNumber } from '../../src/products/hub/dokumen-saya/utils/letterNumbering';
 import type { PtvDocument } from '../../src/products/hub/dokumen-saya/mock/docsMockData';
 

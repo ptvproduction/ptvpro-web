@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   categorizeExternalContact,
   classifyInternalContact,
@@ -261,7 +261,7 @@ describe('Kontak Internal & Eksternal — Supabase Staging Integration & Securit
 
   describe('4. RBAC & Mutation Security Gate', () => {
     it('ensures unsupported HTTP methods (e.g. TRACE) are rejected with 405 Method Not Allowed', async () => {
-      const handlerModule = await import('../../api/kontak');
+      const handlerModule = await import('../../api/_routes/kontak');
       const handler = handlerModule.default;
 
       const req: any = {
@@ -290,7 +290,7 @@ describe('Kontak Internal & Eksternal — Supabase Staging Integration & Securit
     });
 
     it('rejects unauthorized requests without session cookie with 401', async () => {
-      const handlerModule = await import('../../api/kontak');
+      const handlerModule = await import('../../api/_routes/kontak');
       const handler = handlerModule.default;
 
       const methods = ['GET', 'POST', 'PATCH', 'DELETE'];

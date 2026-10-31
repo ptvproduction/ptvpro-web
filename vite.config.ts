@@ -37,13 +37,13 @@ function vercelApiDevPlugin(mode: string): Plugin {
 
         try {
           const subpath = pathname.replace(/^\/api\//, '');
-          const targetTsFile = path.resolve(__dirname, `api/${subpath}.ts`);
+          const targetTsFile = path.resolve(__dirname, `api/_routes/${subpath}.ts`);
 
           let handlerModule;
           if (fs.existsSync(targetTsFile)) {
-            handlerModule = await server.ssrLoadModule(`/api/${subpath}.ts`);
+            handlerModule = await server.ssrLoadModule(`/api/_routes/${subpath}.ts`);
           } else {
-            return next();
+            handlerModule = await server.ssrLoadModule('/api/index.ts');
           }
 
           if (handlerModule && typeof handlerModule.default === 'function') {

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   mapSuratIzinToDoc,
   mapSuratTugasToDoc,
@@ -10,10 +10,10 @@ import {
   type RawSuratIzinDbRow,
   type RawSuratTugasDbRow,
   type RawSuratBarangDbRow,
-} from '../../api/dokumen';
+} from '../../api/_routes/dokumen';
 import { parseDocDate } from '../../src/products/hub/arsip/ArsipPage';
 import { dokumenService } from '../../src/products/hub/dokumen-saya/dokumenService';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
 
 describe('PTVPRO — Migrasi & Integrasi Dokumen Saya & Arsip Dokumen ke Supabase Staging', () => {
   const authSecret = 'ptvpro-secret-key-at-least-32-chars-long-123456';
@@ -315,7 +315,7 @@ describe('PTVPRO — Migrasi & Integrasi Dokumen Saya & Arsip Dokumen ke Supabas
 });
 
 // Unit boundary: the payload fixture stands for a separately authorized database snapshot.
-vi.mock('../../api/auth/_utils/identity', async importOriginal => {
- const actual = await importOriginal<typeof import('../../api/auth/_utils/identity')>();
+vi.mock('../../api/_routes/auth/_utils/identity', async importOriginal => {
+ const actual = await importOriginal<typeof import('../../api/_routes/auth/_utils/identity')>();
  return { ...actual, refreshLiveSession: vi.fn(async (session: any) => ['hub.access', ...(session.capabilities || [])]), };
 });

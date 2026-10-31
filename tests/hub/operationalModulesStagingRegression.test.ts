@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import peminjamanHandler from '../../api/peminjaman';
-import damageHandler from '../../api/lapor-kerusakan';
-import lostFoundHandler from '../../api/lost-found';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
+import peminjamanHandler from '../../api/_routes/peminjaman';
+import damageHandler from '../../api/_routes/lapor-kerusakan';
+import lostFoundHandler from '../../api/_routes/lost-found';
 import { peminjamanService } from '../../src/products/hub/peminjaman/peminjamanService';
 import { damageReportService } from '../../src/products/hub/lapor-kerusakan/damageReportService';
 import { lostFoundService } from '../../src/products/hub/lost-found/lostFoundService';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
 import type { IncomingMessage } from 'node:http';
 
 describe('PTVPRO — 3 Operational Modules Staging Integration & Regression Tests', () => {
@@ -308,7 +308,7 @@ describe('PTVPRO — 3 Operational Modules Staging Integration & Regression Test
 });
 
 // Unit boundary: the payload fixture stands for a separately authorized database snapshot.
-vi.mock('../../api/auth/_utils/identity', async importOriginal => {
- const actual = await importOriginal<typeof import('../../api/auth/_utils/identity')>();
+vi.mock('../../api/_routes/auth/_utils/identity', async importOriginal => {
+ const actual = await importOriginal<typeof import('../../api/_routes/auth/_utils/identity')>();
  return { ...actual, refreshLiveSession: vi.fn(async (session: any) => ['hub.access', ...(session.capabilities || [])]), };
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderToString } from 'react-dom/server';
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 import { routes } from '../../src/app/router';
@@ -6,8 +6,8 @@ import { AppProviders } from '../../src/app/providers/AppProviders';
 import { useSessionStore } from '../../src/core/session/sessionStore';
 import { VercelAuthService } from '../../src/core/auth/authService';
 import { hasCapability } from '../../src/core/policy';
-import { signSessionToken, verifySessionToken } from '../../api/auth/_utils/crypto';
-import type { SessionPayload } from '../../api/auth/_utils/types';
+import { signSessionToken, verifySessionToken } from '../../api/_routes/auth/_utils/crypto';
+import type { SessionPayload } from '../../api/_routes/auth/_utils/types';
 
 const TEST_SECRET = 'super-secret-key-32-chars-long-ptvpro-1234';
 

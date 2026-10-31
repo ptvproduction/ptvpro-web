@@ -1,14 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   linkGoogleIdentityToAccount,
   unlinkGoogleIdentityFromAccount,
   resolveIdentityByGoogleSub,
   LOCAL_LINKED_GOOGLE_ACCOUNTS,
-} from '../../api/auth/_utils/identity';
-import callbackHandler from '../../api/auth/google/callback';
-import statusHandler from '../../api/auth/google/status';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
-import type { ApiRequest, ApiResponse } from '../../api/auth/_utils/types';
+} from '../../api/_routes/auth/_utils/identity';
+import callbackHandler from '../../api/_routes/auth/google/callback';
+import statusHandler from '../../api/_routes/auth/google/status';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
+import type { ApiRequest, ApiResponse } from '../../api/_routes/auth/_utils/types';
 
 // Supabase mock storage for regression testing
 let tableHandlers: Record<string, () => any> = {};
@@ -506,6 +506,6 @@ describe('Google SSO/OAuth & Account Linking Regression Test Suite', () => {
   });
 });
 
-vi.mock('../../api/auth/_utils/liveAccess', () => ({ resolveLiveAccess: vi.fn(async () => ({
+vi.mock('../../api/_routes/auth/_utils/liveAccess', () => ({ resolveLiveAccess: vi.fn(async () => ({
  identity: { id: 'ident-kru-1' }, profiles: ['crew'], membership: { status_organisasi: 'active' }, can: (cap: string) => cap === 'hub.access'
 })) }));

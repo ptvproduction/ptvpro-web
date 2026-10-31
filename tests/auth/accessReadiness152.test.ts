@@ -1,16 +1,16 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+﻿import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Readable } from 'node:stream';
 import { generateKeyPairSync, sign } from 'node:crypto';
-import login from '../../api/auth/login';
-import sessionHandler from '../../api/auth/session';
-import googleLogin from '../../api/auth/google/login';
-import callback from '../../api/auth/google/callback';
-import { resolveLiveAccess, LiveAccessUnavailableError } from '../../api/auth/_utils/liveAccess';
-import { resolveFinanceAccess } from '../../api/financeAccess';
-import { verifyAccountStatusLive, refreshLiveSession } from '../../api/auth/_utils/identity';
-import { parseCookies } from '../../api/auth/_utils/cookies';
-import { createHmacState, signSessionToken, verifySessionToken, verifyGoogleIdToken, verifyHmacState } from '../../api/auth/_utils/crypto';
-import type { ApiRequest, ApiResponse, SessionPayload } from '../../api/auth/_utils/types';
+import login from '../../api/_routes/auth/login';
+import sessionHandler from '../../api/_routes/auth/session';
+import googleLogin from '../../api/_routes/auth/google/login';
+import callback from '../../api/_routes/auth/google/callback';
+import { resolveLiveAccess, LiveAccessUnavailableError } from '../../api/_routes/auth/_utils/liveAccess';
+import { resolveFinanceAccess } from '../../api/_routes/financeAccess';
+import { verifyAccountStatusLive, refreshLiveSession } from '../../api/_routes/auth/_utils/identity';
+import { parseCookies } from '../../api/_routes/auth/_utils/cookies';
+import { createHmacState, signSessionToken, verifySessionToken, verifyGoogleIdToken, verifyHmacState } from '../../api/_routes/auth/_utils/crypto';
+import type { ApiRequest, ApiResponse, SessionPayload } from '../../api/_routes/auth/_utils/types';
 
 const fixture = vi.hoisted(() => ({ tables: {} as Record<string, Record<string, unknown>[]>, failedTable: '', sessionValid:true, sessionError:false }));
 function from(table: string) {

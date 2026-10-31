@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { EventEmitter } from 'node:events';
-import handler from '../../api/finance';
-import * as cookiesUtil from '../../api/auth/_utils/cookies';
-import * as cryptoUtil from '../../api/auth/_utils/crypto';
-import * as financeAccess from '../../api/financeAccess';
+import handler from '../../api/_routes/finance';
+import * as cookiesUtil from '../../api/_routes/auth/_utils/cookies';
+import * as cryptoUtil from '../../api/_routes/auth/_utils/crypto';
+import * as financeAccess from '../../api/_routes/financeAccess';
 
 // In-memory capture variables for Supabase client interactions
 let mockRpcHandler: (fnName: string, args: any) => Promise<any> = () => Promise.resolve({ data: null, error: null });

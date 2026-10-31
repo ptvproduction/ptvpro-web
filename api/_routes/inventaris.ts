@@ -1,11 +1,11 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
+﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createHmac, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { lifecycleClient } from './auth/_utils/portalLifecycle';
 import { resolveLiveAccess, LiveAccessUnavailableError } from './auth/_utils/liveAccess';
-import type { AppCapability } from '../src/core/policy';
+import type { AppCapability } from '../../src/core/policy';
 
 const uuid = z.string().uuid();
 const text = z.string().trim().max(5000);

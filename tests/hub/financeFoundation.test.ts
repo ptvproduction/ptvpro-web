@@ -1,8 +1,8 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+﻿import { afterEach, describe, expect, it, vi } from 'vitest';
 import { financeSection, FINANCE_SETTINGS, loadFinance } from '../../src/products/hub/keuangan/financeFoundation';
-import { resolveFinanceAccess } from '../../api/financeAccess';
-import handler, { readFinance } from '../../api/finance';
-import type { SessionPayload } from '../../api/auth/_utils/types';
+import { resolveFinanceAccess } from '../../api/_routes/financeAccess';
+import handler, { readFinance } from '../../api/_routes/finance';
+import type { SessionPayload } from '../../api/_routes/auth/_utils/types';
 
 const session = { account_id: 'account', identity_id: 'spoofed-cookie-identity', iat: 1792500000 } as SessionPayload;
 function database(options: { profiles?: string[]; caps?: string[]; overrides?: object[]; inactive?: boolean; revoked?: boolean; fail?: string; position?: string; lockout?: string; cutoff?: string } = {}) {

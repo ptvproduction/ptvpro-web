@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
+﻿import { describe, it, expect } from 'vitest';
 import fs from 'fs';
-import { authenticatePortalPassword } from '../../api/auth/_utils/portalLifecycle';
+import { authenticatePortalPassword } from '../../api/_routes/auth/_utils/portalLifecycle';
 import { Readable } from 'node:stream';
-import type { ApiRequest } from '../../api/auth/_utils/types';
+import type { ApiRequest } from '../../api/_routes/auth/_utils/types';
 import { spawnSync } from 'node:child_process';
 
 describe.runIf(process.env.PTV_RUN_LIVE_AUTH_TESTS === 'true')('Real Staging Cloud Authentication Verification', () => {

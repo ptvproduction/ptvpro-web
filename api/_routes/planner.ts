@@ -1,10 +1,10 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
+﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'node:crypto';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
-import { parsePlannerDbRow, RawPlannerDbRow } from '../src/products/hub/kalender/kalenderService';
+import { parsePlannerDbRow, RawPlannerDbRow } from '../../src/products/hub/kalender/kalenderService';
 
 export { parsePlannerDbRow };
 export type { RawPlannerDbRow };

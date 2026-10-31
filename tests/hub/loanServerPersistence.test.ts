@@ -1,8 +1,8 @@
-import { Readable } from 'node:stream';
+﻿import { Readable } from 'node:stream';
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import { handleLoanWrite, loanCanRead } from '../../api/loanPersistence';
+import { handleLoanWrite, loanCanRead } from '../../api/_routes/loanPersistence';
 import { StagingPeminjamanService } from '../../src/products/hub/peminjaman/stagingPeminjamanService';
-import type { SessionPayload } from '../../api/auth/_utils/types';
+import type { SessionPayload } from '../../api/_routes/auth/_utils/types';
 
 const { directRpc } = vi.hoisted(() => ({ directRpc: vi.fn() }));
 vi.mock('../../src/core/supabase/client', () => ({ isSupabaseConfigured: () => true, getSupabaseClient: () => ({ rpc: directRpc }) }));

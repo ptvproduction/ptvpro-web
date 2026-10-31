@@ -1,8 +1,8 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
+﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
-import { safeRandomUuid } from '../src/shared/utils/uuid';
+import { safeRandomUuid } from '../../src/shared/utils/uuid';
 
 export const PLATFORMS = [
   'Instagram',

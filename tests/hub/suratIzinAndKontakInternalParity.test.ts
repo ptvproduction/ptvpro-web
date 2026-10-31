@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { handleDokumenApiRequest } from '../../api/dokumen';
+﻿import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { handleDokumenApiRequest } from '../../api/_routes/dokumen';
 import { docsStore } from '../../src/products/hub/dokumen-saya/docsStore';
 import { dokumenService } from '../../src/products/hub/dokumen-saya/dokumenService';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
-import * as identityModule from '../../api/auth/_utils/identity';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
+import * as identityModule from '../../api/_routes/auth/_utils/identity';
 
 const liveStagingUrl = 'https://swadgljnyelsjstqqxbm.supabase.co';
 const liveServiceRoleKey = 'unit-only-key';
@@ -180,7 +180,7 @@ describe('PTVPRO — Generator Surat Izin Legacy Parity & Kontak Internal Parity
 });
 
 // Unit boundary: the payload fixture stands for a separately authorized database snapshot.
-vi.mock('../../api/auth/_utils/identity', async importOriginal => {
- const actual = await importOriginal<typeof import('../../api/auth/_utils/identity')>();
+vi.mock('../../api/_routes/auth/_utils/identity', async importOriginal => {
+ const actual = await importOriginal<typeof import('../../api/_routes/auth/_utils/identity')>();
  return { ...actual, refreshLiveSession: vi.fn(async (session: any) => ['hub.access', ...(session.capabilities || [])]), };
 });

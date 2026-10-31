@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import { hashSync } from 'bcryptjs';
-import { verifyLegacyBcryptPassword } from '../../api/auth/_utils/legacyPassword';
+import { verifyLegacyBcryptPassword } from '../../api/_routes/auth/_utils/legacyPassword';
 import pythonFixture from '../fixtures/legacy-bcrypt151-synthetic.json';
 
 const syntheticPassword = 'PTV151-SYNTHETIC-ONLY';

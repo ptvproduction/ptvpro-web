@@ -1,7 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+﻿import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
-import handler from '../../api/verifikasi-surat';
+import handler from '../../api/_routes/verifikasi-surat';
 import { verifyDocumentOnServer } from '../../src/products/verification/publicDocumentService';
 
 const { query, createClient } = vi.hoisted(() => ({ query: vi.fn(), createClient: vi.fn() }));

@@ -1,10 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+﻿import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { renderToString } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
-import handler, { readFinance } from '../../api/finance';
-import * as session from '../../api/auth/_utils/crypto';
-import * as access from '../../api/financeAccess';
+import handler, { readFinance } from '../../api/_routes/finance';
+import * as session from '../../api/_routes/auth/_utils/crypto';
+import * as access from '../../api/_routes/financeAccess';
 import { FinancePage } from '../../src/products/hub/keuangan/FinancePage';
 import type { FinanceSnapshot } from '../../src/products/hub/keuangan/financeFoundation';
 import { getStoredRecords, getStoredSemesters, saveRecords, saveSemesters } from '../../src/products/hub/keuangan/kasKruService';

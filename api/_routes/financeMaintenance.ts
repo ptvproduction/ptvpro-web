@@ -1,4 +1,4 @@
-import fs from 'fs';
+﻿import fs from 'fs';
 import { financeBackendUrl } from './auth/_utils/financeLocalHarness';
 
 export const financeMaintenanceResponse = {
@@ -30,9 +30,3 @@ export function financeMaintenanceActive(): boolean {
   }
 }
 
-
-export default function handler(_req: unknown, res: { status: (c: number) => { json: (d: unknown) => void } }) {
-  if (res && typeof res.status === 'function') {
-    return res.status(404).json({ error: 'Endpoint not found' });
-  }
-}

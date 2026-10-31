@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleBroadcastApiRequest } from '../../api/broadcast';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { handleBroadcastApiRequest } from '../../api/_routes/broadcast';
 import {
   mapSuratIzinToDoc,
   mapSuratTugasToDoc,
@@ -7,8 +7,8 @@ import {
   type RawSuratIzinDbRow,
   type RawSuratTugasDbRow,
   type RawSuratBarangDbRow,
-} from '../../api/dokumen';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
+} from '../../api/_routes/dokumen';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
 import { DEFAULT_ANNOUNCEMENTS } from '../../src/products/hub/broadcast/broadcastStore';
 import { INITIAL_DOCS_FIXTURES } from '../../src/products/hub/dokumen-saya/mock/docsMockData';
 

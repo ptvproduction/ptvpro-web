@@ -1,6 +1,6 @@
-import {describe,it,expect,vi} from 'vitest';
+﻿import {describe,it,expect,vi} from 'vitest';
 import type {SupabaseClient} from '@supabase/supabase-js';
-import {readPhase1PersonnelRows} from '../../api/crewPhase1Adapter';
+import {readPhase1PersonnelRows} from '../../api/_routes/crewPhase1Adapter';
 import {mapLegacyKruRowToCrewMember,type RawLegacyKruDbRow} from '../../src/products/hub/kru/kruMapper';
 import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';

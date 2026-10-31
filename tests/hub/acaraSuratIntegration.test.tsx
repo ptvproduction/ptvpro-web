@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { handleDokumenApiRequest } from '../../api/dokumen';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
+﻿import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { handleDokumenApiRequest } from '../../api/_routes/dokumen';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
 import { docsStore } from '../../src/products/hub/dokumen-saya/docsStore';
 import { dokumenService } from '../../src/products/hub/dokumen-saya/dokumenService';
 
@@ -285,7 +285,7 @@ describe('Integrasi Surat Tugas & Izin Pengeluaran Barang dari Detail Acara', ()
 });
 
 // Unit boundary: the payload fixture stands for a separately authorized database snapshot.
-vi.mock('../../api/auth/_utils/identity', async importOriginal => {
- const actual = await importOriginal<typeof import('../../api/auth/_utils/identity')>();
+vi.mock('../../api/_routes/auth/_utils/identity', async importOriginal => {
+ const actual = await importOriginal<typeof import('../../api/_routes/auth/_utils/identity')>();
  return { ...actual, refreshLiveSession: vi.fn(async (session: any) => ['hub.access', ...(session.capabilities || [])]), };
 });

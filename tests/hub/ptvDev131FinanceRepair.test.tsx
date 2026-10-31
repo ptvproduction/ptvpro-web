@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   calculateKasKruMatrix,
@@ -10,7 +10,7 @@ import type { FinanceSemester } from '../../src/products/hub/keuangan/kasKruType
 import { CANONICAL_STAGING_CREW_FIXTURES } from '../../src/products/hub/kru/canonicalCrewData';
 import type { CrewMember } from '../../src/products/hub/kru/types';
 import { hasCapability, type PermissionContext } from '../../src/core/policy/policyEngine';
-import { resolveFinanceAccess } from '../../api/financeAccess';
+import { resolveFinanceAccess } from '../../api/_routes/financeAccess';
 
 const mockSemester: FinanceSemester = {
   id: 'sem-2026-ganjil',

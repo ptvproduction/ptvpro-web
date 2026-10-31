@@ -1,14 +1,14 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
+﻿import type { SupabaseClient } from '@supabase/supabase-js';
 import type { SessionPayload } from './auth/_utils/types';
 import type { FinanceAccess } from './financeAccess';
-import type { FinanceOperationalData } from '../src/products/hub/keuangan/financeOperationalData';
+import type { FinanceOperationalData } from '../../src/products/hub/keuangan/financeOperationalData';
 import {
   fetchSemestersCloudWithClient,
   fetchKasRecordsCloudWithClient,
   fetchLoansCloudWithClient,
   fetchCanonicalCrewRosterWithClient,
   fetchKasKruTariffConfigWithClient,
-} from '../src/products/hub/keuangan/financeOperationalReader';
+} from '../../src/products/hub/keuangan/financeOperationalReader';
 
 export async function readFinanceOperational(
   db: SupabaseClient, access: FinanceAccess, session: Pick<SessionPayload, 'account_id' | 'iat'>,
@@ -61,9 +61,3 @@ export async function readFinanceOperational(
   };
 }
 
-
-export default function handler(_req: unknown, res: { status: (c: number) => { json: (d: unknown) => void } }) {
-  if (res && typeof res.status === 'function') {
-    return res.status(404).json({ error: 'Endpoint not found' });
-  }
-}

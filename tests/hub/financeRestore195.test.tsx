@@ -1,7 +1,7 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+﻿import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
-import { readFinanceOperational } from '../../api/financeOperationalRead';
+import { readFinanceOperational } from '../../api/_routes/financeOperationalRead';
 import { FinancePage } from '../../src/products/hub/keuangan/FinancePage';
 import { FinanceKasKruView } from '../../src/products/hub/keuangan/FinanceKasKruView';
 import { FinancePiutangView } from '../../src/products/hub/keuangan/FinancePiutangView';

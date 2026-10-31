@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import handler from '../../api/finance';
-import { financeMaintenanceActive } from '../../api/financeMaintenance';
+﻿import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import handler from '../../api/_routes/finance';
+import { financeMaintenanceActive } from '../../api/_routes/financeMaintenance';
 import { uploadFinanceProof } from '../../src/products/hub/keuangan/financeOperationalCloudService';
 
 const mocks = vi.hoisted(() => ({ client: vi.fn() }));

@@ -1,9 +1,9 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+﻿import { afterEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { signSessionToken, verifySessionToken } from '../../api/auth/_utils/crypto';
-import { resolveIdentityByCredentials, refreshLiveSession, unlinkGoogleIdentityFromAccount } from '../../api/auth/_utils/identity';
-import { planIdentityReconciliation } from '../../api/auth/_utils/identityReconciliation';
+import { signSessionToken, verifySessionToken } from '../../api/_routes/auth/_utils/crypto';
+import { resolveIdentityByCredentials, refreshLiveSession, unlinkGoogleIdentityFromAccount } from '../../api/_routes/auth/_utils/identity';
+import { planIdentityReconciliation } from '../../api/_routes/auth/_utils/identityReconciliation';
 
 const secret='149-remediation-unit-secret';
 const now=Math.floor(Date.now()/1000);

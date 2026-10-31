@@ -1,4 +1,4 @@
-vi.mock('../../api/auth/_utils/liveAccess', () => ({ resolveLiveAccess: async () => ({ account: { id: 'acc-025', username: 'zidna', status_akun: 'active' }, identity: { ptv_id: 'PTV-025', full_name: 'Zidna Santri' }, membership: { division_id: 'technical', position_title: 'Kru', status_organisasi: 'active' }, profiles: ['crew'], context: { capabilities: ['hub.access', 'inventory.view'], allowed_overrides: [], denied_overrides: [] } }) }));
+﻿vi.mock('../../api/_routes/auth/_utils/liveAccess', () => ({ resolveLiveAccess: async () => ({ account: { id: 'acc-025', username: 'zidna', status_akun: 'active' }, identity: { ptv_id: 'PTV-025', full_name: 'Zidna Santri' }, membership: { division_id: 'technical', position_title: 'Kru', status_organisasi: 'active' }, profiles: ['crew'], context: { capabilities: ['hub.access', 'inventory.view'], allowed_overrides: [], denied_overrides: [] } }) }));
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   generatePkceVerifier,
@@ -7,18 +7,18 @@ import {
   verifyHmacState,
   signSessionToken,
   verifySessionToken,
-} from '../../api/auth/_utils/crypto';
+} from '../../api/_routes/auth/_utils/crypto';
 import {
   parseCookies,
   serializeCookie,
   appendSetCookieHeader,
-} from '../../api/auth/_utils/cookies';
-import { resolveIdentityByGoogleSub } from '../../api/auth/_utils/identity';
-import type { SessionPayload } from '../../api/auth/_utils/types';
-import loginHandler from '../../api/auth/google/login';
-import callbackHandler from '../../api/auth/google/callback';
-import sessionHandler from '../../api/auth/session';
-import logoutHandler from '../../api/auth/logout';
+} from '../../api/_routes/auth/_utils/cookies';
+import { resolveIdentityByGoogleSub } from '../../api/_routes/auth/_utils/identity';
+import type { SessionPayload } from '../../api/_routes/auth/_utils/types';
+import loginHandler from '../../api/_routes/auth/google/login';
+import callbackHandler from '../../api/_routes/auth/google/callback';
+import sessionHandler from '../../api/_routes/auth/session';
+import logoutHandler from '../../api/_routes/auth/logout';
 import { VercelAuthService } from '../../src/core/auth/authService';
 
 const TEST_SECRET = 'super-secret-key-32-chars-long-ptvpro-1234';

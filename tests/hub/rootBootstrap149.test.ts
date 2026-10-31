@@ -1,16 +1,16 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+﻿import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createHash, generateKeyPairSync, sign } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { renderApprovedBootstrap,renderApprovedBootstrapRevert, validateBootstrapPlan } from '../../scripts/lib/root-bootstrap-149.mjs';
 import { inspectLegacyPasswordHash } from '../../scripts/lib/legacy-crew-reconciliation.mjs';
-import { recordPortalLoginProof } from '../../api/auth/_utils/loginProof';
-import callback from '../../api/auth/google/callback';
-import { createHmacState } from '../../api/auth/_utils/crypto';
+import { recordPortalLoginProof } from '../../api/_routes/auth/_utils/loginProof';
+import callback from '../../api/_routes/auth/google/callback';
+import { createHmacState } from '../../api/_routes/auth/_utils/crypto';
 
 const db=vi.hoisted(()=>({from:vi.fn()}));
 const live=vi.hoisted(()=>vi.fn());
 vi.mock('@supabase/supabase-js',()=>({createClient:()=>db}));
-vi.mock('../../api/auth/_utils/liveAccess',()=>({resolveLiveAccess:live}));
+vi.mock('../../api/_routes/auth/_utils/liveAccess',()=>({resolveLiveAccess:live}));
 const template=readFileSync('docs/PTVPRO-ACCESS-149-ROOT-BOOTSTRAP-TEMPLATE.sql','utf8');
 const now=Date.now();
 function target(n:number) {return {accountId:`00000000-0000-4000-8000-00000000000${n}`,identityId:`10000000-0000-4000-8000-00000000000${n}`,accountVersion:new Date(now-10000).toISOString(),credentialVersion:new Date(now-10000).toISOString(),loginProofId:String(n),expectedProfiles:['crew'],expectedOverrides:[]};}

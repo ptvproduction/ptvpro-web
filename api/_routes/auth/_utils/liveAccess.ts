@@ -1,6 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
+﻿import type { SupabaseClient } from '@supabase/supabase-js';
 import type { SessionPayload } from './types';
-import { hasCapability, type AppCapability, type PermissionContext, type AccessProfile } from '../../../src/core/policy';
+import { hasCapability, type AppCapability, type PermissionContext, type AccessProfile } from '../../../../src/core/policy';
 import { sessionNeedsRegistry, portalSessionValid } from './portalLifecycle';
 import { getPositionCapabilityMappings, resolvePositionCapabilities } from '../../positionMapping';
 

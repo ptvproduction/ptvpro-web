@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { CANONICAL_STAGING_CREW_FIXTURES } from '../../src/products/hub/kru/canonicalCrewData';
 import { groupCrewByAngkatan, formatAngkatanDisplay } from '../../src/products/hub/kru/kruStore';
-import { handleKruApiRequest, mapLegacyKruRowToCrewMember } from '../../api/kru';
+import { handleKruApiRequest, mapLegacyKruRowToCrewMember } from '../../api/_routes/kru';
 import { getCrewEffectiveCapabilities } from '../../src/products/hub/kru/utils/crewPermissions';
 import { StagingKruService } from '../../src/products/hub/kru/kruService';
 

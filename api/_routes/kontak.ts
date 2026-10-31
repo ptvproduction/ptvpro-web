@@ -1,9 +1,9 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
+﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
-import { safeRandomUuid } from '../src/shared/utils/uuid';
+import { safeRandomUuid } from '../../src/shared/utils/uuid';
 
 import {
   categorizeExternalContact,
@@ -12,7 +12,7 @@ import {
   type RawKontakEksternalDbRow,
   type EnrichedExternalContact,
   type EnrichedInternalContact,
-} from '../src/products/hub/kontak/kontakMapper';
+} from '../../src/products/hub/kontak/kontakMapper';
 
 export type { RawKontakEksternalDbRow, EnrichedExternalContact, EnrichedInternalContact };
 export { categorizeExternalContact, classifyInternalContact };

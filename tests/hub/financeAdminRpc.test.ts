@@ -1,10 +1,10 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import handler from '../../api/finance';
+﻿import { afterEach, describe, expect, it, vi } from 'vitest';
+import handler from '../../api/_routes/finance';
 
 const mocks = vi.hoisted(() => ({ rpc: vi.fn(), from: vi.fn() }));
 vi.mock('@supabase/supabase-js', () => ({ createClient: () => mocks }));
-vi.mock('../../api/auth/_utils/crypto', () => ({ verifySessionToken: () => ({ account_id: 'verified-account', iat: 1790000000 }) }));
-vi.mock('../../api/financeAccess', () => ({ resolveFinanceAccess: () => ({ identityId: 'verified-identity', canManage: true, global: true }) }));
+vi.mock('../../api/_routes/auth/_utils/crypto', () => ({ verifySessionToken: () => ({ account_id: 'verified-account', iat: 1790000000 }) }));
+vi.mock('../../api/_routes/financeAccess', () => ({ resolveFinanceAccess: () => ({ identityId: 'verified-identity', canManage: true, global: true }) }));
 afterEach(() => { vi.unstubAllEnvs(); vi.clearAllMocks(); });
 
 describe('Finance admin API contract (mock only)', () => {

@@ -1,5 +1,5 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { AppCapability } from '../src/core/policy/capabilities';
+﻿import type { SupabaseClient } from '@supabase/supabase-js';
+import type { AppCapability } from '../../src/core/policy/capabilities';
 
 export const SYSTEM_CONFIG_KEY = 'system_position_capability_mapping';
 export const SYSTEM_CONFIG_PTV_ID = 'PTV-CONFIG-01';
@@ -604,9 +604,3 @@ export function resolvePositionCapabilities(
   return mappings['Kru Operasional'] || [];
 }
 
-
-export default function handler(_req: unknown, res: { status: (c: number) => { json: (d: unknown) => void } }) {
-  if (res && typeof res.status === 'function') {
-    return res.status(404).json({ error: 'Endpoint not found' });
-  }
-}

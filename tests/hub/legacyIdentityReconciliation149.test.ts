@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { crewArchiveSourceKey, evidenceFingerprint, reconcileLegacySnapshot } from '../../scripts/lib/legacy-crew-reconciliation.mjs';
-import { planIdentityReconciliation } from '../../api/auth/_utils/identityReconciliation';
+import { planIdentityReconciliation } from '../../api/_routes/auth/_utils/identityReconciliation';
 
 const uuid='11111111-1111-4111-8111-111111111111';
 function fixture() {

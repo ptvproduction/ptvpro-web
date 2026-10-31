@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+﻿import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import type { CrewMember } from '../../src/products/hub/kru/types';
@@ -162,7 +162,7 @@ describe('PTV-DEV-132: Finance 2.0 Finalization & Staging Readiness', () => {
 
   describe('2. Multi-Layer Security & Access Barrier', () => {
     it('fail-closed: Pembina and Pengarah are completely forbidden from finance access', async () => {
-      const { resolveFinanceAccess } = await import('../../api/financeAccess');
+      const { resolveFinanceAccess } = await import('../../api/_routes/financeAccess');
 
     const mockDbPembina: any = {
       from: (table: string) => {

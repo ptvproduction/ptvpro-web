@@ -1,6 +1,6 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
+﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import crypto from 'node:crypto';
-import { normalizeAcaraColor } from '../src/products/hub/acara/utils/acaraColors';
+import { normalizeAcaraColor } from '../../src/products/hub/acara/utils/acaraColors';
 import { createClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';

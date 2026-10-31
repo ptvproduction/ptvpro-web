@@ -1,12 +1,12 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
+﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { hash } from 'bcryptjs';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { resolveLiveAccess } from './auth/_utils/liveAccess';
-import { isOperationalCrew, CANONICAL_OPERATIONAL_DIVISIONS } from '../src/products/hub/kru/types';
-import type { CrewMember, CrewRole } from '../src/products/hub/kru/types';
-import { mapLegacyKruRowToCrewMember, type RawLegacyKruDbRow } from '../src/products/hub/kru/kruMapper';
+import { isOperationalCrew, CANONICAL_OPERATIONAL_DIVISIONS } from '../../src/products/hub/kru/types';
+import type { CrewMember, CrewRole } from '../../src/products/hub/kru/types';
+import { mapLegacyKruRowToCrewMember, type RawLegacyKruDbRow } from '../../src/products/hub/kru/kruMapper';
 export type { RawLegacyKruDbRow };
 export { mapLegacyKruRowToCrewMember };
 

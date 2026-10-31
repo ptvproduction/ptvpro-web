@@ -1,11 +1,11 @@
-import { Readable } from 'node:stream';
+﻿import { Readable } from 'node:stream';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import handler from '../../api/peminjaman';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
-import type { SessionPayload } from '../../api/auth/_utils/types';
+import handler from '../../api/_routes/peminjaman';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
+import type { SessionPayload } from '../../api/_routes/auth/_utils/types';
 
 const f = vi.hoisted(() => ({ caps: ['hub.access', 'loans.view'] as string[], rpc: vi.fn(), from: vi.fn() }));
-vi.mock('../../api/auth/_utils/identity', () => ({ refreshLiveSession: async (session: SessionPayload) => { session.capabilities = [...f.caps]; return session.capabilities; }, verifyAccountStatusLive: async () => true }));
+vi.mock('../../api/_routes/auth/_utils/identity', () => ({ refreshLiveSession: async (session: SessionPayload) => { session.capabilities = [...f.caps]; return session.capabilities; }, verifyAccountStatusLive: async () => true }));
 vi.mock('@supabase/supabase-js', () => ({ createClient: () => ({ from: f.from, rpc: f.rpc }) }));
 const secret = 'synthetic-loan165-cookie-test-only';
 beforeEach(() => {

@@ -1,17 +1,17 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+﻿import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Readable } from 'node:stream';
 import { hashSync } from 'bcryptjs';
-import { authenticatePortalPassword, fingerprintSession, sessionArguments } from '../../api/auth/_utils/portalLifecycle';
-import { signSessionToken, verifySessionToken } from '../../api/auth/_utils/crypto';
-import logout from '../../api/auth/logout';
-import login from '../../api/auth/login';
-import type { ApiRequest, ApiResponse, SessionPayload } from '../../api/auth/_utils/types';
+import { authenticatePortalPassword, fingerprintSession, sessionArguments } from '../../api/_routes/auth/_utils/portalLifecycle';
+import { signSessionToken, verifySessionToken } from '../../api/_routes/auth/_utils/crypto';
+import logout from '../../api/_routes/auth/logout';
+import login from '../../api/_routes/auth/login';
+import type { ApiRequest, ApiResponse, SessionPayload } from '../../api/_routes/auth/_utils/types';
 
 const mock = vi.hoisted(() => ({ rpc: vi.fn(), live: vi.fn(), create: vi.fn() }));
 vi.mock('@supabase/supabase-js', () => ({ createClient: (...args: unknown[]) => {
  mock.create(...args); return { rpc: mock.rpc, from: () => ({ select: async () => ({data:[{key:'hub.access'}],error:null}) }) };
 } }));
-vi.mock('../../api/auth/_utils/liveAccess', () => ({ resolveLiveAccess: mock.live }));
+vi.mock('../../api/_routes/auth/_utils/liveAccess', () => ({ resolveLiveAccess: mock.live }));
 const secret='SYNTHETIC-PHASE1-SECRET-ONLY-32-CHARS';
 const account='00000000-0000-4000-8000-000000000001',identity='10000000-0000-4000-8000-000000000001';
 const password='SYNTHETIC-PHASE1-PASSWORD';

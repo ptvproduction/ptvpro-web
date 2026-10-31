@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { financeBackendUrl } from '../../api/auth/_utils/financeLocalHarness';
+﻿import { afterEach, describe, expect, it, vi } from 'vitest';
+import { financeBackendUrl } from '../../api/_routes/auth/_utils/financeLocalHarness';
 afterEach(() => vi.unstubAllEnvs());
 describe('Finance local harness binding', () => {
   it('accepts only the explicit loopback test endpoint', () => {

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mapDbRowToAcaraItem, RawAcaraDbRow, acaraService } from '../../src/products/hub/acara/acaraService';
-import handler from '../../api/acara';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
+import handler from '../../api/_routes/acara';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 describe('PTV PRO — Acara Module Staging Integration & Legacy Parity Tests', () => {
@@ -397,7 +397,7 @@ describe('PTV PRO — Acara Module Staging Integration & Legacy Parity Tests', (
 });
 
 // Unit boundary: the payload fixture stands for a separately authorized database snapshot.
-vi.mock('../../api/auth/_utils/identity', async importOriginal => {
- const actual = await importOriginal<typeof import('../../api/auth/_utils/identity')>();
+vi.mock('../../api/_routes/auth/_utils/identity', async importOriginal => {
+ const actual = await importOriginal<typeof import('../../api/_routes/auth/_utils/identity')>();
  return { ...actual, refreshLiveSession: vi.fn(async (session: any) => ['hub.access', ...(session.capabilities || [])]), };
 });

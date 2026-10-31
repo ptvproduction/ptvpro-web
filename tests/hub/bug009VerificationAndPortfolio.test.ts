@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+﻿import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   determineDocumentStatus,
   VALID_INSTANSI_LIST,
-} from '../../api/verifikasi-surat';
+} from '../../api/_routes/verifikasi-surat';
 import { crewPortfolioService } from '../../src/products/hub/kru/services/crewPortfolioService';
 
 describe('BUG-009: Public Verification Redesign & Crew Portfolio', () => {

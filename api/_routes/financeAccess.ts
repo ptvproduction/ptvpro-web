@@ -1,4 +1,4 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
+﻿import type { SupabaseClient } from '@supabase/supabase-js';
 import type { SessionPayload } from './auth/_utils/types';
 import { sessionNeedsRegistry, portalSessionValid } from './auth/_utils/portalLifecycle';
 
@@ -48,9 +48,3 @@ export async function resolveFinanceAccess(db: SupabaseClient, session: SessionP
   return { identityId, canManage, global };
 }
 
-
-export default function handler(_req: unknown, res: { status: (c: number) => { json: (d: unknown) => void } }) {
-  if (res && typeof res.status === 'function') {
-    return res.status(404).json({ error: 'Endpoint not found' });
-  }
-}

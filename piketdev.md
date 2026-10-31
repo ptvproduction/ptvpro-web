@@ -2,6 +2,28 @@
 
 # PIKET DEV — PTV PRO
 
+- **PTV-DEV-249 / zidnal / Selesai (HOTFIX: Restorasi Penuh Production API & Universal Serverless Router).**
+  - **Akar Masalah & Kebutuhan:**
+    1. Pengecualian folder `api/` pada `.vercelignore` sebelumnya menonaktifkan seluruh API backend di Vercel Production.
+    2. Batasan kuota Vercel Hobby Tier membatasi maksimal 12 Serverless Functions per deployment, sementara repositori memiliki 25 endpoint dan 7 helper modules di `api/` (total 32 file) yang bila diletakkan langsung di root `api/` memicu error build Vercel.
+  - **Solusi & Implementasi:**
+    1. *Hapus Pengecualian `.vercelignore`:* Menghapus aturan `api/` dari `.vercelignore` sehingga backend serverless kembali di-deploy ke Vercel.
+    2. *Arsitektur Router Tunggal Konsolidasi:*
+       - Memindahkan seluruh handler endpoint (25 rute resmi) dan modul helper internal ke direktori `api/_routes/` (direktori ber-awalan `_` yang secara resmi diabaikan oleh Vercel untuk pembuatan fungsi mandiri).
+       - Menghapus dummy fallback handler dari 7 file helper internal (`crewPhase1Adapter.ts`, `financeAccess.ts`, `financeMaintenance.ts`, `financeOperationalRead.ts`, `loanPersistence.ts`, `positionMapping.ts`, `reportPersistence.ts`).
+       - Membangun router universal berkinerja tinggi di `api/[...route].ts` dan `api/index.ts` yang menangani seluruh kontrak HTTP, method, routing, query parsing, body streams, cookie autentikasi, serta mengembalikan respon JSON murni (termasuk status 404 JSON untuk rute tidak dikenal, tanpa pernah jatuh ke HTML SPA).
+    3. *Penyelarasan Runtime & Build:*
+       - `vercel.json`: Mengatur rewrite eksplisit `/api` dan `/api/:path*` ke backend Serverless Function.
+       - `vite.config.ts`: Mengintegrasikan `vercelApiDevPlugin` ke router `api/index.ts` sehingga local dev (port 5174) dan production Vercel memiliki 100% paritas arsitektur.
+       - Memperbarui path impor pada 52 berkas pengujian di `tests/` dan `scripts/lib/inventory170-preview-gateway.ts`.
+  - **File:** `api/[...route].ts`, `api/index.ts`, `api/_routes/*`, `vercel.json`, `.vercelignore`, `vite.config.ts`, `tests/apiRouter.test.ts`, `piketdev.md`.
+  - **Validasi:**
+    - `npm run typecheck`: PASS (0 errors).
+    - `tests/apiRouter.test.ts`: PASS (7/7 tests).
+    - Auth & Domain Test Suites (`accessReadiness152`, `vercelDirectAuth`, `publicDocumentServer`, `publicVerification`, `kruStagingIntegration`, `acaraStagingRegression`, `kalenderStagingRegression`): PASS (163/163 tests).
+    - `npm run build`: PASS (built in 16.29s, 0 errors).
+  - **Code Hygiene:** CLN-276.
+
 - **PTV-DEV-248 / zidnal / Selesai (Integrasi GitHub Main & Sukses Deployment Vercel).**
   - **Akar Masalah & Kebutuhan:**
     1. Kode terbaru commit `0818663` ter-push ke `master`, sedangkan branch production aktif Vercel adalah `main`.

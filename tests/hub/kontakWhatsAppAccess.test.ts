@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
-import type { SessionPayload } from '../../api/auth/_utils/types';
-import handler from '../../api/kontak';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
+import type { SessionPayload } from '../../api/_routes/auth/_utils/types';
+import handler from '../../api/_routes/kontak';
 import fs from 'node:fs';
 
 // Mock Supabase client to simulate live Staging PostgreSQL with patched contacts
@@ -61,7 +61,7 @@ vi.mock('@supabase/supabase-js', () => {
 });
 
 // Mock verifyAccountStatusLive to return true for active staging accounts
-vi.mock('../../api/auth/_utils/identity', async (importOriginal) => {
+vi.mock('../../api/_routes/auth/_utils/identity', async (importOriginal) => {
   const actual: any = await importOriginal();
   return {
     ...actual,

@@ -1,14 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleKruApiRequest } from '../../api/kru';
-import kontakHandler from '../../api/kontak';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
-import type { SessionPayload } from '../../api/auth/_utils/types';
-import * as identityModule from '../../api/auth/_utils/identity';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { handleKruApiRequest } from '../../api/_routes/kru';
+import kontakHandler from '../../api/_routes/kontak';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
+import type { SessionPayload } from '../../api/_routes/auth/_utils/types';
+import * as identityModule from '../../api/_routes/auth/_utils/identity';
 
 // Unit harness: no credentials or network access to cloud.
 const liveStagingUrl = 'https://swadgljnyelsjstqqxbm.supabase.co';
 const liveServiceRoleKey = 'unit-test-service-key';
-vi.mock('../../api/auth/_utils/liveAccess', () => ({ resolveLiveAccess: async (_db: unknown, session: SessionPayload) => ({ can: (cap: string) => session.capabilities.includes(cap) }) }));
+vi.mock('../../api/_routes/auth/_utils/liveAccess', () => ({ resolveLiveAccess: async (_db: unknown, session: SessionPayload) => ({ can: (cap: string) => session.capabilities.includes(cap) }) }));
 vi.mock('@supabase/supabase-js', () => ({ createClient: () => ({ from: () => {
   const chain: any = { then: (resolve: any) => resolve({ data: [], error: null }), maybeSingle: async () => ({ data: null, error: null }), single: async () => ({ data: null, error: null }) };
   for (const method of ['select', 'eq', 'or', 'order', 'limit']) chain[method] = () => chain;
@@ -312,7 +312,7 @@ describe('PTVPRO — CRUD & Persistence Unit Test Suite (Kru & Kontak Eksternal)
 });
 
 // Unit boundary: the payload fixture stands for a separately authorized database snapshot.
-vi.mock('../../api/auth/_utils/identity', async importOriginal => {
- const actual = await importOriginal<typeof import('../../api/auth/_utils/identity')>();
+vi.mock('../../api/_routes/auth/_utils/identity', async importOriginal => {
+ const actual = await importOriginal<typeof import('../../api/_routes/auth/_utils/identity')>();
  return { ...actual, refreshLiveSession: vi.fn(async (session: any) => ['hub.access', ...(session.capabilities || [])]), };
 });

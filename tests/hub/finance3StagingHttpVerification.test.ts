@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
+﻿import { describe, it, expect } from 'vitest';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { EventEmitter } from 'node:events';
 import fs from 'node:fs';
 import path from 'node:path';
-import handler from '../../api/finance';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
+import handler from '../../api/_routes/finance';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
 
 function loadEnvFile(file: string): Record<string, string> {
   const p = path.resolve(process.cwd(), file);

@@ -1,9 +1,9 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
+﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
 import { resolveLiveAccess } from './auth/_utils/liveAccess';
-import { accessChangeSchema, type AccessAccount } from '../src/products/hub/akses/accessContract';
+import { accessChangeSchema, type AccessAccount } from '../../src/products/hub/akses/accessContract';
 import { getPositionCapabilityMappings, savePositionCapabilityMappings, formatPositionMappingsAsArray } from './positionMapping';
 import { hash } from 'bcryptjs';
 

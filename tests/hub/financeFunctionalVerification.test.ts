@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { EventEmitter } from 'node:events';
-import handler, { readFinance } from '../../api/finance';
-import * as cookiesUtil from '../../api/auth/_utils/cookies';
-import * as cryptoUtil from '../../api/auth/_utils/crypto';
-import * as financeAccess from '../../api/financeAccess';
+import handler, { readFinance } from '../../api/_routes/finance';
+import * as cookiesUtil from '../../api/_routes/auth/_utils/cookies';
+import * as cryptoUtil from '../../api/_routes/auth/_utils/crypto';
+import * as financeAccess from '../../api/_routes/financeAccess';
 import {
   pocketFormSchema,
   multiPocketCommandSchema,

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+﻿import { describe, it, expect } from 'vitest';
 import {
   Santri,
   IzinColKey,
@@ -10,7 +10,7 @@ import {
   parseCSV,
   SHEET_CSV_URL,
 } from '../../src/products/hub/surat/generator/mock/santriMockData';
-import { publicDocumentStatus } from '../../api/verifikasi-surat';
+import { publicDocumentStatus } from '../../api/_routes/verifikasi-surat';
 
 describe('PTVPRO — Generator Surat Izin | Legacy PHP Parity Tests', () => {
   // ── 1. Google Sheets CSV Parser & Canonical Fallback ──

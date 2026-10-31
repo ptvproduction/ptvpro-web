@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import handler from '../../api/finance';
+﻿import { afterEach, describe, expect, it, vi } from 'vitest';
+import handler from '../../api/_routes/finance';
 
 const mocks = vi.hoisted(() => ({
   rpc: vi.fn(),
@@ -18,14 +18,14 @@ vi.mock('@supabase/supabase-js', () => ({
   }),
 }));
 
-vi.mock('../../api/auth/_utils/crypto', () => ({
+vi.mock('../../api/_routes/auth/_utils/crypto', () => ({
   verifySessionToken: () => ({
     account_id: 'verified-account-uuid',
     iat: 1790000000,
   }),
 }));
 
-vi.mock('../../api/financeAccess', () => ({
+vi.mock('../../api/_routes/financeAccess', () => ({
   resolveFinanceAccess: () => ({
     identityId: 'verified-identity-uuid',
     canManage: true,

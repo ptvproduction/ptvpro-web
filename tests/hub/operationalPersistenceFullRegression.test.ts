@@ -1,12 +1,12 @@
-import * as liveIdentity from '../../api/auth/_utils/identity';
+﻿import * as liveIdentity from '../../api/_routes/auth/_utils/identity';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import acaraHandler, { parseAcaraDbRow, extractValidSqlTime } from '../../api/acara';
-import catatanHandler from '../../api/catatan';
-import plannerHandler, { parsePlannerDbRow } from '../../api/planner';
+import acaraHandler, { parseAcaraDbRow, extractValidSqlTime } from '../../api/_routes/acara';
+import catatanHandler from '../../api/_routes/catatan';
+import plannerHandler, { parsePlannerDbRow } from '../../api/_routes/planner';
 import { acaraService } from '../../src/products/hub/acara/acaraService';
 import { catatanService } from '../../src/products/hub/catatan/catatanService';
 import { kalenderService } from '../../src/products/hub/kalender/kalenderService';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
 
 describe('PTVPRO — Full Operational Persistence Regression Tests (Acara, Kalender, Planner, Catatan, Notulensi)', () => {
   const authSecret = 'ptvpro-secret-key-at-least-32-chars-long-123456';
@@ -270,7 +270,7 @@ describe('PTVPRO — Full Operational Persistence Regression Tests (Acara, Kalen
 });
 
 // Unit boundary: the payload fixture stands for a separately authorized database snapshot.
-vi.mock('../../api/auth/_utils/identity', async importOriginal => {
- const actual = await importOriginal<typeof import('../../api/auth/_utils/identity')>();
+vi.mock('../../api/_routes/auth/_utils/identity', async importOriginal => {
+ const actual = await importOriginal<typeof import('../../api/_routes/auth/_utils/identity')>();
  return { ...actual, refreshLiveSession: vi.fn(async (session: any) => ['hub.access', ...(session.capabilities || [])]), };
 });

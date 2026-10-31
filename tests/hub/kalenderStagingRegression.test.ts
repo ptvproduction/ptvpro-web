@@ -1,6 +1,6 @@
-import * as liveIdentity from '../../api/auth/_utils/identity';
+﻿import * as liveIdentity from '../../api/_routes/auth/_utils/identity';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { parsePlannerDbRow, RawPlannerDbRow } from '../../api/planner';
+import { parsePlannerDbRow, RawPlannerDbRow } from '../../api/_routes/planner';
 import { kalenderService } from '../../src/products/hub/kalender/kalenderService';
 import {
   generateMonthGridCells,
@@ -14,8 +14,8 @@ import {
   isPlannerActiveInMonth,
 } from '../../src/products/hub/kalender/utils/calendarDateUtils';
 import { CalendarEvent, ContentPlannerItem } from '../../src/products/hub/kalender/types';
-import handler from '../../api/planner';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
+import handler from '../../api/_routes/planner';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
 
 describe('Modul Kalender Staging Integration — Data Mapping & Recurrence', () => {
   it('harus memetakan data planner dengan target_tayang Masehi menjadi tanggal_masehi_tahunan', () => {
@@ -591,7 +591,7 @@ describe('Modul Kalender — 9 Pola Recurrence Legacy & Client CRUD Services', (
 });
 
 // Unit boundary: the payload fixture stands for a separately authorized database snapshot.
-vi.mock('../../api/auth/_utils/identity', async importOriginal => {
- const actual = await importOriginal<typeof import('../../api/auth/_utils/identity')>();
+vi.mock('../../api/_routes/auth/_utils/identity', async importOriginal => {
+ const actual = await importOriginal<typeof import('../../api/_routes/auth/_utils/identity')>();
  return { ...actual, refreshLiveSession: vi.fn(async (session: any) => ['hub.access', ...(session.capabilities || [])]), };
 });

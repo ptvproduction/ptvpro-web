@@ -1,8 +1,8 @@
-import { Readable } from 'node:stream';
+﻿import { Readable } from 'node:stream';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { writeReport } from '../../src/products/hub/reportPersistence';
-import { handleReportWrite, reportCanRead } from '../../api/reportPersistence';
-import type { SessionPayload } from '../../api/auth/_utils/types';
+import { handleReportWrite, reportCanRead } from '../../api/_routes/reportPersistence';
+import type { SessionPayload } from '../../api/_routes/auth/_utils/types';
 
 const { rpc } = vi.hoisted(() => ({ rpc: vi.fn() }));
 vi.mock('../../src/core/supabase/client', () => ({

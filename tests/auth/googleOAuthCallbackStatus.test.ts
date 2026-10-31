@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { resolveIdentityByGoogleSub } from '../../api/auth/_utils/identity';
-import callbackHandler from '../../api/auth/google/callback';
-import { createHmacState } from '../../api/auth/_utils/crypto';
-import type { ApiRequest, ApiResponse } from '../../api/auth/_utils/types';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { resolveIdentityByGoogleSub } from '../../api/_routes/auth/_utils/identity';
+import callbackHandler from '../../api/_routes/auth/google/callback';
+import { createHmacState } from '../../api/_routes/auth/_utils/crypto';
+import type { ApiRequest, ApiResponse } from '../../api/_routes/auth/_utils/types';
 
 // Supabase Mock State
 let tableHandlers: Record<string, () => any> = {};

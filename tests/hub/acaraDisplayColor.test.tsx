@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import { mapDbRowToAcaraItem } from '../../src/products/hub/acara/acaraService';
-import { parseAcaraDbRow as mapServer } from '../../api/acara';
+import { parseAcaraDbRow as mapServer } from '../../api/_routes/acara';
 import { ACARA_COLORS, normalizeAcaraColor } from '../../src/products/hub/acara/utils/acaraColors';
 import { AcaraCard } from '../../src/products/hub/acara/components/AcaraCard';
 import { resolveOfficialDomain } from '../../src/products/verification/verificationService';

@@ -1,14 +1,14 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+﻿import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { randomUUID } from 'node:crypto';
-import handler, { mapSuratIzinToDoc } from '../../api/dokumen';
-import publicHandler from '../../api/verifikasi-surat';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
+import handler, { mapSuratIzinToDoc } from '../../api/_routes/dokumen';
+import publicHandler from '../../api/_routes/verifikasi-surat';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
 import { getSuratIzinDocumentProps } from '../../src/products/hub/surat/generator/suratIzinDocument';
 import { StagingDokumenService } from '../../src/products/hub/dokumen-saya/dokumenService';
 
 const mocks = vi.hoisted(() => ({ rpc: vi.fn(), from: vi.fn(), caps: ['hub.access','documents.generate','documents.archive.view'] }));
 vi.mock('@supabase/supabase-js', () => ({ createClient: () => ({ rpc: mocks.rpc, from: mocks.from }) }));
-vi.mock('../../api/auth/_utils/identity', () => ({
+vi.mock('../../api/_routes/auth/_utils/identity', () => ({
   verifyAccountStatusLive: async () => true,
   refreshLiveSession: async () => mocks.caps,
 }));

@@ -1,11 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+﻿import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import handler from '../../api/acara';
+import handler from '../../api/_routes/acara';
 
 const { createClient, verifySessionToken } = vi.hoisted(() => ({ createClient: vi.fn(), verifySessionToken: vi.fn() }));
 vi.mock('@supabase/supabase-js', () => ({ createClient }));
-vi.mock('../../api/auth/_utils/crypto', () => ({ verifySessionToken }));
-vi.mock('../../api/auth/_utils/identity', () => ({ refreshLiveSession: vi.fn(async (session: any) => ['hub.access', ...(session.capabilities || [])]), verifyAccountStatusLive: vi.fn().mockResolvedValue(true) }));
+vi.mock('../../api/_routes/auth/_utils/crypto', () => ({ verifySessionToken }));
+vi.mock('../../api/_routes/auth/_utils/identity', () => ({ refreshLiveSession: vi.fn(async (session: any) => ['hub.access', ...(session.capabilities || [])]), verifyAccountStatusLive: vi.fn().mockResolvedValue(true) }));
 
 describe('Penyimpanan warna acara melalui metadata existing (database mock)', () => {
   let row: any;

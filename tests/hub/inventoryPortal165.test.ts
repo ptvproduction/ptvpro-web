@@ -1,8 +1,8 @@
-import { Readable } from 'node:stream';
+﻿import { Readable } from 'node:stream';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import handler, { inventoryImageType, inventoryRequestId } from '../../api/inventaris';
-import { signSessionToken } from '../../api/auth/_utils/crypto';
-import type { SessionPayload } from '../../api/auth/_utils/types';
+import handler, { inventoryImageType, inventoryRequestId } from '../../api/_routes/inventaris';
+import { signSessionToken } from '../../api/_routes/auth/_utils/crypto';
+import type { SessionPayload } from '../../api/_routes/auth/_utils/types';
 import { SupabaseInventarisService, InventarisServiceManager } from '../../src/products/hub/inventaris/inventarisService';
 
 const f = vi.hoisted(() => ({ tables: {} as Record<string, any[]>, caps: [] as string[], valid: true,

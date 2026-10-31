@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
-import { FinanceScopeUnavailableError, readFinance } from '../../api/finance';
+﻿import { describe, expect, it, vi } from 'vitest';
+import { FinanceScopeUnavailableError, readFinance } from '../../api/_routes/finance';
 
 function database(denied = false) {
   const rpc = vi.fn().mockResolvedValue({ data: { identityId: 'verified-identity', canManage: false, global: true, visibleTransactionIds: ['public-tx'] }, error: denied ? { message: 'scope unavailable' } : null });

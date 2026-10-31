@@ -1,11 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+﻿import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Readable } from 'node:stream';
-import { resolveLiveAccess } from '../../api/auth/_utils/liveAccess';
-import { signSessionToken, verifySessionToken } from '../../api/auth/_utils/crypto';
+import { resolveLiveAccess } from '../../api/_routes/auth/_utils/liveAccess';
+import { signSessionToken, verifySessionToken } from '../../api/_routes/auth/_utils/crypto';
 import { accessChangeSchema } from '../../src/products/hub/akses/accessContract';
 import { hasCapability } from '../../src/core/policy';
-import accessHandler from '../../api/akses';
-import { handleKruApiRequest, readPersonnelAccountStatuses } from '../../api/kru';
+import accessHandler from '../../api/_routes/akses';
+import { handleKruApiRequest, readPersonnelAccountStatuses } from '../../api/_routes/kru';
 import { StagingKruService, personnelFields } from '../../src/products/hub/kru/kruService';
 import { mapLegacyKruRowToCrewMember } from '../../src/products/hub/kru/kruMapper';
 
@@ -124,7 +124,7 @@ describe('PTV-DEV-149 live authorization and direct API (mock database)', () => 
   it.each(['acara','broadcast','catatan','dokumen','kontak','lapor-kerusakan','lost-found','peminjaman','planner'])('API %s menolak grant lama cookie setelah pencabutan di DB', async name => {
     tables.profile_capabilities = [{ profile_id: 'crew', capability_key: 'hub.access' }];
     tables.capability_registry = [{ key: 'hub.access' }];
-    const handler = (await import(`../../api/${name}.ts`)).default;
+    const handler = (await import(`../../api/_routes/${name}.ts`)).default;
     const req = Readable.from([]) as any;
     req.method = 'GET'; req.url = `/api/${name}?type=external`; req.headers = { cookie: `ptv_hub_session=${signSessionToken(session, secret)}` };
     const res: any = { statusCode: 0, setHeader: vi.fn(), end: vi.fn() };
