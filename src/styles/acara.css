@@ -1,0 +1,1965 @@
+/* ============================================================
+   PTV PRO — MODUL ACARA (AGENDA LIPUTAN & PRODUKSI STUDIO)
+   PTV Design System Revisi 03 (R03) Compliant Stylesheet
+   ============================================================ */
+
+.r03-acara {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding-bottom: calc(var(--dock-h, 68px) + env(safe-area-inset-bottom, 16px) + 32px);
+  font-family: var(--font-sans, "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif);
+}
+
+/* ── 1. Header & Segmented Subviews ── */
+.acara-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.acara-header-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.acara-page-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink, #0f172a);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.acara-page-subtitle {
+  font-size: 13.5px;
+  color: var(--muted, #64748b);
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.acara-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Tombol Aksi Primer */
+.acara-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: var(--r-full, 9999px);
+  padding: 8px 18px;
+  min-height: 38px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  transition: all 0.15s ease;
+}
+
+.acara-btn-primary:hover {
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+  transform: translateY(-1px);
+}
+
+.acara-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface, #ffffff);
+  color: var(--ink, #0f172a);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--r-full, 9999px);
+  padding: 8px 16px;
+  min-height: 38px;
+  border: 1px solid var(--border, #cbd5e1);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.acara-btn-secondary:hover {
+  background: var(--subtle, #f8fafc);
+  border-color: #94a3b8;
+}
+
+.acara-btn-destructive {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--r-full, 9999px);
+  background: #fef2f2;
+  border: 1.5px solid #fecaca;
+  color: #dc2626;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.acara-btn-destructive:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+/* ── 2. Filter Bar & Quick Search ── */
+.acara-action-bar,
+.acara-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.acara-action-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.acara-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+
+.acara-filter-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.acara-fchip {
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: var(--ptv-curve-pill, 9999px);
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid var(--line, #e2e8f0);
+  background: var(--surface, #ffffff);
+  color: var(--ink-2, #475569);
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.16s ease;
+}
+
+.acara-fchip:hover:not(.on) {
+  background: var(--b-050, #edf4ff);
+  border-color: var(--b-300, #a7ceff);
+  color: var(--b-700, #0b5fbf);
+}
+
+.acara-fchip.on {
+  background: var(--pri, #1273E6);
+  color: #ffffff;
+  border-color: var(--pri, #1273E6);
+  box-shadow: 0 2px 8px rgba(18, 115, 230, 0.28);
+}
+
+.acara-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--r-lg, 12px);
+  padding: 6px 14px;
+  min-width: 240px;
+  flex: 1;
+  max-width: 340px;
+}
+
+.acara-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  color: var(--ink, #0f172a);
+  width: 100%;
+}
+
+.acara-search-input::placeholder {
+  color: var(--ink3, #94a3b8);
+}
+
+/* ── 3. Agenda List & Cards ── */
+.acara-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.acara-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #ffffff;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--ptv-curve-xl, 20px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .acara-list > .acara-item-row {
+  background: var(--surface, #1e293b);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.acara-list > .acara-item-row:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+:root[data-theme="dark"] .acara-list > .acara-item-row:hover {
+  background: var(--surface-2, rgba(255, 255, 255, 0.04));
+  transform: translateY(-1px);
+}
+
+.acara-item-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+}
+
+.acara-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-lg, 12px);
+  background: var(--icon-box-bg, rgba(37, 99, 235, 0.08));
+  color: var(--icon-box-fg, #2563eb);
+  border: 1px solid var(--icon-box-border, rgba(37, 99, 235, 0.18));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+  transition: all 0.16s ease;
+}
+
+.acara-item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.acara-item-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink, #0f172a);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.acara-item-meta {
+  display: flex;
+  align-items: center;
+  row-gap: 4px;
+  column-gap: 6px;
+  flex-wrap: wrap;
+  white-space: normal;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 12.5px;
+  color: var(--ink-2, #475569);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.acara-item-meta > span:not(.acara-meta-loc) {
+  flex-shrink: 0;
+}
+
+.acara-item-meta .acara-meta-loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+  flex-shrink: 1;
+}
+
+.acara-item-meta .acara-loc-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acara-item-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Badges: Status, Weton, Hijriah */
+.acara-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--r-full, 9999px);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.acara-badge.ok {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.acara-badge.dang {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.acara-badge.info {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.acara-badge.muted {
+  background: var(--bg-2, #f1f5f9);
+  color: var(--ink3, #64748b);
+  border: 1px solid var(--border, #e2e8f0);
+}
+
+.acara-badge-weton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: var(--r-md, 8px);
+  font-size: 10.5px;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.acara-badge-hijri {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--r-full, 9999px);
+  font-size: 11px;
+  font-weight: 600;
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+/* Mobile Quick Add Button */
+.acara-mobile-add-btn {
+  display: none;
+  width: 100%;
+  border-radius: var(--r-xl, 14px);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px dashed #a7f3d0;
+  color: #059669;
+  font-weight: 750;
+  font-size: 13px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-top: 14px;
+}
+
+/* ── 4. Empty State ── */
+.acara-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 20px;
+  background: var(--surface, #ffffff);
+  border: 1.5px dashed var(--border, #e2e8f0);
+  border-radius: var(--r-2xl, 20px);
+  gap: 12px;
+}
+
+.acara-empty-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--r-full, 9999px);
+  background: var(--bg-2, #f1f5f9);
+  color: var(--ink3, #94a3b8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+
+.acara-empty-title {
+  font-size: 16px;
+  font-weight: 750;
+  color: var(--ink, #0f172a);
+  margin: 0;
+}
+
+.acara-empty-desc {
+  font-size: 13px;
+  color: var(--muted, #64748b);
+  margin: 0;
+  max-width: 360px;
+  line-height: 1.5;
+}
+
+/* ── 5. Halaman Detail Acara (2-Column Asymmetric Layout) ── */
+.acara-detail-header {
+  margin-bottom: 22px;
+}
+
+.acara-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2563eb;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-bottom: 12px;
+}
+
+.acara-back-btn:hover {
+  text-decoration: underline;
+}
+
+.acara-detail-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.acara-detail-heading {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ink, #0f172a);
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.acara-detail-date-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.acara-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.acara-detail-main,
+.acara-detail-side {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+}
+
+/* Card Section */
+.acara-card {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line, rgba(11, 42, 74, 0.08));
+  border-radius: var(--r-ref-m, 18px);
+  padding: 16px;
+  box-shadow: var(--shadow-s, 0 1px 3px rgba(0, 0, 0, 0.02));
+  box-sizing: border-box;
+}
+
+.acara-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.acara-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink, #0f172a);
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.acara-section-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--r-full, 9999px);
+  font-weight: 750;
+  background: var(--bg-2, #f1f5f9);
+  color: var(--ink3, #64748b);
+}
+
+.acara-kv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line-2, #e2e8f0);
+  font-size: 13px;
+}
+
+.acara-kv-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.acara-kv-label {
+  color: var(--muted, #64748b);
+  font-weight: 550;
+}
+
+.acara-kv-val {
+  color: var(--ink, #0f172a);
+  font-weight: 700;
+  text-align: right;
+}
+
+/* Rundown List */
+.acara-rd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.acara-rd-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--subtle, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--r-lg, 12px);
+  transition: all 0.12s ease;
+}
+
+.acara-rd-row:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.acara-rd-time-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: var(--r-md, 8px);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--b-050, #eff6ff);
+  color: var(--b-700, #1d4ed8);
+  border: 1px solid var(--b-100, #bfdbfe);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.acara-rd-desc {
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--ink, #0f172a);
+  line-height: 1.4;
+  flex: 1;
+  word-break: break-word;
+}
+
+.acara-rd-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Peralatan & Kru List */
+.acara-gear-row,
+.acara-crew-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--r-xl, 16px);
+  border: 1px solid var(--border, #e2e8f0);
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  margin-bottom: 10px;
+}
+
+.acara-gear-row:last-child,
+.acara-crew-row:last-child {
+  margin-bottom: 0;
+}
+
+.acara-gear-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--r-lg, 12px);
+  background: var(--bg-2, #f1f5f9);
+  border: 1px solid var(--border, #e2e8f0);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.acara-gear-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.acara-crew-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--r-lg, 12px);
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
+  font-weight: 750;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #cbd5e1;
+}
+
+.acara-crew-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--r-lg, 12px);
+}
+
+/* ── 5. Catatan Teknis & Notulensi Card Spacing (R03 Guidebook Compliant) ── */
+.acara-notes-card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.acara-tech-notes-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.acara-notes-subheading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 11px;
+}
+
+.acara-notes-subheading {
+  font-size: 11.5px;
+  font-weight: 750;
+  color: #2563eb;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.acara-notes-edit-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 650;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.acara-notes-edit-btn:hover {
+  color: #1d4ed8;
+}
+
+.acara-tech-notes-content {
+  background: var(--subtle, #f8fafc);
+  padding: 12px 14px;
+  border-radius: var(--r-lg, 12px);
+  border: 1px solid var(--border, #e2e8f0);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink2, #334155);
+  white-space: pre-line;
+}
+
+/* Jarak vertikal lega antara Instruksi Teknis dan Notulensi Rapat: 22-24px total */
+.acara-notes-divider {
+  border: none;
+  border-top: 1px dashed var(--line-2, #e2e8f0);
+  margin: 11px 0;
+}
+
+.acara-notulensi-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.acara-notulensi-subheading {
+  font-size: 11.5px;
+  font-weight: 750;
+  color: #1e40af;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 11px;
+}
+
+.acara-notulensi-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.acara-notulensi-card {
+  border: 1.5px solid rgba(37, 99, 235, 0.2);
+  background: #f8fafc;
+  border-radius: var(--r-xl, 14px);
+  padding: 14px 16px;
+}
+
+.acara-notulensi-empty {
+  border: 1.5px dashed var(--border, #e2e8f0);
+  background: var(--subtle, #f8fafc);
+  text-align: center;
+  padding: 16px 14px;
+  border-radius: var(--r-lg, 12px);
+}
+
+/* ── 6. Modal & Dialog System (R03 Compliant) ── */
+.acara-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: fadeInModal 0.2s ease-out;
+  box-sizing: border-box;
+}
+
+.acara-modal-sheet {
+  background: var(--surface, #ffffff);
+  border-radius: var(--r-2xl, 20px);
+  width: 100%;
+  max-width: 640px;
+  max-height: min(90vh, 820px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  box-sizing: border-box;
+  animation: slideUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.acara-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.acara-modal-title {
+  font-size: 16.5px;
+  font-weight: 750;
+  color: var(--ink, #0f172a);
+  margin: 0;
+}
+
+.acara-modal-close-btn {
+  background: var(--bg-2, #f1f5f9);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-full, 9999px);
+  color: var(--ink3, #64748b);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+
+.acara-modal-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.acara-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.acara-modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border, #e2e8f0);
+  background: var(--subtle, #f8fafc);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+/* Form Fields */
+.acara-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.acara-field-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink, #0f172a);
+}
+
+.acara-field-input,
+.acara-field-select,
+.acara-field-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border-radius: var(--r-lg, 12px);
+  border: 1.5px solid var(--border, #cbd5e1);
+  background: #ffffff;
+  font-size: 13.5px;
+  color: var(--ink, #0f172a);
+  font-family: inherit;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.acara-field-input:focus,
+.acara-field-select:focus,
+.acara-field-textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.acara-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Preset Chips for Crew Job */
+.acara-preset-chip {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: var(--r-md, 8px);
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.1s ease;
+}
+
+.acara-preset-chip:hover {
+  background: #dbeafe;
+}
+
+/* ── Form Acara: Sesi Opsional, Custom Dropdown Notulensi & Edit Actions ── */
+.acara-session-toggle-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--bg-2, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--r-lg, 12px);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.acara-session-toggle-box:hover {
+  background: var(--subtle, #f1f5f9);
+  border-color: #cbd5e1;
+}
+
+.acara-checkbox-custom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink, #0f172a);
+  cursor: pointer;
+}
+
+.acara-checkbox-custom input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.acara-sessions-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--r-xl, 14px);
+}
+
+.acara-session-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--r-lg, 12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.15s ease;
+}
+
+.acara-session-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.acara-session-card-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink, #0f172a);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.acara-session-del-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--r-sm, 6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.acara-session-del-btn:hover {
+  background: #fee2e2;
+}
+
+.acara-session-del-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.acara-session-labels-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.acara-session-label-pill {
+  padding: 4px 10px;
+  border-radius: var(--r-full, 9999px);
+  font-size: 11.5px;
+  font-weight: 600;
+  border: 1px solid var(--border, #cbd5e1);
+  background: #ffffff;
+  color: var(--ink, #334155);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.acara-session-label-pill.is-active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+}
+
+.acara-session-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1.5px dashed #cbd5e1;
+  background: #ffffff;
+  border-radius: var(--r-lg, 12px);
+  color: #2563eb;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.acara-session-add-btn:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+/* Custom Notulensi Dropdown */
+.acara-notulensi-dropdown-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.acara-notulensi-trigger {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border-radius: var(--r-lg, 12px);
+  border: 1.5px solid var(--border, #cbd5e1);
+  background: #ffffff;
+  font-size: 13.5px;
+  color: var(--ink, #0f172a);
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.acara-notulensi-trigger:focus,
+.acara-notulensi-trigger.is-open {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.acara-notulensi-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: var(--r-xl, 14px);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  max-height: 280px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideDownMenu 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.acara-notulensi-search-wrap {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  background: var(--bg-2, #f8fafc);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.acara-notulensi-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--ink, #0f172a);
+  width: 100%;
+}
+
+.acara-notulensi-options-list {
+  padding: 6px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 210px;
+}
+
+.acara-notulensi-option-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--r-md, 8px);
+  cursor: pointer;
+  transition: background 0.12s ease;
+  user-select: none;
+}
+
+.acara-notulensi-option-item:hover,
+.acara-notulensi-option-item.is-highlighted {
+  background: #eff6ff;
+}
+
+.acara-notulensi-option-item.is-selected {
+  background: #dbeafe;
+}
+
+/* Edit Form Actions (Arsipkan & Hapus) */
+.acara-form-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+}
+
+.acara-btn-archive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  border-radius: var(--r-lg, 10px);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.acara-btn-archive:hover {
+  background: #fde68a;
+}
+
+.acara-btn-danger-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #fff;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: var(--r-lg, 10px);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.acara-btn-danger-outline:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+/* ── 7. Responsive Media Queries ── */
+@media (max-width: 959px) {
+  .acara-detail-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 639px) {
+  .acara-action-bar,
+  .acara-filter-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .acara-filter-chips {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .acara-action-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .acara-search-box {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+    padding: 7px 12px;
+  }
+
+  .acara-action-controls .acara-btn-primary {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    font-size: 12.5px;
+    min-height: 38px;
+    white-space: nowrap;
+    border-radius: var(--r-full, 9999px);
+  }
+
+  .acara-mobile-add-btn {
+    display: none;
+  }
+
+  .acara-item-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .acara-item-left {
+    width: 100%;
+  }
+
+  .acara-item-right {
+    width: 100%;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px dashed var(--line-2, #e2e8f0);
+  }
+
+  .acara-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .acara-modal-overlay {
+    padding: 12px 12px env(safe-area-inset-bottom, 16px);
+    align-items: center;
+    justify-content: center;
+    overscroll-behavior: contain;
+  }
+
+  .acara-modal-sheet {
+    width: 100%;
+    max-height: calc(100dvh - 32px);
+    border-radius: var(--r-2xl, 20px);
+    margin: auto 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .acara-modal-header {
+    padding: 14px 16px;
+    flex-shrink: 0;
+  }
+
+  .acara-modal-body {
+    padding: 16px;
+    max-height: calc(100dvh - 150px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1 1 auto;
+  }
+
+  .acara-modal-footer {
+    padding: 12px 16px max(14px, env(safe-area-inset-bottom, 14px));
+    flex-shrink: 0;
+  }
+
+  /* Catatan & Notulensi Mobile Spacing */
+  .acara-notes-subheading-row {
+    margin-bottom: 10px;
+  }
+
+  .acara-notes-divider {
+    margin: 10px 0;
+  }
+
+  .acara-notulensi-subheading {
+    margin-bottom: 10px;
+  }
+}
+
+/* Animations */
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUpModal {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideUpToast {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.acara-item-row {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line, var(--border, #e2e8f0));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.acara-item-row .acara-icon-box {
+  background: color-mix(in srgb, var(--acara-accent, var(--b-600)) 10%, var(--surface));
+  color: var(--acara-accent, var(--b-600));
+  border-color: color-mix(in srgb, var(--acara-accent, var(--b-600)) 30%, var(--line));
+}
+
+[data-theme="dark"] .acara-item-row .acara-icon-box {
+  color: color-mix(in srgb, var(--acara-accent, var(--b-600)) 55%, white);
+}
+
+.acara-item-row:focus-visible {
+  outline: 2px solid var(--b-600);
+  outline-offset: 3px;
+}
+
+.acara-item-row.acara-item-compact {
+  padding: 12px 14px;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.acara-item-compact .acara-item-left {
+  flex: 1;
+  min-width: 0;
+  gap: 12px;
+}
+
+.acara-item-compact .acara-item-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.acara-item-row .acara-item-body {
+  min-width: 0;
+}
+
+.acara-item-row .acara-item-meta {
+  color: var(--ink-2);
+  white-space: normal;
+  overflow: visible;
+}
+
+.acara-color-field { border: 0; padding: 0; margin: 0 0 20px; min-width: 0; }
+.acara-color-field legend { font-weight: 700; margin-bottom: 10px; color: var(--ink); }
+.acara-color-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.acara-color-option {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 44px;
+  padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--ink); cursor: pointer;
+}
+.acara-color-option:has(input:checked) { border-color: var(--b-600); }
+.acara-color-option:focus-within { outline: 2px solid var(--b-600); outline-offset: 2px; }
+.acara-color-swatch { width: 16px; height: 16px; border-radius: 50%; flex: 0 0 auto; }
+
+@media (max-width: 639px) {
+  .acara-search-input {
+    font-size: 16px;
+  }
+  .acara-item-meta .acara-loc-text {
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 430px) {
+  .acara-item-row {
+    padding: 12px;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .acara-item-row .acara-icon-box {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+  .acara-item-row .acara-item-left {
+    min-width: 0;
+    flex: 1;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .acara-item-row .acara-item-title {
+    font-size: 14px;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .acara-item-row .acara-item-meta {
+    font-size: 12.5px;
+    row-gap: 4px;
+    column-gap: 5px;
+    flex-wrap: wrap;
+    white-space: normal;
+    overflow: visible;
+    margin-top: 2px;
+  }
+  /* On mobile, simplify card: only show event name, date, and status badge */
+  .acara-item-row .acara-badge-hijri,
+  .acara-item-row .acara-meta-time,
+  .acara-item-row .acara-meta-loc,
+  .acara-item-row .acara-meta-sep {
+    display: none !important;
+  }
+  .acara-item-row .acara-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: var(--ptv-curve-pill, 999px);
+  }
+  .acara-item-row .acara-item-right {
+    flex-shrink: 0;
+  }
+}
+
+/* ── Dark Mode Consistency & Contrast (R03 Guidebook Compliant) ── */
+:root[data-theme="dark"] .acara-list > .acara-item-row,
+[data-theme="dark"] .acara-list > .acara-item-row,
+:root[data-theme="dark"] .acara-item-row,
+[data-theme="dark"] .acara-item-row {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="dark"] .acara-list > .acara-item-row:hover,
+[data-theme="dark"] .acara-list > .acara-item-row:hover,
+:root[data-theme="dark"] .acara-item-row:hover,
+[data-theme="dark"] .acara-item-row:hover {
+  background: var(--surface-2);
+  border-color: var(--b-600);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+:root[data-theme="dark"] .acara-item-title,
+[data-theme="dark"] .acara-item-title {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-item-meta,
+[data-theme="dark"] .acara-item-meta {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .acara-badge.ok,
+[data-theme="dark"] .acara-badge.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+  border-color: var(--ok-border);
+}
+
+:root[data-theme="dark"] .acara-badge.dang,
+[data-theme="dark"] .acara-badge.dang {
+  background: var(--dang-bg);
+  color: var(--dang);
+  border-color: var(--dang-border);
+}
+
+:root[data-theme="dark"] .acara-badge.info,
+[data-theme="dark"] .acara-badge.info {
+  background: var(--info-bg);
+  color: var(--info);
+  border-color: var(--info-border);
+}
+
+:root[data-theme="dark"] .acara-badge.muted,
+[data-theme="dark"] .acara-badge.muted {
+  background: var(--surface-2);
+  color: var(--muted);
+  border-color: var(--line);
+}
+
+:root[data-theme="dark"] .acara-badge-weton,
+[data-theme="dark"] .acara-badge-weton {
+  background: var(--warn-bg);
+  color: var(--warn);
+  border-color: var(--warn-border);
+}
+
+:root[data-theme="dark"] .acara-badge-hijri,
+[data-theme="dark"] .acara-badge-hijri {
+  background: var(--ok-bg);
+  color: var(--ok);
+  border-color: var(--ok-border);
+}
+
+:root[data-theme="dark"] .acara-mobile-add-btn,
+[data-theme="dark"] .acara-mobile-add-btn {
+  background: rgba(129, 201, 149, 0.12);
+  border-color: rgba(129, 201, 149, 0.35);
+  color: #81C995;
+}
+
+:root[data-theme="dark"] .acara-fchip,
+[data-theme="dark"] .acara-fchip {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink-2);
+}
+
+:root[data-theme="dark"] .acara-fchip:hover,
+[data-theme="dark"] .acara-fchip:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+  border-color: var(--b-600);
+}
+
+:root[data-theme="dark"] .acara-fchip.on,
+[data-theme="dark"] .acara-fchip.on {
+  background: var(--pri, #1273E6);
+  border-color: var(--pri, #1273E6);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(18, 115, 230, 0.35);
+}
+
+:root[data-theme="dark"] .acara-search-box,
+[data-theme="dark"] .acara-search-box {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+:root[data-theme="dark"] .acara-search-input,
+[data-theme="dark"] .acara-search-input {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-search-input::placeholder,
+[data-theme="dark"] .acara-search-input::placeholder {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .acara-card,
+[data-theme="dark"] .acara-card {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="dark"] .acara-section-title,
+[data-theme="dark"] .acara-section-title {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-section-badge,
+[data-theme="dark"] .acara-section-badge {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .acara-kv-row,
+[data-theme="dark"] .acara-kv-row {
+  border-color: var(--line-2);
+}
+
+:root[data-theme="dark"] .acara-kv-label,
+[data-theme="dark"] .acara-kv-label {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .acara-kv-val,
+[data-theme="dark"] .acara-kv-val {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-rd-row,
+[data-theme="dark"] .acara-rd-row {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-rd-row:hover,
+[data-theme="dark"] .acara-rd-row:hover {
+  background: var(--surface);
+  border-color: var(--b-600);
+}
+
+:root[data-theme="dark"] .acara-rd-time-badge,
+[data-theme="dark"] .acara-rd-time-badge {
+  background: rgba(138, 180, 248, 0.14);
+  color: #8AB4F8;
+  border-color: rgba(138, 180, 248, 0.32);
+}
+
+:root[data-theme="dark"] .acara-rd-desc,
+[data-theme="dark"] .acara-rd-desc {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-gear-row,
+[data-theme="dark"] .acara-gear-row,
+:root[data-theme="dark"] .acara-crew-row,
+[data-theme="dark"] .acara-crew-row {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+:root[data-theme="dark"] .acara-gear-thumb,
+[data-theme="dark"] .acara-gear-thumb {
+  background: var(--bg-2);
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .acara-crew-avatar,
+[data-theme="dark"] .acara-crew-avatar {
+  background: linear-gradient(135deg, rgba(66, 133, 244, 0.22), rgba(138, 180, 248, 0.22));
+  color: #8AB4F8;
+  border-color: rgba(138, 180, 248, 0.35);
+}
+
+:root[data-theme="dark"] .acara-tech-notes-content,
+[data-theme="dark"] .acara-tech-notes-content {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-notes-subheading,
+[data-theme="dark"] .acara-notes-subheading,
+:root[data-theme="dark"] .acara-notulensi-subheading,
+[data-theme="dark"] .acara-notulensi-subheading {
+  color: var(--b-500);
+}
+
+:root[data-theme="dark"] .acara-notes-edit-btn,
+[data-theme="dark"] .acara-notes-edit-btn {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .acara-notes-edit-btn:hover,
+[data-theme="dark"] .acara-notes-edit-btn:hover {
+  color: var(--b-500);
+}
+
+:root[data-theme="dark"] .acara-notulensi-card,
+[data-theme="dark"] .acara-notulensi-card {
+  background: var(--surface-2);
+  border-color: rgba(138, 180, 248, 0.28);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-notulensi-empty,
+[data-theme="dark"] .acara-notulensi-empty {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+:root[data-theme="dark"] .acara-btn-secondary,
+[data-theme="dark"] .acara-btn-secondary {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-btn-secondary:hover,
+[data-theme="dark"] .acara-btn-secondary:hover {
+  background: var(--surface);
+  border-color: var(--b-600);
+  color: var(--b-500);
+}
+
+:root[data-theme="dark"] .acara-btn-destructive,
+[data-theme="dark"] .acara-btn-destructive {
+  background: rgba(242, 139, 130, 0.12);
+  border-color: rgba(242, 139, 130, 0.32);
+  color: #F28B82;
+}
+
+:root[data-theme="dark"] .acara-btn-destructive:hover,
+[data-theme="dark"] .acara-btn-destructive:hover {
+  background: rgba(242, 139, 130, 0.22);
+  border-color: rgba(242, 139, 130, 0.5);
+  color: #FFA49D;
+}
+
+:root[data-theme="dark"] .acara-back-btn,
+[data-theme="dark"] .acara-back-btn {
+  color: var(--b-500);
+}
+
+:root[data-theme="dark"] .acara-detail-heading,
+[data-theme="dark"] .acara-detail-heading {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-empty-box,
+[data-theme="dark"] .acara-empty-box {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+:root[data-theme="dark"] .acara-empty-icon,
+[data-theme="dark"] .acara-empty-icon {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .acara-empty-title,
+[data-theme="dark"] .acara-empty-title {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-empty-desc,
+[data-theme="dark"] .acara-empty-desc {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .acara-modal-sheet,
+[data-theme="dark"] .acara-modal-sheet {
+  background: var(--surface);
+}
+
+:root[data-theme="dark"] .acara-modal-header,
+[data-theme="dark"] .acara-modal-header {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+:root[data-theme="dark"] .acara-modal-title,
+[data-theme="dark"] .acara-modal-title {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-modal-close-btn,
+[data-theme="dark"] .acara-modal-close-btn {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .acara-modal-close-btn:hover,
+[data-theme="dark"] .acara-modal-close-btn:hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-modal-footer,
+[data-theme="dark"] .acara-modal-footer {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+:root[data-theme="dark"] .acara-field-label,
+[data-theme="dark"] .acara-field-label {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-field-input,
+[data-theme="dark"] .acara-field-input,
+:root[data-theme="dark"] .acara-field-select,
+[data-theme="dark"] .acara-field-select,
+:root[data-theme="dark"] .acara-field-textarea,
+[data-theme="dark"] .acara-field-textarea {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .acara-preset-chip,
+[data-theme="dark"] .acara-preset-chip {
+  background: rgba(138, 180, 248, 0.14);
+  color: #8AB4F8;
+  border-color: rgba(138, 180, 248, 0.32);
+}
+
+:root[data-theme="dark"] .acara-preset-chip:hover,
+[data-theme="dark"] .acara-preset-chip:hover {
+  background: rgba(138, 180, 248, 0.24);
+  color: #C2E7FF;
+}
+
+/* Acara Sessions Dark Mode */
+:root[data-theme="dark"] .acara-session-card,
+[data-theme="dark"] .acara-session-card {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+:root[data-theme="dark"] .acara-session-card-title,
+[data-theme="dark"] .acara-session-card-title {
+  color: var(--ink);
+}
+:root[data-theme="dark"] .acara-session-label-pill,
+[data-theme="dark"] .acara-session-label-pill {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+:root[data-theme="dark"] .acara-session-label-pill.is-active,
+[data-theme="dark"] .acara-session-label-pill.is-active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #3b82f6 !important;
+  font-weight: 700;
+}
+:root[data-theme="dark"] .acara-session-label-pill:hover,
+[data-theme="dark"] .acara-session-label-pill:hover {
+  border-color: var(--b-400);
+  color: var(--ink);
+}
+:root[data-theme="dark"] .acara-session-add-btn,
+[data-theme="dark"] .acara-session-add-btn {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--b-400);
+}
+:root[data-theme="dark"] .acara-session-add-btn:hover,
+[data-theme="dark"] .acara-session-add-btn:hover {
+  background: var(--surface);
+  border-color: var(--b-300);
+}
+:root[data-theme="dark"] .acara-session-toggle-box,
+[data-theme="dark"] .acara-session-toggle-box {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+/* Acara Notulensi Dropdown Dark Mode */
+:root[data-theme="dark"] .acara-notulensi-trigger,
+[data-theme="dark"] .acara-notulensi-trigger {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--ink);
+}
+:root[data-theme="dark"] .acara-notulensi-trigger:focus,
+[data-theme="dark"] .acara-notulensi-trigger:focus,
+:root[data-theme="dark"] .acara-notulensi-trigger.is-open,
+[data-theme="dark"] .acara-notulensi-trigger.is-open {
+  border-color: var(--b-400);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+:root[data-theme="dark"] .acara-notulensi-menu,
+[data-theme="dark"] .acara-notulensi-menu {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6);
+}
+:root[data-theme="dark"] .acara-notulensi-search-wrap,
+[data-theme="dark"] .acara-notulensi-search-wrap {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+:root[data-theme="dark"] .acara-notulensi-search-input,
+[data-theme="dark"] .acara-notulensi-search-input {
+  color: var(--ink);
+}
+:root[data-theme="dark"] .acara-notulensi-option-item,
+[data-theme="dark"] .acara-notulensi-option-item {
+  color: var(--ink);
+}
+:root[data-theme="dark"] .acara-notulensi-option-item:hover,
+[data-theme="dark"] .acara-notulensi-option-item:hover,
+:root[data-theme="dark"] .acara-notulensi-option-item.is-highlighted,
+[data-theme="dark"] .acara-notulensi-option-item.is-highlighted {
+  background: rgba(37, 99, 235, 0.18);
+}
+:root[data-theme="dark"] .acara-notulensi-option-item.is-selected,
+[data-theme="dark"] .acara-notulensi-option-item.is-selected {
+  background: rgba(37, 99, 235, 0.28);
+}
+
+/* Color Field & Action Buttons Dark Mode */
+:root[data-theme="dark"] .acara-color-field legend,
+[data-theme="dark"] .acara-color-field legend {
+  color: var(--ink);
+}
+:root[data-theme="dark"] .acara-color-option,
+[data-theme="dark"] .acara-color-option {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--ink);
+}
+:root[data-theme="dark"] .acara-btn-archive,
+[data-theme="dark"] .acara-btn-archive {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--ink);
+}
+:root[data-theme="dark"] .acara-btn-archive:hover,
+[data-theme="dark"] .acara-btn-archive:hover {
+  background: var(--surface);
+  border-color: var(--b-400);
+}
+:root[data-theme="dark"] .acara-btn-danger-outline,
+[data-theme="dark"] .acara-btn-danger-outline {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+:root[data-theme="dark"] .acara-btn-danger-outline:hover,
+[data-theme="dark"] .acara-btn-danger-outline:hover {
+  background: rgba(239, 68, 68, 0.24);
+  color: #fca5a5;
+}
+

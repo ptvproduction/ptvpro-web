@@ -1,7 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useSessionStore } from '@core/session';
+import { useCrewStore } from '../kru/kruStore';
 import { AppCapability } from '@core/policy';
+import { UniversalSearchModal } from './UniversalSearchModal';
+import { NotificationCenterModal } from './NotificationCenterModal';
+import { notificationService } from './notificationService';
+import { UserProfileMenuModal } from './UserProfileMenuModal';
+import { TopAnnouncementBanner } from './TopAnnouncementBanner';
+import { useThemeStore } from '@core/theme/themeStore';
+import { BackToTopButton, GlobalToastContainer } from '@shared/components';
+import { dialogManager } from '@shared/utils/dialogManager';
+import { useModalScrollLock } from '@shared/hooks/useModalScrollLock';
+import { WorkspaceBottomSheet } from './WorkspaceBottomSheet';
+import '@/styles/shell.css';
 
 interface SidebarItemDef {
   key: string;
@@ -9,6 +21,7 @@ interface SidebarItemDef {
   path: string;
   iconClass: string;
   capability?: AppCapability;
+  anyCapabilities?: AppCapability[];
   isExternal?: boolean;
 }
 
@@ -20,7 +33,7 @@ interface SidebarGroupDef {
 /**
  * 7 Authoritative Sidebar Groups ported 1:1 from page-dasbor.php (SIDEBAR definition)
  */
-const SIDEBAR_GROUPS: SidebarGroupDef[] = [
+export const SIDEBAR_GROUPS: SidebarGroupDef[] = [
   {
     groupName: 'Utama',
     items: [
@@ -110,18 +123,11 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
         capability: 'crew.view',
       },
       {
-        key: 'id',
-        label: 'ID Digital',
-        path: '/hub/id',
-        iconClass: 'fa-solid fa-id-card',
-        capability: 'id.view',
-      },
-      {
-        key: 'dokumen',
-        label: 'Dokumen Saya',
-        path: '/hub/dokumen',
-        iconClass: 'fa-solid fa-file-lines',
-        capability: 'documents.view',
+        key: 'akses',
+        label: 'Manajemen Akun',
+        path: '/hub/akses',
+        iconClass: 'fa-solid fa-user-shield',
+        capability: 'crew.permissions.manage',
       },
       {
         key: 'kontak',
@@ -143,6 +149,13 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
     groupName: 'Administrasi & Verifikasi',
     items: [
       {
+        key: 'keuangan',
+        label: 'Keuangan',
+        path: '/hub/keuangan',
+        iconClass: 'fa-solid fa-receipt',
+        anyCapabilities: ['finance.view', 'finance.view_own'],
+      },
+      {
         key: 'generatorIzin',
         label: 'Generator Surat Izin',
         path: '/hub/surat/generator',
@@ -157,32 +170,25 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
         capability: 'documents.request',
       },
       {
+        key: 'arsip',
+        label: 'Surat & Arsip',
+        path: '/hub/arsip',
+        iconClass: 'fa-solid fa-box-archive',
+        anyCapabilities: ['documents.archive.view', 'documents.view', 'documents.approve', 'documents.archive.manage'],
+      },
+      {
         key: 'verifikasiSurat',
         label: 'Keabsahan Dokumen',
-        path: 'https://progresiftv.id/verifikasi-surat/',
+        path: '/verifikasi-surat',
         iconClass: 'fa-solid fa-shield-halved',
         isExternal: true,
       },
       {
         key: 'verifikasiIdentitas',
         label: 'Verifikasi Identitas',
-        path: 'https://progresiftv.id/verifikasi-identitas/',
+        path: '/verifikasi-identitas',
         iconClass: 'fa-solid fa-id-card',
         isExternal: true,
-      },
-      {
-        key: 'arsip',
-        label: 'Surat & Arsip',
-        path: '/hub/arsip',
-        iconClass: 'fa-solid fa-box-archive',
-        capability: 'documents.archive.view',
-      },
-      {
-        key: 'keuangan',
-        label: 'Keuangan',
-        path: '/hub/keuangan',
-        iconClass: 'fa-solid fa-receipt',
-        capability: 'finance.view',
       },
     ],
   },
@@ -190,18 +196,25 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
     groupName: 'Media',
     items: [
       {
-        key: 'broadcast',
-        label: 'Broadcast',
-        path: '/hub/broadcast',
-        iconClass: 'fa-solid fa-bullhorn',
-        capability: 'broadcast.view',
-      },
-      {
         key: 'projectHaul',
         label: 'Haul & Harlah PPBS',
         path: '/hub/haul',
         iconClass: 'fa-solid fa-calendar-day',
         capability: 'projecthaul.view',
+      },
+      {
+        key: 'portal',
+        label: 'Pengelolaan Portal',
+        path: '/hub/portal',
+        iconClass: 'fa-solid fa-globe',
+        anyCapabilities: ['settings.system', 'crew.permissions.manage'],
+      },
+      {
+        key: 'broadcast',
+        label: 'Pengumuman',
+        path: '/hub/broadcast',
+        iconClass: 'fa-solid fa-bullhorn',
+        capability: 'broadcast.view',
       },
       {
         key: 'seo',
@@ -216,11 +229,18 @@ const SIDEBAR_GROUPS: SidebarGroupDef[] = [
     groupName: 'Sistem',
     items: [
       {
-        key: 'pengaturan',
-        label: 'Pengaturan',
-        path: '/hub/pengaturan',
-        iconClass: 'fa-solid fa-gear',
+        key: 'profile',
+        label: 'Profil',
+        path: '/hub/profile',
+        iconClass: 'fa-solid fa-circle-user',
         capability: 'settings.personal',
+      },
+      {
+        key: 'portofolio',
+        label: 'Portofolio Saya',
+        path: '/hub/portofolio',
+        iconClass: 'fa-solid fa-briefcase',
+        anyCapabilities: ['id.view', 'settings.personal', 'crew.view'],
       },
     ],
   },
@@ -230,6 +250,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
   '/hub': 'Beranda',
   '/hub/beranda': 'Beranda',
   '/hub/kru': 'Manajemen Kru',
+  '/hub/akses': 'Manajemen Akun',
   '/hub/inventaris': 'Aset Inventaris Progresif TV',
   '/hub/inventaris/nilai': 'Nilai Inventaris PTV',
   '/hub/peminjaman': 'Peminjaman Alat',
@@ -238,8 +259,9 @@ const BREADCRUMB_MAP: Record<string, string> = {
   '/hub/catatan': 'Catatan Bersama',
   '/hub/kerusakan': 'Lapor Kerusakan',
   '/hub/lostfound': 'Lost & Found',
-  '/hub/id': 'ID Digital Kru',
-  '/hub/dokumen': 'Dokumen Saya',
+  '/hub/profile': 'Profil & Akun Kru',
+  '/hub/id': 'Profil & Akun Kru',
+  '/hub/dokumen': 'Surat & Arsip',
   '/hub/kontak': 'Kontak Internal',
   '/hub/kontak-eksternal': 'Kontak Eksternal',
   '/hub/perizinan': 'Pengajuan Perizinan',
@@ -249,34 +271,186 @@ const BREADCRUMB_MAP: Record<string, string> = {
   '/hub/broadcast': 'Broadcast & Pengumuman',
   '/hub/haul': 'Haul & Harlah PPBS',
   '/hub/seo': 'SEO & Analytics',
-  '/hub/pengaturan': 'Pengaturan Sistem',
+  '/hub/portal': 'Pengelolaan Portal & Status',
+  '/hub/pengaturan': 'Profil & Akun Kru',
 };
 
 export const HubShell: React.FC = () => {
   const { user, logout, can } = useSessionStore();
+  const { getCurrentUser } = useCrewStore();
+  const currentUser = getCurrentUser();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDark, toggleTheme } = useThemeStore();
 
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    return document.documentElement.getAttribute('data-theme') === 'dark';
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('ptv_sidebar_collapsed') === 'true';
+        document.documentElement.setAttribute('data-sidebar-collapsed', String(saved));
+        return saved;
+      } catch {
+        return false;
+      }
+    }
+    return false;
   });
+
+  const toggleSidebarCollapse = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      document.documentElement.setAttribute('data-sidebar-collapsed', String(next));
+      try {
+        localStorage.setItem('ptv_sidebar_collapsed', String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
 
   const [isQuickOpen, setIsQuickOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const quickSheetRef = useRef<HTMLElement>(null);
+  const moreSheetRef = useRef<HTMLElement>(null);
+
+  // 3 Header Features State (Mutually Exclusive - No Stacking)
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+
+  const closeAllPopups = () => {
+    setIsSearchOpen(false);
+    setIsMobileSearchOpen(false);
+    setIsNotifOpen(false);
+    setIsProfileOpen(false);
+    setIsMoreOpen(false);
+    setIsQuickOpen(false);
+  };
+
+  const handleOpenDesktopSearch = () => {
+    if (isSearchOpen) {
+      setIsSearchOpen(false);
+      return;
+    }
+    closeAllPopups();
+    setIsSearchOpen(true);
+  };
+
+  const handleOpenMobileSearch = () => {
+    if (isMobileSearchOpen) {
+      setIsMobileSearchOpen(false);
+      return;
+    }
+    closeAllPopups();
+    setIsMobileSearchOpen(true);
+  };
+
+  const handleOpenNotif = () => {
+    if (isNotifOpen) {
+      setIsNotifOpen(false);
+      return;
+    }
+    closeAllPopups();
+    setIsNotifOpen(true);
+  };
 
   useEffect(() => {
-    const theme = isDark ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', theme);
+    let mounted = true;
+    notificationService.getNotifications(user).then((notifs) => {
+      if (mounted) setUnreadCount(notifs.filter((n) => !n.is_read).length);
+    });
+    const unsubscribe = notificationService.subscribe((count) => {
+      if (mounted) setUnreadCount(count);
+    });
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
+  }, [user]);
+
+  // Integrasi scroll lock & accessibility untuk Quick Actions sheet
+  useModalScrollLock({
+    isOpen: isQuickOpen,
+    onClose: () => setIsQuickOpen(false),
+    modalRef: quickSheetRef,
+    id: 'hub-quick-actions',
+    isGlobal: true,
+  });
+
+  // Integrasi scroll lock & accessibility untuk More Menu sheet
+  useModalScrollLock({
+    isOpen: isMoreOpen,
+    onClose: () => setIsMoreOpen(false),
+    modalRef: moreSheetRef,
+    id: 'hub-more-menu',
+    isGlobal: true,
+  });
+
+  // Global Keyboard Shortcut: '/' & 'Ctrl/Cmd+K' untuk Universal Search (Guarded)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 1. ESC: Delegasikan ke dialogManager jika ada modal aktif
+      if (e.key === 'Escape') {
+        if (dialogManager.hasActiveDialog()) {
+          const handled = dialogManager.handleEscape(e);
+          if (handled) return;
+        }
+        closeAllPopups();
+        return;
+      }
+
+      // 2. Shortcut '/' atau 'Ctrl/Cmd+K' untuk Universal Search
+      const isSearchShortcut =
+        (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) ||
+        ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K'));
+
+      if (isSearchShortcut) {
+        // Jangan picu jika sedang mengetik di input, textarea, contenteditable, atau jika ada dialog aktif
+        if (dialogManager.shouldBlockGlobalShortcut(e)) {
+          return;
+        }
+
+        e.preventDefault();
+        if (window.innerWidth < 992) {
+          handleOpenMobileSearch();
+        } else {
+          handleOpenDesktopSearch();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
     try {
-      localStorage.setItem('ptv-theme', theme);
+      localStorage.setItem('ptv_sidebar_collapsed', String(isSidebarCollapsed));
+      document.documentElement.setAttribute('data-sidebar-collapsed', String(isSidebarCollapsed));
     } catch {
       // ignore
     }
-  }, [isDark]);
+  }, [isSidebarCollapsed]);
 
-  const toggleTheme = () => {
-    setIsDark((prev) => !prev);
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 8);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Bersihkan modal dan reset scroll lock saat route berubah
+  useEffect(() => {
+    closeAllPopups();
+    dialogManager.resetOnRouteChange();
+  }, [location.pathname]);
 
   const currentPath = location.pathname;
   const currentCrumb =
@@ -297,16 +471,40 @@ export const HubShell: React.FC = () => {
 
   const isTabActive = (tab: string) => {
     if (tab === 'home') return currentPath === '/hub' || currentPath === '/hub/beranda';
-    if (tab === 'acara') return currentPath.startsWith('/hub/acara') || currentPath.startsWith('/hub/kalender');
-    if (tab === 'alat') return currentPath.startsWith('/hub/inventaris') || currentPath.startsWith('/hub/peminjaman');
-    if (tab === 'more') return isMoreOpen;
+    if (tab === 'acara') return currentPath === '/hub/acara' || currentPath.startsWith('/hub/acara/') || currentPath === '/hub/kalender' || currentPath.startsWith('/hub/kalender/');
+    if (tab === 'alat') return (
+      currentPath === '/hub/inventaris' ||
+      currentPath.startsWith('/hub/inventaris/') ||
+      currentPath === '/hub/peminjaman' ||
+      currentPath.startsWith('/hub/peminjaman/') ||
+      currentPath === '/hub/kerusakan' ||
+      currentPath.startsWith('/hub/kerusakan/') ||
+      currentPath === '/hub/lostfound' ||
+      currentPath.startsWith('/hub/lostfound/')
+    );
+    if (tab === 'profile') return (
+      currentPath === '/hub/profile' ||
+      currentPath.startsWith('/hub/profile/') ||
+      currentPath === '/hub/id' ||
+      currentPath === '/hub/pengaturan'
+    );
     return false;
   };
 
   return (
     <>
       {/* ── DESKTOP SIDEBAR 1:1 DARI shellHTML() ── */}
-      <aside className="side" id="side">
+      <aside className={`side ${isSidebarCollapsed ? 'collapsed' : ''}`} id="side">
+        <button
+          type="button"
+          className="side-collapse-btn"
+          onClick={toggleSidebarCollapse}
+          aria-label={isSidebarCollapsed ? 'Perluas menu navigasi' : 'Ciutkan menu navigasi'}
+          title={isSidebarCollapsed ? 'Perluas menu navigasi' : 'Ciutkan menu navigasi'}
+        >
+          <i className={isSidebarCollapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left'} />
+        </button>
+
         <div className="side-brand">
           <a
             href="#beranda"
@@ -316,10 +514,17 @@ export const HubShell: React.FC = () => {
               navigate('/hub/beranda');
             }}
             aria-label="Progresif TV"
+            title="Progresif TV Hub"
           >
             <span
-              className="brand-logo-gradient"
+              className="brand-logo-gradient brand-logo-expanded"
               style={{ '--logo-url': "url('/assets/images/ptv-logo-white.webp')" } as React.CSSProperties}
+              role="img"
+              aria-label="Progresif TV Production"
+            />
+            <span
+              className="brand-logo-symbol brand-logo-minimized"
+              style={{ '--symbol-url': "url('/assets/images/ptv-symbol.png')" } as React.CSSProperties}
               role="img"
               aria-label="Progresif TV"
             />
@@ -328,7 +533,18 @@ export const HubShell: React.FC = () => {
 
         <div className="side-scroll" id="sideNav">
           {SIDEBAR_GROUPS.map((grp) => {
-            const accessibleItems = grp.items.filter((item) => !item.capability || can(item.capability));
+            const userCategory = ((user as any)?.category || (user as any)?.kategori || (user as any)?.kategori_personel || '').toLowerCase().trim();
+            const isPembinaOrPengarah = userCategory === 'pembina' || userCategory === 'pengarah' || user?.assigned_profiles?.includes('pembina');
+
+            const accessibleItems = grp.items.filter((item) => {
+              if (item.key === 'keuangan' && isPembinaOrPengarah) {
+                return false;
+              }
+              if (item.anyCapabilities && item.anyCapabilities.length > 0) {
+                return item.anyCapabilities.some((cap) => can(cap));
+              }
+              return !item.capability || can(item.capability);
+            });
             if (!accessibleItems.length) return null;
 
             return (
@@ -342,14 +558,16 @@ export const HubShell: React.FC = () => {
                         href={item.path}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="snav"
+                        className="snav snav-portal"
                         style={{ textDecoration: 'none' }}
+                        title={`${item.label} (Buka tab baru)`}
                       >
                         <i className={item.iconClass} />
                         <span>{item.label}</span>
                         <i
-                          className="fa-solid fa-arrow-up-right-from-square"
+                          className="fa-solid fa-arrow-up-right-from-square snav-ext-ic"
                           style={{ fontSize: '10px', marginLeft: 'auto', opacity: 0.6 }}
+                          title="Buka tab baru"
                         />
                       </a>
                     );
@@ -362,6 +580,7 @@ export const HubShell: React.FC = () => {
                       key={item.key}
                       to={item.path}
                       className={`snav ${isActive ? 'on' : ''}`}
+                      title={item.label}
                     >
                       <i className={item.iconClass} />
                       <span>{item.label}</span>
@@ -374,29 +593,50 @@ export const HubShell: React.FC = () => {
         </div>
 
         <div className="side-foot">
-          <button
-            type="button"
-            className="snav"
-            onClick={toggleTheme}
-            data-act="theme"
+          <a
+            href="/"
+            className="snav snav-portal snav-foot-portal"
+            title="Kembali ke Portal"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/');
+            }}
           >
-            <i className={isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon'} />
-            <span>{isDark ? 'Mode terang' : 'Mode gelap'}</span>
-          </button>
-          <button
-            type="button"
-            className="snav"
-            onClick={logout}
-            data-act="logout"
-          >
-            <i className="fa-solid fa-arrow-right-from-bracket" />
-            <span>Keluar</span>
-          </button>
+            <i className="fa-solid fa-house-laptop" />
+            <span>Kembali ke Portal</span>
+          </a>
+          <div className="side-foot-row">
+            <button
+              type="button"
+              className="snav snav-foot-btn snav-foot-theme"
+              onClick={toggleTheme}
+              data-act="theme"
+              title={isDark ? 'Mode terang' : 'Mode gelap'}
+              aria-label={isDark ? 'Beralih ke mode terang' : 'Beralih ke mode gelap'}
+            >
+              <i className={isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon'} />
+              <span>{isDark ? 'Terang' : 'Gelap'}</span>
+            </button>
+            <button
+              type="button"
+              className="snav snav-foot-btn snav-foot-logout"
+              onClick={logout}
+              data-act="logout"
+              title="Keluar"
+              aria-label="Keluar dari akun"
+            >
+              <i className="fa-solid fa-arrow-right-from-bracket" />
+              <span>Keluar</span>
+            </button>
+          </div>
         </div>
       </aside>
 
+      {/* ── NOTIFICATION BAR GLOBAL DI ATAS HEADER (HANYA AREA KONTEN) ── */}
+      <TopAnnouncementBanner />
+
       {/* ── HEADER 1:1 DARI shellHTML() ── */}
-      <header className="hdr">
+      <header className={`hdr ${isScrolled ? 'stuck' : ''}`}>
         <div className="hdr-in">
           <div className="brand">
             <a
@@ -421,304 +661,212 @@ export const HubShell: React.FC = () => {
             <b>{currentCrumb}</b>
           </div>
 
-          <button
-            type="button"
-            className="hdr-search"
-            onClick={() => alert('Pencarian Universal: Ketik acara, alat, kru, atau dokumen.')}
-          >
-            <i className="fa-solid fa-magnifying-glass" />
-            <span>Cari acara, alat, kru, surat…</span>
-            <kbd>/</kbd>
-          </button>
-
           <div className="hdr-actions">
+            <button
+              type="button"
+              className="hdr-search"
+              onClick={handleOpenDesktopSearch}
+              aria-label="Cari acara, alat, kru, surat"
+            >
+              <i className="fa-solid fa-magnifying-glass" />
+              <span>Cari acara, alat, kru, surat…</span>
+              <kbd>/</kbd>
+            </button>
+
             <button
               type="button"
               className="icon-btn only-mobile"
               aria-label="Cari"
-              onClick={() => alert('Pencarian Universal')}
+              onClick={handleOpenMobileSearch}
             >
               <i className="fa-solid fa-magnifying-glass" />
             </button>
 
             <button
               type="button"
-              className="icon-btn"
-              aria-label="Notifikasi"
-              onClick={() => alert('Notifikasi PTV PRO')}
+              className="icon-btn only-mobile"
+              aria-label="Kembali ke Portal"
+              title="Kembali ke Portal"
+              onClick={() => navigate('/')}
             >
-              <i className="fa-solid fa-bell" />
-              <span className="dot" id="notifDot" style={{ display: 'none' }} />
+              <i className="fa-solid fa-house-laptop" style={{ fontSize: '13.5px' }} />
             </button>
 
             <button
               type="button"
               className="icon-btn"
-              aria-label="Profil"
-              style={{ width: 'auto', padding: '0 4px' }}
-              onClick={() => navigate('/hub/id')}
+              aria-label="Notifikasi"
+              onClick={handleOpenNotif}
             >
-              <span className="avatar sm">{userInitials}</span>
+              <i className="fa-solid fa-bell" />
+              <span
+                className="dot"
+                id="notifDot"
+                style={{
+                  display: unreadCount > 0 ? 'grid' : 'none',
+                }}
+              >
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className="icon-btn icon-btn-profile only-desktop"
+              title="Buka Profil"
+              aria-label="Buka Profil"
+              onClick={() => navigate('/hub/profile')}
+              style={{ width: 'auto', padding: '0 4px', cursor: 'pointer' }}
+            >
+              <span className="avatar sm">
+                {(currentUser?.foto_url || (user as any)?.foto_url || (user as any)?.avatar_url) ? (
+                  <img
+                    src={currentUser?.foto_url || (user as any)?.foto_url || (user as any)?.avatar_url}
+                    alt={currentUser?.full_name || user?.full_name || 'Profil'}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                  />
+                ) : (
+                  userInitials
+                )}
+              </span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* ── MAIN CONTENT VIEWPORT ── */}
+      {/* ── MAIN CONTENT VIEWPORT (GLOBAL SUBTLE FADE + LIFT TRANSITION) ── */}
       <main className="main" id="main">
-        <div className="page-in" id="view">
+        <div className="page-in ptv-page-transition" id="view" key={location.pathname}>
           <Outlet />
         </div>
       </main>
 
-      {/* ── MOBILE BOTTOM NAVIGATION 1:1 DARI shellHTML() ── */}
-      <nav className="bnav" id="bnav">
-        <div className="bnav-in">
+      {/* ── AMBIENT BOTTOM GRADIENT ── */}
+      <div className="ptv-nav-ambient-gradient" aria-hidden="true" />
+
+      {/* ── MOBILE FLOATING NAVIGATION 2.0 (JID SPACE EXACT GEOMETRY) ── */}
+      <nav className="ptv-floating-dock" id="floatingDock" aria-label="Navigasi Utama Mobile">
+        <div className="ptv-dock-pill">
           <button
             type="button"
-            className={`bitem ${isTabActive('home') ? 'on' : ''}`}
+            className={`ptv-dock-item ${isTabActive('home') ? 'is-active' : ''}`}
             data-tab="home"
             onClick={() => {
               setIsMoreOpen(false);
               navigate('/hub/beranda');
             }}
+            aria-label="Home"
           >
             <i className="fa-solid fa-house" />
-            <span>Home</span>
+            {isTabActive('home') && <span className="dock-label">Home</span>}
           </button>
 
           <button
             type="button"
-            className={`bitem ${isTabActive('acara') ? 'on' : ''}`}
+            className={`ptv-dock-item ${isTabActive('acara') ? 'is-active' : ''}`}
             data-tab="acara"
             onClick={() => {
               setIsMoreOpen(false);
               navigate('/hub/acara');
             }}
+            aria-label="Acara"
           >
             <i className="fa-solid fa-calendar-day" />
-            <span>Acara</span>
+            {isTabActive('acara') && <span className="dock-label">Acara</span>}
           </button>
 
           <button
             type="button"
-            className="fab"
-            data-act="quick"
-            aria-label="Aksi cepat"
-            onClick={() => setIsQuickOpen(true)}
-          >
-            <i className="fa-solid fa-plus" />
-          </button>
-
-          <button
-            type="button"
-            className={`bitem ${isTabActive('alat') ? 'on' : ''}`}
+            className={`ptv-dock-item ${isTabActive('alat') ? 'is-active' : ''}`}
             data-tab="alat"
             onClick={() => {
               setIsMoreOpen(false);
               navigate('/hub/inventaris');
             }}
+            aria-label="Alat"
           >
-            <i className="fa-solid fa-camera-retro" />
-            <span>Alat</span>
+            <i className="fa-solid fa-boxes-stacked" />
+            {isTabActive('alat') && <span className="dock-label">Alat</span>}
           </button>
 
           <button
             type="button"
-            className={`bitem ${isTabActive('more') ? 'on' : ''}`}
-            data-tab="more"
-            style={{ position: 'relative' }}
-            onClick={() => setIsMoreOpen(!isMoreOpen)}
+            className={`ptv-dock-item ${isTabActive('profile') ? 'is-active' : ''}`}
+            data-tab="profile"
+            onClick={() => {
+              setIsMoreOpen(false);
+              navigate('/hub/profile');
+            }}
+            aria-label="Profil"
           >
-            <i className="fa-solid fa-ellipsis" />
-            <span>More</span>
-            <span className="action-dot" id="moreActionDot" style={{ display: 'none' }} />
+            <i className="fa-solid fa-circle-user" />
+            {isTabActive('profile') && <span className="dock-label">Profil</span>}
           </button>
         </div>
+
+        {/* Tombol Discover Lingkaran */}
+        <button
+          type="button"
+          className={`ptv-dock-discover ${isMoreOpen ? 'is-active' : ''}`}
+          aria-label="Buka Progresif TV Workspace"
+          onClick={() => {
+            if (isMoreOpen) {
+              setIsMoreOpen(false);
+            } else {
+              closeAllPopups();
+              setIsMoreOpen(true);
+            }
+          }}
+        >
+          <i className="fa-solid fa-table-cells-large" />
+        </button>
       </nav>
 
-      {/* ── AKSI CEPAT BOTTOM SHEET (FAB MODAL) ── */}
-      <div
-        className={`scrim ${isQuickOpen ? 'on' : ''}`}
-        id="quickScrim"
-        onClick={() => setIsQuickOpen(false)}
+      {/* ── DISCOVER: PROGRESIF TV WORKSPACE (INTERACTIVE BOTTOM SHEET) ── */}
+      <WorkspaceBottomSheet
+        isOpen={isMoreOpen}
+        onClose={() => setIsMoreOpen(false)}
+        can={can}
+        navigate={navigate}
+        user={user}
       />
-      <section
-        className={`sheet ${isQuickOpen ? 'on' : ''}`}
-        id="quickSheet"
-        role="dialog"
-        aria-modal="true"
-      >
-        <div className="sheet-grab" />
-        <div className="sheet-hd">
-          <h3 id="sheetTitle">Aksi cepat</h3>
-          <button
-            type="button"
-            className="icon-btn"
-            onClick={() => setIsQuickOpen(false)}
-            aria-label="Tutup"
-          >
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="sheet-body" id="sheetBody">
-          <div className="qa-grid">
-            <button
-              type="button"
-              className="qa"
-              onClick={() => {
-                setIsQuickOpen(false);
-                navigate('/hub/surat/generator');
-              }}
-            >
-              <span className="qa-ic">
-                <i className="fa-solid fa-shield-halved" />
-              </span>
-              <span>
-                <span className="qa-t">Generator Surat Izin</span>
-                <span className="qa-s">Penerbitan surat izin resmi santri</span>
-              </span>
-            </button>
 
-            <button
-              type="button"
-              className="qa"
-              onClick={() => {
-                setIsQuickOpen(false);
-                navigate('/hub/peminjaman');
-              }}
-            >
-              <span className="qa-ic">
-                <i className="fa-solid fa-boxes-stacked" />
-              </span>
-              <span>
-                <span className="qa-t">Pinjam Alat</span>
-                <span className="qa-s">Ambil alat dari inventaris</span>
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className="qa"
-              onClick={() => {
-                setIsQuickOpen(false);
-                navigate('/hub/catatan');
-              }}
-            >
-              <span className="qa-ic">
-                <i className="fa-solid fa-note-sticky" />
-              </span>
-              <span>
-                <span className="qa-t">Tambah Catatan Bersama</span>
-                <span className="qa-s">Tulis &amp; bagikan catatan kru</span>
-              </span>
-            </button>
-          </div>
-          <p className="hint mt16" style={{ textAlign: 'center', fontSize: '12px' }}>
-            Semua pengajuan &amp; pencatatan otomatis tersinkronisasi.
-          </p>
-        </div>
-      </section>
-
-      {/* ── MOBILE MORE SHEET ── */}
-      <div
-        className={`scrim ${isMoreOpen ? 'on' : ''}`}
-        id="moreScrim"
-        onClick={() => setIsMoreOpen(false)}
+      {/* ── 3 FITUR HEADER MODALS (1:1 DENGAN LEGACY PHP) ── */}
+      {/* 1. Global Search (Desktop Sheet) */}
+      <UniversalSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        isMobile={false}
       />
-      <section
-        className={`sheet ${isMoreOpen ? 'on' : ''}`}
-        id="moreSheet"
-        role="dialog"
-        aria-modal="true"
-        style={{ maxHeight: '82vh' }}
-      >
-        <div className="sheet-grab" />
-        <div className="sheet-hd">
-          <h3>Menu Lainnya</h3>
-          <button
-            type="button"
-            className="icon-btn"
-            onClick={() => setIsMoreOpen(false)}
-            aria-label="Tutup"
-          >
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="sheet-body" style={{ overflowY: 'auto', paddingBottom: '24px' }}>
-          {SIDEBAR_GROUPS.map((grp) => {
-            const accessibleItems = grp.items.filter((item) => !item.capability || can(item.capability));
-            if (!accessibleItems.length) return null;
 
-            return (
-              <div key={grp.groupName} style={{ marginBottom: '16px' }}>
-                <p
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    color: 'var(--muted)',
-                    margin: '0 0 6px 12px',
-                  }}
-                >
-                  {grp.groupName}
-                </p>
-                <div className="list">
-                  {accessibleItems.map((item) => {
-                    if (item.isExternal) {
-                      return (
-                        <a
-                          key={item.key}
-                          href={item.path}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="li"
-                          style={{ textDecoration: 'none' }}
-                          onClick={() => setIsMoreOpen(false)}
-                        >
-                          <span className="li-ic">
-                            <i className={item.iconClass} />
-                          </span>
-                          <span className="li-body">
-                            <span className="li-t">{item.label}</span>
-                          </span>
-                          <i
-                            className="fa-solid fa-arrow-up-right-from-square"
-                            style={{ fontSize: '12px', color: 'var(--muted)', marginLeft: 'auto', opacity: 0.7 }}
-                          />
-                        </a>
-                      );
-                    }
+      {/* 1b. Global Search (Mobile Overlay) */}
+      <UniversalSearchModal
+        isOpen={isMobileSearchOpen}
+        onClose={() => setIsMobileSearchOpen(false)}
+        isMobile={true}
+      />
 
-                    return (
-                      <button
-                        key={item.key}
-                        type="button"
-                        className="li"
-                        onClick={() => {
-                          setIsMoreOpen(false);
-                          navigate(item.path);
-                        }}
-                      >
-                        <span className="li-ic">
-                          <i className={item.iconClass} />
-                        </span>
-                        <span className="li-body">
-                          <span className="li-t">{item.label}</span>
-                        </span>
-                        <span className="chev">
-                          <i className="fa-solid fa-chevron-right" />
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      {/* 2. Notification Center */}
+      <NotificationCenterModal
+        isOpen={isNotifOpen}
+        onClose={() => setIsNotifOpen(false)}
+        onUnreadChange={(count) => setUnreadCount(count)}
+      />
+
+      {/* 3. User Profile Menu */}
+      <UserProfileMenuModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        onToggleTheme={toggleTheme}
+        isDark={isDark}
+        user={user}
+      />
+
+      {/* 4. Global Back to Top Button */}
+      <BackToTopButton threshold={350} />
+
+      {/* 5. Global Toast Container (Top Right under Header & Announcement Bar) */}
+      <GlobalToastContainer />
     </>
   );
 };

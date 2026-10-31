@@ -2,6 +2,17 @@ import { describe, it, expect } from 'vitest';
 import { hasCapability, PermissionContext } from './policyEngine';
 
 describe('Authoritative Policy Engine (hasCapability)', () => {
+  it('live crew keeps derived Kas Saya without restoring revoked registry grants', () => {
+    const live: PermissionContext = { status_akun: 'active', status_organisasi: 'active', assigned_profiles: ['crew'],
+      allowed_overrides: [], denied_overrides: [], capabilities: ['hub.access'], capabilities_verified_live: true };
+    expect(hasCapability(live, 'finance.view_own')).toBe(true);
+    expect(hasCapability(live, 'finance.view')).toBe(false);
+    expect(hasCapability(live, 'inventory.view')).toBe(false);
+    expect(hasCapability({ ...live, denied_overrides: ['finance.view_own'] }, 'finance.view_own')).toBe(false);
+    expect(hasCapability({ ...live, status_organisasi: 'inactive' }, 'finance.view_own')).toBe(false);
+    expect(hasCapability({ ...live, assigned_profiles: ['crew', 'pembina'] }, 'finance.view_own')).toBe(false);
+    expect(hasCapability({ ...live, category: 'Pengarah' }, 'finance.view_own')).toBe(false);
+  });
   it('1. Root Executive has unrestricted capabilities', () => {
     const rootUser: PermissionContext = {
       status_akun: 'active',
@@ -32,6 +43,9 @@ describe('Authoritative Policy Engine (hasCapability)', () => {
     expect(hasCapability(crewMember, 'loans.checkout')).toBe(true);
     expect(hasCapability(crewMember, 'notes.create')).toBe(true);
 
+    // Read own kas only
+    expect(hasCapability(crewMember, 'finance.view_own')).toBe(true);
+
     // Denied for Crew by default
     expect(hasCapability(crewMember, 'finance.view')).toBe(false);
     expect(hasCapability(crewMember, 'finance.manage')).toBe(false);
@@ -53,6 +67,7 @@ describe('Authoritative Policy Engine (hasCapability)', () => {
 
     // Strictly quarantined
     expect(hasCapability(pembinaUser, 'finance.view')).toBe(false);
+    expect(hasCapability(pembinaUser, 'finance.view_own')).toBe(false);
     expect(hasCapability(pembinaUser, 'finance.manage')).toBe(false);
     expect(hasCapability(pembinaUser, 'finance.operator')).toBe(false);
     expect(hasCapability(pembinaUser, 'inventory.valuation.view')).toBe(false);

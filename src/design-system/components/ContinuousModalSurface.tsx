@@ -20,6 +20,7 @@ export const ContinuousModalSurface = React.forwardRef<HTMLDivElement, Continuou
       variant = 'elevated',
       maxWidth = '540px',
       contentPadding = '24px 28px',
+      clipContent = true,
       ariaLabel,
       className = '',
       style = {},
@@ -34,6 +35,7 @@ export const ContinuousModalSurface = React.forwardRef<HTMLDivElement, Continuou
         radius={radius}
         variant={variant}
         contentPadding={contentPadding}
+        clipContent={clipContent}
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}

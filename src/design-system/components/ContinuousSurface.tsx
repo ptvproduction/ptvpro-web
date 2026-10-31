@@ -31,6 +31,7 @@ export interface ContinuousSurfaceProps extends React.HTMLAttributes<HTMLElement
   borderColor?: string;
   borderWidth?: number;
   fillColor?: string;
+  hoverFillColor?: string;
   shadow?: string | boolean;
   hoverShadow?: string;
   hoverBorderColor?: string;
@@ -57,12 +58,13 @@ export const ContinuousSurface = React.forwardRef<HTMLElement, ContinuousSurface
       borderColor,
       borderWidth,
       fillColor,
+      hoverFillColor,
       shadow = true,
       hoverShadow,
       hoverBorderColor,
       hoverElevation = false,
       interactive = false,
-      isDark = false,
+      isDark: isDarkProp,
       params,
       clipContent = false,
       backgroundOverlay,
@@ -83,6 +85,25 @@ export const ContinuousSurface = React.forwardRef<HTMLElement, ContinuousSurface
     const clipId = `ptv-clip-${rawId}`;
 
     const [isHovered, setIsHovered] = useState(false);
+    const [detectedDark, setDetectedDark] = useState<boolean>(() => {
+      if (typeof document !== 'undefined') {
+        return document.documentElement.getAttribute('data-theme') === 'dark';
+      }
+      return false;
+    });
+
+    useEffect(() => {
+      if (typeof document === 'undefined') return;
+      const checkTheme = () => {
+        setDetectedDark(document.documentElement.getAttribute('data-theme') === 'dark');
+      };
+      checkTheme();
+      const observer = new MutationObserver(checkTheme);
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      return () => observer.disconnect();
+    }, []);
+
+    const isDark = isDarkProp !== undefined ? isDarkProp : detectedDark;
 
     // Initial dimension estimation
     const isFixedW = typeof width === 'number';
@@ -123,7 +144,10 @@ export const ContinuousSurface = React.forwardRef<HTMLElement, ContinuousSurface
     }, [width, height, isFixedW, isFixedH, containerRef]);
 
     const surfaceStyle = getSurfaceStyle(variant, isDark);
-    const effectiveFill = fillColor !== undefined ? fillColor : surfaceStyle.fill;
+    const baseFill = fillColor !== undefined ? fillColor : surfaceStyle.fill;
+    const effectiveFill = (isHovered && (interactive || hoverElevation) && hoverFillColor)
+      ? hoverFillColor
+      : baseFill;
     const effectiveStrokeWidth = borderWidth !== undefined ? borderWidth : border ? surfaceStyle.strokeWidth : 0;
     
     // Stroke color changes on hover if interactive/hoverElevation
@@ -148,7 +172,8 @@ export const ContinuousSurface = React.forwardRef<HTMLElement, ContinuousSurface
         ? generateContinuousPath(effectiveW, effectiveH, clampedR, 28, params)
         : '';
 
-    const widthStyle = typeof width === 'number' ? `${width}px` : width || '100%';
+    const isSpan = Component === 'span';
+    const widthStyle = typeof width === 'number' ? `${width}px` : width || (isSpan ? 'fit-content' : '100%');
     const heightStyle = typeof height === 'number' ? `${height}px` : height || 'auto';
 
     const handleMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
@@ -180,10 +205,10 @@ export const ContinuousSurface = React.forwardRef<HTMLElement, ContinuousSurface
     } = (style as React.CSSProperties) || {};
 
     const contentLayout: React.CSSProperties = {
-      display: display !== undefined ? display : 'block',
+      display: display !== undefined ? display : isSpan ? 'inline-flex' : 'block',
       flexDirection,
-      alignItems,
-      justifyContent,
+      alignItems: alignItems !== undefined ? alignItems : isSpan ? 'center' : undefined,
+      justifyContent: justifyContent !== undefined ? justifyContent : isSpan ? 'center' : undefined,
       placeItems,
       placeContent,
       justifyItems,
@@ -204,6 +229,8 @@ export const ContinuousSurface = React.forwardRef<HTMLElement, ContinuousSurface
         onMouseLeave={handleMouseLeave}
         style={{
           position: 'relative',
+          display: display !== undefined ? display : isSpan ? 'inline-flex' : undefined,
+          verticalAlign: isSpan ? 'middle' : undefined,
           width: widthStyle,
           height: heightStyle,
           boxSizing: 'border-box',
@@ -257,6 +284,9 @@ export const ContinuousSurface = React.forwardRef<HTMLElement, ContinuousSurface
                 d={svgPath}
                 fill={effectiveFill}
                 stroke="none"
+                style={{
+                  transition: 'fill 0.18s ease',
+                }}
               />
             )}
           </svg>
@@ -312,20 +342,24 @@ export const ContinuousSurface = React.forwardRef<HTMLElement, ContinuousSurface
           </svg>
         )}
 
-        {/* Content Layer (Unclipped HTML with native stacking and full accessibility) */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 2,
-            width: '100%',
-            height: '100%',
-            boxSizing: 'border-box',
-            color: surfaceStyle.textColor,
-            ...contentLayout,
-          }}
-        >
-          {children}
-        </div>
+        {/* Content Layer (Unclipped HTML with native stacking and full accessibility, clipped if clipContent is true) */}
+        {React.createElement(
+          Component === 'span' ? 'span' : 'div',
+          {
+            style: {
+              position: 'relative',
+              zIndex: 2,
+              width: '100%',
+              height: '100%',
+              boxSizing: 'border-box',
+              color: (style as React.CSSProperties)?.color ?? (fillColor ? 'inherit' : surfaceStyle.textColor),
+              clipPath: (clipContent && effectiveW > 0 && effectiveH > 0) ? `url(#${clipId})` : undefined,
+              WebkitClipPath: (clipContent && effectiveW > 0 && effectiveH > 0) ? `url(#${clipId})` : undefined,
+              ...contentLayout,
+            },
+          },
+          children
+        )}
       </Component>
     );
   }

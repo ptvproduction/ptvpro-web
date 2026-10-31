@@ -1,5 +1,6 @@
 import { PeminjamanRecord, PeminjamanFilterParams, CheckoutLoanDTO, ReturnLoanDTO, KondisiKembali } from './types';
 import { inventarisService } from '../inventaris/inventarisService';
+import { StagingPeminjamanService } from './stagingPeminjamanService';
 
 export interface IPeminjamanService {
   getPeminjamanList(filters?: PeminjamanFilterParams): Promise<PeminjamanRecord[]>;
@@ -90,14 +91,69 @@ export class LocalPeminjamanService implements IPeminjamanService {
   }
 
   async getPeminjamanList(filters?: PeminjamanFilterParams): Promise<PeminjamanRecord[]> {
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    if (typeof fetch !== 'undefined') {
+      try {
+        const res = await fetch('/api/peminjaman', {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+        });
 
+        if (!res.ok) {
+          let errorMsg = `HTTP Error ${res.status}: Gagal memuat data peminjaman.`;
+          const errData = await res.json().catch(() => null);
+          if (errData?.error) errorMsg = errData.error;
+          throw new Error(errorMsg);
+        }
+
+        const contentType = res.headers?.get?.('content-type');
+        if (contentType && !contentType.includes('application/json')) {
+          throw new Error('Respon server bukan format JSON yang valid.');
+        }
+
+        const body = await res.json();
+        if (!body.success || !Array.isArray(body.loans)) {
+          throw new Error('Format respon API peminjaman tidak valid.');
+        }
+
+        let result = body.loans as PeminjamanRecord[];
+
+        if (filters?.status && filters.status !== 'all') {
+          result = result.filter((r) => r.status === filters.status);
+        }
+
+        if (filters?.search) {
+          const q = filters.search.toLowerCase();
+          result = result.filter(
+            (r) =>
+              r.transaction_id.toLowerCase().includes(q) ||
+              r.peminjam_nama.toLowerCase().includes(q) ||
+              r.nama_alat.toLowerCase().includes(q) ||
+              r.kode_unit.toLowerCase().includes(q) ||
+              r.keperluan.toLowerCase().includes(q)
+          );
+        }
+
+        return result;
+      } catch (err: any) {
+        if (err?.code === 'ERR_INVALID_URL' || err?.message?.includes?.('Failed to parse URL')) {
+          // Fallback ke penyimpanan memori lokal untuk unit test non-browser (Node.js vitest)
+          return this.getLocalRecords(filters);
+        }
+        console.error('[PeminjamanService Error]:', err.message);
+        throw err;
+      }
+    }
+
+    return this.getLocalRecords(filters);
+  }
+
+  private getLocalRecords(filters?: PeminjamanFilterParams): PeminjamanRecord[] {
     let result = [...this.records];
-
     if (filters?.status && filters.status !== 'all') {
       result = result.filter((r) => r.status === filters.status);
     }
-
     if (filters?.search) {
       const q = filters.search.toLowerCase();
       result = result.filter(
@@ -109,7 +165,6 @@ export class LocalPeminjamanService implements IPeminjamanService {
           r.keperluan.toLowerCase().includes(q)
       );
     }
-
     return result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }
 
@@ -230,4 +285,7 @@ export class LocalPeminjamanService implements IPeminjamanService {
   }
 }
 
-export const peminjamanService = LocalPeminjamanService.getInstance();
+export const peminjamanService: IPeminjamanService =
+  import.meta.env.MODE === 'test' && import.meta.env.VITE_INVENTARIS_BACKEND === 'local'
+    ? LocalPeminjamanService.getInstance()
+    : new StagingPeminjamanService();

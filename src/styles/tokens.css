@@ -36,6 +36,34 @@
   font-weight: 700;
   font-display: swap;
 }
+@font-face {
+  font-family: "SF Pro Text";
+  src: url("/assets/fonts/sf-pro-display/SF-Pro-Display-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SF Pro Text";
+  src: url("/assets/fonts/sf-pro-display/SF-Pro-Display-Medium.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SF Pro Text";
+  src: url("/assets/fonts/sf-pro-display/SF-Pro-Display-Semibold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SF Pro Text";
+  src: url("/assets/fonts/sf-pro-display/SF-Pro-Display-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
 
 :root {
   /* ── PTV Royal Blue Scales ── */
@@ -49,7 +77,7 @@
   --b-100: #DCEBFF;
   --b-050: #EDF4FF;
 
-  /* ── Surfaces & Backgrounds (Light Default) ── */
+  /* ── Surfaces & Backgrounds (Light Baseline Default) ── */
   --bg: #F8FAFD;
   --bg-2: #FFFFFF;
   --surface: #FFFFFF;
@@ -61,6 +89,8 @@
   --ink: #0B2A4A;
   --ink-2: #38587A;
   --muted: #6E8CAE;
+  --ink-3: var(--muted);
+  --ink3: var(--muted);
   --line: rgba(11, 42, 74, 0.10);
   --line-2: rgba(11, 42, 74, 0.055);
 
@@ -93,7 +123,50 @@
   --accent-bg: #E2EDFD;
   --accent-fg: #0B5FBF;
 
-  /* ── PTV Unified Continuous Curve System ── */
+  /* ── Feedback & Semantic Status Borders ── */
+  --ok-border: rgba(15, 122, 90, 0.25);
+  --warn-border: rgba(217, 119, 6, 0.25);
+  --dang-border: rgba(176, 43, 35, 0.25);
+  --info-border: rgba(11, 95, 191, 0.25);
+
+  /* ── Beranda Shortcut Feature Tokens (Light Canonical) ── */
+  --shortcut-surat-fg: var(--b-600);          /* Biru PTV (#1273E6) */
+  --shortcut-surat-bg: var(--b-050);          /* #EDF4FF */
+  --shortcut-surat-border: rgba(18, 115, 230, 0.20);
+  --shortcut-surat-hover-border: var(--b-300); /* #A7CEFF */
+
+  --shortcut-pinjam-fg: #4F46E5;              /* Indigo */
+  --shortcut-pinjam-bg: #EEF2FF;
+  --shortcut-pinjam-border: rgba(79, 70, 229, 0.20);
+  --shortcut-pinjam-hover-border: #C7D2FE;
+
+  --shortcut-masalah-fg: #D97706;             /* Amber / Oranye */
+  --shortcut-masalah-bg: #FEF3C7;
+  --shortcut-masalah-border: rgba(217, 119, 6, 0.20);
+  --shortcut-masalah-hover-border: #FDE68A;
+
+  --shortcut-lostfound-fg: #0D9488;           /* Cyan / Teal */
+  --shortcut-lostfound-bg: #CCFBF1;
+  --shortcut-lostfound-border: rgba(13, 148, 136, 0.20);
+  --shortcut-lostfound-hover-border: #99F6E4;
+
+  --shortcut-tugas-fg: #059669;               /* Hijau */
+  --shortcut-tugas-bg: #D1FAE5;
+  --shortcut-tugas-border: rgba(5, 150, 105, 0.20);
+  --shortcut-tugas-hover-border: #A7F3D0;
+
+  --shortcut-id-fg: #9333EA;                  /* Ungu */
+  --shortcut-id-bg: #F3E8FF;
+  --shortcut-id-border: rgba(147, 51, 234, 0.20);
+  --shortcut-id-hover-border: #E9D5FF;
+
+  /* ── Proposed Mappings for Prototype Undefined Tokens (R03 Documentation) ── */
+  --gold: #9A6B08;          /* Usulan: mapped to warn/amber tone for notification unread dot */
+  --gold-bg: #FCF0D6;
+  --g-500: #3B8EF7;         /* Usulan: mapped to royal blue gradient start for analytics chart */
+  --g-700: #0B5FBF;         /* Usulan: mapped to royal blue gradient stop for analytics chart */
+
+  /* ── PTV Unified Continuous Curve System (Profile D Scale) ── */
   --ptv-curve-xs: 6px;       /* Micro badges, inline tags (h: 18-24px) */
   --ptv-curve-sm: 9px;       /* Small controls, compact buttons (h: 28-34px) */
   --ptv-curve-md: 12px;      /* Standard controls: inputs, PTVSelect triggers, buttons (h: 38-46px) */
@@ -128,6 +201,21 @@
   --r-xl: var(--ptv-curve-2xl);  /* 28px */
   --r-full: var(--ptv-curve-pill); /* 9999px */
 
+  /* ── Authoritative R03 HTML Reference Extracted Nominal Radius Scale ── */
+  --r-ref-xs: 9px;               /* shape.small: Badge persegi & mikro */
+  --r-ref-s: 13px;               /* shape.control: Input field, select trigger */
+  --r-ref-m: 18px;               /* shape.card: Card standard, stat box */
+  --r-ref-l: 24px;               /* shape.dialog: Modal dialog desktop, hero */
+  --r-ref-xl: 30px;              /* shape.sheet: Sheet modal mobile top corners */
+  --r-ref-full: 999px;           /* shape.pill: Button, chip .fchip, segmented bar */
+  --r-ref-circle: 50%;           /* shape.circle: Avatar kru, icon button circular */
+
+  /* Component-specific source radii extracted from reference HTML */
+  --r-thumb: 14px;           /* .thumb (52x52px asset image thumbnail) */
+  --r-dock: 26px;            /* .bnav-in (mobile floating dock capsule) */
+  --r-icon-box: 13px;        /* .li-ic (list item icon container) */
+  --r-action-box: 19px;      /* .qrb span.ic (quick action rounded container) */
+
   /* ── Layout & Responsive Metrics ── */
   --header-h: 58px;
   --dock-h: 64px;
@@ -137,12 +225,24 @@
   --sar: env(safe-area-inset-right, 0px);
   --sidebar-w: 250px;
   --maxw: 1160px;
+}
 
-  /* ── Universal PTV PRO Hub Typography Tokens (SF Pro Display Standard) ── */
+:root[data-sidebar-collapsed="true"],
+.side.collapsed {
+  --sidebar-w: 72px;
+}
+
+:root {
+
+  /* ── Universal PTV PRO Hub Typography Tokens (SF Pro Display & SF Pro Text Standard) ── */
   --ptv-font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-body: "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --ptv-font-display: var(--font-display);
+  --ptv-font-text: var(--font-body);
   --ptv-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  --font: var(--ptv-font-family);
-  --font-sans: var(--ptv-font-family);
+  --font: var(--font-body);
+  --font-sans: var(--font-body);
 
   /* ── Compatibility Aliases for Existing React Components ── */
   --bg-primary: var(--bg);
@@ -179,47 +279,104 @@
 /* ── Dark Mode Token Overrides ── */
 :root[data-theme="dark"],
 [data-theme="dark"] {
-  --bg: #060F1C;
-  --bg-2: #0A1626;
-  --surface: #0E1B2D;
-  --surface-2: #122238;
-  --glass: rgba(14, 27, 45, 0.72);
-  --card-bg: #0E1B2D;
+  /* ── Neutral Charcoal Surfaces (Gmail / Google Workspace Dark Baseline) ── */
+  --bg: #111315;
+  --bg-2: #1B1E21;
+  --surface: #24282C;
+  --surface-2: #2E3338;
+  --glass: rgba(27, 30, 33, 0.90);
+  --card-bg: #24282C;
 
-  --ink: #E6F0FC;
-  --ink-2: #B8CEE6;
-  --muted: #7F9ABA;
-  --line: rgba(255, 255, 255, 0.10);
-  --line-2: rgba(255, 255, 255, 0.055);
+  /* ── Restrained Typography Ink (High Comfort, WCAG AA Compliant) ── */
+  --ink: #E8EAED;
+  --ink-2: #BDC1C6;
+  --muted: #9DA5AE;
+  --ink-3: var(--muted);
+  --ink3: var(--muted);
+  --line: #34383D;
+  --line-2: rgba(255, 255, 255, 0.08);
 
-  --b-100: #12314F;
-  --b-050: #0E2540;
-  --b-600: #4E9BFB;
-  --b-700: #3B8EF7;
+  /* ── Calm PTV Royal Blue Scales (Soft Blue Accent #A8C7FA) ── */
+  --b-900: #1A283B;
+  --b-800: #1E3554;
+  --b-700: #4285F4;
+  --b-600: #8AB4F8;
+  --b-500: #A8C7FA;
+  --b-400: #C2E7FF;
+  --b-300: #D3E3FD;
+  --b-100: #1E2A3A;
+  --b-050: rgba(168, 199, 250, 0.12);
 
-  --ok: #4FC79B;
-  --ok-bg: #0E2E26;
-  --warn: #E3BA63;
-  --warn-bg: #30260F;
-  --dang: #EE8C82;
-  --dang-bg: #351B18;
-  --info: #7DBCEA;
-  --info-bg: #0F2740;
-  --neutral-bg: #16253A;
-  --neutral-fg: #92AACA;
+  /* ── Desaturated Soft Semantic Status ── */
+  --ok: #81C995;
+  --ok-bg: rgba(129, 201, 149, 0.12);
+  --warn: #FDD663;
+  --warn-bg: rgba(253, 214, 99, 0.12);
+  --dang: #F28B82;
+  --dang-bg: rgba(242, 139, 130, 0.12);
+  --info: #8AB4F8;
+  --info-bg: rgba(138, 180, 248, 0.12);
+  --neutral-bg: #2E3338;
+  --neutral-fg: #BDC1C6;
+  --accent-bg: rgba(168, 199, 250, 0.12);
+  --accent-fg: #A8C7FA;
 
-  --shadow-s: 0 2px 6px rgba(0, 0, 0, 0.4);
-  --shadow-m: 0 6px 18px rgba(0, 0, 0, 0.5);
-  --shadow-l: 0 10px 30px rgba(0, 0, 0, 0.6);
+  /* ── Dark Mode Status Borders ── */
+  --ok-border: rgba(129, 201, 149, 0.25);
+  --warn-border: rgba(253, 214, 99, 0.25);
+  --dang-border: rgba(242, 139, 130, 0.25);
+  --info-border: rgba(138, 180, 248, 0.25);
+
+  /* ── Beranda Shortcut Feature Tokens (Dark Canonical) ── */
+  --shortcut-surat-fg: #A8C7FA;
+  --shortcut-surat-bg: rgba(168, 199, 250, 0.12);
+  --shortcut-surat-border: rgba(168, 199, 250, 0.22);
+  --shortcut-surat-hover-border: rgba(168, 199, 250, 0.40);
+
+  --shortcut-pinjam-fg: #A5B4FC;
+  --shortcut-pinjam-bg: rgba(165, 180, 252, 0.12);
+  --shortcut-pinjam-border: rgba(165, 180, 252, 0.22);
+  --shortcut-pinjam-hover-border: rgba(165, 180, 252, 0.40);
+
+  --shortcut-masalah-fg: #FDD663;
+  --shortcut-masalah-bg: rgba(253, 214, 99, 0.12);
+  --shortcut-masalah-border: rgba(253, 214, 99, 0.22);
+  --shortcut-masalah-hover-border: rgba(253, 214, 99, 0.40);
+
+  --shortcut-lostfound-fg: #5EEAD4;
+  --shortcut-lostfound-bg: rgba(94, 234, 212, 0.12);
+  --shortcut-lostfound-border: rgba(94, 234, 212, 0.22);
+  --shortcut-lostfound-hover-border: rgba(94, 234, 212, 0.40);
+
+  --shortcut-tugas-fg: #81C995;
+  --shortcut-tugas-bg: rgba(129, 201, 149, 0.12);
+  --shortcut-tugas-border: rgba(129, 201, 149, 0.22);
+  --shortcut-tugas-hover-border: rgba(129, 201, 149, 0.40);
+
+  --shortcut-id-fg: #D8B4FE;
+  --shortcut-id-bg: rgba(216, 180, 254, 0.12);
+  --shortcut-id-border: rgba(216, 180, 254, 0.22);
+  --shortcut-id-hover-border: rgba(216, 180, 254, 0.40);
+
+  /* ── Shadows & Subtle Elevations ── */
+  --shadow-s: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-m: 0 4px 14px rgba(0, 0, 0, 0.40);
+  --shadow-l: 0 8px 28px rgba(0, 0, 0, 0.50);
+  --shadow-blue: 0 4px 14px rgba(0, 0, 0, 0.35);
+
+  --gold: #FDD663;
+  --gold-bg: rgba(253, 214, 99, 0.12);
+  --g-500: #8AB4F8;
+  --g-700: #4285F4;
 
   /* ── Canonical Profile D Soft Surface Dark Tokens ── */
-  --ptv-soft-surface-bg: #0E1B2D;
-  --ptv-soft-border: 0.75px solid rgba(255, 255, 255, 0.12);
-  --ptv-soft-stroke: rgba(255, 255, 255, 0.12);
+  --ptv-soft-surface-bg: #24282C;
+  --ptv-soft-border: 0.75px solid #34383D;
+  --ptv-soft-stroke: #34383D;
   --ptv-soft-stroke-width: 0.75px;
-  --ptv-soft-shadow: 0 10px 22px rgba(0, 0, 0, 0.45), 0 2px 5px rgba(0, 0, 0, 0.25);
-  --ptv-soft-shadow-elevated: 0 18px 40px rgba(0, 0, 0, 0.60), 0 4px 12px rgba(0, 0, 0, 0.35);
-  --ptv-soft-filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.45)) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.25));
+  --ptv-soft-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --ptv-soft-shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --ptv-soft-filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.35));
 
   --bg-primary: var(--bg);
   --bg-secondary: var(--surface);
@@ -232,12 +389,195 @@
   --text-muted: var(--muted);
 }
 
-/* ── Universal Root Hub Scoping ── */
+/* ── Universal Root Hub Scoping (R03 Canonical Standard) ── */
 .ptv-hub-root {
+  /* Surfaces & Backgrounds (Light R03 Reference Extraction) */
+  --bg: #F1F7FF;
+  --bg-2: #F7FBFF;
+  --surface: #FFFFFF;
+  --surface-2: #FFFFFF;
+  --glass: rgba(255, 255, 255, 0.72);
+  --card-bg: #FFFFFF;
+  --ptv-soft-surface-bg: #FFFFFF;
+  --ptv-soft-stroke: rgba(226, 232, 240, 0.85);
+  --ptv-soft-filter: drop-shadow(0 10px 22px rgba(15, 23, 42, 0.06)) drop-shadow(0 2px 5px rgba(15, 23, 42, 0.03));
+
   --ptv-font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   font-family: var(--ptv-font-family);
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* ── Named Category Companion Accent Tokens (Light) ── */
+  --cat-kamera-bg: #EBF3FE;
+  --cat-kamera-fg: #1273E6;
+  --cat-kamera-border: #BED8FD;
+
+  --cat-lensa-bg: #F3E8FF;
+  --cat-lensa-fg: #7C3AED;
+  --cat-lensa-border: #DDD6FE;
+
+  --cat-tripod-bg: #E0F2FE;
+  --cat-tripod-fg: #0284C7;
+  --cat-tripod-border: #BAE6FD;
+
+  --cat-baterai-bg: #FCF0D6;
+  --cat-baterai-fg: #9A6B08;
+  --cat-baterai-border: #FDE68A;
+
+  --cat-audio-bg: #E1F5EE;
+  --cat-audio-fg: #0F7A5A;
+  --cat-audio-border: #A7F3D0;
+
+  --cat-lighting-bg: #FEF3C7;
+  --cat-lighting-fg: #D97706;
+  --cat-lighting-border: #FDE68A;
+
+  --cat-stabilizer-bg: #FFEDD5;
+  --cat-stabilizer-fg: #EA580C;
+  --cat-stabilizer-border: #FED7AA;
+
+  --cat-streaming-bg: #FFE4E6;
+  --cat-streaming-fg: #E11D48;
+  --cat-streaming-border: #FECDD3;
+
+  --cat-lainnya-bg: #E9F0F9;
+  --cat-lainnya-fg: #5A7793;
+  --cat-lainnya-border: rgba(11, 42, 74, 0.055);
 }
+
+:root[data-theme="dark"] .ptv-hub-root {
+  --bg: #111315;
+  --bg-2: #1B1E21;
+  --surface: #24282C;
+  --surface-2: #2E3338;
+  --glass: rgba(27, 30, 33, 0.90);
+  --card-bg: #24282C;
+  --ptv-soft-surface-bg: #24282C;
+  --ptv-soft-stroke: #34383D;
+  --ptv-soft-filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.35));
+
+  /* ── Named Category Companion Accent Tokens (Dark Neutral Harmony) ── */
+  --cat-kamera-bg: #1A283B;
+  --cat-kamera-fg: #A8C7FA;
+  --cat-kamera-border: #2D4363;
+
+  --cat-lensa-bg: #2D1B4E;
+  --cat-lensa-fg: #D8B4FE;
+  --cat-lensa-border: #4A2D7D;
+
+  --cat-tripod-bg: #132D42;
+  --cat-tripod-fg: #7DD3FC;
+  --cat-tripod-border: #234E6F;
+
+  --cat-baterai-bg: #352B18;
+  --cat-baterai-fg: #FDD663;
+  --cat-baterai-border: #5A4722;
+
+  --cat-audio-bg: #163628;
+  --cat-audio-fg: #81C995;
+  --cat-audio-border: #265B43;
+
+  --cat-lighting-bg: #382512;
+  --cat-lighting-fg: #FBBF24;
+  --cat-lighting-border: #5C3D1B;
+
+  --cat-stabilizer-bg: #381E12;
+  --cat-stabilizer-fg: #FB923C;
+  --cat-stabilizer-border: #5C321B;
+
+  --cat-streaming-bg: #3D141F;
+  --cat-streaming-fg: #FB7185;
+  --cat-streaming-border: #632233;
+
+  --cat-lainnya-bg: #24282C;
+  --cat-lainnya-fg: #BDC1C6;
+  --cat-lainnya-border: #34383D;
+}
+
+.r03-card {
+  border-radius: var(--r-ref-m, 18px);
+}
+
+/* ── Canonical R03 Page Heading Standard ── */
+.ptv-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.ptv-page-header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ptv-page-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.ptv-page-subtitle {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .ptv-page-header {
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .ptv-page-title {
+    font-size: 21px;
+  }
+  .ptv-page-subtitle {
+    font-size: 13px;
+  }
+}
+
+/* ============================================================
+   Task D: Smooth Theme Switching Color Transition (250ms)
+   Diterapkan secara selektif HANYA pada background, border, dan color.
+   TIDAK menerapkan transition: all secara global.
+   TIDAK menganimasikan width, height, layout, atau position.
+   ============================================================ */
+body,
+.dash-main,
+.dash-topbar,
+.dash-sidebar,
+.ptv-hub-root,
+.r03-surface,
+.kal-surface-card,
+.inv-prod-card {
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 250ms cubic-bezier(0.4, 0, 0.2, 1),
+              color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .dash-main,
+  .dash-topbar,
+  .dash-sidebar,
+  .ptv-hub-root,
+  .r03-surface,
+  .kal-surface-card,
+  .inv-prod-card {
+    transition: none !important;
+  }
+}
+
 

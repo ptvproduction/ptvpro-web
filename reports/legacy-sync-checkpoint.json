@@ -1,0 +1,13 @@
+{
+  "last_synced_at": "2026-10-22T23:06:28.982Z",
+  "completed_at": "2026-10-22T23:06:28.982Z",
+  "counts": {
+    "legacy_total": 26,
+    "incremental_candidates": 11,
+    "synced_ready": 4,
+    "skipped_unchanged": 7,
+    "conflicts_quarantined": 0,
+    "unmapped_identities": 12
+  },
+  "status": "SUCCESS"
+}

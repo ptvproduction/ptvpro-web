@@ -1,0 +1,2249 @@
+{
+  "session": "PTV-DEV-153",
+  "collectionWindow": "25 Oktober 2026 sekitar04:44–04:53 WIB",
+  "scope": "STAGING READ-ONLY CATALOG AND AGGREGATES ONLY",
+  "projectRef": "swadgljnyelsjstqqxbm",
+  "projectName": "ptvpro-staging",
+  "databaseVersion": "17.11",
+  "connectionRole": "postgres",
+  "transactionReadOnlyVerified": true,
+  "legacyAccessed": false,
+  "mutationsExecuted": false,
+  "identityCheckpoint": {
+    "read_only": "on",
+    "private_schemas": [
+      {
+        "acl": "{postgres=UC/postgres,service_role=U/postgres}",
+        "name": "ptv_finance_private"
+      }
+    ],
+    "cluster_fingerprint": "72737c1de8ff53d24950c9d2b30bd42d"
+  },
+  "catalog": {
+    "tables": [
+      {
+        "rls": true,
+        "name": "access_profile",
+        "columns": [
+          "id:character varying(32):required",
+          "name:character varying(100):required",
+          "description:text:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "account_capability_overrides",
+        "columns": [
+          "id:uuid:required",
+          "account_id:uuid:required",
+          "capability_key:character varying(64):required",
+          "override_type:character varying(8):required",
+          "reason:text",
+          "granted_by:uuid",
+          "created_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "account_profiles",
+        "columns": [
+          "account_id:uuid:required",
+          "profile_id:character varying(32):required",
+          "assigned_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "auth_audit_log",
+        "columns": [
+          "id:bigint:required",
+          "actor_id:uuid",
+          "actor_ptv_id:character varying(16)",
+          "event_type:character varying(64):required",
+          "ip_address:character varying(45)",
+          "user_agent:text",
+          "metadata:jsonb:required",
+          "created_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "auth_credentials",
+        "columns": [
+          "account_id:uuid:required",
+          "password_hash:character varying(255)",
+          "hash_algorithm:character varying(32):required",
+          "needs_rehash:boolean:required",
+          "oauth_provider:character varying(32)",
+          "oauth_subject_id:character varying(255)",
+          "oauth_email:character varying(255)",
+          "password_updated_at:timestamp with time zone",
+          "updated_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "canonical_identity",
+        "columns": [
+          "id:uuid:required",
+          "ptv_id:character varying(16):required",
+          "full_name:character varying(255):required",
+          "avatar_url:text",
+          "legacy_id:bigint",
+          "metadata:jsonb:required",
+          "created_at:timestamp with time zone:required",
+          "updated_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "capability_registry",
+        "columns": [
+          "key:character varying(64):required",
+          "domain:character varying(32):required",
+          "description:text:required",
+          "is_mutation:boolean:required",
+          "is_sensitive:boolean:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "legacy_archive_kru",
+        "columns": [
+          "archive_id:uuid:required",
+          "source_key:character varying(128):required",
+          "production_id:character varying(64)",
+          "ptv_id:character varying(32)",
+          "full_name:character varying(255)",
+          "username:character varying(128)",
+          "divisi:character varying(128)",
+          "jabatan:character varying(255)",
+          "angkatan:character varying(32)",
+          "status:character varying(64)",
+          "role:character varying(64)",
+          "photo_url:text",
+          "email_masked:character varying(255)",
+          "telepon_masked:character varying(64)",
+          "canonical_identity_id:uuid",
+          "reconciliation_status:character varying(32):required",
+          "metadata_json:jsonb",
+          "imported_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "organization_membership",
+        "columns": [
+          "id:uuid:required",
+          "identity_id:uuid:required",
+          "organization_id:character varying(32):required",
+          "division_id:character varying(32)",
+          "position_title:character varying(100):required",
+          "special_responsibility:character varying(100)",
+          "cohort:integer",
+          "status_organisasi:character varying(16):required",
+          "period_start:date:required",
+          "period_end:date",
+          "is_current:boolean:required",
+          "created_at:timestamp with time zone:required",
+          "updated_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "profile_capabilities",
+        "columns": [
+          "profile_id:character varying(32):required",
+          "capability_key:character varying(64):required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_allocations",
+        "columns": [
+          "id:uuid:required",
+          "transaction_id:uuid:required",
+          "pocket_id:uuid:required",
+          "direction:character varying(3):required",
+          "amount_minor:bigint:required",
+          "created_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_audit_log",
+        "columns": [
+          "id:uuid:required",
+          "entity_type:character varying(40):required",
+          "entity_id:uuid:required",
+          "action:character varying(30):required",
+          "actor_id:uuid",
+          "payload:jsonb:required",
+          "occurred_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_categories",
+        "columns": [
+          "id:uuid:required",
+          "name:character varying(80):required",
+          "kind:character varying(20):required",
+          "is_active:boolean:required",
+          "created_at:timestamp with time zone:required",
+          "is_archived:boolean:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_kas_payments",
+        "columns": [
+          "id:uuid:required",
+          "record_id:uuid:required",
+          "transaction_id:uuid:required",
+          "amount_minor:bigint:required",
+          "paid_at:date:required",
+          "payment_method:character varying(32):required",
+          "recorded_by_ptv_id:character varying(32):required",
+          "status:character varying(20):required",
+          "reversal_reason:text",
+          "reversed_at:timestamp with time zone",
+          "reversed_by_ptv_id:character varying(32)",
+          "created_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_kas_records",
+        "columns": [
+          "id:uuid:required",
+          "semester_id:uuid:required",
+          "ptv_id:character varying(20):required",
+          "crew_name:character varying(120):required",
+          "period:character varying(7):required",
+          "amount_minor:bigint:required",
+          "paid_amount_minor:bigint:required",
+          "status:character varying(20):required",
+          "payment_date:date",
+          "method:character varying(20):required",
+          "pocket_id:uuid:required",
+          "transaction_id:uuid",
+          "notes:text",
+          "audit_reference:character varying(100)",
+          "reversal_reason:text",
+          "created_at:timestamp with time zone:required",
+          "updated_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_loan_payments",
+        "columns": [
+          "id:uuid:required",
+          "loan_id:uuid:required",
+          "paid_on:date:required",
+          "amount_minor:bigint:required",
+          "to_pocket_id:uuid:required",
+          "receipt_tx_id:uuid",
+          "method:character varying(20):required",
+          "notes:text",
+          "created_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_loans",
+        "columns": [
+          "id:uuid:required",
+          "borrower_type:character varying(20):required",
+          "borrower_id:character varying(50)",
+          "borrower_name:character varying(120):required",
+          "borrower_contact:character varying(60):required",
+          "borrower_institution:character varying(120)",
+          "principal_minor:bigint:required",
+          "interest_type:character varying(10):required",
+          "interest_rate_percent:numeric(5,2):required",
+          "interest_minor:bigint:required",
+          "total_due_minor:bigint:required",
+          "total_paid_minor:bigint:required",
+          "remaining_minor:bigint:required",
+          "disbursed_on:date:required",
+          "due_date:date",
+          "disbursed_from_pocket_id:uuid:required",
+          "disbursement_tx_id:uuid",
+          "status:character varying(20):required",
+          "purpose:text:required",
+          "notes:text",
+          "created_at:timestamp with time zone:required",
+          "updated_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_pockets",
+        "columns": [
+          "id:uuid:required",
+          "name:character varying(80):required",
+          "kind:character varying(20):required",
+          "provider:character varying(80)",
+          "account_number:character varying(64)",
+          "account_holder:character varying(120)",
+          "archived:boolean:required",
+          "version:integer:required",
+          "balance_minor:bigint:required",
+          "qris_asset_path:text",
+          "qris_merchant_name:text",
+          "qris_nmid:text",
+          "qris_verified_at:timestamp with time zone",
+          "created_at:timestamp with time zone:required",
+          "updated_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_semesters",
+        "columns": [
+          "id:uuid:required",
+          "name:character varying(100):required",
+          "start_date:date:required",
+          "end_date:date:required",
+          "monthly_fee_minor:bigint:required",
+          "monthly_fees:jsonb:required",
+          "is_active:boolean:required",
+          "is_archived:boolean:required",
+          "created_at:timestamp with time zone:required",
+          "updated_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_settings",
+        "columns": [
+          "id:character varying(50):required",
+          "default_monthly_fee_minor:bigint:required",
+          "fee_due_day:integer:required",
+          "default_loan_due_days:integer:required",
+          "treasurer_name:character varying(100):required",
+          "treasurer_ptv_id:character varying(20):required",
+          "treasurer_phone:character varying(30):required",
+          "official_bank_pocket_id:uuid",
+          "official_qris_pocket_id:uuid",
+          "updated_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_source_references",
+        "columns": [
+          "id:uuid:required",
+          "transaction_id:uuid:required",
+          "source_table:character varying(30):required",
+          "source_id:uuid:required",
+          "created_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "ptv_finance_transactions",
+        "columns": [
+          "id:uuid:required",
+          "occurred_on:date:required",
+          "description:text:required",
+          "kind:character varying(20):required",
+          "currency:character varying(3):required",
+          "amount_minor:bigint:required",
+          "category_id:uuid",
+          "status:character varying(20):required",
+          "idempotency_key:uuid:required",
+          "command_hash:character varying(64):required",
+          "audit_reference:text:required",
+          "created_by:uuid",
+          "created_at:timestamp with time zone:required",
+          "proof_url:text",
+          "notes:text",
+          "recorded_by:character varying(80)"
+        ],
+        "force_rls": false
+      },
+      {
+        "rls": true,
+        "name": "user_account",
+        "columns": [
+          "id:uuid:required",
+          "identity_id:uuid:required",
+          "auth_user_id:uuid",
+          "username:character varying(64):required",
+          "status_akun:character varying(16):required",
+          "failed_login_attempts:integer:required",
+          "lockout_until:timestamp with time zone",
+          "tokens_valid_after:timestamp with time zone:required",
+          "last_login_at:timestamp with time zone",
+          "last_login_ip:character varying(45)",
+          "created_at:timestamp with time zone:required",
+          "updated_at:timestamp with time zone:required"
+        ],
+        "force_rls": false
+      }
+    ],
+    "indexes": [
+      {
+        "name": "access_profile_pkey",
+        "table": "access_profile",
+        "definition": "CREATE UNIQUE INDEX access_profile_pkey ON public.access_profile USING btree (id)"
+      },
+      {
+        "name": "account_capability_overrides_account_id_capability_key_key",
+        "table": "account_capability_overrides",
+        "definition": "CREATE UNIQUE INDEX account_capability_overrides_account_id_capability_key_key ON public.account_capability_overrides USING btree (account_id, capability_key)"
+      },
+      {
+        "name": "account_capability_overrides_pkey",
+        "table": "account_capability_overrides",
+        "definition": "CREATE UNIQUE INDEX account_capability_overrides_pkey ON public.account_capability_overrides USING btree (id)"
+      },
+      {
+        "name": "account_profiles_pkey",
+        "table": "account_profiles",
+        "definition": "CREATE UNIQUE INDEX account_profiles_pkey ON public.account_profiles USING btree (account_id, profile_id)"
+      },
+      {
+        "name": "auth_audit_log_pkey",
+        "table": "auth_audit_log",
+        "definition": "CREATE UNIQUE INDEX auth_audit_log_pkey ON public.auth_audit_log USING btree (id)"
+      },
+      {
+        "name": "auth_credentials_pkey",
+        "table": "auth_credentials",
+        "definition": "CREATE UNIQUE INDEX auth_credentials_pkey ON public.auth_credentials USING btree (account_id)"
+      },
+      {
+        "name": "idx_auth_credentials_oauth_provider_subject",
+        "table": "auth_credentials",
+        "definition": "CREATE UNIQUE INDEX idx_auth_credentials_oauth_provider_subject ON public.auth_credentials USING btree (oauth_provider, oauth_subject_id) WHERE ((oauth_provider IS NOT NULL) AND (oauth_subject_id IS NOT NULL))"
+      },
+      {
+        "name": "canonical_identity_legacy_id_key",
+        "table": "canonical_identity",
+        "definition": "CREATE UNIQUE INDEX canonical_identity_legacy_id_key ON public.canonical_identity USING btree (legacy_id)"
+      },
+      {
+        "name": "canonical_identity_pkey",
+        "table": "canonical_identity",
+        "definition": "CREATE UNIQUE INDEX canonical_identity_pkey ON public.canonical_identity USING btree (id)"
+      },
+      {
+        "name": "canonical_identity_ptv_id_key",
+        "table": "canonical_identity",
+        "definition": "CREATE UNIQUE INDEX canonical_identity_ptv_id_key ON public.canonical_identity USING btree (ptv_id)"
+      },
+      {
+        "name": "idx_canonical_identity_legacy_id",
+        "table": "canonical_identity",
+        "definition": "CREATE INDEX idx_canonical_identity_legacy_id ON public.canonical_identity USING btree (legacy_id)"
+      },
+      {
+        "name": "idx_canonical_identity_ptv_id",
+        "table": "canonical_identity",
+        "definition": "CREATE INDEX idx_canonical_identity_ptv_id ON public.canonical_identity USING btree (ptv_id)"
+      },
+      {
+        "name": "capability_registry_pkey",
+        "table": "capability_registry",
+        "definition": "CREATE UNIQUE INDEX capability_registry_pkey ON public.capability_registry USING btree (key)"
+      },
+      {
+        "name": "idx_legacy_archive_kru_ptv_id",
+        "table": "legacy_archive_kru",
+        "definition": "CREATE INDEX idx_legacy_archive_kru_ptv_id ON public.legacy_archive_kru USING btree (ptv_id)"
+      },
+      {
+        "name": "idx_legacy_archive_kru_source_key",
+        "table": "legacy_archive_kru",
+        "definition": "CREATE INDEX idx_legacy_archive_kru_source_key ON public.legacy_archive_kru USING btree (source_key)"
+      },
+      {
+        "name": "legacy_archive_kru_pkey",
+        "table": "legacy_archive_kru",
+        "definition": "CREATE UNIQUE INDEX legacy_archive_kru_pkey ON public.legacy_archive_kru USING btree (archive_id)"
+      },
+      {
+        "name": "legacy_archive_kru_source_key_key",
+        "table": "legacy_archive_kru",
+        "definition": "CREATE UNIQUE INDEX legacy_archive_kru_source_key_key ON public.legacy_archive_kru USING btree (source_key)"
+      },
+      {
+        "name": "idx_org_membership_current",
+        "table": "organization_membership",
+        "definition": "CREATE INDEX idx_org_membership_current ON public.organization_membership USING btree (identity_id, is_current)"
+      },
+      {
+        "name": "idx_org_membership_identity",
+        "table": "organization_membership",
+        "definition": "CREATE INDEX idx_org_membership_identity ON public.organization_membership USING btree (identity_id)"
+      },
+      {
+        "name": "organization_membership_pkey",
+        "table": "organization_membership",
+        "definition": "CREATE UNIQUE INDEX organization_membership_pkey ON public.organization_membership USING btree (id)"
+      },
+      {
+        "name": "profile_capabilities_pkey",
+        "table": "profile_capabilities",
+        "definition": "CREATE UNIQUE INDEX profile_capabilities_pkey ON public.profile_capabilities USING btree (profile_id, capability_key)"
+      },
+      {
+        "name": "idx_ptv_finance_allocations_pocket",
+        "table": "ptv_finance_allocations",
+        "definition": "CREATE INDEX idx_ptv_finance_allocations_pocket ON public.ptv_finance_allocations USING btree (pocket_id)"
+      },
+      {
+        "name": "idx_ptv_finance_allocations_tx",
+        "table": "ptv_finance_allocations",
+        "definition": "CREATE INDEX idx_ptv_finance_allocations_tx ON public.ptv_finance_allocations USING btree (transaction_id)"
+      },
+      {
+        "name": "ptv_finance_allocations_pkey",
+        "table": "ptv_finance_allocations",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_allocations_pkey ON public.ptv_finance_allocations USING btree (id)"
+      },
+      {
+        "name": "unique_tx_pocket",
+        "table": "ptv_finance_allocations",
+        "definition": "CREATE UNIQUE INDEX unique_tx_pocket ON public.ptv_finance_allocations USING btree (transaction_id, pocket_id)"
+      },
+      {
+        "name": "idx_ptv_finance_audit_entity",
+        "table": "ptv_finance_audit_log",
+        "definition": "CREATE INDEX idx_ptv_finance_audit_entity ON public.ptv_finance_audit_log USING btree (entity_type, entity_id)"
+      },
+      {
+        "name": "idx_ptv_finance_audit_occurred",
+        "table": "ptv_finance_audit_log",
+        "definition": "CREATE INDEX idx_ptv_finance_audit_occurred ON public.ptv_finance_audit_log USING btree (occurred_at DESC)"
+      },
+      {
+        "name": "ptv_finance_audit_log_pkey",
+        "table": "ptv_finance_audit_log",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_audit_log_pkey ON public.ptv_finance_audit_log USING btree (id)"
+      },
+      {
+        "name": "idx_ptv_finance_categories_kind_active",
+        "table": "ptv_finance_categories",
+        "definition": "CREATE INDEX idx_ptv_finance_categories_kind_active ON public.ptv_finance_categories USING btree (kind, is_active)"
+      },
+      {
+        "name": "ptv_finance_categories_pkey",
+        "table": "ptv_finance_categories",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_categories_pkey ON public.ptv_finance_categories USING btree (id)"
+      },
+      {
+        "name": "unique_category_name_kind",
+        "table": "ptv_finance_categories",
+        "definition": "CREATE UNIQUE INDEX unique_category_name_kind ON public.ptv_finance_categories USING btree (name, kind)"
+      },
+      {
+        "name": "idx_ptv_finance_kas_payments_record",
+        "table": "ptv_finance_kas_payments",
+        "definition": "CREATE INDEX idx_ptv_finance_kas_payments_record ON public.ptv_finance_kas_payments USING btree (record_id, status)"
+      },
+      {
+        "name": "ptv_finance_kas_payments_pkey",
+        "table": "ptv_finance_kas_payments",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_kas_payments_pkey ON public.ptv_finance_kas_payments USING btree (id)"
+      },
+      {
+        "name": "idx_ptv_finance_kas_records_crew",
+        "table": "ptv_finance_kas_records",
+        "definition": "CREATE INDEX idx_ptv_finance_kas_records_crew ON public.ptv_finance_kas_records USING btree (ptv_id, period)"
+      },
+      {
+        "name": "ptv_finance_kas_records_pkey",
+        "table": "ptv_finance_kas_records",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_kas_records_pkey ON public.ptv_finance_kas_records USING btree (id)"
+      },
+      {
+        "name": "uq_kas_record_semester_crew_period",
+        "table": "ptv_finance_kas_records",
+        "definition": "CREATE UNIQUE INDEX uq_kas_record_semester_crew_period ON public.ptv_finance_kas_records USING btree (semester_id, ptv_id, period)"
+      },
+      {
+        "name": "idx_ptv_finance_loan_payments_loan",
+        "table": "ptv_finance_loan_payments",
+        "definition": "CREATE INDEX idx_ptv_finance_loan_payments_loan ON public.ptv_finance_loan_payments USING btree (loan_id, paid_on)"
+      },
+      {
+        "name": "ptv_finance_loan_payments_pkey",
+        "table": "ptv_finance_loan_payments",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_loan_payments_pkey ON public.ptv_finance_loan_payments USING btree (id)"
+      },
+      {
+        "name": "idx_ptv_finance_loans_status",
+        "table": "ptv_finance_loans",
+        "definition": "CREATE INDEX idx_ptv_finance_loans_status ON public.ptv_finance_loans USING btree (status, due_date)"
+      },
+      {
+        "name": "ptv_finance_loans_pkey",
+        "table": "ptv_finance_loans",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_loans_pkey ON public.ptv_finance_loans USING btree (id)"
+      },
+      {
+        "name": "idx_ptv_finance_pockets_archived",
+        "table": "ptv_finance_pockets",
+        "definition": "CREATE INDEX idx_ptv_finance_pockets_archived ON public.ptv_finance_pockets USING btree (archived)"
+      },
+      {
+        "name": "idx_ptv_finance_pockets_kind",
+        "table": "ptv_finance_pockets",
+        "definition": "CREATE INDEX idx_ptv_finance_pockets_kind ON public.ptv_finance_pockets USING btree (kind)"
+      },
+      {
+        "name": "ptv_finance_pockets_pkey",
+        "table": "ptv_finance_pockets",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_pockets_pkey ON public.ptv_finance_pockets USING btree (id)"
+      },
+      {
+        "name": "idx_ptv_finance_semesters_active",
+        "table": "ptv_finance_semesters",
+        "definition": "CREATE INDEX idx_ptv_finance_semesters_active ON public.ptv_finance_semesters USING btree (is_active, is_archived)"
+      },
+      {
+        "name": "ptv_finance_semesters_pkey",
+        "table": "ptv_finance_semesters",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_semesters_pkey ON public.ptv_finance_semesters USING btree (id)"
+      },
+      {
+        "name": "ptv_finance_settings_pkey",
+        "table": "ptv_finance_settings",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_settings_pkey ON public.ptv_finance_settings USING btree (id)"
+      },
+      {
+        "name": "idx_ptv_finance_source_refs_src",
+        "table": "ptv_finance_source_references",
+        "definition": "CREATE INDEX idx_ptv_finance_source_refs_src ON public.ptv_finance_source_references USING btree (source_table, source_id)"
+      },
+      {
+        "name": "idx_ptv_finance_source_refs_tx",
+        "table": "ptv_finance_source_references",
+        "definition": "CREATE INDEX idx_ptv_finance_source_refs_tx ON public.ptv_finance_source_references USING btree (transaction_id)"
+      },
+      {
+        "name": "ptv_finance_source_references_pkey",
+        "table": "ptv_finance_source_references",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_source_references_pkey ON public.ptv_finance_source_references USING btree (id)"
+      },
+      {
+        "name": "unique_source_record_mapping",
+        "table": "ptv_finance_source_references",
+        "definition": "CREATE UNIQUE INDEX unique_source_record_mapping ON public.ptv_finance_source_references USING btree (source_table, source_id)"
+      },
+      {
+        "name": "idx_ptv_finance_transactions_kind",
+        "table": "ptv_finance_transactions",
+        "definition": "CREATE INDEX idx_ptv_finance_transactions_kind ON public.ptv_finance_transactions USING btree (kind)"
+      },
+      {
+        "name": "idx_ptv_finance_transactions_occurred",
+        "table": "ptv_finance_transactions",
+        "definition": "CREATE INDEX idx_ptv_finance_transactions_occurred ON public.ptv_finance_transactions USING btree (occurred_on DESC)"
+      },
+      {
+        "name": "idx_ptv_finance_transactions_status",
+        "table": "ptv_finance_transactions",
+        "definition": "CREATE INDEX idx_ptv_finance_transactions_status ON public.ptv_finance_transactions USING btree (status)"
+      },
+      {
+        "name": "ptv_finance_transactions_idempotency_key_key",
+        "table": "ptv_finance_transactions",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_transactions_idempotency_key_key ON public.ptv_finance_transactions USING btree (idempotency_key)"
+      },
+      {
+        "name": "ptv_finance_transactions_pkey",
+        "table": "ptv_finance_transactions",
+        "definition": "CREATE UNIQUE INDEX ptv_finance_transactions_pkey ON public.ptv_finance_transactions USING btree (id)"
+      },
+      {
+        "name": "idx_user_account_username",
+        "table": "user_account",
+        "definition": "CREATE INDEX idx_user_account_username ON public.user_account USING btree (lower((username)::text))"
+      },
+      {
+        "name": "user_account_auth_user_id_key",
+        "table": "user_account",
+        "definition": "CREATE UNIQUE INDEX user_account_auth_user_id_key ON public.user_account USING btree (auth_user_id)"
+      },
+      {
+        "name": "user_account_identity_id_key",
+        "table": "user_account",
+        "definition": "CREATE UNIQUE INDEX user_account_identity_id_key ON public.user_account USING btree (identity_id)"
+      },
+      {
+        "name": "user_account_pkey",
+        "table": "user_account",
+        "definition": "CREATE UNIQUE INDEX user_account_pkey ON public.user_account USING btree (id)"
+      },
+      {
+        "name": "user_account_username_key",
+        "table": "user_account",
+        "definition": "CREATE UNIQUE INDEX user_account_username_key ON public.user_account USING btree (username)"
+      }
+    ],
+    "constraints": [
+      {
+        "name": "access_profile_pkey",
+        "type": "p",
+        "table": "access_profile",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "account_capability_overrides_account_id_capability_key_key",
+        "type": "u",
+        "table": "account_capability_overrides",
+        "definition": "UNIQUE (account_id, capability_key)"
+      },
+      {
+        "name": "account_capability_overrides_account_id_fkey",
+        "type": "f",
+        "table": "account_capability_overrides",
+        "definition": "FOREIGN KEY (account_id) REFERENCES user_account(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "account_capability_overrides_capability_key_fkey",
+        "type": "f",
+        "table": "account_capability_overrides",
+        "definition": "FOREIGN KEY (capability_key) REFERENCES capability_registry(key) ON DELETE CASCADE"
+      },
+      {
+        "name": "account_capability_overrides_granted_by_fkey",
+        "type": "f",
+        "table": "account_capability_overrides",
+        "definition": "FOREIGN KEY (granted_by) REFERENCES canonical_identity(id)"
+      },
+      {
+        "name": "account_capability_overrides_override_type_check",
+        "type": "c",
+        "table": "account_capability_overrides",
+        "definition": "CHECK (((override_type)::text = ANY ((ARRAY['allow'::character varying, 'deny'::character varying])::text[])))"
+      },
+      {
+        "name": "account_capability_overrides_pkey",
+        "type": "p",
+        "table": "account_capability_overrides",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "account_profiles_account_id_fkey",
+        "type": "f",
+        "table": "account_profiles",
+        "definition": "FOREIGN KEY (account_id) REFERENCES user_account(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "account_profiles_pkey",
+        "type": "p",
+        "table": "account_profiles",
+        "definition": "PRIMARY KEY (account_id, profile_id)"
+      },
+      {
+        "name": "account_profiles_profile_id_fkey",
+        "type": "f",
+        "table": "account_profiles",
+        "definition": "FOREIGN KEY (profile_id) REFERENCES access_profile(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "auth_audit_log_actor_id_fkey",
+        "type": "f",
+        "table": "auth_audit_log",
+        "definition": "FOREIGN KEY (actor_id) REFERENCES canonical_identity(id)"
+      },
+      {
+        "name": "auth_audit_log_pkey",
+        "type": "p",
+        "table": "auth_audit_log",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "auth_credentials_account_id_fkey",
+        "type": "f",
+        "table": "auth_credentials",
+        "definition": "FOREIGN KEY (account_id) REFERENCES user_account(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "auth_credentials_pkey",
+        "type": "p",
+        "table": "auth_credentials",
+        "definition": "PRIMARY KEY (account_id)"
+      },
+      {
+        "name": "canonical_identity_legacy_id_key",
+        "type": "u",
+        "table": "canonical_identity",
+        "definition": "UNIQUE (legacy_id)"
+      },
+      {
+        "name": "canonical_identity_pkey",
+        "type": "p",
+        "table": "canonical_identity",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "canonical_identity_ptv_id_key",
+        "type": "u",
+        "table": "canonical_identity",
+        "definition": "UNIQUE (ptv_id)"
+      },
+      {
+        "name": "capability_registry_pkey",
+        "type": "p",
+        "table": "capability_registry",
+        "definition": "PRIMARY KEY (key)"
+      },
+      {
+        "name": "legacy_archive_kru_pkey",
+        "type": "p",
+        "table": "legacy_archive_kru",
+        "definition": "PRIMARY KEY (archive_id)"
+      },
+      {
+        "name": "legacy_archive_kru_reconciliation_status_check",
+        "type": "c",
+        "table": "legacy_archive_kru",
+        "definition": "CHECK (((reconciliation_status)::text = ANY ((ARRAY['unlinked'::character varying, 'linked'::character varying, 'conflict'::character varying, 'skipped'::character varying])::text[])))"
+      },
+      {
+        "name": "legacy_archive_kru_source_key_key",
+        "type": "u",
+        "table": "legacy_archive_kru",
+        "definition": "UNIQUE (source_key)"
+      },
+      {
+        "name": "organization_membership_division_id_fkey",
+        "type": "f",
+        "table": "organization_membership",
+        "definition": "FOREIGN KEY (division_id) REFERENCES organization_division(id)"
+      },
+      {
+        "name": "organization_membership_identity_id_fkey",
+        "type": "f",
+        "table": "organization_membership",
+        "definition": "FOREIGN KEY (identity_id) REFERENCES canonical_identity(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "organization_membership_organization_id_fkey",
+        "type": "f",
+        "table": "organization_membership",
+        "definition": "FOREIGN KEY (organization_id) REFERENCES organization(id)"
+      },
+      {
+        "name": "organization_membership_pkey",
+        "type": "p",
+        "table": "organization_membership",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "organization_membership_status_organisasi_check",
+        "type": "c",
+        "table": "organization_membership",
+        "definition": "CHECK (((status_organisasi)::text = ANY ((ARRAY['active'::character varying, 'inactive'::character varying, 'archived'::character varying])::text[])))"
+      },
+      {
+        "name": "profile_capabilities_capability_key_fkey",
+        "type": "f",
+        "table": "profile_capabilities",
+        "definition": "FOREIGN KEY (capability_key) REFERENCES capability_registry(key) ON DELETE CASCADE"
+      },
+      {
+        "name": "profile_capabilities_pkey",
+        "type": "p",
+        "table": "profile_capabilities",
+        "definition": "PRIMARY KEY (profile_id, capability_key)"
+      },
+      {
+        "name": "profile_capabilities_profile_id_fkey",
+        "type": "f",
+        "table": "profile_capabilities",
+        "definition": "FOREIGN KEY (profile_id) REFERENCES access_profile(id) ON DELETE CASCADE"
+      },
+      {
+        "name": "check_allocation_amount_positive",
+        "type": "c",
+        "table": "ptv_finance_allocations",
+        "definition": "CHECK ((amount_minor > 0))"
+      },
+      {
+        "name": "check_allocation_direction",
+        "type": "c",
+        "table": "ptv_finance_allocations",
+        "definition": "CHECK (((direction)::text = ANY ((ARRAY['in'::character varying, 'out'::character varying])::text[])))"
+      },
+      {
+        "name": "ptv_finance_allocations_pkey",
+        "type": "p",
+        "table": "ptv_finance_allocations",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ptv_finance_allocations_pocket_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_allocations",
+        "definition": "FOREIGN KEY (pocket_id) REFERENCES ptv_finance_pockets(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "ptv_finance_allocations_transaction_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_allocations",
+        "definition": "FOREIGN KEY (transaction_id) REFERENCES ptv_finance_transactions(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "unique_tx_pocket",
+        "type": "u",
+        "table": "ptv_finance_allocations",
+        "definition": "UNIQUE (transaction_id, pocket_id)"
+      },
+      {
+        "name": "check_audit_action",
+        "type": "c",
+        "table": "ptv_finance_audit_log",
+        "definition": "CHECK (((action)::text = ANY ((ARRAY['create'::character varying, 'update'::character varying, 'archive'::character varying, 'post'::character varying, 'reverse'::character varying])::text[])))"
+      },
+      {
+        "name": "check_audit_entity",
+        "type": "c",
+        "table": "ptv_finance_audit_log",
+        "definition": "CHECK (((entity_type)::text = ANY ((ARRAY['pocket'::character varying, 'category'::character varying, 'transaction'::character varying, 'source_reference'::character varying])::text[])))"
+      },
+      {
+        "name": "ptv_finance_audit_log_pkey",
+        "type": "p",
+        "table": "ptv_finance_audit_log",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "check_category_kind",
+        "type": "c",
+        "table": "ptv_finance_categories",
+        "definition": "CHECK (((kind)::text = ANY ((ARRAY['income'::character varying, 'expense'::character varying])::text[])))"
+      },
+      {
+        "name": "check_category_name_length",
+        "type": "c",
+        "table": "ptv_finance_categories",
+        "definition": "CHECK ((length(TRIM(BOTH FROM name)) >= 1))"
+      },
+      {
+        "name": "ptv_finance_categories_pkey",
+        "type": "p",
+        "table": "ptv_finance_categories",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "unique_category_name_kind",
+        "type": "u",
+        "table": "ptv_finance_categories",
+        "definition": "UNIQUE (name, kind)"
+      },
+      {
+        "name": "ptv_finance_kas_payments_amount_minor_check",
+        "type": "c",
+        "table": "ptv_finance_kas_payments",
+        "definition": "CHECK ((amount_minor > 0))"
+      },
+      {
+        "name": "ptv_finance_kas_payments_pkey",
+        "type": "p",
+        "table": "ptv_finance_kas_payments",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ptv_finance_kas_payments_record_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_kas_payments",
+        "definition": "FOREIGN KEY (record_id) REFERENCES ptv_finance_kas_records(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "ptv_finance_kas_payments_status_check",
+        "type": "c",
+        "table": "ptv_finance_kas_payments",
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['posted'::character varying, 'reversed'::character varying])::text[])))"
+      },
+      {
+        "name": "ptv_finance_kas_payments_transaction_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_kas_payments",
+        "definition": "FOREIGN KEY (transaction_id) REFERENCES ptv_finance_transactions(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "chk_kas_record_paid",
+        "type": "c",
+        "table": "ptv_finance_kas_records",
+        "definition": "CHECK ((paid_amount_minor >= 0))"
+      },
+      {
+        "name": "chk_kas_record_status",
+        "type": "c",
+        "table": "ptv_finance_kas_records",
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['lunas'::character varying, 'sebagian'::character varying, 'belum'::character varying, 'dikecualikan'::character varying])::text[])))"
+      },
+      {
+        "name": "ptv_finance_kas_records_pkey",
+        "type": "p",
+        "table": "ptv_finance_kas_records",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ptv_finance_kas_records_pocket_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_kas_records",
+        "definition": "FOREIGN KEY (pocket_id) REFERENCES ptv_finance_pockets(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "ptv_finance_kas_records_semester_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_kas_records",
+        "definition": "FOREIGN KEY (semester_id) REFERENCES ptv_finance_semesters(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "ptv_finance_kas_records_transaction_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_kas_records",
+        "definition": "FOREIGN KEY (transaction_id) REFERENCES ptv_finance_transactions(id) ON DELETE SET NULL"
+      },
+      {
+        "name": "uq_kas_record_semester_crew_period",
+        "type": "u",
+        "table": "ptv_finance_kas_records",
+        "definition": "UNIQUE (semester_id, ptv_id, period)"
+      },
+      {
+        "name": "chk_payment_amount_positive",
+        "type": "c",
+        "table": "ptv_finance_loan_payments",
+        "definition": "CHECK ((amount_minor > 0))"
+      },
+      {
+        "name": "ptv_finance_loan_payments_loan_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_loan_payments",
+        "definition": "FOREIGN KEY (loan_id) REFERENCES ptv_finance_loans(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "ptv_finance_loan_payments_pkey",
+        "type": "p",
+        "table": "ptv_finance_loan_payments",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ptv_finance_loan_payments_receipt_tx_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_loan_payments",
+        "definition": "FOREIGN KEY (receipt_tx_id) REFERENCES ptv_finance_transactions(id) ON DELETE SET NULL"
+      },
+      {
+        "name": "ptv_finance_loan_payments_to_pocket_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_loan_payments",
+        "definition": "FOREIGN KEY (to_pocket_id) REFERENCES ptv_finance_pockets(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "chk_loan_interest_minor",
+        "type": "c",
+        "table": "ptv_finance_loans",
+        "definition": "CHECK ((interest_minor >= 0))"
+      },
+      {
+        "name": "chk_loan_interest_rate",
+        "type": "c",
+        "table": "ptv_finance_loans",
+        "definition": "CHECK ((interest_rate_percent >= (0)::numeric))"
+      },
+      {
+        "name": "chk_loan_interest_type",
+        "type": "c",
+        "table": "ptv_finance_loans",
+        "definition": "CHECK (((interest_type)::text = ANY ((ARRAY['none'::character varying, 'flat'::character varying])::text[])))"
+      },
+      {
+        "name": "chk_loan_principal_positive",
+        "type": "c",
+        "table": "ptv_finance_loans",
+        "definition": "CHECK ((principal_minor > 0))"
+      },
+      {
+        "name": "chk_loan_remaining_nonneg",
+        "type": "c",
+        "table": "ptv_finance_loans",
+        "definition": "CHECK ((remaining_minor >= 0))"
+      },
+      {
+        "name": "chk_loan_status",
+        "type": "c",
+        "table": "ptv_finance_loans",
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['aktif'::character varying, 'lunas'::character varying, 'overdue'::character varying, 'dibatalkan'::character varying])::text[])))"
+      },
+      {
+        "name": "chk_loan_total_due",
+        "type": "c",
+        "table": "ptv_finance_loans",
+        "definition": "CHECK ((total_due_minor >= principal_minor))"
+      },
+      {
+        "name": "ptv_finance_loans_disbursed_from_pocket_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_loans",
+        "definition": "FOREIGN KEY (disbursed_from_pocket_id) REFERENCES ptv_finance_pockets(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "ptv_finance_loans_disbursement_tx_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_loans",
+        "definition": "FOREIGN KEY (disbursement_tx_id) REFERENCES ptv_finance_transactions(id) ON DELETE SET NULL"
+      },
+      {
+        "name": "ptv_finance_loans_pkey",
+        "type": "p",
+        "table": "ptv_finance_loans",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "check_pocket_archive_zero_balance",
+        "type": "c",
+        "table": "ptv_finance_pockets",
+        "definition": "CHECK (((NOT archived) OR (balance_minor = 0)))"
+      },
+      {
+        "name": "check_pocket_balance_non_negative",
+        "type": "c",
+        "table": "ptv_finance_pockets",
+        "definition": "CHECK ((balance_minor >= 0))"
+      },
+      {
+        "name": "check_pocket_kind",
+        "type": "c",
+        "table": "ptv_finance_pockets",
+        "definition": "CHECK (((kind)::text = ANY ((ARRAY['cash'::character varying, 'bank'::character varying, 'ewallet'::character varying])::text[])))"
+      },
+      {
+        "name": "check_pocket_kind_details",
+        "type": "c",
+        "table": "ptv_finance_pockets",
+        "definition": "CHECK (((((kind)::text = 'cash'::text) AND (provider IS NULL) AND (account_number IS NULL) AND (account_holder IS NULL)) OR (((kind)::text = ANY ((ARRAY['bank'::character varying, 'ewallet'::character varying])::text[])) AND (provider IS NOT NULL) AND (account_number IS NOT NULL) AND (account_holder IS NOT NULL))))"
+      },
+      {
+        "name": "check_pocket_name_length",
+        "type": "c",
+        "table": "ptv_finance_pockets",
+        "definition": "CHECK ((length(TRIM(BOTH FROM name)) >= 1))"
+      },
+      {
+        "name": "check_pocket_qris_metadata",
+        "type": "c",
+        "table": "ptv_finance_pockets",
+        "definition": "CHECK ((((qris_asset_path IS NULL) AND (qris_merchant_name IS NULL) AND (qris_nmid IS NULL) AND (qris_verified_at IS NULL)) OR ((qris_asset_path IS NOT NULL) AND (qris_merchant_name IS NOT NULL) AND (qris_nmid IS NOT NULL) AND (qris_verified_at IS NOT NULL))))"
+      },
+      {
+        "name": "check_pocket_version",
+        "type": "c",
+        "table": "ptv_finance_pockets",
+        "definition": "CHECK ((version >= 1))"
+      },
+      {
+        "name": "ptv_finance_pockets_pkey",
+        "type": "p",
+        "table": "ptv_finance_pockets",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "chk_semester_dates",
+        "type": "c",
+        "table": "ptv_finance_semesters",
+        "definition": "CHECK ((end_date >= start_date))"
+      },
+      {
+        "name": "chk_semester_fee_positive",
+        "type": "c",
+        "table": "ptv_finance_semesters",
+        "definition": "CHECK ((monthly_fee_minor > 0))"
+      },
+      {
+        "name": "ptv_finance_semesters_pkey",
+        "type": "p",
+        "table": "ptv_finance_semesters",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ptv_finance_settings_official_bank_pocket_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_settings",
+        "definition": "FOREIGN KEY (official_bank_pocket_id) REFERENCES ptv_finance_pockets(id) ON DELETE SET NULL"
+      },
+      {
+        "name": "ptv_finance_settings_official_qris_pocket_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_settings",
+        "definition": "FOREIGN KEY (official_qris_pocket_id) REFERENCES ptv_finance_pockets(id) ON DELETE SET NULL"
+      },
+      {
+        "name": "ptv_finance_settings_pkey",
+        "type": "p",
+        "table": "ptv_finance_settings",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "check_source_table",
+        "type": "c",
+        "table": "ptv_finance_source_references",
+        "definition": "CHECK (((source_table)::text = ANY ((ARRAY['ptv_pemasukan'::character varying, 'ptv_pengeluaran'::character varying])::text[])))"
+      },
+      {
+        "name": "ptv_finance_source_references_pkey",
+        "type": "p",
+        "table": "ptv_finance_source_references",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ptv_finance_source_references_transaction_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_source_references",
+        "definition": "FOREIGN KEY (transaction_id) REFERENCES ptv_finance_transactions(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "unique_source_record_mapping",
+        "type": "u",
+        "table": "ptv_finance_source_references",
+        "definition": "UNIQUE (source_table, source_id)"
+      },
+      {
+        "name": "check_tx_amount_positive",
+        "type": "c",
+        "table": "ptv_finance_transactions",
+        "definition": "CHECK ((amount_minor > 0))"
+      },
+      {
+        "name": "check_tx_category_rule",
+        "type": "c",
+        "table": "ptv_finance_transactions",
+        "definition": "CHECK (((((kind)::text = 'transfer'::text) AND (category_id IS NULL)) OR (((kind)::text = ANY ((ARRAY['income'::character varying, 'expense'::character varying])::text[])) AND (category_id IS NOT NULL))))"
+      },
+      {
+        "name": "check_tx_currency",
+        "type": "c",
+        "table": "ptv_finance_transactions",
+        "definition": "CHECK (((currency)::text = 'IDR'::text))"
+      },
+      {
+        "name": "check_tx_kind",
+        "type": "c",
+        "table": "ptv_finance_transactions",
+        "definition": "CHECK (((kind)::text = ANY ((ARRAY['income'::character varying, 'expense'::character varying, 'transfer'::character varying])::text[])))"
+      },
+      {
+        "name": "check_tx_status",
+        "type": "c",
+        "table": "ptv_finance_transactions",
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['posted'::character varying, 'reversed'::character varying])::text[])))"
+      },
+      {
+        "name": "ptv_finance_transactions_category_id_fkey",
+        "type": "f",
+        "table": "ptv_finance_transactions",
+        "definition": "FOREIGN KEY (category_id) REFERENCES ptv_finance_categories(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "ptv_finance_transactions_idempotency_key_key",
+        "type": "u",
+        "table": "ptv_finance_transactions",
+        "definition": "UNIQUE (idempotency_key)"
+      },
+      {
+        "name": "ptv_finance_transactions_pkey",
+        "type": "p",
+        "table": "ptv_finance_transactions",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "user_account_auth_user_id_key",
+        "type": "u",
+        "table": "user_account",
+        "definition": "UNIQUE (auth_user_id)"
+      },
+      {
+        "name": "user_account_identity_id_fkey",
+        "type": "f",
+        "table": "user_account",
+        "definition": "FOREIGN KEY (identity_id) REFERENCES canonical_identity(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "user_account_identity_id_key",
+        "type": "u",
+        "table": "user_account",
+        "definition": "UNIQUE (identity_id)"
+      },
+      {
+        "name": "user_account_pkey",
+        "type": "p",
+        "table": "user_account",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "user_account_status_akun_check",
+        "type": "c",
+        "table": "user_account",
+        "definition": "CHECK (((status_akun)::text = ANY ((ARRAY['active'::character varying, 'inactive'::character varying])::text[])))"
+      },
+      {
+        "name": "user_account_username_key",
+        "type": "u",
+        "table": "user_account",
+        "definition": "UNIQUE (username)"
+      }
+    ],
+    "migration_table": "supabase_migrations.schema_migrations",
+    "auth_session_columns": [
+      "id:uuid",
+      "user_id:uuid",
+      "not_after:timestamp with time zone"
+    ]
+  },
+  "security": {
+    "policies": [
+      {
+        "name": "allow_read_access_profile",
+        "check": null,
+        "roles": [
+          "public"
+        ],
+        "table": "access_profile",
+        "using": "true",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "block_client_credentials",
+        "check": null,
+        "roles": [
+          "public"
+        ],
+        "table": "auth_credentials",
+        "using": "false",
+        "schema": "public",
+        "command": "ALL",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "allow_read_capability_registry",
+        "check": null,
+        "roles": [
+          "public"
+        ],
+        "table": "capability_registry",
+        "using": "true",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "allow_read_profile_capabilities",
+        "check": null,
+        "roles": [
+          "public"
+        ],
+        "table": "profile_capabilities",
+        "using": "true",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "ptv_finance_allocations_read_policy",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "ptv_finance_allocations",
+        "using": "(has_capability('finance.view'::text) OR has_capability('finance.manage'::text))",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "ptv_finance_categories_read_policy",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "ptv_finance_categories",
+        "using": "((has_capability('finance.view'::text) AND (is_active = true)) OR has_capability('finance.manage'::text))",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "ptv_finance_kas_payments_read",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "ptv_finance_kas_payments",
+        "using": "((NOT is_finance_restricted_personnel()) AND (has_capability('finance.view'::text) OR (EXISTS ( SELECT 1\n   FROM ptv_finance_kas_records r\n  WHERE ((r.id = ptv_finance_kas_payments.record_id) AND ((r.ptv_id)::text = (current_authenticated_ptv_id())::text))))))",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "ptv_finance_kas_records_read",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "ptv_finance_kas_records",
+        "using": "((NOT is_finance_restricted_personnel()) AND (has_capability('finance.view'::text) OR ((ptv_id)::text = (current_authenticated_ptv_id())::text)))",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "ptv_finance_loan_payments_read",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "ptv_finance_loan_payments",
+        "using": "((NOT is_finance_restricted_personnel()) AND (has_capability('finance.manage'::text) OR (EXISTS ( SELECT 1\n   FROM ptv_finance_loans l\n  WHERE ((l.id = ptv_finance_loan_payments.loan_id) AND ((l.borrower_type)::text = 'kru'::text) AND ((l.borrower_id)::text = (current_authenticated_ptv_id())::text))))))",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "ptv_finance_loans_read",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "ptv_finance_loans",
+        "using": "((NOT is_finance_restricted_personnel()) AND (has_capability('finance.manage'::text) OR (((borrower_type)::text = 'kru'::text) AND ((borrower_id)::text = (current_authenticated_ptv_id())::text))))",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "ptv_finance_pockets_read_policy",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "ptv_finance_pockets",
+        "using": "(has_capability('finance.view'::text) OR has_capability('finance.manage'::text))",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "ptv_finance_semesters_read",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "ptv_finance_semesters",
+        "using": "(NOT is_finance_restricted_personnel())",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "ptv_finance_settings_read",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "ptv_finance_settings",
+        "using": "(NOT is_finance_restricted_personnel())",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "ptv_finance_source_refs_read_policy",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "ptv_finance_source_references",
+        "using": "(has_capability('finance.view'::text) OR has_capability('finance.manage'::text))",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "ptv_finance_transactions_read_policy",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "ptv_finance_transactions",
+        "using": "(has_capability('finance.view'::text) OR has_capability('finance.manage'::text))",
+        "schema": "public",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "finance_proofs_delete",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "objects",
+        "using": "((bucket_id = 'finance-proofs'::text) AND (NOT is_finance_restricted_personnel()) AND has_capability('finance.manage'::text))",
+        "schema": "storage",
+        "command": "DELETE",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "finance_proofs_read",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "objects",
+        "using": "((bucket_id = 'finance-proofs'::text) AND (NOT is_finance_restricted_personnel()) AND (has_capability('finance.view'::text) OR has_capability('finance.view_own'::text)))",
+        "schema": "storage",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "finance_proofs_upload",
+        "check": "((bucket_id = 'finance-proofs'::text) AND (NOT is_finance_restricted_personnel()) AND has_capability('finance.manage'::text))",
+        "roles": [
+          "authenticated"
+        ],
+        "table": "objects",
+        "using": null,
+        "schema": "storage",
+        "command": "INSERT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "inventory_authenticated_upload",
+        "check": "((bucket_id = 'inventory'::text) AND ((has_capability('inventory.create'::text) IS TRUE) OR (has_capability('inventory.edit'::text) IS TRUE)))",
+        "roles": [
+          "authenticated"
+        ],
+        "table": "objects",
+        "using": null,
+        "schema": "storage",
+        "command": "INSERT",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "inventory_manager_delete",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "objects",
+        "using": "((bucket_id = 'inventory'::text) AND ((has_capability('inventory.delete'::text) IS TRUE) OR (has_capability('inventory.manage'::text) IS TRUE)))",
+        "schema": "storage",
+        "command": "DELETE",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "inventory_owner_cleanup",
+        "check": null,
+        "roles": [
+          "authenticated"
+        ],
+        "table": "objects",
+        "using": "((bucket_id = 'inventory'::text) AND (owner = auth.uid()) AND (has_capability('inventory.create'::text) IS TRUE) AND (NOT (EXISTS ( SELECT 1\n   FROM ptv_inventaris pi\n  WHERE ((pi.foto_url IS NOT NULL) AND (pi.foto_url ~~ ('%'::text || objects.name)))))))",
+        "schema": "storage",
+        "command": "DELETE",
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "inventory_public_view",
+        "check": null,
+        "roles": [
+          "public"
+        ],
+        "table": "objects",
+        "using": "(bucket_id = 'inventory'::text)",
+        "schema": "storage",
+        "command": "SELECT",
+        "permissive": "PERMISSIVE"
+      }
+    ],
+    "triggers": [
+      {
+        "name": "trg_prevent_audit_tampering",
+        "table": "ptv_finance_audit_log",
+        "enabled": "O",
+        "function": "fn_ptv_finance_prevent_audit_tampering"
+      }
+    ],
+    "functions": [
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "14ae427513d1de6c53fa8c7a0d061366",
+        "name": "authorize",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, auth"
+        ],
+        "schema": "ptv_finance_private",
+        "definer": true,
+        "signature": "ptv_finance_private.authorize(uuid,bigint,text)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "c50f4f55c344cdc231cd86ac23a7cdd4",
+        "name": "disburse_loan_atomic",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, auth"
+        ],
+        "schema": "ptv_finance_private",
+        "definer": true,
+        "signature": "ptv_finance_private.disburse_loan_atomic(uuid,bigint,jsonb,jsonb)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "4f9e04766ab77004d7ed02e61a9baf22",
+        "name": "post_transaction",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, auth"
+        ],
+        "schema": "ptv_finance_private",
+        "definer": true,
+        "signature": "ptv_finance_private.post_transaction(uuid,bigint,jsonb)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "48dbb5181ffdd79752a9e99a73929df6",
+        "name": "record_kas_kru_payment_atomic",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, auth"
+        ],
+        "schema": "ptv_finance_private",
+        "definer": true,
+        "signature": "ptv_finance_private.record_kas_kru_payment_atomic(uuid,bigint,jsonb,jsonb)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "818d925273e5fcd00473373f012d308d",
+        "name": "record_loan_payment_atomic",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, auth"
+        ],
+        "schema": "ptv_finance_private",
+        "definer": true,
+        "signature": "ptv_finance_private.record_loan_payment_atomic(uuid,bigint,jsonb,jsonb)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "2e1ec0cd19a0249cf0124b8544d2ae8a",
+        "name": "reverse_operational_record_atomic",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, auth"
+        ],
+        "schema": "ptv_finance_private",
+        "definer": true,
+        "signature": "ptv_finance_private.reverse_operational_record_atomic(uuid,bigint,text,uuid,text)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "cd62221062d56bb5d9ccd54d39a15624",
+        "name": "void_finance_transaction",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public"
+        ],
+        "schema": "ptv_finance_private",
+        "definer": true,
+        "signature": "ptv_finance_private.void_finance_transaction(uuid,bigint,uuid,text)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "md5": "ed772c5f9a282e69fe2adb240a66e617",
+        "name": "fn_ptv_finance_prevent_audit_tampering",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": false,
+        "signature": "fn_ptv_finance_prevent_audit_tampering()",
+        "anon_execute": true,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      {
+        "acl": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "md5": "942e2785e9b4f1506ad267eb17027254",
+        "name": "has_capability",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, auth"
+        ],
+        "schema": "public",
+        "definer": true,
+        "signature": "has_capability(text)",
+        "anon_execute": true,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      {
+        "acl": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "md5": "8fdd0060af32d1ea8f945769c8bfae07",
+        "name": "is_finance_restricted_personnel",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, auth"
+        ],
+        "schema": "public",
+        "definer": true,
+        "signature": "is_finance_restricted_personnel()",
+        "anon_execute": true,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "5e7404aa06b7d8e0bef1a5d9497c0515",
+        "name": "rpc_disburse_loan_atomic",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": false,
+        "signature": "rpc_disburse_loan_atomic(uuid,bigint,jsonb,jsonb)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "md5": "b0409415e4d44787f9f98cb031eddd70",
+        "name": "rpc_get_finance_loans_aggregate",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public"
+        ],
+        "schema": "public",
+        "definer": true,
+        "signature": "rpc_get_finance_loans_aggregate()",
+        "anon_execute": true,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "7606f93680edb85b5bf36921e6760c7d",
+        "name": "rpc_post_finance_transaction_server",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": false,
+        "signature": "rpc_post_finance_transaction_server(uuid,bigint,jsonb)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "3bcfa3c4b2c5063b3195d0229fc97efd",
+        "name": "rpc_record_kas_kru_payment_atomic",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": false,
+        "signature": "rpc_record_kas_kru_payment_atomic(uuid,bigint,jsonb,jsonb)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "fc6ab2a5acbd9a06df7407f33f616b51",
+        "name": "rpc_record_loan_payment_atomic",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": false,
+        "signature": "rpc_record_loan_payment_atomic(uuid,bigint,jsonb,jsonb)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "21e6cf9367cf7b1bf1e4cc3754038288",
+        "name": "rpc_reverse_operational_record_atomic",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": false,
+        "signature": "rpc_reverse_operational_record_atomic(uuid,bigint,text,uuid,text)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "md5": "c9ef3be35bd01f3fb88ed4b60643ab82",
+        "name": "rpc_void_finance_transaction_atomic",
+        "owner": "postgres",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": false,
+        "signature": "rpc_void_finance_transaction_atomic(uuid,bigint,uuid,text)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      }
+    ],
+    "migrations": [
+      {
+        "name": "report_persistence_staging",
+        "version": "20261020164441"
+      },
+      {
+        "name": "report_persistence_cookie_adapter",
+        "version": "20261020165048"
+      },
+      {
+        "name": "loan_persistence_server_adapter",
+        "version": "20261020233530"
+      }
+    ],
+    "proof_bucket": [
+      {
+        "id": "finance-proofs",
+        "public": false,
+        "file_size_limit": 5242880
+      }
+    ],
+    "role_memberships": null,
+    "access_store_write": [
+      {
+        "role": "anon",
+        "table": "user_account",
+        "direct_write": true
+      },
+      {
+        "role": "anon",
+        "table": "canonical_identity",
+        "direct_write": true
+      },
+      {
+        "role": "anon",
+        "table": "organization_membership",
+        "direct_write": true
+      },
+      {
+        "role": "anon",
+        "table": "account_profiles",
+        "direct_write": true
+      },
+      {
+        "role": "anon",
+        "table": "account_capability_overrides",
+        "direct_write": true
+      },
+      {
+        "role": "anon",
+        "table": "profile_capabilities",
+        "direct_write": true
+      },
+      {
+        "role": "anon",
+        "table": "access_profile",
+        "direct_write": true
+      },
+      {
+        "role": "anon",
+        "table": "capability_registry",
+        "direct_write": true
+      },
+      {
+        "role": "anon",
+        "table": "auth_credentials",
+        "direct_write": true
+      },
+      {
+        "role": "authenticated",
+        "table": "user_account",
+        "direct_write": true
+      },
+      {
+        "role": "authenticated",
+        "table": "canonical_identity",
+        "direct_write": true
+      },
+      {
+        "role": "authenticated",
+        "table": "organization_membership",
+        "direct_write": true
+      },
+      {
+        "role": "authenticated",
+        "table": "account_profiles",
+        "direct_write": true
+      },
+      {
+        "role": "authenticated",
+        "table": "account_capability_overrides",
+        "direct_write": true
+      },
+      {
+        "role": "authenticated",
+        "table": "profile_capabilities",
+        "direct_write": true
+      },
+      {
+        "role": "authenticated",
+        "table": "access_profile",
+        "direct_write": true
+      },
+      {
+        "role": "authenticated",
+        "table": "capability_registry",
+        "direct_write": true
+      },
+      {
+        "role": "authenticated",
+        "table": "auth_credentials",
+        "direct_write": true
+      },
+      {
+        "role": "service_role",
+        "table": "user_account",
+        "direct_write": true
+      },
+      {
+        "role": "service_role",
+        "table": "canonical_identity",
+        "direct_write": true
+      },
+      {
+        "role": "service_role",
+        "table": "organization_membership",
+        "direct_write": true
+      },
+      {
+        "role": "service_role",
+        "table": "account_profiles",
+        "direct_write": true
+      },
+      {
+        "role": "service_role",
+        "table": "account_capability_overrides",
+        "direct_write": true
+      },
+      {
+        "role": "service_role",
+        "table": "profile_capabilities",
+        "direct_write": true
+      },
+      {
+        "role": "service_role",
+        "table": "access_profile",
+        "direct_write": true
+      },
+      {
+        "role": "service_role",
+        "table": "capability_registry",
+        "direct_write": true
+      },
+      {
+        "role": "service_role",
+        "table": "auth_credentials",
+        "direct_write": true
+      }
+    ]
+  },
+  "functionArguments": [
+    {
+      "nspname": "ptv_finance_private",
+      "proname": "record_kas_kru_payment_atomic",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_command",
+        "p_kas_payload"
+      ],
+      "returns": "jsonb",
+      "signature": "ptv_finance_private.record_kas_kru_payment_atomic(uuid,bigint,jsonb,jsonb)"
+    },
+    {
+      "nspname": "public",
+      "proname": "rpc_record_kas_kru_payment_atomic",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_command",
+        "p_kas_payload"
+      ],
+      "returns": "jsonb",
+      "signature": "rpc_record_kas_kru_payment_atomic(uuid,bigint,jsonb,jsonb)"
+    },
+    {
+      "nspname": "public",
+      "proname": "rpc_void_finance_transaction_atomic",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_tx_id",
+        "p_reason"
+      ],
+      "returns": "jsonb",
+      "signature": "rpc_void_finance_transaction_atomic(uuid,bigint,uuid,text)"
+    },
+    {
+      "nspname": "public",
+      "proname": "has_capability",
+      "proargnames": [
+        "p_capability"
+      ],
+      "returns": "boolean",
+      "signature": "has_capability(text)"
+    },
+    {
+      "nspname": "public",
+      "proname": "rpc_get_finance_loans_aggregate",
+      "proargnames": null,
+      "returns": "jsonb",
+      "signature": "rpc_get_finance_loans_aggregate()"
+    },
+    {
+      "nspname": "ptv_finance_private",
+      "proname": "authorize",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_cap"
+      ],
+      "returns": "uuid",
+      "signature": "ptv_finance_private.authorize(uuid,bigint,text)"
+    },
+    {
+      "nspname": "ptv_finance_private",
+      "proname": "post_transaction",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_command"
+      ],
+      "returns": "jsonb",
+      "signature": "ptv_finance_private.post_transaction(uuid,bigint,jsonb)"
+    },
+    {
+      "nspname": "public",
+      "proname": "rpc_post_finance_transaction_server",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_command"
+      ],
+      "returns": "jsonb",
+      "signature": "rpc_post_finance_transaction_server(uuid,bigint,jsonb)"
+    },
+    {
+      "nspname": "ptv_finance_private",
+      "proname": "disburse_loan_atomic",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_command",
+        "p_loan_payload"
+      ],
+      "returns": "jsonb",
+      "signature": "ptv_finance_private.disburse_loan_atomic(uuid,bigint,jsonb,jsonb)"
+    },
+    {
+      "nspname": "public",
+      "proname": "rpc_disburse_loan_atomic",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_command",
+        "p_loan_payload"
+      ],
+      "returns": "jsonb",
+      "signature": "rpc_disburse_loan_atomic(uuid,bigint,jsonb,jsonb)"
+    },
+    {
+      "nspname": "ptv_finance_private",
+      "proname": "record_loan_payment_atomic",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_command",
+        "p_payment_payload"
+      ],
+      "returns": "jsonb",
+      "signature": "ptv_finance_private.record_loan_payment_atomic(uuid,bigint,jsonb,jsonb)"
+    },
+    {
+      "nspname": "public",
+      "proname": "rpc_record_loan_payment_atomic",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_command",
+        "p_payment_payload"
+      ],
+      "returns": "jsonb",
+      "signature": "rpc_record_loan_payment_atomic(uuid,bigint,jsonb,jsonb)"
+    },
+    {
+      "nspname": "ptv_finance_private",
+      "proname": "reverse_operational_record_atomic",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_record_type",
+        "p_record_id",
+        "p_reason"
+      ],
+      "returns": "jsonb",
+      "signature": "ptv_finance_private.reverse_operational_record_atomic(uuid,bigint,text,uuid,text)"
+    },
+    {
+      "nspname": "public",
+      "proname": "rpc_reverse_operational_record_atomic",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_record_type",
+        "p_record_id",
+        "p_reason"
+      ],
+      "returns": "jsonb",
+      "signature": "rpc_reverse_operational_record_atomic(uuid,bigint,text,uuid,text)"
+    },
+    {
+      "nspname": "ptv_finance_private",
+      "proname": "void_finance_transaction",
+      "proargnames": [
+        "p_account_id",
+        "p_session_iat",
+        "p_tx_id",
+        "p_reason"
+      ],
+      "returns": "jsonb",
+      "signature": "ptv_finance_private.void_finance_transaction(uuid,bigint,uuid,text)"
+    }
+  ],
+  "aggregates": {
+    "loans": 0,
+    "kas_records": 0,
+    "root_grants": 53,
+    "kas_payments": 0,
+    "transactions": {
+      "posted": 54,
+      "reversed": 4
+    },
+    "account_count": 2,
+    "archive_count": 94,
+    "loan_payments": 0,
+    "portal_proofs": 0,
+    "archive_linked": 0,
+    "identity_count": 2,
+    "google_bindings": 0,
+    "category_missing": 2,
+    "negative_pockets": 0,
+    "root_assignments": 0,
+    "bootstrap_markers": 0,
+    "join_month_missing": 2,
+    "orphan_allocations": 0,
+    "password_candidates": 0,
+    "auth_credential_rows": 0,
+    "duplicate_ptv_groups": 1,
+    "kas_unexplained_paid": 0,
+    "duplicate_idempotency": 0,
+    "historical_unclassified": 58,
+    "loan_unexplained_totals": 0,
+    "loan_payments_without_ledger": 0,
+    "account_membership_not_unique": 0,
+    "allocation_invariant_failures": 0,
+    "loan_payments_reversed_ledger": 0,
+    "kas_payment_ledger_status_mismatch": 0
+  },
+  "authSummary": {
+    "native_users": 2,
+    "native_identity_providers": {
+      "email": 2
+    },
+    "native_users_with_password": 2,
+    "native_users_with_prior_signin": 2
+  },
+  "additionalCounts": [
+    {
+      "has_capability_policy_dependencies": 28,
+      "active_accounts": 2,
+      "locked_accounts": 0,
+      "override_rows": 0
+    }
+  ],
+  "notes": [
+    "All SQL explicitly wrapped in BEGIN TRANSACTION READ ONLY and ROLLBACK.",
+    "No business RPCs invoked; no auth login/refresh/logout/email calls.",
+    "Definition fingerprints/ACLs are catalog evidence, not exploit or runtime tests.",
+    "Legacy not accessed. No real credentials/hashes/tokens or person rows exported.",
+    "Independent queries are not one global repeatable-read snapshot. Rebaseline under maintenance before migration."
+  ]
+}

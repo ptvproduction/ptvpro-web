@@ -23,6 +23,6 @@ export default [
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', '.history/**', 'legacy/**'],
+    ignores: ['dist/**', 'node_modules/**', '.history/**', 'legacy/**', '.gemini/**', 'src/*.mjs', 'scripts/**', 'tests/**/*.mjs', 'tests/**/*.cjs'],
   },
 ];

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '@core/session';
 import { inventarisService, NilaiFilterParams } from './inventarisService';
 import { ItemInventaris } from './types';
-import { PTVSelect } from '@shared/components';
+import { PTVSelect, TableSkeleton } from '@shared/components';
+import { useInstantData } from '@shared/hooks/useInstantData';
+import { resolveInventoryPhotoUrl } from './utils/inventoryPhotoUtils';
 
 export const formatRupiah = (val: number | string | undefined | null): string => {
   const n = typeof val === 'number' ? val : parseFloat(String(val || 0).replace(/[^0-9.-]/g, '')) || 0;
@@ -29,6 +32,32 @@ export const formatDateIndo = (isoDate?: string): string => {
   }
 };
 
+export const getCatIconClass = (cat: string) => {
+  const lower = cat.toLowerCase();
+  if (lower.includes('kamera')) return 'fa-camera-retro';
+  if (lower.includes('lensa')) return 'fa-circle-dot';
+  if (lower.includes('audio') || lower.includes('mic')) return 'fa-microphone';
+  if (lower.includes('lighting') || lower.includes('lampu')) return 'fa-lightbulb';
+  if (lower.includes('stabilizer') || lower.includes('gimbal')) return 'fa-arrows-to-dot';
+  if (lower.includes('tripod') || lower.includes('rig')) return 'fa-arrows-to-dot';
+  return 'fa-box';
+};
+
+export const getCatCompanionClass = (cat: string) => {
+  const lower = cat.toLowerCase();
+  if (lower.includes('kamera')) return 'ptv-nilai-cat-kamera';
+  if (lower.includes('lensa')) return 'ptv-nilai-cat-lensa';
+  if (lower.includes('audio') || lower.includes('mic')) return 'ptv-nilai-cat-audio';
+  if (lower.includes('lighting') || lower.includes('lampu')) return 'ptv-nilai-cat-lighting';
+  if (lower.includes('stabilizer') || lower.includes('gimbal')) return 'ptv-nilai-cat-stabilizer';
+  if (lower.includes('tripod') || lower.includes('rig')) return 'ptv-nilai-cat-tripod';
+  if (lower.includes('baterai') || lower.includes('power')) return 'ptv-nilai-cat-baterai';
+  if (lower.includes('streaming') || lower.includes('live')) return 'ptv-nilai-cat-streaming';
+  if (lower.includes('komputer') || lower.includes('laptop')) return 'ptv-nilai-cat-komputer';
+  if (lower.includes('kabel') || lower.includes('adapter')) return 'ptv-nilai-cat-kabel';
+  return 'ptv-nilai-cat-lainnya';
+};
+
 export const NilaiInventarisPage: React.FC = () => {
   const { can } = useSessionStore();
   const navigate = useNavigate();
@@ -38,17 +67,36 @@ export const NilaiInventarisPage: React.FC = () => {
   const canManage = can('inventory.valuation.manage') || can('inventory.create');
   const canDelete = can('inventory.delete');
 
-  // Filters state
-  const [searchQ, setSearchQ] = useState('');
-  const [filterStatus, setFilterStatus] = useState('semua');
-  const [filterCat, setFilterCat] = useState('semua');
-  const [filterSource, setFilterSource] = useState('semua');
-  const [sortBy, setSortBy] = useState<'default' | 'val_desc' | 'val_asc' | 'date_desc' | 'name_asc'>('default');
+  // Navigation State Persistence (PTV-DEV-186)
+  const savedNavState = React.useRef<{ searchQ?: string; filterStatus?: string; filterCat?: string; filterSource?: string; sortBy?: any; scrollY?: number } | null>(null);
+  if (savedNavState.current === null && typeof window !== 'undefined') {
+    try {
+      const raw = sessionStorage.getItem('ptv_nilai_nav_state');
+      if (raw) savedNavState.current = JSON.parse(raw);
+    } catch (e) {
+      void e;
+    }
+  }
 
-  // Data state
-  const [rawItems, setRawItems] = useState<ItemInventaris[]>([]);
+  // Filters state with persistence
+  const [searchQ, setSearchQ] = useState(() => savedNavState.current?.searchQ || '');
+  const [filterStatus, setFilterStatus] = useState(() => savedNavState.current?.filterStatus || 'semua');
+  const [filterCat, setFilterCat] = useState(() => savedNavState.current?.filterCat || 'semua');
+  const [filterSource, setFilterSource] = useState(() => savedNavState.current?.filterSource || 'semua');
+  const [sortBy, setSortBy] = useState<'default' | 'val_desc' | 'val_asc' | 'date_desc' | 'name_asc'>(() => savedNavState.current?.sortBy || 'default');
+
+  // Instant-First Persistent Cache: Instant display on remount, background revalidation
+  const {
+    data: rawItems,
+    isLoading: loading,
+    refetch: loadData,
+  } = useInstantData<ItemInventaris[]>({
+    key: 'inventaris_catalog_list',
+    fetcher: () => inventarisService.getInventarisList(),
+    ttlMs: 15 * 60 * 1000,
+    initialFallback: [],
+  });
   const [displayItems, setDisplayItems] = useState<ItemInventaris[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Edit / Catat Modal state
   const [editingItem, setEditingItem] = useState<ItemInventaris | null>(null);
@@ -75,20 +123,39 @@ export const NilaiInventarisPage: React.FC = () => {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  // Load items
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const all = await inventarisService.getInventarisList();
-      setRawItems(all);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Filters synchronization
 
   useEffect(() => {
-    loadData();
-  }, []);
+    try {
+      sessionStorage.setItem(
+        'ptv_nilai_nav_state',
+        JSON.stringify({ searchQ, filterStatus, filterCat, filterSource, sortBy, scrollY: window.scrollY })
+      );
+    } catch (e) {
+      void e;
+    }
+  }, [searchQ, filterStatus, filterCat, filterSource, sortBy]);
+
+  useEffect(() => {
+    if (!loading && savedNavState.current?.scrollY) {
+      const targetScroll = savedNavState.current.scrollY;
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: targetScroll, behavior: 'instant' });
+      });
+    }
+  }, [loading]);
+
+  const handleOpenDetail = (id: string) => {
+    try {
+      sessionStorage.setItem(
+        'ptv_nilai_nav_state',
+        JSON.stringify({ searchQ, filterStatus, filterCat, filterSource, sortBy, scrollY: window.scrollY })
+      );
+    } catch (e) {
+      void e;
+    }
+    navigate(`/hub/inventaris/nilai/${id}`);
+  };
 
   // Filter effect
   useEffect(() => {
@@ -198,30 +265,20 @@ export const NilaiInventarisPage: React.FC = () => {
     await loadData();
   };
 
-  const getCatIconClass = (cat: string) => {
-    const lower = cat.toLowerCase();
-    if (lower.includes('kamera')) return 'fa-camera-retro';
-    if (lower.includes('lensa')) return 'fa-circle-dot';
-    if (lower.includes('audio') || lower.includes('mic')) return 'fa-microphone';
-    if (lower.includes('lighting') || lower.includes('lampu')) return 'fa-lightbulb';
-    if (lower.includes('stabilizer') || lower.includes('tripod') || lower.includes('gimbal')) return 'fa-arrows-to-dot';
-    return 'fa-box';
-  };
-
-  // Unauthorized screen 1:1 legacy
+  // Unauthorized screen
   if (!canView) {
     return (
       <div className="page subview-fade">
-        <div style={{ background: '#fff', border: '1.5px solid #fee2e2', borderRadius: 'var(--ptv-curve-xl)', padding: '32px 24px', textAlign: 'center', boxShadow: '0 4px 16px rgba(239,68,68,0.06)', maxWidth: '560px', margin: '40px auto' }}>
-          <div style={{ width: '56px', height: '56px', background: '#fef2f2', color: '#ef4444', borderRadius: 'var(--ptv-curve-circle)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '24px' }}>
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--dang-border)', borderRadius: 'var(--ptv-curve-xl)', padding: '36px 24px', textAlign: 'center', maxWidth: '560px', margin: '40px auto' }}>
+          <div style={{ width: '56px', height: '56px', background: 'var(--dang-bg)', color: 'var(--dang)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '24px' }}>
             <i className="fa-solid fa-lock" />
           </div>
-          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>Akses Modul Terbatas</h3>
-          <p style={{ fontSize: '13.5px', color: '#64748b', lineHeight: 1.5, marginBottom: '20px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink)', marginBottom: '8px' }}>Akses Modul Terbatas</h3>
+          <p style={{ fontSize: '13.5px', color: 'var(--muted)', lineHeight: 1.5, marginBottom: '20px' }}>
             Modul <b>Nilai Inventaris PTV</b> hanya dapat diakses oleh peran <b>Eksekutif, Administrasi, dan Kru Operasional</b> aktif.
           </p>
-          <button className="btn pri" onClick={() => navigate('/hub/beranda')} style={{ borderRadius: 'var(--ptv-curve-md)', padding: '8px 20px' }}>
-            <i className="fa-solid fa-house" style={{ marginRight: '6px' }} /> Kembali ke Beranda
+          <button className="ptv-nilai-btn-catalog" onClick={() => navigate('/hub/beranda')} style={{ margin: '0 auto' }}>
+            <i className="fa-solid fa-house" /> Kembali ke Beranda
           </button>
         </div>
       </div>
@@ -231,50 +288,44 @@ export const NilaiInventarisPage: React.FC = () => {
   return (
     <div className="page subview-fade ptv-nilai-page" style={{ paddingTop: '4px' }}>
       {/* Simulation Banner Notice */}
-      <div style={{ background: 'var(--b-050, #eff6ff)', border: '1px solid var(--b-200, #bfdbfe)', borderRadius: 'var(--ptv-curve-md)', padding: '10px 14px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <i className="fa-solid fa-circle-info" style={{ color: 'var(--b-600, #2563eb)', fontSize: '16px', flexShrink: 0 }} />
-        <span style={{ fontSize: '12.5px', color: 'var(--b-800, #1e40af)', lineHeight: 1.4 }}>
+      <div className="ptv-nilai-notice-banner">
+        <i className="fa-solid fa-circle-info ptv-nilai-notice-icon" />
+        <span className="ptv-nilai-notice-text">
           <strong>Data Simulasi Finansial:</strong> Nilai perolehan dan catatan valuasi yang ditampilkan di bawah ini merupakan data simulasi untuk keperluan verifikasi antarmuka dan operasional sistem, bukan nilai buku riil aset Progresif TV.
         </span>
       </div>
 
-      {/* ── 1. Header 1:1 Legacy ── */}
-      <div className="ptv-nilai-header">
-        <div className="ptv-nilai-header-left">
-          <div className="ptv-nilai-header-icon">
-            <i className="fa-solid fa-coins" />
-          </div>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <h1 className="ptv-nilai-header-title">Nilai Inventaris PTV</h1>
-            <p className="ptv-nilai-header-sub">
-              Valuasi aset, pencatatan perolehan, dan audit finansial peralatan Progresif TV
-            </p>
-          </div>
+      {/* ── 1. Standard R03 Header ── */}
+      <header className="ptv-page-header">
+        <div className="ptv-page-header-main">
+          <h1 className="ptv-page-title">Nilai Inventaris PTV</h1>
+          <p className="ptv-page-subtitle">
+            Valuasi aset, pencatatan perolehan, dan audit finansial peralatan Progresif TV
+          </p>
         </div>
-        <div className="ptv-nilai-header-actions">
+        <div className="ptv-page-header-actions">
           <button
             type="button"
-            className="btn sm"
+            className="ptv-nilai-btn-catalog"
             onClick={() => navigate('/hub/inventaris')}
-            style={{ background: '#fff', border: '1.5px solid #e2e8f0', borderRadius: 'var(--ptv-curve-md)', fontWeight: 700, padding: '6px 14px', color: '#334155', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            <i className="fa-solid fa-boxes-stacked" style={{ color: '#2563eb' }} />
+            <i className="fa-solid fa-boxes-stacked" />
             <span>Katalog Alat</span>
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* ── 2. KPI Metric Bento Grid 1:1 Legacy ── */}
+      {/* ── 2. KPI Metric Bento Grid ── */}
       <div className="ptv-nilai-kpi-grid">
         {/* Total Nilai */}
-        <div className="ptv-nilai-kpi-card">
+        <div className="ptv-nilai-kpi-card kpi-total">
           <div className="ptv-nilai-kpi-card-hd">
             <span className="ptv-nilai-kpi-card-lbl">Total Nilai Aset</span>
-            <span className="ptv-nilai-kpi-card-ic" style={{ background: '#ecfdf5', color: '#059669' }}>
+            <span className="ptv-nilai-kpi-card-ic ptv-nilai-ic-total">
               <i className="fa-solid fa-vault" />
             </span>
           </div>
-          <div className="ptv-nilai-kpi-card-val" style={{ color: '#047857' }}>
+          <div className="ptv-nilai-kpi-card-val">
             {formatRupiah(totalValuation)}
           </div>
           <div className="ptv-nilai-kpi-card-sub">
@@ -282,32 +333,32 @@ export const NilaiInventarisPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Terdaftar vs Bernilai */}
-        <div className="ptv-nilai-kpi-card">
+        {/* Cakupan Valuasi */}
+        <div className="ptv-nilai-kpi-card kpi-coverage">
           <div className="ptv-nilai-kpi-card-hd">
             <span className="ptv-nilai-kpi-card-lbl">Cakupan Valuasi</span>
-            <span className="ptv-nilai-kpi-card-ic" style={{ background: '#eff6ff', color: '#2563eb' }}>
+            <span className="ptv-nilai-kpi-card-ic ptv-nilai-ic-coverage">
               <i className="fa-solid fa-chart-pie" />
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-            <span className="ptv-nilai-kpi-card-val" style={{ color: '#1e40af' }}>{coveragePercent}%</span>
-            <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>({itemsWithValueCount}/{totalRegisteredItems})</span>
+            <span className="ptv-nilai-kpi-card-val">{coveragePercent}%</span>
+            <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600 }}>({itemsWithValueCount}/{totalRegisteredItems})</span>
           </div>
-          <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: 'var(--ptv-curve-pill)', overflow: 'hidden', marginTop: '8px' }}>
-            <div style={{ width: `${coveragePercent}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #10b981)', borderRadius: 'var(--ptv-curve-pill)' }} />
+          <div className="ptv-nilai-coverage-progress-rail">
+            <div className="ptv-nilai-coverage-progress-fill" style={{ width: `${coveragePercent}%` }} />
           </div>
         </div>
 
         {/* Rata-rata Nilai */}
-        <div className="ptv-nilai-kpi-card">
+        <div className="ptv-nilai-kpi-card kpi-avg">
           <div className="ptv-nilai-kpi-card-hd">
             <span className="ptv-nilai-kpi-card-lbl">Rata-rata / Alat</span>
-            <span className="ptv-nilai-kpi-card-ic" style={{ background: '#fdf4ff', color: '#a855f7' }}>
+            <span className="ptv-nilai-kpi-card-ic ptv-nilai-ic-avg">
               <i className="fa-solid fa-calculator" />
             </span>
           </div>
-          <div className="ptv-nilai-kpi-card-val" style={{ color: '#7e22ce' }}>
+          <div className="ptv-nilai-kpi-card-val">
             {formatRupiah(avgValuation)}
           </div>
           <div className="ptv-nilai-kpi-card-sub">
@@ -316,15 +367,15 @@ export const NilaiInventarisPage: React.FC = () => {
         </div>
 
         {/* Belum Dicatat */}
-        <div className="ptv-nilai-kpi-card">
+        <div className="ptv-nilai-kpi-card kpi-unrecorded">
           <div className="ptv-nilai-kpi-card-hd">
             <span className="ptv-nilai-kpi-card-lbl">Belum Dicatat</span>
-            <span className="ptv-nilai-kpi-card-ic" style={{ background: '#fffbeb', color: '#d97706' }}>
+            <span className="ptv-nilai-kpi-card-ic ptv-nilai-ic-unrecorded">
               <i className="fa-solid fa-file-circle-question" />
             </span>
           </div>
-          <div className="ptv-nilai-kpi-card-val" style={{ color: '#b45309' }}>
-            {unrecordedCount} <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Alat</span>
+          <div className="ptv-nilai-kpi-card-val unrecorded">
+            {unrecordedCount} <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--muted)' }}>Alat</span>
           </div>
           <div className="ptv-nilai-kpi-card-sub">
             Menunggu data perolehan
@@ -332,28 +383,26 @@ export const NilaiInventarisPage: React.FC = () => {
         </div>
       </div>
 
-      {/* ── 3. Filters & Search Toolbar 1:1 Legacy ── */}
+      {/* ── 3. Filters & Search Toolbar ── */}
       <div className="ptv-nilai-filter-bar">
-        <div className="ptv-nilai-toolbar-grid">
-          {/* Search Input */}
+        <div className="ptv-nilai-toolbar-vertical-wrap">
+          {/* Search Input (Pure Pill >=48px, >=16px font) */}
           <div className="ptv-nilai-search-wrap">
-            <i className="fa-solid fa-magnifying-glass" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: '13px' }} />
+            <i className="fa-solid fa-magnifying-glass ptv-nilai-search-icon" />
             <input
               type="text"
               id="nilaiSearchInput"
-              className="input"
+              className="ptv-nilai-search-input"
               placeholder="Cari nama alat, kode, vendor, invoice, sumber..."
               value={searchQ}
               onChange={(e) => setSearchQ(e.target.value)}
-              style={{ paddingLeft: '36px', paddingRight: searchQ ? '32px' : '14px' }}
             />
             {searchQ && (
               <button
                 type="button"
-                className="btn sm"
+                className="ptv-nilai-search-clear-btn"
                 id="nilaiSearchClearBtn"
                 onClick={() => setSearchQ('')}
-                style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#94a3b8', padding: '4px 8px', cursor: 'pointer' }}
                 aria-label="Hapus pencarian"
               >
                 <i className="fa-solid fa-xmark" />
@@ -364,22 +413,22 @@ export const NilaiInventarisPage: React.FC = () => {
           {/* Filter Dropdowns Grid */}
           <div className="ptv-nilai-filter-grid">
             {/* Status */}
-            <div>
+            <div className="ptv-nilai-filter-col">
               <PTVSelect
                 id="nilaiFilterStatusSel"
                 value={filterStatus}
                 onChange={(val) => setFilterStatus(val)}
                 options={[
-                  { value: 'semua', label: 'Semua Status Nilai' },
+                  { value: 'semua', label: 'Semua Status' },
                   { value: 'Aktif', label: 'Aktif' },
                   { value: 'Belum Dicatat', label: 'Belum Dicatat' },
                 ]}
-                ariaLabel="Semua Status Nilai"
+                ariaLabel="Filter Status Nilai"
               />
             </div>
 
             {/* Kategori */}
-            <div>
+            <div className="ptv-nilai-filter-col">
               <PTVSelect
                 id="nilaiFilterCatSel"
                 value={filterCat}
@@ -388,36 +437,36 @@ export const NilaiInventarisPage: React.FC = () => {
                   { value: 'semua', label: 'Semua Kategori' },
                   ...activeCats.map((c) => ({ value: c, label: c })),
                 ]}
-                ariaLabel="Semua Kategori"
+                ariaLabel="Filter Kategori"
               />
             </div>
 
             {/* Sumber Dana */}
-            <div>
+            <div className="ptv-nilai-filter-col">
               <PTVSelect
                 id="nilaiFilterSourceSel"
                 value={filterSource}
                 onChange={(val) => setFilterSource(val)}
                 options={[
-                  { value: 'semua', label: 'Semua Sumber Dana' },
+                  { value: 'semua', label: 'Semua Sumber' },
                   ...availableSources.map((s) => ({ value: s, label: s })),
                 ]}
-                ariaLabel="Semua Sumber Dana"
+                ariaLabel="Filter Sumber Dana"
               />
             </div>
 
             {/* Urutkan */}
-            <div>
+            <div className="ptv-nilai-filter-col">
               <PTVSelect
                 id="nilaiSortBySel"
                 value={sortBy}
                 onChange={(val) => setSortBy(val as any)}
                 options={[
-                  { value: 'default', label: 'Urutan: Kategori & Nama' },
-                  { value: 'val_desc', label: 'Nilai Tertinggi → Terendah' },
-                  { value: 'val_asc', label: 'Nilai Terendah → Tertinggi' },
-                  { value: 'date_desc', label: 'Tanggal Perolehan Terbaru' },
-                  { value: 'name_asc', label: 'Nama Alat (A-Z)' },
+                  { value: 'default', label: 'Urutan: Kategori' },
+                  { value: 'val_desc', label: 'Nilai: Tertinggi' },
+                  { value: 'val_asc', label: 'Nilai: Terendah' },
+                  { value: 'date_desc', label: 'Perolehan: Terbaru' },
+                  { value: 'name_asc', label: 'Nama: A → Z' },
                 ]}
                 ariaLabel="Urutan Filter Nilai Inventaris"
               />
@@ -432,31 +481,25 @@ export const NilaiInventarisPage: React.FC = () => {
             </span>
             <button
               type="button"
-              className="btn sm"
+              className="ptv-nilai-btn-reset-pill"
               onClick={resetFilters}
-              style={{ background: '#fee2e2', color: '#b91c1c', border: 'none', borderRadius: 'var(--ptv-curve-sm)', padding: '3px 10px', fontWeight: 700, fontSize: '11.5px', cursor: 'pointer' }}
             >
-              <i className="fa-solid fa-rotate-left" style={{ marginRight: '4px' }} /> Reset Filter
+              <i className="fa-solid fa-rotate-left" /> Reset Filter
             </button>
           </div>
         )}
       </div>
 
-      {/* ── 4. Data List Cards 1:1 Legacy ── */}
+      {/* ── 4. Data List Cards ── */}
       <div id="nilaiInventarisListWrap">
-        {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)' }}>
-            <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: '8px' }} />
-            Memuat data nilai inventaris...
-          </div>
+        {loading && rawItems.length === 0 ? (
+          <TableSkeleton rows={5} />
         ) : displayItems.length === 0 ? (
-          <div style={{ background: 'var(--surface, #ffffff)', border: '1.5px solid var(--line, #e2e8f0)', borderRadius: 'var(--ptv-curve-xl)', padding: '48px 24px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-            <div style={{ width: '52px', height: '52px', background: '#f1f5f9', color: '#94a3b8', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: '22px' }}>
-              <i className="fa-solid fa-box-open" />
-            </div>
-            <h4 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: '0 0 6px 0' }}>Tidak Ada Data Inventaris yang Cocok</h4>
-            <p style={{ fontSize: '13px', color: 'var(--muted, #64748b)', margin: '0 0 16px 0' }}>Silakan sesuaikan kata kunci pencarian atau filter status nilai di atas.</p>
-            <button type="button" className="btn sm pri" onClick={resetFilters} style={{ borderRadius: 'var(--ptv-curve-md)', padding: '6px 16px' }}>
+          <div className="ptv-nilai-empty-card">
+            <i className="fa-solid fa-box-open ptv-nilai-empty-icon" />
+            <h4 className="ptv-nilai-empty-title">Tidak Ada Data Inventaris yang Cocok</h4>
+            <p className="ptv-nilai-empty-text">Silakan sesuaikan kata kunci pencarian atau filter status nilai di atas.</p>
+            <button type="button" className="ptv-nilai-btn-catalog" onClick={resetFilters} style={{ margin: '0 auto' }}>
               Reset Filter
             </button>
           </div>
@@ -481,51 +524,56 @@ export const NilaiInventarisPage: React.FC = () => {
                   <div className="ptv-nilai-card-inner">
                     {/* Left: Thumbnail + Name + Code + Badges */}
                     <div className="ptv-nilai-card-main-col">
-                      <div className="ptv-nilai-thumb">
-                        {x.foto_url ? (
-                          <img
-                            src={x.foto_url}
-                            alt={x.nama_alat}
-                            onError={(e) => {
-                              (e.currentTarget as HTMLElement).style.display = 'none';
-                              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                              if (fallback) fallback.style.display = 'flex';
-                            }}
-                          />
-                        ) : null}
-                        <div
-                          style={{
-                            display: x.foto_url ? 'none' : 'flex',
-                            width: '100%',
-                            height: '100%',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#64748b',
-                            fontSize: '22px',
-                          }}
-                        >
-                          <i className={`fa-solid ${getCatIconClass(x.kategori)}`} />
-                        </div>
+                      <div className={`ptv-nilai-thumb ${getCatCompanionClass(x.kategori)}`} data-cat={x.kategori.toLowerCase()}>
+                        {(() => {
+                          const resolvedPhoto = resolveInventoryPhotoUrl(x.foto_url);
+                          return (
+                            <>
+                              {resolvedPhoto ? (
+                                <img
+                                  src={resolvedPhoto}
+                                  alt={x.nama_alat}
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLElement).style.display = 'none';
+                                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                    if (fallback) fallback.style.display = 'flex';
+                                  }}
+                                />
+                              ) : null}
+                              <div
+                                style={{
+                                  display: resolvedPhoto ? 'none' : 'flex',
+                                  width: '100%',
+                                  height: '100%',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '22px',
+                                }}
+                              >
+                                <i className={`fa-solid ${getCatIconClass(x.kategori)}`} />
+                              </div>
+                            </>
+                          );
+                        })()}
                       </div>
 
                       {/* Text metadata */}
                       <div className="ptv-nilai-card-info">
                         <div className="ptv-nilai-badges">
                           <span className="ptv-nilai-badge-code">{x.kode}</span>
-                          <span className="ptv-nilai-badge-cat">
-                            <i className="fa-solid fa-layer-group" style={{ fontSize: '10px', marginRight: '3px' }} />
+                          <span className={`ptv-nilai-badge-cat ${getCatCompanionClass(x.kategori)}`} data-cat={x.kategori.toLowerCase()}>
+                            <i className={`fa-solid ${getCatIconClass(x.kategori)}`} style={{ fontSize: '10px', marginRight: '4px' }} />
                             {x.kategori}
                           </span>
                           <span className="ptv-nilai-badge-loc">
-                            <i className="fa-solid fa-location-dot" style={{ fontSize: '9.5px', marginRight: '3px', color: '#ef4444' }} />
+                            <i className="fa-solid fa-location-dot" style={{ fontSize: '9.5px', marginRight: '3px', color: 'var(--muted)' }} />
                             {locName}
                           </span>
                         </div>
 
                         <h3
                           className="ptv-nilai-card-name"
-                          onClick={() => navigate(`/hub/inventaris/nilai/${x.id}`)}
-                          style={{ cursor: 'pointer' }}
+                          onClick={() => handleOpenDetail(x.id)}
                         >
                           {x.nama_alat}
                         </h3>
@@ -546,45 +594,39 @@ export const NilaiInventarisPage: React.FC = () => {
                     <div className="ptv-nilai-card-dossier-col">
                       <div className="ptv-nilai-dossier-hd">
                         <span className="ptv-nilai-dossier-title">Nilai Perolehan</span>
-                        {hasVal ? (
-                          <span style={{ fontSize: '10.5px', fontWeight: 700, padding: '1px 6px', borderRadius: 'var(--ptv-curve-xs)', background: '#ecfdf5', color: '#059669' }}>
-                            {statusAset}
-                          </span>
-                        ) : (
-                          <span style={{ fontSize: '10.5px', fontWeight: 700, padding: '1px 6px', borderRadius: 'var(--ptv-curve-xs)', background: '#fef3c7', color: '#b45309' }}>
-                            Belum Dicatat
-                          </span>
-                        )}
+                        <span className={`ptv-nilai-dossier-badge-status ${hasVal ? 'aktif' : 'belum-dicatat'}`}>
+                          {hasVal ? statusAset : 'Belum Dicatat'}
+                        </span>
                       </div>
 
                       <div className="ptv-nilai-dossier-val">{hasVal && v ? formatRupiah(v.nilai_perolehan) : 'Rp —'}</div>
 
                       {hasVal && v && totalUnits > 1 && (
-                        <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', marginTop: '2px' }}>
+                        <div className="ptv-nilai-dossier-unit-breakdown">
                           @ {formatRupiah(Math.round(v.nilai_perolehan / totalUnits))} &times; {totalUnits} Unit
                         </div>
                       )}
 
                       <div className="ptv-nilai-dossier-meta-grid">
-                        <span style={{ color: '#94a3b8' }}>
-                          <i className="fa-regular fa-calendar" style={{ fontSize: '10px', marginRight: '3px' }} />
+                        <span className="meta-lbl">
+                          <i className="fa-regular fa-calendar" style={{ fontSize: '10px' }} />
                           Tanggal:
                         </span>
-                        <span style={{ fontWeight: 600 }}>{tglPerolehan}</span>
+                        <span className="meta-val">{tglPerolehan}</span>
 
-                        <span style={{ color: '#94a3b8' }}>
-                          <i className="fa-solid fa-hand-holding-dollar" style={{ fontSize: '10px', marginRight: '3px' }} />
+                        <span className="meta-lbl">
+                          <i className="fa-solid fa-hand-holding-dollar" style={{ fontSize: '10px' }} />
                           Sumber:
                         </span>
-                        <span style={{ fontWeight: 600 }}>{sourceName}</span>
+                        <span className="meta-val">{sourceName}</span>
 
                         {vendorName !== '—' && (
                           <>
-                            <span style={{ color: '#94a3b8' }}>
-                              <i className="fa-solid fa-store" style={{ fontSize: '10px', marginRight: '3px' }} />
+                            <span className="meta-lbl">
+                              <i className="fa-solid fa-store" style={{ fontSize: '10px' }} />
                               Vendor:
                             </span>
-                            <span style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={vendorName}>
+                            <span className="meta-val" title={vendorName}>
                               {vendorName}
                             </span>
                           </>
@@ -592,11 +634,11 @@ export const NilaiInventarisPage: React.FC = () => {
 
                         {noInvoice !== '—' && (
                           <>
-                            <span style={{ color: '#94a3b8' }}>
-                              <i className="fa-solid fa-receipt" style={{ fontSize: '10px', marginRight: '3px' }} />
+                            <span className="meta-lbl">
+                              <i className="fa-solid fa-receipt" style={{ fontSize: '10px' }} />
                               Invoice:
                             </span>
-                            <span style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={noInvoice}>
+                            <span className="meta-val" title={noInvoice}>
                               {noInvoice}
                             </span>
                           </>
@@ -608,27 +650,18 @@ export const NilaiInventarisPage: React.FC = () => {
                     <div className="ptv-nilai-card-actions-col">
                       <button
                         type="button"
-                        className="btn sm ptv-nilai-btn-detail"
-                        onClick={() => navigate(`/hub/inventaris/nilai/${x.id}`)}
-                        style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: 'var(--ptv-curve-md)', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '6px' }}
+                        className="ptv-nilai-btn-detail"
+                        onClick={() => handleOpenDetail(x.id)}
                       >
-                        <i className="fa-solid fa-eye" style={{ color: '#2563eb' }} />
+                        <i className="fa-solid fa-eye" />
                         <span>Detail</span>
                       </button>
 
                       {canManage && (
                         <button
                           type="button"
-                          className="btn sm pri ptv-nilai-btn-edit"
+                          className="ptv-nilai-btn-edit"
                           onClick={() => handleOpenEdit(x)}
-                          style={{
-                            borderRadius: 'var(--ptv-curve-md)',
-                            fontWeight: 700,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            background: hasVal ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : 'linear-gradient(135deg, #059669, #10b981)',
-                          }}
                         >
                           <i className={`fa-solid ${hasVal ? 'fa-pen-to-square' : 'fa-plus'}`} />
                           <span>{hasVal ? 'Ubah' : 'Catat Nilai'}</span>
@@ -638,12 +671,13 @@ export const NilaiInventarisPage: React.FC = () => {
                       {canDelete && hasVal && (
                         <button
                           type="button"
-                          className="btn sm ptv-nilai-btn-del"
+                          className="ptv-nilai-btn-del"
                           onClick={() => handleDeleteNilai(x.id, x.nama_alat)}
-                          style={{ background: '#fff', border: '1px solid #fee2e2', color: '#dc2626', borderRadius: 'var(--ptv-curve-md)', fontWeight: 700, fontSize: '11px' }}
+                          aria-label={`Hapus catatan nilai finansial untuk ${x.nama_alat}`}
                           title="Hapus catatan nilai finansial saja (alat fisik tetap ada)"
                         >
                           <i className="fa-regular fa-trash-can" />
+                          <span>Hapus</span>
                         </button>
                       )}
                     </div>
@@ -656,91 +690,74 @@ export const NilaiInventarisPage: React.FC = () => {
       </div>
 
       {/* ── Modal Edit / Catat Nilai ── */}
-      {editingItem && (
+      {editingItem && typeof document !== 'undefined' && createPortal(
         <div
           role="dialog"
           aria-modal="true"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(15, 23, 42, 0.65)',
-            backdropFilter: 'blur(4px)',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '16px',
+          className="ptv-nilai-modal-backdrop"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setEditingItem(null);
           }}
         >
-          <div
-            style={{
-              background: 'var(--surface, #ffffff)',
-              borderRadius: 'var(--ptv-curve-2xl)',
-              width: '100%',
-              maxWidth: '520px',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              maxHeight: '90vh',
-            }}
-          >
+          <form onSubmit={handleSaveEdit} className="ptv-nilai-modal-card">
             {/* Modal Header */}
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line-2, #f1f5f9)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div className="ptv-nilai-modal-header">
               <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: 'var(--ink, #0f172a)' }}>
+                <h3 className="ptv-nilai-modal-title">
                   {editingItem.nilai_inventaris ? 'Ubah Catatan Nilai' : 'Catat Nilai Inventaris'}
                 </h3>
-                <span style={{ fontSize: '12px', color: 'var(--muted, #64748b)' }}>
+                <span className="ptv-nilai-modal-sub">
                   {editingItem.kode} &bull; {editingItem.nama_alat}
                 </span>
               </div>
               <button
                 type="button"
+                className="ptv-nilai-modal-close-btn"
                 onClick={() => setEditingItem(null)}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--muted, #94a3b8)', fontSize: '16px' }}
+                aria-label="Tutup modal"
               >
                 <i className="fa-solid fa-xmark" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <form onSubmit={handleSaveEdit} style={{ padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                  Total Nilai Perolehan (Rp) *
+            <div className="ptv-nilai-modal-body">
+              <div className="ptv-nilai-form-group">
+                <label className="ptv-nilai-form-label">
+                  <span>Total Nilai Perolehan (Rp)</span>
+                  <span className="req">*</span>
                 </label>
                 <input
                   type="number"
-                  className="input"
+                  className="ptv-nilai-form-input"
                   required
                   placeholder="Contoh: 58000000"
                   value={editForm.nilai_perolehan}
                   onChange={(e) => setEditForm({ ...editForm, nilai_perolehan: e.target.value })}
-                  style={{ width: '100%', boxSizing: 'border-box' }}
                 />
-                <span style={{ fontSize: '11px', color: 'var(--muted, #64748b)', marginTop: '2px', display: 'block' }}>
+                <span className="ptv-nilai-form-hint">
                   Format Rupiah: {editForm.nilai_perolehan ? formatRupiah(editForm.nilai_perolehan) : 'Rp 0'}
                 </span>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                    Tanggal Perolehan *
+              <div className="ptv-nilai-form-row-2col">
+                <div className="ptv-nilai-form-group">
+                  <label className="ptv-nilai-form-label">
+                    <span>Tanggal Perolehan</span>
+                    <span className="req">*</span>
                   </label>
                   <input
                     type="date"
-                    className="input"
+                    className="ptv-nilai-form-input"
                     required
                     value={editForm.tanggal_perolehan}
                     onChange={(e) => setEditForm({ ...editForm, tanggal_perolehan: e.target.value })}
-                    style={{ width: '100%', boxSizing: 'border-box' }}
                   />
                 </div>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                    Sumber Dana *
+                <div className="ptv-nilai-form-group">
+                  <label className="ptv-nilai-form-label">
+                    <span>Sumber Dana</span>
+                    <span className="req">*</span>
                   </label>
                   <PTVSelect
                     value={editForm.sumber_perolehan}
@@ -756,71 +773,68 @@ export const NilaiInventarisPage: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                    Vendor / Toko
-                  </label>
+              <div className="ptv-nilai-form-row-2col">
+                <div className="ptv-nilai-form-group">
+                  <label className="ptv-nilai-form-label">Vendor / Toko</label>
                   <input
                     type="text"
-                    className="input"
+                    className="ptv-nilai-form-input"
                     placeholder="Contoh: JPC Kemang"
                     value={editForm.vendor}
                     onChange={(e) => setEditForm({ ...editForm, vendor: e.target.value })}
-                    style={{ width: '100%', boxSizing: 'border-box' }}
                   />
                 </div>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                    Nomor Invoice
-                  </label>
+                <div className="ptv-nilai-form-group">
+                  <label className="ptv-nilai-form-label">Nomor Invoice</label>
                   <input
                     type="text"
-                    className="input"
+                    className="ptv-nilai-form-input"
                     placeholder="Contoh: INV/2024/001"
                     value={editForm.nomor_invoice}
                     onChange={(e) => setEditForm({ ...editForm, nomor_invoice: e.target.value })}
-                    style={{ width: '100%', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                  Catatan Administratif
-                </label>
+              <div className="ptv-nilai-form-group">
+                <label className="ptv-nilai-form-label">Catatan Administratif</label>
                 <textarea
-                  className="input"
+                  className="ptv-nilai-form-textarea"
                   rows={2}
                   placeholder="Catatan kondisi atau keperluan pembelian..."
                   value={editForm.catatan}
                   onChange={(e) => setEditForm({ ...editForm, catatan: e.target.value })}
-                  style={{ width: '100%', boxSizing: 'border-box', height: 'auto', padding: '8px' }}
                 />
               </div>
+            </div>
 
-              {/* Modal Actions */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
-                <button
-                  type="button"
-                  className="btn sm"
-                  onClick={() => setEditingItem(null)}
-                  style={{ background: '#f1f5f9', border: 'none', borderRadius: 'var(--ptv-curve-md)', padding: '8px 16px', fontWeight: 700 }}
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="btn sm pri"
-                  style={{ borderRadius: 'var(--ptv-curve-md)', padding: '8px 20px', fontWeight: 700 }}
-                >
-                  {submitting ? 'Menyimpan...' : 'Simpan Catatan Nilai'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+            {/* Modal Actions */}
+            <div className="ptv-nilai-modal-footer">
+              <button
+                type="button"
+                className="ptv-nilai-btn-cancel-modal"
+                onClick={() => setEditingItem(null)}
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="ptv-nilai-btn-submit-modal"
+              >
+                {submitting ? (
+                  <>
+                    <i className="fa-solid fa-spinner fa-spin" />
+                    <span>Menyimpan...</span>
+                  </>
+                ) : (
+                  <span>Simpan Catatan Nilai</span>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>,
+        document.body
       )}
     </div>
   );

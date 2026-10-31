@@ -12,6 +12,17 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'mock-anon-key
 
 let supabaseInstance: SupabaseClient | null = null;
 
+export function isSupabaseConfigured(): boolean {
+  const url = import.meta.env.VITE_SUPABASE_URL;
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  return Boolean(
+    url &&
+    !url.includes('localhost:54321') &&
+    key &&
+    !key.includes('mock-anon-key')
+  );
+}
+
 export function getSupabaseClient(): SupabaseClient {
   if (!supabaseInstance) {
     supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
@@ -23,3 +34,8 @@ export function getSupabaseClient(): SupabaseClient {
   }
   return supabaseInstance;
 }
+
+export function setSupabaseClientForTesting(client: SupabaseClient | null): void {
+  supabaseInstance = client;
+}
+

@@ -5,8 +5,13 @@ export interface PTVSelectOption<T extends string = string> {
   value: T;
   label: string;
   icon?: string;
+  iconColor?: string;
+  iconBg?: string;
   disabled?: boolean;
   description?: string;
+  isAction?: boolean;
+  onAction?: () => void;
+  hasSeparatorBefore?: boolean;
 }
 
 export interface PTVSelectProps<T extends string = string> {
@@ -48,7 +53,7 @@ export function PTVSelect<T extends string = string>({
   searchPlaceholder = 'Cari...',
   size = 'md',
   ariaLabel,
-  usePortal = false,
+  usePortal = true,
 }: PTVSelectProps<T>) {
   const generatedId = useId();
   const selectId = id || generatedId;
@@ -88,10 +93,16 @@ export function PTVSelect<T extends string = string>({
       const top = nextPlacement === 'bottom'
         ? rect.bottom + 5
         : rect.top - 5;
+      
+      // Ensure dropdown does not overflow viewport bounds
+      const viewportW = typeof window !== 'undefined' ? window.innerWidth : 1024;
+      const width = Math.min(rect.width, Math.max(260, viewportW - 24));
+      const left = Math.max(12, Math.min(rect.left, viewportW - width - 12));
+
       setPortalCoords({
         top,
-        left: rect.left,
-        width: rect.width,
+        left,
+        width,
       });
     }
   }, [usePortal]);
@@ -99,6 +110,7 @@ export function PTVSelect<T extends string = string>({
   // Open & Close handlers
   const handleOpen = useCallback(() => {
     if (disabled) return;
+    window.dispatchEvent(new CustomEvent('ptv-select-open', { detail: selectId }));
     updatePosition();
     setIsOpen(true);
     setSearchQuery('');
@@ -148,14 +160,25 @@ export function PTVSelect<T extends string = string>({
       }
     };
 
+    const handleOtherSelectOpen = (e: Event) => {
+      const customEvt = e as CustomEvent;
+      if (customEvt.detail !== selectId) {
+        handleClose();
+      }
+    };
+
     document.addEventListener('mousedown', handlePointerDownOutside);
     document.addEventListener('touchstart', handlePointerDownOutside);
+    document.addEventListener('click', handlePointerDownOutside);
+    window.addEventListener('ptv-select-open', handleOtherSelectOpen);
     window.addEventListener('resize', handleScrollOrResize);
     window.addEventListener('scroll', handleScrollOrResize, true);
 
     return () => {
       document.removeEventListener('mousedown', handlePointerDownOutside);
       document.removeEventListener('touchstart', handlePointerDownOutside);
+      document.removeEventListener('click', handlePointerDownOutside);
+      window.removeEventListener('ptv-select-open', handleOtherSelectOpen);
       window.removeEventListener('resize', handleScrollOrResize);
       window.removeEventListener('scroll', handleScrollOrResize, true);
     };
@@ -181,6 +204,11 @@ export function PTVSelect<T extends string = string>({
   // Select an option
   const handleSelect = (option: PTVSelectOption<T>) => {
     if (option.disabled) return;
+    if (option.isAction && option.onAction) {
+      option.onAction();
+      handleClose();
+      return;
+    }
     onChange(option.value);
     handleClose();
     triggerRef.current?.focus();
@@ -303,31 +331,49 @@ export function PTVSelect<T extends string = string>({
             const isSelected = opt.value === value;
             const isFocused = idx === highlightedIndex;
             return (
-              <li
-                key={opt.value}
-                id={`${selectId}-opt-${idx}`}
-                role="option"
-                aria-selected={isSelected}
-                aria-disabled={opt.disabled}
-                className={`ptv-select-item ${isSelected ? 'is-selected' : ''} ${
-                  isFocused ? 'is-focused' : ''
-                } ${opt.disabled ? 'is-disabled' : ''}`}
-                onClick={() => handleSelect(opt)}
-                onMouseEnter={() => !opt.disabled && setHighlightedIndex(idx)}
-              >
-                <div className="ptv-select-item-content">
-                  {opt.icon && <i className={`${opt.icon} ptv-select-icon-lead`} />}
-                  <div>
-                    <div className="ptv-select-item-text">{opt.label}</div>
-                    {opt.description && (
-                      <div className="ptv-select-item-desc">{opt.description}</div>
-                    )}
-                  </div>
-                </div>
-                {isSelected && (
-                  <i className="fa-solid fa-check ptv-select-check-icon" aria-hidden="true" />
+              <React.Fragment key={opt.value}>
+                {opt.hasSeparatorBefore && (
+                  <li className="ptv-select-separator" role="separator" />
                 )}
-              </li>
+                <li
+                  id={`${selectId}-opt-${idx}`}
+                  role="option"
+                  aria-selected={isSelected}
+                  aria-disabled={opt.disabled}
+                  className={`ptv-select-item ${isSelected ? 'is-selected' : ''} ${
+                    isFocused ? 'is-focused' : ''
+                  } ${opt.disabled ? 'is-disabled' : ''} ${opt.isAction ? 'is-action' : ''}`}
+                  onClick={() => handleSelect(opt)}
+                  onMouseEnter={() => !opt.disabled && setHighlightedIndex(idx)}
+                >
+                  <div className="ptv-select-item-content">
+                    {opt.icon && (
+                      opt.iconBg || opt.iconColor ? (
+                        <span
+                          className="ptv-select-icon-box"
+                          style={{
+                            backgroundColor: opt.iconBg || 'transparent',
+                            color: opt.iconColor || 'inherit',
+                          }}
+                        >
+                          <i className={opt.icon} />
+                        </span>
+                      ) : (
+                        <i className={`${opt.icon} ptv-select-icon-lead`} />
+                      )
+                    )}
+                    <div>
+                      <div className="ptv-select-item-text">{opt.label}</div>
+                      {opt.description && (
+                        <div className="ptv-select-item-desc">{opt.description}</div>
+                      )}
+                    </div>
+                  </div>
+                  {isSelected && !opt.isAction && (
+                    <i className="fa-solid fa-check ptv-select-check-icon" aria-hidden="true" />
+                  )}
+                </li>
+              </React.Fragment>
             );
           })
         )}
@@ -359,10 +405,22 @@ export function PTVSelect<T extends string = string>({
       >
         <span className="ptv-select-value">
           {selectedOption?.icon && (
-            <i className={`${selectedOption.icon} ptv-select-icon-lead`} />
+            selectedOption.iconBg || selectedOption.iconColor ? (
+              <span
+                className="ptv-select-icon-box"
+                style={{
+                  backgroundColor: selectedOption.iconBg || 'transparent',
+                  color: selectedOption.iconColor || 'inherit',
+                }}
+              >
+                <i className={selectedOption.icon} />
+              </span>
+            ) : (
+              <i className={`${selectedOption.icon} ptv-select-icon-lead`} />
+            )
           )}
           {selectedOption ? (
-            <span>{selectedOption.label}</span>
+            <span className="ptv-select-text-label">{selectedOption.label}</span>
           ) : (
             <span className="ptv-select-placeholder">{placeholder}</span>
           )}

@@ -1,0 +1,67 @@
+{
+  "runId": "PTV-DEV-117-TEST-1792559426",
+  "timestamp": "2026-10-21T05:10:26.232Z",
+  "targetProjectRef": "swadgljnyelsjstqqxbm",
+  "pockets": {
+    "alpha": {
+      "id": "94f454b2-af09-43b2-a172-ff2cbc263082",
+      "name": "[TEST][PTV-DEV-117] Kas Uji Alpha"
+    },
+    "beta": {
+      "id": "4dd78d1f-6370-438a-9fd0-ea3f10473f66",
+      "name": "[TEST][PTV-DEV-117] Bank Uji Beta"
+    }
+  },
+  "transactions": [
+    {
+      "action": "income",
+      "id": "ede1f3fc-88f8-4756-a1f5-520d4c434f1c",
+      "amountMinor": "10000000",
+      "key": "0f991a51-903c-4ff7-b0c0-0c002c555ca3"
+    },
+    {
+      "action": "transfer",
+      "id": "8e4b3211-5c41-4418-b92d-e4466ea58d81",
+      "amountMinor": "4000000",
+      "key": "0b689ab9-b2f8-4125-894f-4cbcf6f581bd"
+    },
+    {
+      "action": "expense",
+      "id": "fee99b14-6cc2-4cb6-a0e8-225805a417c0",
+      "amountMinor": "1500000",
+      "key": "5efa3c02-cdb8-4ac3-a35d-781137c7333b"
+    },
+    {
+      "action": "expense_drain_alpha",
+      "id": "c5b7345f-2660-4f68-b0f9-1fc4a9e9658f",
+      "amountMinor": "6000000",
+      "key": "61946529-d156-4fbb-b6a7-6a74b455df10"
+    },
+    {
+      "action": "expense_drain_beta",
+      "id": "71454964-b064-4786-81be-55ee3c3a635b",
+      "amountMinor": "2500000",
+      "key": "e268cdcc-6f1d-4809-ac16-7f47abff217b"
+    }
+  ],
+  "reconciliation": {
+    "dummyTransactionsCount": 5,
+    "dummyAllocationsCount": 6,
+    "totalAuditLogsCount": 9,
+    "finalPocketBalances": {
+      "alpha": 0,
+      "beta": 0
+    },
+    "legacyIntegrity": "100% UTUH (53 baris Rp 1.244.200 & Rp 633.924)"
+  },
+  "steps": [
+    {
+      "step": "create_pockets",
+      "success": true
+    },
+    {
+      "step": "archive_pockets",
+      "success": true
+    }
+  ]
+}

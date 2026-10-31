@@ -59,7 +59,7 @@ export const ALL_CAPABILITIES = [
   'audit.logs.view',
 ] as const;
 
-export type AppCapability = (typeof ALL_CAPABILITIES)[number];
+export type AppCapability = (typeof ALL_CAPABILITIES)[number] | 'finance.view_own';
 
 /**
  * Mutation capabilities that modify state.

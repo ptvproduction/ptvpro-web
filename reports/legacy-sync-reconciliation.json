@@ -1,0 +1,176 @@
+{
+  "started_at": "2026-10-29T16:07:01.774Z",
+  "mode": "backfill",
+  "is_dry_run": true,
+  "source_mode": "cloud",
+  "legacy_source_type": "local_sql_dump",
+  "target_project": "https://swadgljnyelsjstqqxbm.supabase.co",
+  "counts": {
+    "legacy_total": 29,
+    "incremental_candidates": 14,
+    "synced_ready": 4,
+    "skipped_unchanged": 10,
+    "conflicts_quarantined": 0,
+    "unmapped_identities": 14
+  },
+  "tables": {
+    "ptv_surat_izin": {
+      "total": 7,
+      "ready": 3,
+      "unmapped": 14,
+      "conflicts": 0
+    },
+    "ptv_surat_tugas": {
+      "total": 0,
+      "ready": 0,
+      "unmapped": 0,
+      "conflicts": 0
+    },
+    "ptv_surat_barang": {
+      "total": 0,
+      "ready": 0,
+      "unmapped": 0,
+      "conflicts": 0
+    },
+    "ptv_catatan": {
+      "total": 4,
+      "ready": 1,
+      "unmapped": 0,
+      "conflicts": 0
+    },
+    "ptv_pengumuman": {
+      "total": 3,
+      "ready": 0,
+      "unmapped": 0,
+      "conflicts": 0
+    },
+    "ptv_ebook": {
+      "total": 15,
+      "ready": 0,
+      "unique_titles": 5
+    }
+  },
+  "quarantine": [],
+  "unmapped_identities_log": [
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "ff305b4f-0c0e-4abc-9da9-2556bdb1743c",
+      "nomor_surat": "001/SI-PTV/X/2026",
+      "field": "diajukan_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "ff305b4f-0c0e-4abc-9da9-2556bdb1743c",
+      "nomor_surat": "001/SI-PTV/X/2026",
+      "field": "disetujui_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "ea91b82d-ff86-41dc-bc87-d29c1a7f09f5",
+      "nomor_surat": "007/SI-PTV/X/2026",
+      "field": "diajukan_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "ea91b82d-ff86-41dc-bc87-d29c1a7f09f5",
+      "nomor_surat": "007/SI-PTV/X/2026",
+      "field": "disetujui_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "df6e9e3b-ef6a-4359-a1df-9cb10f2294e7",
+      "nomor_surat": "009/SI-PTV/X/2026",
+      "field": "diajukan_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "df6e9e3b-ef6a-4359-a1df-9cb10f2294e7",
+      "nomor_surat": "009/SI-PTV/X/2026",
+      "field": "disetujui_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "872488ae-c2c2-484c-a3a8-49d75f3cc9b6",
+      "nomor_surat": "011/SI-PTV/X/2026",
+      "field": "diajukan_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "872488ae-c2c2-484c-a3a8-49d75f3cc9b6",
+      "nomor_surat": "011/SI-PTV/X/2026",
+      "field": "disetujui_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "64c7fd85-3dfc-4025-ac7d-61f8d67708aa",
+      "nomor_surat": "012/SI-PTV/X/2026",
+      "field": "diajukan_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "64c7fd85-3dfc-4025-ac7d-61f8d67708aa",
+      "nomor_surat": "012/SI-PTV/X/2026",
+      "field": "disetujui_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "08420b47-cd90-4a66-8efc-f866df101fe6",
+      "nomor_surat": "013/SI-PTV/X/2026",
+      "field": "diajukan_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "08420b47-cd90-4a66-8efc-f866df101fe6",
+      "nomor_surat": "013/SI-PTV/X/2026",
+      "field": "disetujui_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "4d6e78c2-5e04-40c4-818c-e953ec8b01eb",
+      "nomor_surat": "014/SI-PTV/X/2026",
+      "field": "diajukan_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    },
+    {
+      "table": "ptv_surat_izin",
+      "doc_id": "4d6e78c2-5e04-40c4-818c-e953ec8b01eb",
+      "nomor_surat": "014/SI-PTV/X/2026",
+      "field": "disetujui_oleh",
+      "raw_value": "Progresif TV",
+      "action": "SET_NULL_PRESERVE_LOG"
+    }
+  ],
+  "conflicts_log": [],
+  "orphan_retention_log": [],
+  "next_sequences": {
+    "SI": 2,
+    "ST": 1,
+    "SBB": 1
+  },
+  "completed_at": "2026-10-29T16:07:02.978Z"
+}

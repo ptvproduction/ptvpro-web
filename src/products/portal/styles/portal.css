@@ -1,0 +1,1436 @@
+/* ---------- PTVPRO Public Portal — Design System Alignment ---------- */
+/* Typography Alignment: SF Pro Display (Official PTV Hub & Design Guide R03 Standard) */
+
+/* Global HTML & Body Atmosphere Isolation for Portal */
+html.portal-page-active,
+html:has(body.portal-page-active) {
+  background: #F5F7FA !important;
+  color: #0F1A2E !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: var(--ptv-font-family, "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif) !important;
+  overflow-x: clip !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: auto !important;
+  scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 72px) !important;
+  scroll-behavior: smooth !important;
+  height: auto !important;
+  min-height: 100% !important;
+  color-scheme: only light !important;
+}
+
+body.portal-page-active {
+  background: #F5F7FA !important;
+  color: #0F1A2E !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: var(--ptv-font-family, "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif) !important;
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  height: auto !important;
+  min-height: 100% !important;
+  color-scheme: only light !important;
+}
+
+/* Suppress dashboard ambient backgrounds & grid; restore blue safe-area notch fill */
+body.portal-page-active::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 0 auto !important;
+  height: env(safe-area-inset-top, 0px) !important;
+  background: #1749C0 !important;
+  z-index: 30 !important;
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+body.portal-page-active::after {
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+}
+
+/* ---------- Portal Design Tokens & Scoped Root ---------- */
+.ptvpro-portal {
+  --brand: #1749C0;
+  --brand-deep: #0B2A72;
+  --brand-ink: #103A9B;
+  --tint: #E4ECFB;
+  --tint-line: #BFD0F3;
+  --paper: #F5F7FA;
+  --card: #FFFFFF;
+  --ink: #0F1A2E;
+  --muted: #56637A;
+  --line: #DAE1EC;
+  --on-brand: #FFFFFF;
+  --on-brand-soft: rgba(255, 255, 255, 0.78);
+  --mark: rgba(255, 255, 255, 0.07);
+
+  /* Typography: Aligned 1:1 with PTV Hub & Design Guide R03 (SF Pro Display) */
+  --font-display: var(--ptv-font-family, "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif);
+  --font-body: var(--ptv-font-family, "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif);
+
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 72px;
+
+  /* Design Tokens — Radius Hierarchy (Aligned with PTVPRO Design System) */
+  --r-xs: var(--radius-xs, 6px);      /* Badge kecil, indicator dots, chip mikro */
+  --r-sm: var(--radius-sm, 8px);      /* Navigation controls, close button, language switcher, back link */
+  --r-md: var(--radius-md, 12px);     /* Tombol utama & sekunder (.btn, .cta, .opt), search input, chips, alerts */
+  --r-lg: var(--radius-lg, 16px);     /* Service cards (.svc, .feature), modals (.dlg, .wap, .dmp), list table (.stl), toast */
+  --r-pill: 9999px;                   /* Indicator dots & capsule pills */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  background: var(--paper) !important;
+  color: var(--ink);
+  font: 400 1rem/1.55 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+  color-scheme: only light;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.ptvpro-portal > main,
+.ptvpro-portal .cat {
+  flex: 1 0 auto;
+  width: 100%;
+  scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 72px);
+}
+
+.ptvpro-portal *,
+.ptvpro-portal *::before,
+.ptvpro-portal *::after {
+  box-sizing: inherit;
+}
+
+.ptvpro-portal a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ptvpro-portal h1,
+.ptvpro-portal h2,
+.ptvpro-portal h3,
+.ptvpro-portal p {
+  margin: 0;
+}
+
+.ptvpro-portal .wrap {
+  display: block !important;
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4.5vw, 32px);
+  box-sizing: border-box;
+}
+
+.ptvpro-portal svg.i {
+  width: 1.25em;
+  height: 1.25em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+.ptvpro-portal :focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+.ptvpro-portal .skip {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+  background: var(--card);
+  color: var(--ink);
+  padding: var(--s3) var(--s4);
+  border-radius: var(--r-sm);
+  z-index: 50;
+  text-decoration: none;
+}
+
+.ptvpro-portal .skip:focus {
+  left: var(--s4);
+}
+
+/* ---------- Header + Hero (One Solid Blue Field) ---------- */
+.ptvpro-portal .top {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.ptvpro-portal header.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 50;
+  background: var(--brand);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 12px rgba(11, 42, 114, 0.12);
+}
+
+.ptvpro-portal .bar .wrap {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+
+.ptvpro-portal .brand-logo-btn {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  line-height: 1;
+}
+
+.ptvpro-portal .brand-logo-btn:hover {
+  opacity: 0.88;
+}
+
+.ptvpro-portal .portal-header-logo {
+  height: 24px;
+  width: auto;
+  max-width: 175px;
+  object-fit: contain;
+  display: block;
+}
+
+.ptvpro-portal .word {
+  font: 700 1.375rem/1 var(--font-display);
+  letter-spacing: -0.035em;
+  display: inline-flex;
+  align-items: baseline;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+}
+
+.ptvpro-portal .word span {
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.ptvpro-portal .bar nav {
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+}
+
+.ptvpro-portal .bar nav a,
+.ptvpro-portal .bar nav > button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--s3);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  font-family: var(--font-body);
+  border-radius: var(--r-sm);
+  color: var(--on-brand-soft);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.ptvpro-portal .bar nav a:hover,
+.ptvpro-portal .bar nav > button:hover {
+  color: var(--on-brand);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.ptvpro-portal .bar nav a[aria-current="page"],
+.ptvpro-portal .bar nav > button[aria-current="page"] {
+  color: var(--on-brand);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.ptvpro-portal .bar :focus-visible,
+.ptvpro-portal .hero :focus-visible {
+  outline-color: var(--on-brand);
+}
+
+.ptvpro-portal .sd {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FFC857;
+  margin-right: 6px;
+}
+
+.ptvpro-portal .lang {
+  display: flex;
+  margin-left: var(--s2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+
+.ptvpro-portal .lang button {
+  min-height: 42px;
+  min-width: 42px;
+  padding: 0 var(--s2);
+  border: 0;
+  background: none;
+  color: var(--on-brand-soft);
+  font: 600 0.875rem var(--font-body);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ptvpro-portal .lang button[aria-pressed="true"] {
+  background: var(--on-brand);
+  color: var(--brand);
+}
+
+.ptvpro-portal .lang button:hover:not([aria-pressed="true"]) {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.ptvpro-portal .hero {
+  padding-block: calc(var(--s5) + 22px) var(--s6);
+}
+
+.ptvpro-portal .hero h1 {
+  font: 700 clamp(2.125rem, 9.5vw, 4.25rem)/1.02 var(--font-display);
+  letter-spacing: -0.04em;
+  max-width: 14ch;
+}
+
+.ptvpro-portal .hero p {
+  margin-top: var(--s4);
+  max-width: 46ch;
+  font-size: 1.0625rem;
+  color: var(--on-brand-soft);
+}
+
+.ptvpro-portal .hero .note {
+  display: flex;
+  gap: var(--s2);
+  align-items: flex-start;
+  margin-top: var(--s5);
+  padding-top: var(--s4);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 0.9375rem;
+  color: var(--on-brand-soft);
+  max-width: 52ch;
+}
+
+.ptvpro-portal .hero .note svg {
+  margin-top: 2px;
+}
+
+/* ---------- Main & Tools ---------- */
+.ptvpro-portal main {
+  display: block !important;
+  padding-block: var(--s6) var(--s7);
+  background: transparent !important;
+}
+
+.ptvpro-portal #layanan {
+  padding-top: var(--s5);
+}
+
+.ptvpro-portal .tools {
+  display: grid;
+  gap: var(--s3);
+  margin-top: var(--s5);
+}
+
+.ptvpro-portal .search {
+  position: relative;
+  display: block;
+}
+
+.ptvpro-portal .search .i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.ptvpro-portal .search input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 var(--s4) 0 44px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-sizing: border-box;
+}
+
+.ptvpro-portal .search input:focus {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+  border-color: var(--brand);
+}
+
+.ptvpro-portal .chips {
+  display: flex;
+  gap: var(--s2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  margin-inline: calc(-1 * clamp(16px, 4.5vw, 32px));
+  padding-inline: clamp(16px, 4.5vw, 32px);
+}
+
+.ptvpro-portal .chips::-webkit-scrollbar {
+  display: none;
+}
+
+.ptvpro-portal .chips button {
+  flex: none;
+  min-height: 44px;
+  padding: 0 var(--s4);
+  scroll-snap-align: start;
+  border: 1px solid var(--line) !important;
+  background: var(--card) !important;
+  color: var(--ink) !important;
+  border-radius: var(--r-md) !important;
+  font: 500 0.9375rem var(--font-body);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.ptvpro-portal .chips button:hover {
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+}
+
+/* ---------- Featured Carousel ---------- */
+.ptvpro-portal .car {
+  margin: 0;
+}
+
+.ptvpro-portal .track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  border-radius: var(--r-lg);
+}
+
+.ptvpro-portal .track::-webkit-scrollbar {
+  display: none;
+}
+
+.ptvpro-portal .feature {
+  display: grid;
+  gap: var(--s3);
+  margin-top: var(--s5);
+  padding: var(--s4);
+  background: var(--tint);
+  border: 1px solid var(--tint-line);
+  border-radius: var(--r-lg);
+  transition: border-color 0.2s, transform 0.25s var(--ease);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+.ptvpro-portal .feature[hidden] {
+  display: none;
+}
+
+.ptvpro-portal .feature:hover {
+  border-color: #B4C6EE;
+  transform: translateY(-2px);
+}
+
+.ptvpro-portal .track .feature {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  margin: 0;
+}
+
+.ptvpro-portal .track .feature:hover {
+  transform: none;
+}
+
+.ptvpro-portal .feature .tagline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--brand-ink);
+  font-weight: 600;
+}
+
+.ptvpro-portal .feature .tagline svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.ptvpro-portal .feature h2 {
+  font: 700 1.5rem/1.15 var(--font-display);
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.ptvpro-portal .feature p {
+  color: var(--muted);
+  max-width: 58ch;
+}
+
+.ptvpro-portal .cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  justify-self: start;
+  min-height: 44px;
+  padding: 0 var(--s4);
+  border-radius: var(--r-md);
+  background: var(--brand);
+  color: var(--on-brand);
+  font-weight: 600;
+  transition: gap 0.2s var(--ease);
+}
+
+.ptvpro-portal .feature:hover .cta {
+  gap: var(--s3);
+}
+
+.ptvpro-portal .cnav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--s3);
+  margin-top: var(--s2);
+}
+
+.ptvpro-portal .dots {
+  display: flex;
+}
+
+.ptvpro-portal .dot {
+  width: 36px;
+  height: 44px;
+  border: 0 !important;
+  background: none !important;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0 !important;
+}
+
+.ptvpro-portal .dot::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--tint-line);
+  transition: width 0.25s var(--ease), background-color 0.2s;
+}
+
+.ptvpro-portal .dot[aria-current="true"]::after {
+  width: 26px;
+  background: var(--brand);
+}
+
+.ptvpro-portal .arr {
+  display: none;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--line) !important;
+  background: var(--card) !important;
+  color: var(--ink) !important;
+  border-radius: var(--r-sm) !important;
+  cursor: pointer;
+  padding: 0 !important;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.ptvpro-portal .arr:hover {
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+}
+
+/* ---------- Categories & Service Cards ---------- */
+.ptvpro-portal .cat {
+  position: relative;
+  z-index: 1;
+  padding-block: var(--s5);
+  background: transparent !important;
+}
+
+.ptvpro-portal .cat:has(.svc:hover),
+.ptvpro-portal .cat:has(.svc:focus-visible),
+.ptvpro-portal .cat:focus-within {
+  z-index: 4;
+}
+
+.ptvpro-portal .cat + .cat {
+  border-top: 1px solid var(--line);
+  margin-top: var(--s3);
+}
+
+.ptvpro-portal .cat-head h2 {
+  font: 700 1.5rem/1.15 var(--font-display);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.ptvpro-portal .cat-head p {
+  margin-top: var(--s2);
+  color: var(--muted);
+  max-width: 34ch;
+}
+
+.ptvpro-portal .list {
+  display: grid;
+  gap: var(--s3);
+  margin-top: calc(var(--s4) - 4px);
+  padding-top: 4px;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Service Card Base */
+.ptvpro-portal .svc {
+  --svc-accent: var(--brand);
+  --svc-bg: var(--tint);
+  --svc-hover-bg: rgba(255, 255, 255, 0.98);
+  --svc-shadow: rgba(23, 73, 192, 0.25);
+
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 44px 1fr 24px;
+  gap: var(--s4);
+  align-items: start;
+  padding: var(--s4);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  transition: border-color 0.22s var(--ease),
+              background-color 0.22s var(--ease),
+              box-shadow 0.25s var(--ease),
+              transform 0.25s var(--ease);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  text-align: left;
+  box-sizing: border-box;
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
+}
+
+/* Service-specific Harmonious Accent Colors */
+.ptvpro-portal .svc[data-svc="aset"],
+.ptvpro-portal .svc.svc-aset {
+  --svc-accent: #B7791F;
+  --svc-bg: #FFF5E4;
+  --svc-hover-bg: #FCF9F3;
+  --svc-shadow: rgba(183, 121, 31, 0.28);
+}
+
+.ptvpro-portal .svc[data-svc="short"],
+.ptvpro-portal .svc.svc-short {
+  --svc-accent: #8054C8;
+  --svc-bg: #F2ECFF;
+  --svc-hover-bg: #FBF8FE;
+  --svc-shadow: rgba(128, 84, 200, 0.28);
+}
+
+.ptvpro-portal .svc[data-svc="hub"],
+.ptvpro-portal .svc.svc-hub {
+  --svc-accent: #194AC7;
+  --svc-bg: #E8EFFF;
+  --svc-hover-bg: #F6F9FF;
+  --svc-shadow: rgba(25, 74, 199, 0.30);
+}
+
+.ptvpro-portal .svc[data-svc="idv"],
+.ptvpro-portal .svc.svc-idv {
+  --svc-accent: #14836A;
+  --svc-bg: #E5F6F0;
+  --svc-hover-bg: #F5FAF7;
+  --svc-shadow: rgba(20, 131, 106, 0.28);
+}
+
+.ptvpro-portal .svc[data-svc="ltr"],
+.ptvpro-portal .svc.svc-ltr {
+  --svc-accent: #C46B42;
+  --svc-bg: #FFF0E7;
+  --svc-hover-bg: #FDF8F5;
+  --svc-shadow: rgba(196, 107, 66, 0.28);
+}
+
+.ptvpro-portal .svc[data-svc="maj"],
+.ptvpro-portal .svc.svc-maj {
+  --svc-accent: #0F766E;
+  --svc-bg: #E6FFFA;
+  --svc-hover-bg: #F2FCFA;
+  --svc-shadow: rgba(15, 118, 110, 0.28);
+}
+
+.ptvpro-portal .svc:hover {
+  border-color: var(--svc-accent);
+  background-color: var(--svc-hover-bg);
+  box-shadow: 0 10px 26px -10px var(--svc-shadow), 0 2px 6px -1px rgba(15, 26, 46, 0.04);
+  transform: translateY(-3px);
+  z-index: 10;
+}
+
+.ptvpro-portal .svc:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px -6px var(--svc-shadow);
+}
+
+.ptvpro-portal .svc:focus-visible {
+  outline: 3px solid var(--svc-accent);
+  outline-offset: 3px;
+  border-color: var(--svc-accent);
+  transform: translateY(-3px);
+  z-index: 10;
+}
+
+.ptvpro-portal .tile {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  background: var(--svc-bg);
+  color: var(--svc-accent);
+  transition: transform 0.22s var(--ease), background-color 0.22s var(--ease);
+}
+
+.ptvpro-portal .svc:hover .tile {
+  transform: scale(1.05);
+}
+
+.ptvpro-portal .tile svg {
+  width: 22px;
+  height: 22px;
+}
+
+.ptvpro-portal .svc h3 {
+  font: 700 1.1875rem/1.25 var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.ptvpro-portal .svc p {
+  margin-top: var(--s1);
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.ptvpro-portal .go {
+  color: var(--muted);
+  transition: transform 0.25s var(--ease), color 0.2s;
+  justify-self: end;
+}
+
+.ptvpro-portal .svc:hover .go {
+  color: var(--svc-accent);
+  transform: translate(2px, -2px);
+}
+
+.ptvpro-portal .access {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-top: var(--s3);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.ptvpro-portal .access::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dot, var(--brand));
+}
+
+.ptvpro-portal .access.open { --dot: #1E8E5A; }
+.ptvpro-portal .access.crew { --dot: var(--brand); }
+.ptvpro-portal .access.own { --dot: #B8860B; }
+.ptvpro-portal .access.login { --dot: #8E44AD; }
+
+.ptvpro-portal .svc.hub {
+  border-color: rgba(25, 74, 199, 0.25);
+}
+
+.ptvpro-portal .meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s3);
+  margin-top: var(--s3);
+}
+
+.ptvpro-portal .meta .access {
+  margin-top: 0;
+}
+
+.ptvpro-portal .bd {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: var(--r-xs);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: #E9EDF4;
+  color: #3A465C;
+}
+
+.ptvpro-portal .bd::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ptvpro-portal .bd.ok {
+  background: #E3F3EA;
+  color: #14532D;
+}
+
+.ptvpro-portal .bd.incident {
+  background: #FDEBD0;
+  color: #7A4300;
+}
+
+.ptvpro-portal .bd.maint {
+  background: var(--tint);
+  color: var(--brand-ink);
+}
+
+.ptvpro-portal .bd.soon {
+  background: #EEF2F6;
+  color: #475569;
+}
+
+.ptvpro-portal .nt {
+  display: block;
+  margin-top: var(--s2);
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+
+/* ---------- Empty Search State ---------- */
+.ptvpro-portal .empty {
+  padding: var(--s7) var(--s4);
+  text-align: center;
+}
+
+.ptvpro-portal .empty h3 {
+  font: 700 1.25rem var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.ptvpro-portal .empty p {
+  margin: var(--s2) 0 var(--s4);
+  color: var(--muted);
+}
+
+/* ---------- Sub-views: Status, Coming Soon, Maintenance ---------- */
+.ptvpro-portal .pg {
+  padding-block: var(--s5) var(--s8);
+}
+
+.ptvpro-portal .pg h1 {
+  font: 700 clamp(1.75rem, 7vw, 2.75rem)/1.05 var(--font-display);
+  letter-spacing: -0.035em;
+  margin-top: var(--s3);
+  max-width: 20ch;
+  color: var(--ink);
+}
+
+.ptvpro-portal .lead {
+  margin-top: var(--s3);
+  color: var(--muted);
+  max-width: 56ch;
+}
+
+.ptvpro-portal .back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: 44px;
+  padding: 0 var(--s3) 0 var(--s2);
+  margin-left: calc(-1 * var(--s2));
+  border: 0;
+  background: none;
+  color: var(--brand-ink);
+  font: 600 0.9375rem var(--font-body);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+}
+
+.ptvpro-portal .back:hover {
+  background: var(--tint);
+}
+
+.ptvpro-portal .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  min-height: 48px;
+  padding: 0 var(--s5);
+  margin-top: var(--s5);
+  border: 0;
+  border-radius: var(--r-md);
+  background: var(--brand);
+  color: var(--on-brand);
+  font: 600 1rem var(--font-body);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-decoration: none;
+}
+
+.ptvpro-portal .btn:hover {
+  background: var(--brand-ink);
+}
+
+.ptvpro-portal .btn.ghost {
+  background: none;
+  color: var(--brand-ink);
+  border: 1px solid var(--tint-line);
+}
+
+.ptvpro-portal .btn.ghost:hover {
+  background: var(--tint);
+}
+
+.ptvpro-portal .sum {
+  display: flex;
+  gap: var(--s3);
+  align-items: center;
+  margin-top: var(--s5);
+  padding: var(--s4);
+  border-radius: var(--r-md);
+  background: #E3F3EA;
+  border: 1px solid #B5DDC7;
+  color: #14532D;
+  font-weight: 600;
+}
+
+.ptvpro-portal .sum.warn {
+  background: #FDF0DB;
+  border-color: #F0D29C;
+  color: #7A4300;
+}
+
+.ptvpro-portal .stl {
+  list-style: none;
+  margin: var(--s4) 0 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--card);
+}
+
+.ptvpro-portal .stl li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--s4);
+}
+
+.ptvpro-portal .stl li + li {
+  border-top: 1px solid var(--line);
+}
+
+.ptvpro-portal .stl b {
+  font: 700 1.0625rem var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.ptvpro-portal .fine {
+  margin-top: var(--s3);
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.ptvpro-portal .idrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  margin-top: var(--s3);
+}
+
+.ptvpro-portal .tile.big {
+  width: 64px;
+  height: 64px;
+}
+
+.ptvpro-portal .tile.big svg {
+  width: 30px;
+  height: 30px;
+}
+
+.ptvpro-portal .info {
+  display: flex;
+  gap: var(--s3);
+  align-items: flex-start;
+  margin-top: var(--s5);
+  padding: var(--s4);
+  max-width: 60ch;
+  background: var(--tint);
+  border: 1px solid var(--tint-line);
+  border-radius: var(--r-md);
+  color: var(--brand-ink);
+}
+
+.ptvpro-portal .info .i {
+  margin-top: 2px;
+}
+
+/* ---------- Announcement Modal ---------- */
+.ptvpro-portal .ov,
+.ptvpro-portal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: var(--s4);
+  background: rgba(8, 18, 43, 0.62);
+  animation: ptvFade 0.2s;
+}
+
+.ptvpro-portal .dlg,
+.ptvpro-portal-dialog {
+  position: relative;
+  width: min(100%, 440px);
+  background: var(--card);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  animation: ptvLift 0.25s var(--ease);
+}
+
+.ptvpro-portal .scr {
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ptvpro-portal .dlg img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ptvpro-portal .pb {
+  padding: var(--s5);
+}
+
+.ptvpro-portal .pb h2 {
+  font: 700 1.375rem/1.2 var(--font-display);
+  letter-spacing: -0.025em;
+  padding-right: var(--s6);
+  color: var(--ink);
+}
+
+.ptvpro-portal .pb p {
+  margin-top: var(--s3);
+  color: var(--muted);
+}
+
+.ptvpro-portal .pb .btn {
+  margin-top: var(--s4);
+  width: 100%;
+}
+
+.ptvpro-portal .x {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+.ptvpro-portal .x:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+@keyframes ptvFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ptvLift {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- WhatsApp Help FAB & Drawer ---------- */
+.ptvpro-portal .fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  z-index: 55;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #1B8A55;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 8px 24px -8px rgba(11, 42, 114, 0.5);
+  transition: transform 0.2s var(--ease);
+}
+
+.ptvpro-portal .fab:hover {
+  transform: scale(1.06);
+}
+
+.ptvpro-portal .fab .i {
+  width: 26px;
+  height: 26px;
+}
+
+.ptvpro-portal .wap {
+  position: fixed;
+  right: 16px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
+  z-index: 55;
+  width: min(calc(100vw - 32px), 340px);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--s4);
+  box-shadow: 0 16px 44px -14px rgba(11, 42, 114, 0.45);
+  animation: ptvLift 0.2s var(--ease);
+}
+
+.ptvpro-portal .opts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s2);
+  margin-top: var(--s3);
+}
+
+.ptvpro-portal .opt {
+  min-height: 44px;
+  padding: 0 var(--s2);
+  border: 1px solid var(--line) !important;
+  background: var(--card) !important;
+  color: var(--ink) !important;
+  border-radius: var(--r-md) !important;
+  font: 500 0.9375rem var(--font-body);
+  cursor: pointer;
+}
+
+.ptvpro-portal .opt[aria-pressed="true"] {
+  border-color: var(--brand) !important;
+  background: var(--tint) !important;
+  color: var(--brand-ink) !important;
+  font-weight: 600;
+}
+
+.ptvpro-portal .prev {
+  margin-top: var(--s3);
+  padding: var(--s3);
+  background: #E3F3EA;
+  border-radius: var(--r-md);
+  color: #10361F;
+  font-size: 0.9375rem;
+}
+
+.ptvpro-portal .prev small {
+  display: block;
+  font-size: 0.8125rem;
+  opacity: 0.75;
+  margin-bottom: var(--s1);
+}
+
+.ptvpro-portal .wb {
+  width: 100%;
+  margin-top: var(--s3);
+  background: #1B8A55;
+  color: #fff;
+}
+
+.ptvpro-portal .wb:hover {
+  background: #14703F;
+}
+
+.ptvpro-portal .wb:disabled {
+  background: #A0AEC0;
+  cursor: not-allowed;
+}
+
+/* ---------- Footer & Watermark ---------- */
+.ptvpro-portal footer {
+  margin-top: auto;
+  width: 100%;
+  background: var(--brand-deep);
+  color: #fff;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.ptvpro-portal footer .wrap {
+  display: block !important;
+  padding-block: var(--s6) 0 !important;
+}
+
+.ptvpro-portal .foot-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s4) var(--s6);
+  align-items: flex-end;
+  width: 100%;
+}
+
+.ptvpro-portal .foot-top strong {
+  display: block;
+  font: 700 1.25rem/1.1 var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+.ptvpro-portal .foot-top span {
+  display: block;
+  margin-top: var(--s1);
+  opacity: 0.75;
+  font-size: 0.9375rem;
+}
+
+.ptvpro-portal .foot-top small {
+  opacity: 0.6;
+  font-size: 0.8125rem;
+}
+
+.ptvpro-portal .fl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s5);
+  font-size: 0.9375rem;
+}
+
+.ptvpro-portal .fl a,
+.ptvpro-portal .fl button.foot-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  opacity: 0.85;
+  color: #fff;
+  text-decoration: none;
+  font: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.ptvpro-portal .fl a:hover,
+.ptvpro-portal .fl button.foot-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ptvpro-portal footer :focus-visible {
+  outline-color: #fff;
+}
+
+.ptvpro-portal .cp {
+  display: block !important;
+  margin-top: var(--s4);
+  opacity: 0.6;
+  font-size: 0.8125rem;
+  width: 100%;
+}
+
+.ptvpro-portal .mark {
+  display: block;
+  margin-top: var(--s5);
+  font: 700 clamp(84px, 27vw, 300px)/0.78 var(--font-display);
+  letter-spacing: -0.06em;
+  color: var(--mark);
+  white-space: nowrap;
+  user-select: none;
+  margin-bottom: -0.12em;
+}
+
+/* ---------- Toast Notification ---------- */
+.ptvpro-portal .toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+  transform: translate(-50%, 16px);
+  max-width: min(92vw, 420px);
+  padding: var(--s3) var(--s4);
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--r-lg);
+  font-size: 0.9375rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.25s var(--ease);
+  z-index: 60;
+}
+
+.ptvpro-portal .toast.on {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.ptvpro-portal .sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.ptvpro-portal .nl-svc {
+  display: none !important;
+}
+
+/* ---------- Responsive Breakpoints (720px & 980px) ---------- */
+@media (min-width: 720px) {
+  .ptvpro-portal .hero {
+    padding-block: var(--s7) var(--s7);
+  }
+  .ptvpro-portal .list {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s4);
+  }
+  .ptvpro-portal .svc.hub {
+    grid-column: 1 / -1;
+    grid-template-columns: 56px 1fr 24px;
+    padding: var(--s5);
+  }
+  .ptvpro-portal .svc.hub .tile {
+    width: 56px;
+    height: 56px;
+  }
+  .ptvpro-portal .svc.hub .tile svg {
+    width: 26px;
+    height: 26px;
+  }
+  .ptvpro-portal .svc.hub h3 {
+    font-size: 1.5rem;
+  }
+  .ptvpro-portal .svc.hub p {
+    max-width: 62ch;
+    font-size: 1rem;
+  }
+  .ptvpro-portal .feature {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: var(--s6);
+    padding: var(--s5);
+  }
+  .ptvpro-portal .feature .tagline,
+  .ptvpro-portal .feature h2,
+  .ptvpro-portal .feature p {
+    grid-column: 1;
+  }
+  .ptvpro-portal .feature .cta {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    justify-self: end;
+  }
+  .ptvpro-portal .arr {
+    display: grid !important;
+  }
+  .ptvpro-portal .nl-svc {
+    display: inline-flex !important;
+  }
+}
+
+@media (min-width: 980px) {
+  .ptvpro-portal main {
+    padding-block: var(--s7) var(--s8);
+  }
+  .ptvpro-portal .cat {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--s7);
+    padding-block: var(--s6);
+  }
+  .ptvpro-portal .cat-head {
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + 80px);
+    align-self: start;
+  }
+  .ptvpro-portal .list {
+    margin-top: 0;
+    padding-top: 4px;
+  }
+  .ptvpro-portal .chips {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ptvpro-portal *,
+  .ptvpro-portal *::before,
+  .ptvpro-portal *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+  .ptvpro-portal .svc:hover,
+  .ptvpro-portal .svc:focus-visible,
+  .ptvpro-portal .feature:hover {
+    transform: none !important;
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "gate": true,
+  "project": "swadgljnyelsjstqqxbm",
+  "rpc_acls": [
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "args": "text, text, text, date, date, text, uuid[], uuid",
+      "name": "rpc_checkout_loan"
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "args": "jsonb, jsonb",
+      "name": "rpc_create_inventaris"
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "args": "",
+      "name": "rpc_get_next_inv_code"
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "args": "text, date, text, text, uuid",
+      "name": "rpc_return_loan"
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "args": "uuid, uuid, text, uuid",
+      "name": "rpc_return_single_unit"
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "args": "jsonb, jsonb",
+      "name": "rpc_update_inventaris"
+    }
+  ],
+  "table_acls": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "owner": "postgres",
+      "table": "ptv_inventaris"
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "owner": "postgres",
+      "table": "ptv_inventaris_unit"
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "owner": "postgres",
+      "table": "ptv_nilai_inventaris"
+    }
+  ],
+  "captured_at": "2026-10-26T13:27:55.782542+00:00",
+  "rpc_restore": [
+    "GRANT EXECUTE ON FUNCTION public.rpc_checkout_loan(text, text, text, date, date, text, uuid[], uuid) TO authenticated;",
+    "GRANT EXECUTE ON FUNCTION public.rpc_create_inventaris(jsonb, jsonb) TO authenticated;",
+    "GRANT EXECUTE ON FUNCTION public.rpc_get_next_inv_code() TO authenticated;",
+    "GRANT EXECUTE ON FUNCTION public.rpc_return_loan(text, date, text, text, uuid) TO authenticated;",
+    "GRANT EXECUTE ON FUNCTION public.rpc_return_single_unit(uuid, uuid, text, uuid) TO authenticated;",
+    "GRANT EXECUTE ON FUNCTION public.rpc_update_inventaris(jsonb, jsonb) TO authenticated;"
+  ],
+  "fixture_count": 0,
+  "table_restore": [
+    "GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE public.ptv_inventaris TO anon;",
+    "GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE public.ptv_inventaris TO authenticated;",
+    "GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE public.ptv_inventaris_unit TO anon;",
+    "GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE public.ptv_inventaris_unit TO authenticated;",
+    "GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE public.ptv_nilai_inventaris TO anon;",
+    "GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE public.ptv_nilai_inventaris TO authenticated;"
+  ],
+  "inventory_storage_policies": [
+    {
+      "cmd": "INSERT",
+      "name": "inventory_authenticated_upload",
+      "check": "((bucket_id = 'inventory'::text) AND ((has_capability('inventory.create'::text) IS TRUE) OR (has_capability('inventory.edit'::text) IS TRUE)))",
+      "roles": [
+        "authenticated"
+      ],
+      "using": null,
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "DELETE",
+      "name": "inventory_manager_delete",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "((bucket_id = 'inventory'::text) AND ((has_capability('inventory.delete'::text) IS TRUE) OR (has_capability('inventory.manage'::text) IS TRUE)))",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "DELETE",
+      "name": "inventory_owner_cleanup",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "using": "((bucket_id = 'inventory'::text) AND (owner = auth.uid()) AND (has_capability('inventory.create'::text) IS TRUE) AND (NOT (EXISTS ( SELECT 1\n   FROM ptv_inventaris pi\n  WHERE ((pi.foto_url IS NOT NULL) AND (pi.foto_url ~~ ('%'::text || objects.name)))))))",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "SELECT",
+      "name": "inventory_public_view",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "using": "(bucket_id = 'inventory'::text)",
+      "permissive": "PERMISSIVE"
+    }
+  ]
+}

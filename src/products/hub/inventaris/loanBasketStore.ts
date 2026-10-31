@@ -51,21 +51,56 @@ class LoanBasketStore {
     return this.items.size;
   }
 
-  public has(key: string): boolean {
-    return this.items.has(key);
+  public has(keyOrUnitId: string): boolean {
+    if (this.items.has(keyOrUnitId)) return true;
+    const lowerKey = keyOrUnitId.toLowerCase();
+    return this.cachedItems.some(
+      (i) =>
+        i.key === keyOrUnitId ||
+        i.key.toLowerCase() === lowerKey ||
+        i.unitId === keyOrUnitId ||
+        `${i.assetId}_${i.unitId}` === keyOrUnitId ||
+        `${i.assetId}_${i.unitNo}` === keyOrUnitId ||
+        `${i.assetId}_${i.unitNo}`.toLowerCase() === lowerKey ||
+        `${i.invCode}_${i.unitNo}` === keyOrUnitId ||
+        `${i.invCode}_${i.unitNo}`.toLowerCase() === lowerKey
+    );
+  }
+
+  public hasUnit(unitId: string): boolean {
+    return this.cachedItems.some((i) => i.unitId === unitId);
   }
 
   public hasAsset(assetId: string): boolean {
-    return this.cachedItems.some((i) => i.assetId === assetId);
+    return this.cachedItems.some(
+      (i) => i.assetId === assetId || i.assetId.toLowerCase() === assetId.toLowerCase()
+    );
+  }
+
+  public hasAssetUnit(assetId: string, unitIdentifier: string | number): boolean {
+    return this.cachedItems.some(
+      (i) =>
+        (i.assetId === assetId || i.assetId.toLowerCase() === String(assetId).toLowerCase()) &&
+        (i.unitId === String(unitIdentifier) || i.unitNo === Number(unitIdentifier))
+    );
   }
 
   public toggle(item: LoanBasketItem): boolean {
+    // Check if item or unit is already in basket
+    const existingEntry = Array.from(this.items.entries()).find(
+      ([k, it]) =>
+        k === item.key ||
+        (it.unitId && item.unitId && it.unitId === item.unitId) ||
+        (it.assetId === item.assetId && it.unitNo === item.unitNo)
+    );
+
     let added = false;
-    if (this.items.has(item.key)) {
-      this.items.delete(item.key);
+    if (existingEntry) {
+      this.items.delete(existingEntry[0]);
       added = false;
     } else {
-      this.items.set(item.key, item);
+      const storeKey = item.key || `${item.assetId}_${item.unitId}`;
+      this.items.set(storeKey, { ...item, key: storeKey });
       added = true;
     }
     this.saveToStorage();
@@ -73,11 +108,30 @@ class LoanBasketStore {
     return added;
   }
 
-  public remove(key: string): void {
-    if (this.items.has(key)) {
-      this.items.delete(key);
+  public remove(keyOrUnitId: string): void {
+    if (this.items.has(keyOrUnitId)) {
+      this.items.delete(keyOrUnitId);
       this.saveToStorage();
       this.notify();
+      return;
+    }
+    const lower = keyOrUnitId.toLowerCase();
+    for (const [k, item] of this.items.entries()) {
+      if (
+        k === keyOrUnitId ||
+        k.toLowerCase() === lower ||
+        item.unitId === keyOrUnitId ||
+        `${item.assetId}_${item.unitNo}` === keyOrUnitId ||
+        `${item.assetId}_${item.unitNo}`.toLowerCase() === lower ||
+        `${item.assetId}_${item.unitId}` === keyOrUnitId ||
+        `${item.invCode}_${item.unitNo}` === keyOrUnitId ||
+        `${item.invCode}_${item.unitNo}`.toLowerCase() === lower
+      ) {
+        this.items.delete(k);
+        this.saveToStorage();
+        this.notify();
+        break;
+      }
     }
   }
 

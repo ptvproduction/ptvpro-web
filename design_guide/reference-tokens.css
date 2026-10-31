@@ -1,0 +1,87 @@
+/* EXTRACTED REFERENCE TOKENS - NOT A PRODUCTION DROP-IN
+Scope these tokens to Hub content. Do not apply globally or affect login.
+Font remains reference metadata; production keeps approved SF Pro. */
+:root {
+  --b-900: #072A52;
+  --b-800: #0A3C74;
+  --b-700: #0B5FBF;
+  --b-600: #1273E6;
+  --b-500: #3B8EF7;
+  --b-400: #6FB0FF;
+  --b-300: #A7CEFF;
+  --b-100: #DCEBFF;
+  --b-050: #EDF4FF;
+  --bg: #F1F7FF;
+  --bg-2: #F7FBFF;
+  --surface: #FFFFFF;
+  --surface-2: #FFFFFF;
+  --glass: rgba(255,255,255,.72);
+  --ink: #0B2A4A;
+  --ink-2: #38587A;
+  --muted: #6E8CAE;
+  --line: rgba(11,42,74,.10);
+  --line-2: rgba(11,42,74,.055);
+  --shadow-s: 0 1px 2px rgba(11,60,116,.05), 0 3px 10px rgba(11,60,116,.05);
+  --shadow-m: 0 4px 12px rgba(11,60,116,.07), 0 18px 40px rgba(11,60,116,.10);
+  --shadow-l: 0 -4px 16px rgba(11,60,116,.06), 0 -24px 60px rgba(11,60,116,.16);
+  --shadow-blue: 0 8px 22px rgba(18,115,230,.28);
+  --ok: #0F7A5A;
+  --ok-bg: #E1F5EE;
+  --warn: #9A6B08;
+  --warn-bg: #FCF0D6;
+  --dang: #B02B23;
+  --dang-bg: #FDE8E6;
+  --info: #0B5FBF;
+  --info-bg: #E2EDFD;
+  --neutral-bg: #E9F0F9;
+  --neutral-fg: #5A7793;
+  --accent-bg: #E2EDFD;
+  --accent-fg: #0B5FBF;
+  --r-xs: 9px;
+  --r-s: 13px;
+  --r-m: 18px;
+  --r-l: 24px;
+  --r-xl: 30px;
+  --r-full: 999px;
+  --header-h: 58px;
+  --dock-h: 64px;
+  --sat: env(safe-area-inset-top,0px);
+  --sab: env(safe-area-inset-bottom,0px);
+  --sal: env(safe-area-inset-left,0px);
+  --sar: env(safe-area-inset-right,0px);
+  --sidebar-w: 250px;
+  --maxw: 1160px;
+  --font: "Inter","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+:root[data-theme="dark"] {
+  --bg: #060F1C;
+  --bg-2: #0A1626;
+  --surface: #0E1B2D;
+  --surface-2: #122238;
+  --glass: rgba(14,27,45,.72);
+  --ink: #E6F0FC;
+  --ink-2: #B8CEE6;
+  --muted: #7F9ABA;
+  --line: rgba(255,255,255,.10);
+  --line-2: rgba(255,255,255,.055);
+  --b-100: #12314F;
+  --b-050: #0E2540;
+  --b-600: #4E9BFB;
+  --b-700: #3B8EF7;
+  --ok: #4FC79B;
+  --ok-bg: #0E2E26;
+  --warn: #E3BA63;
+  --warn-bg: #30260F;
+  --dang: #EE8C82;
+  --dang-bg: #351B18;
+  --info: #7DBCEA;
+  --info-bg: #0F2740;
+  --neutral-bg: #16253A;
+  --neutral-fg: #92AACA;
+  --accent-bg: #0F2740;
+  --accent-fg: #7DBCEA;
+  --shadow-s: 0 1px 2px rgba(0,0,0,.45);
+  --shadow-m: 0 12px 34px rgba(0,0,0,.5);
+  --shadow-l: 0 -18px 56px rgba(0,0,0,.55);
+  --shadow-blue: 0 8px 22px rgba(18,115,230,.35);
+}

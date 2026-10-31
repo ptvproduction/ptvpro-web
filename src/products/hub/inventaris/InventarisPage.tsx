@@ -1,99 +1,283 @@
-import React, { useState, useEffect, useSyncExternalStore } from 'react';
+import React, { useState, useEffect, useSyncExternalStore, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '@core/session';
-import { inventarisService } from './inventarisService';
-import { ItemInventaris } from './types';
+import { inventarisService, normalizeInventoryCategory } from './inventarisService';
+import { ItemInventaris, INVENTORY_CATEGORIES } from './types';
 import { loanBasketStore } from './loanBasketStore';
 import { LoanModal } from '../peminjaman/LoanModal';
-import { PTVSelect } from '@shared/components';
+import { TambahAlatModal } from './TambahAlatModal';
+import { UnitPickerModal } from './UnitPickerModal';
+import { InventoryScanDialog } from './InventoryScanDialog';
+import { resolveInventoryPhotoUrl } from './utils/inventoryPhotoUtils';
+import { InventoryGridSkeleton } from '@/shared/components';
+import { useInstantData } from '@shared/hooks/useInstantData';
+import '@/styles/inventaris.css';
+
+interface CategoryVisual {
+  icon: string;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+}
+
+export function getCategoryVisual(category: string): CategoryVisual {
+  const c = category.toLowerCase();
+  if (c === 'semua') {
+    return {
+      icon: 'fa-boxes-stacked',
+      color: '#1273E6',
+      bgColor: 'rgba(18, 115, 230, 0.10)',
+      borderColor: 'rgba(18, 115, 230, 0.22)',
+    };
+  }
+  if (c.includes('kamera')) {
+    return {
+      icon: 'fa-camera',
+      color: '#1273E6',
+      bgColor: 'rgba(18, 115, 230, 0.10)',
+      borderColor: 'rgba(18, 115, 230, 0.22)',
+    };
+  }
+  if (c.includes('lensa')) {
+    return {
+      icon: 'fa-circle-dot',
+      color: '#9333EA',
+      bgColor: 'rgba(147, 51, 234, 0.10)',
+      borderColor: 'rgba(147, 51, 234, 0.22)',
+    };
+  }
+  if (c.includes('tripod') || c.includes('rig') || c.includes('stabilizer')) {
+    return {
+      icon: 'fa-arrows-to-dot',
+      color: '#0D9488',
+      bgColor: 'rgba(13, 148, 136, 0.10)',
+      borderColor: 'rgba(13, 148, 136, 0.22)',
+    };
+  }
+  if (c.includes('baterai') || c.includes('power')) {
+    return {
+      icon: 'fa-battery-three-quarters',
+      color: '#D97706',
+      bgColor: 'rgba(217, 119, 6, 0.10)',
+      borderColor: 'rgba(217, 119, 6, 0.22)',
+    };
+  }
+  if (c.includes('smartphone') || c.includes('tablet') || c.includes('hp')) {
+    return {
+      icon: 'fa-mobile-screen',
+      color: '#4F46E5',
+      bgColor: 'rgba(79, 70, 229, 0.10)',
+      borderColor: 'rgba(79, 70, 229, 0.22)',
+    };
+  }
+  if (c.includes('komputer') || c.includes('laptop') || c.includes('pc')) {
+    return {
+      icon: 'fa-laptop',
+      color: '#2563EB',
+      bgColor: 'rgba(37, 99, 235, 0.10)',
+      borderColor: 'rgba(37, 99, 235, 0.22)',
+    };
+  }
+  if (c.includes('audio') || c.includes('mic')) {
+    return {
+      icon: 'fa-microphone',
+      color: '#059669',
+      bgColor: 'rgba(5, 150, 105, 0.10)',
+      borderColor: 'rgba(5, 150, 105, 0.22)',
+    };
+  }
+  if (c.includes('lighting') || c.includes('lampu')) {
+    return {
+      icon: 'fa-lightbulb',
+      color: '#D97706',
+      bgColor: 'rgba(245, 158, 11, 0.12)',
+      borderColor: 'rgba(245, 158, 11, 0.25)',
+    };
+  }
+  if (c.includes('streaming') || c.includes('live') || c.includes('broadcast')) {
+    return {
+      icon: 'fa-tower-broadcast',
+      color: '#E11D48',
+      bgColor: 'rgba(225, 29, 72, 0.10)',
+      borderColor: 'rgba(225, 29, 72, 0.22)',
+    };
+  }
+  if (c.includes('kabel') || c.includes('adapter')) {
+    return {
+      icon: 'fa-plug',
+      color: '#EA580C',
+      bgColor: 'rgba(234, 88, 12, 0.10)',
+      borderColor: 'rgba(234, 88, 12, 0.22)',
+    };
+  }
+  if (c.includes('cabinet') || c.includes('dry')) {
+    return {
+      icon: 'fa-box-archive',
+      color: '#0284C7',
+      bgColor: 'rgba(2, 132, 199, 0.10)',
+      borderColor: 'rgba(2, 132, 199, 0.22)',
+    };
+  }
+  if (c.includes('tv') || c.includes('televisi')) {
+    return {
+      icon: 'fa-tv',
+      color: '#7C3AED',
+      bgColor: 'rgba(124, 58, 237, 0.10)',
+      borderColor: 'rgba(124, 58, 237, 0.22)',
+    };
+  }
+  if (c.includes('storage') || c.includes('ssd') || c.includes('memory')) {
+    return {
+      icon: 'fa-hard-drive',
+      color: '#4B5563',
+      bgColor: 'rgba(75, 85, 99, 0.10)',
+      borderColor: 'rgba(75, 85, 99, 0.22)',
+    };
+  }
+  if (c.includes('peralatan') || c.includes('perkakas')) {
+    return {
+      icon: 'fa-wrench',
+      color: '#C026D3',
+      bgColor: 'rgba(192, 38, 211, 0.10)',
+      borderColor: 'rgba(192, 38, 211, 0.22)',
+    };
+  }
+  if (c.includes('atk')) {
+    return {
+      icon: 'fa-pen-ruler',
+      color: '#65A30D',
+      bgColor: 'rgba(101, 163, 13, 0.10)',
+      borderColor: 'rgba(101, 163, 13, 0.22)',
+    };
+  }
+  if (c.includes('jaringan') || c.includes('network')) {
+    return {
+      icon: 'fa-network-wired',
+      color: '#0891B2',
+      bgColor: 'rgba(8, 145, 178, 0.10)',
+      borderColor: 'rgba(8, 145, 178, 0.22)',
+    };
+  }
+  return {
+    icon: 'fa-shapes',
+    color: '#64748B',
+    bgColor: 'rgba(100, 116, 139, 0.10)',
+    borderColor: 'rgba(100, 116, 139, 0.22)',
+  };
+}
 
 export const InventarisPage: React.FC = () => {
   const navigate = useNavigate();
   const { can } = useSessionStore();
 
-  const [items, setItems] = useState<ItemInventaris[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Instant-First Persistent Cache: Instant display on remount, background revalidation
+  const {
+    data: items,
+    isLoading: loading,
+    refetch: loadData,
+  } = useInstantData<ItemInventaris[]>({
+    key: 'inventaris_catalog_list',
+    fetcher: () => inventarisService.getInventarisList(),
+    ttlMs: 15 * 60 * 1000,
+    initialFallback: [],
+  });
 
-  // Filters from pgInventaris()
-  const [searchQ, setSearchQ] = useState('');
-  const [catFilter, setCatFilter] = useState('semua');
-  const [statusFilter, setStatusFilter] = useState('semua');
+  // Navigation State Persistence (PTV-DEV-186)
+  const savedNavState = useRef<{ searchQ?: string; catFilter?: string; statusFilter?: string; scrollY?: number } | null>(null);
+  if (savedNavState.current === null && typeof window !== 'undefined') {
+    try {
+      const raw = sessionStorage.getItem('ptv_inventaris_nav_state');
+      if (raw) savedNavState.current = JSON.parse(raw);
+    } catch (e) {
+      void e;
+    }
+  }
 
-  // Detail & Modals
+  // Filters with persistence
+  const [searchQ, setSearchQ] = useState(() => savedNavState.current?.searchQ || '');
+  const [catFilter, setCatFilter] = useState(() => savedNavState.current?.catFilter || 'semua');
+  const [statusFilter, setStatusFilter] = useState(() => savedNavState.current?.statusFilter || 'semua');
+
+  // Modals
   const [isDaftarPinjamanOpen, setIsDaftarPinjamanOpen] = useState(false);
   const [isNewAssetOpen, setIsNewAssetOpen] = useState(false);
+  const [scanOpen, setScanOpen] = useState(false);
   const [unitPickerAsset, setUnitPickerAsset] = useState<ItemInventaris | null>(null);
 
-  // Form New Asset
-  const [newKode, setNewKode] = useState('');
-  const [newNama, setNewNama] = useState('');
-  const [newKat, setNewKat] = useState('Kamera');
-  const [newSpec, setNewSpec] = useState('');
-  const [newLoc, setNewLoc] = useState('Studio PTV');
-  const [newQty, setNewQty] = useState('1');
-  const [newSubmitting, setNewSubmitting] = useState(false);
+  const catTrackRef = useRef<HTMLDivElement>(null);
 
   // Sync loanBasket
   const basketItems = useSyncExternalStore(
     (cb) => loanBasketStore.subscribe(cb),
-    () => loanBasketStore.getItems()
+    () => loanBasketStore.getItems(),
+    () => []
   );
   const basketCount = basketItems.length;
 
-  const loadData = async () => {
-    setLoading(true);
+  useEffect(() => {
     try {
-      const data = await inventarisService.getInventarisList();
-      setItems(data);
-    } finally {
-      setLoading(false);
+      sessionStorage.setItem(
+        'ptv_inventaris_nav_state',
+        JSON.stringify({ searchQ, catFilter, statusFilter, scrollY: window.scrollY })
+      );
+    } catch (e) {
+      void e;
     }
-  };
+  }, [searchQ, catFilter, statusFilter]);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (!loading && savedNavState.current?.scrollY) {
+      const targetScroll = savedNavState.current.scrollY;
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: targetScroll, behavior: 'instant' });
+      });
+    }
+  }, [loading]);
+
+  const handleOpenDetail = (id: string) => {
+    try {
+      sessionStorage.setItem(
+        'ptv_inventaris_nav_state',
+        JSON.stringify({ searchQ, catFilter, statusFilter, scrollY: window.scrollY })
+      );
+    } catch (e) {
+      void e;
+    }
+    navigate(`/hub/inventaris/${id}`);
+  };
 
   const canCreate = can('inventory.create');
 
-  // Helper categories
-  const ALL_CATEGORIES = [
-    'Kamera',
-    'Lensa',
-    'Tripod & Rig',
-    'Baterai & Power',
-    'Audio',
-    'Lighting',
-    'Stabilizer',
-    'Streaming / Live',
-    'Lainnya',
-  ];
-
-  const getCatIconMarkup = (c: string) => {
-    const lower = c.toLowerCase();
-    if (lower.includes('kamera')) return <i className="fa-solid fa-camera-retro" />;
-    if (lower.includes('lensa')) return <i className="fa-solid fa-circle-dot" />;
-    if (lower.includes('audio') || lower.includes('mic')) return <i className="fa-solid fa-microphone" />;
-    if (lower.includes('lighting') || lower.includes('lampu')) return <i className="fa-solid fa-lightbulb" />;
-    if (lower.includes('tripod') || lower.includes('rig') || lower.includes('stabilizer')) return <i className="fa-solid fa-arrows-to-dot" />;
-    if (lower.includes('baterai') || lower.includes('power')) return <i className="fa-solid fa-battery-three-quarters" />;
-    return <i className="fa-solid fa-shapes" />;
-  };
+  // Helper categories (17 kanonikal)
+  const canonicalCategories = INVENTORY_CATEGORIES;
 
   // Filtered Rows
   let filteredRows = [...items];
 
   // 1. Kategori
   if (catFilter !== 'semua') {
-    filteredRows = filteredRows.filter((x) => x.kategori.toLowerCase() === catFilter.toLowerCase());
+    filteredRows = filteredRows.filter((x) => {
+      const norm = normalizeInventoryCategory(x.kategori);
+      return norm.toLowerCase() === catFilter.toLowerCase();
+    });
   }
 
   // 2. Status
   if (statusFilter !== 'semua') {
-    if (statusFilter === 'Tersedia') filteredRows = filteredRows.filter((x) => x.unit_tersedia > 0);
-    else if (statusFilter === 'Dipinjam') filteredRows = filteredRows.filter((x) => x.total_unit - x.unit_tersedia > 0);
-    else if (statusFilter === 'Rusak') {
-      filteredRows = filteredRows.filter((x) => x.units.some((u) => u.kondisi === 'rusak' || u.status_peminjaman === 'maintenance'));
+    if (statusFilter === 'Tersedia') {
+      filteredRows = filteredRows.filter((x) => x.unit_tersedia > 0);
+    } else if (statusFilter === 'Dipinjam') {
+      filteredRows = filteredRows.filter((x) => x.total_unit - x.unit_tersedia > 0);
+    } else if (statusFilter === 'Bermasalah') {
+      filteredRows = filteredRows.filter((x) =>
+        x.units.some(
+          (u) =>
+            u.kondisi === 'rusak' ||
+            u.kondisi === 'perlu_servis' ||
+            u.kondisi === 'hilang' ||
+            u.status_peminjaman === 'maintenance'
+        )
+      );
     }
   }
 
@@ -101,16 +285,41 @@ export const InventarisPage: React.FC = () => {
   if (searchQ.trim()) {
     const q = searchQ.trim().toLowerCase();
     filteredRows = filteredRows.filter((x) =>
-      (x.nama_alat + ' ' + x.kode + ' ' + (x.spesifikasi || '') + ' ' + x.kategori).toLowerCase().includes(q)
+      (
+        x.nama_alat +
+        ' ' +
+        x.kode +
+        ' ' +
+        (x.spesifikasi || '') +
+        ' ' +
+        x.kategori +
+        ' ' +
+        (x.lokasi_penyimpanan || '') +
+        ' ' + x.units.map((unit) => `${unit.kode_unit} ${unit.nama_unit || ''}`).join(' ')
+      )
+        .toLowerCase()
+        .includes(q)
     );
   }
 
   // Metrics for scoped category
-  const catScoped = catFilter === 'semua' ? items : items.filter((x) => x.kategori.toLowerCase() === catFilter.toLowerCase());
+  const catScoped =
+    catFilter === 'semua'
+      ? items
+      : items.filter((x) => normalizeInventoryCategory(x.kategori).toLowerCase() === catFilter.toLowerCase());
+
   const countCatAll = catScoped.length;
   const countCatAvail = catScoped.filter((x) => x.unit_tersedia > 0).length;
   const countCatBorrowed = catScoped.filter((x) => x.total_unit - x.unit_tersedia > 0).length;
-  const countCatDamaged = catScoped.filter((x) => x.units.some((u) => u.kondisi === 'rusak' || u.status_peminjaman === 'maintenance')).length;
+  const countCatDamaged = catScoped.filter((x) =>
+    x.units.some(
+      (u) =>
+        u.kondisi === 'rusak' ||
+        u.kondisi === 'perlu_servis' ||
+        u.kondisi === 'hilang' ||
+        u.status_peminjaman === 'maintenance'
+    )
+  ).length;
 
   const isFiltered = catFilter !== 'semua' || statusFilter !== 'semua' || !!searchQ.trim();
 
@@ -140,59 +349,40 @@ export const InventarisPage: React.FC = () => {
     }
   };
 
-  const handleNewAssetSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newKode.trim() || !newNama.trim()) {
-      alert('Kode dan Nama Alat wajib diisi.');
-      return;
-    }
-    try {
-      setNewSubmitting(true);
-      await inventarisService.createInventaris({
-        kode: newKode.trim(),
-        nama_alat: newNama.trim(),
-        kategori: newKat,
-        spesifikasi: newSpec.trim(),
-        lokasi_penyimpanan: newLoc.trim(),
-        jumlah_unit: parseInt(newQty, 10) || 1,
-      });
-      setIsNewAssetOpen(false);
-      alert('Alat baru berhasil ditambahkan ke inventaris!');
-      await loadData();
-    } catch (err: unknown) {
-      alert((err as Error).message || 'Gagal menyimpan alat baru');
-    } finally {
-      setNewSubmitting(false);
+  const scrollCategoryTrack = (direction: 'left' | 'right') => {
+    if (catTrackRef.current) {
+      const offset = direction === 'left' ? -240 : 240;
+      catTrackRef.current.scrollBy({ left: offset, behavior: 'smooth' });
     }
   };
 
   return (
-    <div className="page">
-      {/* ── HEADER: UNIFIED SEARCH BAR WITH SCAN & BASKET BUTTON ── */}
-      <div className="row gap8" style={{ alignItems: 'center' }}>
+    <div className="page r03-inventaris r03-inventaris-restored">
+      {/* ── 1. HEADER: UNIFIED SEARCH BAR WITH SCAN & BASKET BUTTON ── */}
+      <div className="inv-search-toolbar">
         <div className="inv-search-wrap">
           <span className="search-icon">
             <i className="fa-solid fa-magnifying-glass" />
           </span>
           <input
             id="invQ"
+            aria-label="Cari inventaris"
             value={searchQ}
             onChange={(e) => setSearchQ(e.target.value)}
-            placeholder="Cari nama, kode (INV-xxx), merk, model, lokasi…"
+            placeholder="Cari nama, kode (INV-xxx), merk, model, lokasi..."
           />
+        </div>
           <button
             type="button"
             className="inv-search-scan-btn"
-            onClick={() => alert('Scanner barcode kamera fisik aktif')}
+            onClick={() => setScanOpen(true)}
             aria-label="Pindai Barcode"
           >
             <i className="fa-solid fa-qrcode" />
-            <span className="only-desktop" style={{ marginLeft: '4px' }}>
+            <span className="only-desktop" style={{ marginLeft: '6px' }}>
               Scan
             </span>
           </button>
-        </div>
-
         <button
           type="button"
           className="inv-top-basket-btn"
@@ -205,7 +395,7 @@ export const InventarisPage: React.FC = () => {
         </button>
       </div>
 
-      {/* ── HERO BANNER 1:1 DARI pgInventaris() ── */}
+      {/* ── 2. HERO BANNER PHOTOGRAPHIC INVENTARIS ── */}
       <div className="inv-hero-banner">
         <img
           src="/assets/images/hero-bg-default.webp"
@@ -213,9 +403,6 @@ export const InventarisPage: React.FC = () => {
           loading="lazy"
         />
         <div className="inv-hero-overlay">
-          <div className="inv-hero-tag">
-            <i className="fa-solid fa-boxes-stacked" /> KATALOG INVENTARIS
-          </div>
           <div className="inv-hero-title">Aset Inventaris Progresif TV Production</div>
           <div className="inv-hero-sub">
             Kelola peminjaman, monitor ketersediaan unit, dan telusuri riwayat alat dengan mudah.
@@ -223,34 +410,29 @@ export const InventarisPage: React.FC = () => {
         </div>
       </div>
 
-      {/* ── CATEGORY SECTION (PREMIUM CARD RAIL) ── */}
+      {/* ── 3. SECTION KATEGORI ALAT (HORIZONTAL CAROUSEL) ── */}
       <div className="inv-cat-box">
         <div className="inv-cat-box-header">
           <div className="inv-cat-box-title">
-            <i className="fa-solid fa-layer-group" /> Kategori Alat
+            <i className="fa-solid fa-layer-group" />
+            <span>KATEGORI ALAT</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className="inv-cat-box-count">{ALL_CATEGORIES.length + 1} Kategori</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span className="inv-cat-box-count">{canonicalCategories.length} KATEGORI</span>
             <div className="inv-cat-nav-btns">
               <button
                 type="button"
                 className="inv-cat-nav-btn"
-                onClick={() => {
-                  const el = document.getElementById('invCatTrack');
-                  if (el) el.scrollBy({ left: -200, behavior: 'smooth' });
-                }}
-                aria-label="Geser Kiri"
+                onClick={() => scrollCategoryTrack('left')}
+                aria-label="Geser Kategori ke Kiri"
               >
                 <i className="fa-solid fa-chevron-left" />
               </button>
               <button
                 type="button"
                 className="inv-cat-nav-btn"
-                onClick={() => {
-                  const el = document.getElementById('invCatTrack');
-                  if (el) el.scrollBy({ left: 200, behavior: 'smooth' });
-                }}
-                aria-label="Geser Kanan"
+                onClick={() => scrollCategoryTrack('right')}
+                aria-label="Geser Kategori ke Kanan"
               >
                 <i className="fa-solid fa-chevron-right" />
               </button>
@@ -258,45 +440,107 @@ export const InventarisPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="inv-cat-scroll-track" id="invCatTrack">
-          <button
-            type="button"
-            className={`inv-cat-card ${catFilter === 'semua' ? 'on' : ''}`}
-            onClick={() => setCatFilter('semua')}
-          >
-            <div className="inv-cat-card-icon">
-              <i className="fa-solid fa-boxes-stacked" />
-            </div>
-            <div className="inv-cat-card-name">Semua</div>
-            <div className="inv-cat-card-count">{items.length} alat</div>
-          </button>
-          {ALL_CATEGORIES.map((cat) => {
-            const cnt = items.filter((x) => x.kategori.toLowerCase() === cat.toLowerCase()).length;
+        <div className="inv-cat-scroll-track" id="invCatTrack" ref={catTrackRef}>
+          {/* Kartu 'Semua' */}
+          {(() => {
+            const isAllActive = catFilter === 'semua';
+            const allVisual = getCategoryVisual('semua');
+            return (
+              <button
+                type="button"
+                className={`inv-cat-card ${isAllActive ? 'on' : ''}`}
+                onClick={() => setCatFilter('semua')}
+                style={
+                  isAllActive
+                    ? {
+                        borderColor: 'var(--b-600, #1273E6)',
+                        boxShadow: '0 0 0 2px var(--b-600, #1273E6), 0 4px 14px rgba(18, 115, 230, 0.16)',
+                        background: 'var(--surface, #FFFFFF)',
+                      }
+                    : undefined
+                }
+              >
+                <div
+                  className="inv-cat-card-icon"
+                  style={
+                    isAllActive
+                      ? { background: 'var(--b-600, #1273E6)', color: '#FFFFFF', borderColor: 'var(--b-600, #1273E6)' }
+                      : { background: allVisual.bgColor, color: allVisual.color, borderColor: allVisual.borderColor }
+                  }
+                >
+                  <i className={`fa-solid ${allVisual.icon}`} />
+                </div>
+                <div className="inv-cat-card-name" style={{ color: isAllActive ? 'var(--b-700, #0B5FBF)' : undefined }}>
+                  Semua
+                </div>
+                <div
+                  className="inv-cat-card-count"
+                  style={{ color: isAllActive ? 'var(--b-600, #1273E6)' : undefined, fontWeight: isAllActive ? 700 : 500 }}
+                >
+                  {items.length} alat
+                </div>
+              </button>
+            );
+          })()}
+
+          {/* Seluruh 17 Kategori Kanonikal */}
+          {canonicalCategories.map((cat) => {
+            const cnt = items.filter(
+              (x) => normalizeInventoryCategory(x.kategori).toLowerCase() === cat.toLowerCase()
+            ).length;
+            const isActive = catFilter.toLowerCase() === cat.toLowerCase();
+            const visual = getCategoryVisual(cat);
+
             return (
               <button
                 key={cat}
                 type="button"
-                className={`inv-cat-card ${catFilter.toLowerCase() === cat.toLowerCase() ? 'on' : ''}`}
+                className={`inv-cat-card ${isActive ? 'on' : ''}`}
                 onClick={() => setCatFilter(cat)}
+                style={
+                  isActive
+                    ? {
+                        borderColor: 'var(--b-600, #1273E6)',
+                        boxShadow: '0 0 0 2px var(--b-600, #1273E6), 0 4px 14px rgba(18, 115, 230, 0.16)',
+                        background: 'var(--surface, #FFFFFF)',
+                      }
+                    : undefined
+                }
               >
-                <div className="inv-cat-card-icon">{getCatIconMarkup(cat)}</div>
-                <div className="inv-cat-card-name">{cat}</div>
-                <div className="inv-cat-card-count">{cnt} alat</div>
+                <div
+                  className="inv-cat-card-icon"
+                  style={
+                    isActive
+                      ? { background: 'var(--b-600, #1273E6)', color: '#FFFFFF', borderColor: 'var(--b-600, #1273E6)' }
+                      : { background: visual.bgColor, color: visual.color, borderColor: visual.borderColor }
+                  }
+                >
+                  <i className={`fa-solid ${visual.icon}`} />
+                </div>
+                <div className="inv-cat-card-name" style={{ color: isActive ? 'var(--b-700, #0B5FBF)' : undefined }}>
+                  {cat}
+                </div>
+                <div
+                  className="inv-cat-card-count"
+                  style={{ color: isActive ? 'var(--b-600, #1273E6)' : undefined, fontWeight: isActive ? 700 : 500 }}
+                >
+                  {cnt} alat
+                </div>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* ── STATUS SEGMENTED TOOLBAR & ACTIONS ── */}
+      {/* ── 4. STATUS SEGMENTED TOOLBAR & ACTION + ALAT ── */}
       <div
         className="inv-toolbar-row"
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '10px',
-          marginTop: '14px',
+          gap: '12px',
+          marginTop: '16px',
           flexWrap: 'wrap',
         }}
       >
@@ -329,11 +573,11 @@ export const InventarisPage: React.FC = () => {
           </button>
           <button
             type="button"
-            className={`inv-segment-btn ${statusFilter === 'Rusak' ? 'on' : ''}`}
-            onClick={() => setStatusFilter('Rusak')}
+            className={`inv-segment-btn ${statusFilter === 'Bermasalah' ? 'on' : ''}`}
+            onClick={() => setStatusFilter('Bermasalah')}
           >
             <span className="inv-segment-dot" style={{ background: '#ef4444' }} />
-            <span>Rusak</span>
+            <span>Bermasalah</span>
             <span className="inv-segment-count">{countCatDamaged}</span>
           </button>
         </div>
@@ -363,64 +607,35 @@ export const InventarisPage: React.FC = () => {
                 padding: '3px 10px',
                 minHeight: '34px',
                 fontWeight: 600,
-                color: 'var(--warn)',
-                borderRadius: 'var(--ptv-curve-sm)',
-              }}
-            >
-              <i className="fa-solid fa-rotate-left" style={{ marginRight: '4px', fontSize: '10.5px' }} />
-              Reset Filter
-            </button>
-          )}
-
-          {basketCount > 0 && (
-            <button
-              type="button"
-              className="btn sm"
-              onClick={() => setIsDaftarPinjamanOpen(true)}
-              style={{
-                fontSize: '12px',
-                padding: '0 12px',
-                minHeight: '34px',
-                fontWeight: 600,
-                color: 'var(--b-700)',
-                background: 'var(--b-050)',
-                border: '1px solid var(--b-200)',
+                color: 'var(--warn, #9A6B08)',
+                background: 'var(--warn-bg, #FCF0D6)',
+                border: '1px solid var(--warn-border, rgba(154, 107, 8, 0.25))',
                 borderRadius: 'var(--ptv-curve-pill)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 1px 4px rgba(18,115,230,0.08)',
                 cursor: 'pointer',
               }}
             >
-              <i className="fa-solid fa-clipboard-check" style={{ fontSize: '12px' }} />
-              <span>{basketCount} dalam daftar pinjaman</span>
+              <i className="fa-solid fa-rotate-left" style={{ marginRight: '5px', fontSize: '10.5px' }} />
+              Reset Filter
             </button>
           )}
 
           {canCreate && (
             <button
               type="button"
+              id="btnAddNewAsset"
               className="btn sm pri"
-              onClick={() => {
-                setNewKode(`INV-${(items.length + 1).toString().padStart(3, '0')}`);
-                setNewNama('');
-                setNewKat('Kamera');
-                setNewSpec('');
-                setNewLoc('Studio PTV');
-                setNewQty('1');
-                setIsNewAssetOpen(true);
-              }}
+              onClick={() => setIsNewAssetOpen(true)}
               style={{
-                minHeight: '34px',
-                padding: '0 14px',
+                minHeight: '36px',
+                padding: '0 16px',
                 borderRadius: 'var(--ptv-curve-pill)',
                 fontWeight: 700,
-                fontSize: '12.5px',
+                fontSize: '13px',
                 boxShadow: '0 2px 8px rgba(18,115,230,0.25)',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '5px',
+                cursor: 'pointer',
               }}
             >
               <i className="fa-solid fa-plus" />
@@ -430,23 +645,80 @@ export const InventarisPage: React.FC = () => {
         </div>
       </div>
 
-      {/* ── RESULT COUNT & SCOPE STATUS ── */}
-      <div className="row-b mt12 mb10" style={{ alignItems: 'center', padding: '0 1px' }}>
-        <span className="t-sm" style={{ fontWeight: 700, color: 'var(--ink)' }}>
-          {filteredRows.length} alat{catFilter !== 'semua' ? ` • ${catFilter}` : ''}
+      {/* ── 5. RESULT COUNT LABEL ── */}
+      <div style={{ marginTop: '14px', marginBottom: '12px', padding: '0 2px' }}>
+        <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--ink, #0B2A4A)' }}>
+          {filteredRows.length} alat
+          {catFilter !== 'semua' ? ` • ${catFilter}` : ''}
+          {statusFilter !== 'semua' ? ` (${statusFilter})` : ''}
         </span>
       </div>
 
-      {/* ── PRODUCT CATALOG GRID 1:1 DARI renderCard() ── */}
+      {/* ── 6. PRODUCT CATALOG GRID (DOMINANT PHOTO CARDS) ── */}
       {loading ? (
-        <div style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)' }}>
-          <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: '8px' }} />
-          Memuat katalog inventaris...
-        </div>
+        <InventoryGridSkeleton count={6} />
       ) : filteredRows.length === 0 ? (
-        <div className="empty card">
-          <i className="fa-solid fa-boxes-stacked" />
-          <p>Tidak ada alat yang cocok. Ubah filter atau kata kunci.</p>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            padding: '52px 24px',
+            minHeight: '260px',
+            background: 'var(--surface, #FFFFFF)',
+            border: '1px solid var(--line-2, rgba(11, 42, 74, 0.08))',
+            borderRadius: 'var(--ptv-curve-xl)',
+            boxShadow: 'var(--shadow-s)',
+            boxSizing: 'border-box',
+          }}
+        >
+          <div
+            style={{
+              width: '54px',
+              height: '54px',
+              borderRadius: '50%',
+              background: 'var(--bg-2, #F7FBFF)',
+              display: 'grid',
+              placeItems: 'center',
+              fontSize: '22px',
+              color: 'var(--muted, #6E8CAE)',
+              marginBottom: '12px',
+            }}
+          >
+            <i className="fa-solid fa-boxes-stacked" />
+          </div>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--ink, #0B2A4A)', marginBottom: '4px' }}>
+            Tidak ada alat yang cocok
+          </div>
+          <div style={{ fontSize: '13px', color: 'var(--muted, #6E8CAE)', maxWidth: '340px' }}>
+            Ubah kata kunci pencarian atau reset filter untuk melihat katalog inventaris lengkap.
+          </div>
+          {isFiltered && (
+            <button
+              type="button"
+              className="btn sm"
+              onClick={() => {
+                setCatFilter('semua');
+                setStatusFilter('semua');
+                setSearchQ('');
+              }}
+              style={{
+                marginTop: '16px',
+                borderRadius: 'var(--ptv-curve-pill)',
+                padding: '0 16px',
+                minHeight: '34px',
+                fontWeight: 650,
+                color: 'var(--b-700, #0B5FBF)',
+                background: 'var(--b-050, #EDF4FF)',
+                border: '1px solid var(--b-300, #A7CEFF)',
+                cursor: 'pointer',
+              }}
+            >
+              Reset Filter
+            </button>
+          )}
         </div>
       ) : (
         <div className="inv-catalog-grid">
@@ -454,7 +726,13 @@ export const InventarisPage: React.FC = () => {
             const avail = x.unit_tersedia;
             const total = x.total_unit;
             const borrowed = total - avail;
-            const damaged = x.units.filter((u) => u.kondisi === 'rusak').length;
+            const damaged = x.units.filter(
+              (u) =>
+                u.kondisi === 'rusak' ||
+                u.kondisi === 'perlu_servis' ||
+                u.kondisi === 'hilang' ||
+                u.status_peminjaman === 'maintenance'
+            ).length;
 
             let badgeTxt = 'Tersedia';
             let badgeColor = '#15803d';
@@ -477,7 +755,7 @@ export const InventarisPage: React.FC = () => {
               dotColor = '#f59e0b';
               badgeBorder = 'rgba(245,158,11,0.3)';
             } else if (damaged > 0) {
-              badgeTxt = 'Rusak';
+              badgeTxt = 'Bermasalah';
               badgeColor = '#b91c1c';
               dotColor = '#ef4444';
               badgeBorder = 'rgba(239,68,68,0.3)';
@@ -489,6 +767,8 @@ export const InventarisPage: React.FC = () => {
             }
 
             const inBasket = loanBasketStore.hasAsset(x.id);
+            const resolvedPhoto = resolveInventoryPhotoUrl(x.foto_url);
+            const catVisual = getCategoryVisual(x.kategori);
 
             return (
               <div
@@ -496,10 +776,10 @@ export const InventarisPage: React.FC = () => {
                 tabIndex={0}
                 key={x.id}
                 className="inv-prod-card"
-                onClick={() => navigate(`/hub/inventaris/${x.id}`)}
+                onClick={() => handleOpenDetail(x.id)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
-                    navigate(`/hub/inventaris/${x.id}`);
+                    handleOpenDetail(x.id);
                   }
                 }}
                 style={
@@ -508,11 +788,11 @@ export const InventarisPage: React.FC = () => {
                     : { cursor: 'pointer' }
                 }
               >
-                {/* 1. Status ketersediaan (badge pada foto) 1:1 Legacy */}
+                {/* 1. Status ketersediaan (badge pada foto) */}
                 <div className="inv-prod-photo">
-                  {x.foto_url ? (
+                  {resolvedPhoto ? (
                     <img
-                      src={x.foto_url}
+                      src={resolvedPhoto}
                       alt={x.nama_alat}
                       loading="lazy"
                       onError={(e) => {
@@ -522,8 +802,20 @@ export const InventarisPage: React.FC = () => {
                       }}
                     />
                   ) : null}
-                  <span className="inv-prod-icon" style={{ display: x.foto_url ? 'none' : 'flex' }}>
-                    {getCatIconMarkup(x.kategori)}
+                  <span
+                    className="inv-prod-icon"
+                    style={{
+                      display: resolvedPhoto ? 'none' : 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '100%',
+                      height: '100%',
+                      fontSize: '36px',
+                      color: catVisual.color,
+                      opacity: 0.65,
+                    }}
+                  >
+                    <i className={`fa-solid ${catVisual.icon}`} />
                   </span>
 
                   <span
@@ -533,17 +825,25 @@ export const InventarisPage: React.FC = () => {
                       borderColor: badgeBorder,
                     }}
                   >
-                    <span style={{ display: 'inline-block', width: '5px', height: '5px', borderRadius: '50%', background: dotColor }} />
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        width: '5px',
+                        height: '5px',
+                        borderRadius: '50%',
+                        background: dotColor,
+                      }}
+                    />
                     <span>{badgeTxt}</span>
                   </span>
                 </div>
 
-                {/* 2. Detail Card Body 1:1 Legacy .inv-prod-body */}
+                {/* 2. Detail Card Body */}
                 <div className="inv-prod-body">
                   {/* 2a. Kode & Kategori */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
                     <div className="inv-prod-code">{x.kode || `INV-${String(x.id).slice(0, 5).toUpperCase()}`}</div>
-                    <span style={{ fontSize: '10.5px', color: 'var(--muted)', fontWeight: 600, textTransform: 'capitalize' }}>
+                    <span className="inv-prod-cat" style={{ fontSize: '10.5px', color: 'var(--muted)', fontWeight: 600, textTransform: 'capitalize' }}>
                       {x.kategori || 'Alat'}
                     </span>
                   </div>
@@ -560,7 +860,7 @@ export const InventarisPage: React.FC = () => {
 
                   {/* 2c. Jumlah Unit & Ketersediaan */}
                   <div style={{ marginTop: 'auto', paddingTop: '6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 600, lineHeight: 1.25 }} className="trunc">
+                    <div className="inv-prod-unit-status trunc" style={{ fontSize: '11px', fontWeight: 600, lineHeight: 1.25 }}>
                       {total <= 1 ? (
                         avail === 1 ? (
                           <span style={{ color: '#16a34a', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
@@ -575,37 +875,36 @@ export const InventarisPage: React.FC = () => {
                         ) : damaged === 1 ? (
                           <span style={{ color: '#dc2626', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#dc2626', display: 'inline-block', flexShrink: 0 }} />
-                            1 unit &bull; Rusak
+                            1 unit &bull; Bermasalah
                           </span>
                         ) : (
-                          <span style={{ color: '#64748b', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#64748b', display: 'inline-block', flexShrink: 0 }} />
-                            1 unit &bull; Tidak tersedia
-                          </span>
+                          <span style={{ color: 'var(--muted)' }}>0 unit</span>
                         )
                       ) : (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'var(--ink, #0f172a)', flexWrap: 'wrap' }}>
-                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: avail > 0 ? '#16a34a' : damaged > 0 ? '#dc2626' : '#d97706', display: 'inline-block', flexShrink: 0 }} />
-                          <span>
-                            <b>{total} unit</b> &bull;{' '}
-                            <span style={{ color: avail > 0 ? '#16a34a' : '#dc2626', fontWeight: 700 }}>
-                              {avail} tersedia
-                            </span>
+                        <span style={{ color: 'var(--ink)' }}>
+                          Total {total} unit &bull;{' '}
+                          <span style={{ color: avail > 0 ? '#16a34a' : '#dc2626' }}>
+                            {avail} siap pakai
                           </span>
-                          {borrowed > 0 ? (
-                            <span style={{ color: '#d97706', fontSize: '10.5px' }}>
-                              ({borrowed} pinjam)
-                            </span>
-                          ) : null}
                         </span>
                       )}
                     </div>
 
-                    {/* 2d. Lokasi & Quick Action Button */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', color: 'var(--muted)', fontWeight: 500, gap: '6px', paddingTop: '3px', borderTop: '1px solid var(--line-2, #f1f5f9)' }}>
-                      <span className="trunc" style={{ flex: 1 }} title={`Lokasi: ${x.units?.[0]?.lokasi_penyimpanan || 'Studio PTV'}`}>
-                        <i className="fa-solid fa-location-dot" style={{ fontSize: '10px', marginRight: '3px', color: '#0284c7' }} />
-                        {x.units?.[0]?.lokasi_penyimpanan || 'Studio PTV'}
+                    {/* Quick Add Button / Lokasi */}
+                    <div
+                      className="inv-prod-loc-row"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginTop: '4px',
+                        paddingTop: '4px',
+                        borderTop: '1px solid var(--line-2)',
+                      }}
+                    >
+                      <span className="inv-prod-loc-text trunc" style={{ fontSize: '10px', color: 'var(--muted)' }}>
+                        <i className="fa-solid fa-location-dot" style={{ marginRight: '3px' }} />
+                        {x.lokasi_penyimpanan || 'Studio PTV'}
                       </span>
                       {avail > 0 && (
                         <button
@@ -627,233 +926,49 @@ export const InventarisPage: React.FC = () => {
         </div>
       )}
 
-
-
       {/* ── UNIT PICKER MODAL (MULTI-UNIT SELECTOR) ── */}
-      {unitPickerAsset && (
-        <>
-          <div className="scrim on" onClick={() => setUnitPickerAsset(null)} />
-          <section className="sheet on" role="dialog" aria-modal="true">
-            <div className="sheet-grab" />
-            <div className="sheet-hd">
-              <h3>Pilih Unit Fisik — {unitPickerAsset.nama_alat}</h3>
-              <button
-                type="button"
-                className="icon-btn"
-                onClick={() => setUnitPickerAsset(null)}
-                aria-label="Tutup"
-              >
-                <i className="fa-solid fa-xmark" />
-              </button>
-            </div>
-            <div className="sheet-body" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {unitPickerAsset.units.map((u, idx) => {
-                const isAvail = u.status_peminjaman === 'tersedia';
-                const basketKey = `${unitPickerAsset.id}_${u.id}`;
-                const inBasket = loanBasketStore.has(basketKey);
-
-                return (
-                  <div
-                    key={u.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '12px 14px',
-                      border: `1.5px solid ${inBasket ? '#3b82f6' : '#e2e8f0'}`,
-                      borderRadius: 'var(--ptv-curve-md)',
-                      background: inBasket ? '#eff6ff' : '#ffffff',
-                      gap: '12px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div
-                        style={{
-                          width: '38px',
-                          height: '38px',
-                          borderRadius: 'var(--ptv-curve-sm)',
-                          background: isAvail ? '#e0f2fe' : '#f1f5f9',
-                          color: isAvail ? '#0284c7' : '#64748b',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontWeight: 700,
-                        }}
-                      >
-                        #{idx + 1}
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>
-                          Unit {idx + 1} &bull; <span className="font-mono">{u.kode_unit}</span>
-                        </div>
-                        <div style={{ fontSize: '11.5px', color: '#64748b' }}>
-                          Kondisi: <b>{u.kondisi}</b> &bull; Status: <b>{u.status_peminjaman}</b>
-                        </div>
-                      </div>
-                    </div>
-                    {isAvail ? (
-                      <button
-                        type="button"
-                        className={`btn sm ${inBasket ? '' : 'pri'}`}
-                        onClick={() => {
-                          loanBasketStore.toggle({
-                            key: basketKey,
-                            assetId: unitPickerAsset.id,
-                            unitId: u.id,
-                            unitNo: idx + 1,
-                            unitCode: u.kode_unit,
-                            unitName: `Unit ${idx + 1} (${u.kode_unit})`,
-                            assetName: unitPickerAsset.nama_alat,
-                            invCode: unitPickerAsset.kode,
-                          });
-                        }}
-                        style={{ minHeight: '34px', padding: '0 12px', borderRadius: 'var(--ptv-curve-md)' }}
-                      >
-                        <i className={`fa-solid ${inBasket ? 'fa-check' : 'fa-plus'}`} style={{ marginRight: '4px' }} />
-                        {inBasket ? 'Dipilih' : 'Pilih Unit'}
-                      </button>
-                    ) : (
-                      <span className="chip warn" style={{ fontSize: '11px' }}>
-                        Tidak Tersedia
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '14px', gap: '8px' }}>
-                <button
-                  type="button"
-                  className="btn sm"
-                  onClick={() => setUnitPickerAsset(null)}
-                >
-                  Selesai
-                </button>
-                <button
-                  type="button"
-                  className="btn sm pri"
-                  onClick={() => {
-                    setUnitPickerAsset(null);
-                    setIsDaftarPinjamanOpen(true);
-                  }}
-                >
-                  Lihat Daftar Pinjaman <i className="fa-solid fa-arrow-right" style={{ marginLeft: '4px' }} />
-                </button>
-              </div>
-            </div>
-          </section>
-        </>
+      {scanOpen && (
+        <InventoryScanDialog
+          onClose={() => setScanOpen(false)}
+          catalogItems={items}
+          onScan={(value, match) => {
+            setScanOpen(false);
+            if (match?.asset) {
+              setUnitPickerAsset(match.asset);
+            } else {
+              setSearchQ(value);
+            }
+          }}
+        />
       )}
+      <UnitPickerModal
+        isOpen={unitPickerAsset !== null}
+        asset={unitPickerAsset}
+        onClose={() => setUnitPickerAsset(null)}
+        onOpenLoanModal={() => {
+          setUnitPickerAsset(null);
+          setIsDaftarPinjamanOpen(true);
+        }}
+      />
 
-      {/* ── MODAL PINJAM ALAT 1:1 LEGACY DARI openLoanModal() ── */}
+      {/* ── MODAL PINJAM ALAT (LOAN MODAL) ── */}
       <LoanModal
         isOpen={isDaftarPinjamanOpen}
         onClose={() => setIsDaftarPinjamanOpen(false)}
-        onSuccess={() => loadData()}
+        onSuccess={() => {
+          loadData();
+        }}
       />
 
-      {/* ── MODAL TAMBAH ALAT BARU ── */}
-      {isNewAssetOpen && (
-        <>
-          <div className="scrim on" onClick={() => setIsNewAssetOpen(false)} />
-          <section className="sheet on" role="dialog" aria-modal="true">
-            <div className="sheet-grab" />
-            <div className="sheet-hd">
-              <h3>Tambah Alat Baru ke Katalog</h3>
-              <button
-                type="button"
-                className="icon-btn"
-                onClick={() => setIsNewAssetOpen(false)}
-                aria-label="Tutup"
-              >
-                <i className="fa-solid fa-xmark" />
-              </button>
-            </div>
-            <div className="sheet-body" style={{ padding: '16px' }}>
-              <form onSubmit={handleNewAssetSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Kode Alat</label>
-                  <input
-                    type="text"
-                    value={newKode}
-                    onChange={(e) => setNewKode(e.target.value)}
-                    required
-                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Nama Alat</label>
-                  <input
-                    type="text"
-                    value={newNama}
-                    onChange={(e) => setNewNama(e.target.value)}
-                    required
-                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Kategori</label>
-                  <PTVSelect
-                    value={newKat}
-                    onChange={(val) => setNewKat(val)}
-                    options={ALL_CATEGORIES.map((c) => ({ value: c, label: c }))}
-                    ariaLabel="Kategori Alat"
-                    size="sm"
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Spesifikasi / Keterangan</label>
-                  <input
-                    type="text"
-                    value={newSpec}
-                    onChange={(e) => setNewSpec(e.target.value)}
-                    style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
-                  />
-                </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Lokasi Penyimpanan</label>
-                    <input
-                      type="text"
-                      value={newLoc}
-                      onChange={(e) => setNewLoc(e.target.value)}
-                      style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
-                    />
-                  </div>
-                  <div style={{ width: '100px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Jumlah Unit</label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={newQty}
-                      onChange={(e) => setNewQty(e.target.value)}
-                      style={{ width: '100%', marginTop: '4px', height: '38px', padding: '0 10px', borderRadius: 'var(--ptv-curve-md)', border: '1px solid #cbd5e1' }}
-                    />
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                  <button
-                    type="button"
-                    className="btn sec flex-1"
-                    onClick={() => setIsNewAssetOpen(false)}
-                    style={{ borderRadius: 'var(--ptv-curve-md)' }}
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn pri flex-1"
-                    disabled={newSubmitting}
-                    style={{ borderRadius: 'var(--ptv-curve-md)' }}
-                  >
-                    {newSubmitting ? 'Menyimpan...' : 'Simpan Alat'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </section>
-        </>
-      )}
+      {/* ── MODAL TAMBAH ALAT BARU (SUPABASE ATOMIC RPC) ── */}
+      <TambahAlatModal
+        isOpen={isNewAssetOpen}
+        onClose={() => setIsNewAssetOpen(false)}
+        onSuccess={() => {
+          setIsNewAssetOpen(false);
+          loadData();
+        }}
+      />
     </div>
   );
 };

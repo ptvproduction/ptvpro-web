@@ -43,6 +43,7 @@ export interface AuthUser extends PermissionContext {
   position: string;
   angkatan?: number;
   organization: string;
+  capabilities?: readonly AppCapability[];
 }
 
 export interface AuthSession {
@@ -60,4 +61,9 @@ export interface AuthResult {
   success: boolean;
   session?: AuthSession;
   error?: string;
+}
+
+export interface OAuthSignInOptions {
+  provider: 'google';
+  redirectTo?: string;
 }

@@ -1,0 +1,243 @@
+{
+  "session": "PTV-DEV-171",
+  "dateLocal": "2026-10-27",
+  "operator": "zidnal",
+  "status": "COMPLETE_CLOUD_STAGING_INVENTORY_STORAGE_SECURITY",
+  "blockers": [],
+  "hosted": {
+    "deploymentId": "dpl_FfuFc5Z6bdGY5sZxkJgf5RK5CGWU",
+    "origin": "https://ptvpro-9sjo6ryow-ptvpro-web.vercel.app",
+    "redeployed": false,
+    "guard168Reimplemented": false,
+    "postCutoverPositive": "PASS: real cookie/session, catalog/detail, upload, public-media exact bytes, atomic create/retry/edit, valuation, checkout/return/history, damage/QC, logout+cleanup",
+    "sharedLostFoundPostCutover": "PASS create/update/delete; damage/QC compatibility PASS"
+  },
+  "tester": {
+    "authorization": "User request171 + previously confirmed Rouf plan169 consent",
+    "mechanism": "New Staging-pinned service-role-only private definer RPC requiring durable live Root session/profile; no existing pre-bootstrap/DPAPI guard altered",
+    "credential": "Server-generated random256bit, bcrypt10; returned once to runner memory; no password/hash input or logging",
+    "negativeEvidence": "PTVPRO-INVENTORY-171-NEGATIVE-RESULTS.json",
+    "hostedChecksPassed": 25,
+    "localRpcChecksPassed": 18,
+    "final": {
+      "status": "inactive",
+      "overrides": 0,
+      "credential": false,
+      "active_sessions": 0
+    },
+    "administrationPathClosedAfterTest": true,
+    "mainAccounts": [
+      {
+        "status": "active",
+        "profiles": [
+          "crew",
+          "eksekutif"
+        ],
+        "username": "rouf"
+      },
+      {
+        "status": "active",
+        "profiles": [
+          "crew",
+          "root_executive"
+        ],
+        "username": "jid"
+      }
+    ]
+  },
+  "cutover": {
+    "status": "EXECUTED_VERIFIED",
+    "migrationVersions": [
+      {
+        "name": "inventory171_root_scoped_tester",
+        "version": "20261026174842"
+      },
+      {
+        "name": "inventory171_portal_security_cutover",
+        "version": "20261026180134"
+      }
+    ],
+    "tables": [
+      "ptv_inventaris",
+      "ptv_inventaris_unit",
+      "ptv_nilai_inventaris",
+      "ptv_peminjaman",
+      "ptv_lapor_masalah"
+    ],
+    "nativeRpcCount": 6,
+    "clientRoles": [
+      "PUBLIC",
+      "anon",
+      "authenticated"
+    ],
+    "allEffectiveNativeTablePrivilegesClosed": true,
+    "storage": "Four inventory-only legacy policies replaced by four restrictive policies for anon/authenticated; no list/write native inventory; public media retained",
+    "legacyPolicyDependency": "Removed native owner-cleanup subquery to avoid requiring revoked inventory SELECT for other-bucket deletes",
+    "serviceRolePrivilegesPreserved": true,
+    "otherBucketPolicyDigestUnchanged": true,
+    "residualViewsAndDirectInventoryPublicClientRoutines": {
+      "dependent_views": null,
+      "client_executable_inventory_public_functions": null
+    },
+    "postflight": {
+      "tables": [
+        {
+          "table": "ptv_inventaris",
+          "anon_select": false,
+          "auth_select": false,
+          "server_select": true
+        },
+        {
+          "table": "ptv_inventaris_unit",
+          "anon_select": false,
+          "auth_select": false,
+          "server_select": true
+        },
+        {
+          "table": "ptv_nilai_inventaris",
+          "anon_select": false,
+          "auth_select": false,
+          "server_select": true
+        },
+        {
+          "table": "ptv_peminjaman",
+          "anon_select": false,
+          "auth_select": false,
+          "server_select": true
+        },
+        {
+          "table": "ptv_lapor_masalah",
+          "anon_select": false,
+          "auth_select": false,
+          "server_select": true
+        }
+      ],
+      "native_rpc": [
+        {
+          "signature": "rpc_checkout_loan(text,text,text,date,date,text,uuid[],uuid)",
+          "auth_execute": false
+        },
+        {
+          "signature": "rpc_create_inventaris(jsonb,jsonb)",
+          "auth_execute": false
+        },
+        {
+          "signature": "rpc_get_next_inv_code()",
+          "auth_execute": false
+        },
+        {
+          "signature": "rpc_return_loan(text,date,text,text,uuid)",
+          "auth_execute": false
+        },
+        {
+          "signature": "rpc_return_single_unit(uuid,uuid,text,uuid)",
+          "auth_execute": false
+        },
+        {
+          "signature": "rpc_update_inventaris(jsonb,jsonb)",
+          "auth_execute": false
+        }
+      ],
+      "storage_policies": [
+        {
+          "mode": "RESTRICTIVE",
+          "name": "inventory_portal_171_delete",
+          "check": null,
+          "roles": [
+            "anon",
+            "authenticated"
+          ],
+          "using": "(bucket_id <> 'inventory'::text)",
+          "command": "DELETE"
+        },
+        {
+          "mode": "RESTRICTIVE",
+          "name": "inventory_portal_171_insert",
+          "check": "(bucket_id <> 'inventory'::text)",
+          "roles": [
+            "anon",
+            "authenticated"
+          ],
+          "using": null,
+          "command": "INSERT"
+        },
+        {
+          "mode": "RESTRICTIVE",
+          "name": "inventory_portal_171_select",
+          "check": null,
+          "roles": [
+            "anon",
+            "authenticated"
+          ],
+          "using": "(bucket_id <> 'inventory'::text)",
+          "command": "SELECT"
+        },
+        {
+          "mode": "RESTRICTIVE",
+          "name": "inventory_portal_171_update",
+          "check": "(bucket_id <> 'inventory'::text)",
+          "roles": [
+            "anon",
+            "authenticated"
+          ],
+          "using": "(bucket_id <> 'inventory'::text)",
+          "command": "UPDATE"
+        }
+      ],
+      "tester_admin_closed": true
+    },
+    "nativeEvidence": "PTVPRO-INVENTORY-171-NATIVE-RESULTS.json"
+  },
+  "rollback": {
+    "file": "PTVPRO-INVENTORY-171-CUTOVER-ROLLBACK.sql",
+    "sha256": "5781334168f2522f4f5f4d9160f0250f53155341a197e13c2b019fbf9c954567",
+    "localChecksPassed": 18,
+    "cloudExecuted": false,
+    "restores": "Exact captured client ACLs and legacy inventory policies; does not remove Guard168/index167 or reopen tester admin"
+  },
+  "validation": {
+    "vitestTests": 83,
+    "vitestFiles": 7,
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "newScriptsSyntax": "PASS",
+    "build": "Not repeated: no app/frontend or deployment source changes;170 build retained",
+    "localTesterModel": "18PASS (registry fixture stub; real registry separately verified hosted)",
+    "localCutoverModel": "18PASS (RPC permission stubs; real handlers separately verified hosted)"
+  },
+  "cleanup": {
+    "counts": {
+      "loans": 2,
+      "units": 251,
+      "damage": 1,
+      "master": 164,
+      "fixtures": 0,
+      "valuation": 114,
+      "tester_sessions": 0,
+      "tester_namespace_objects": 0
+    },
+    "operationalSixTableDigestsMatch170": true,
+    "disabledTesterRetainedForAudit": true,
+    "auditEventsRetained": true,
+    "credentialRemoved": true
+  },
+  "scope": {
+    "production": "STRICT READ-ONLY; no Production mutations",
+    "commit": false,
+    "push": false,
+    "deploy": false,
+    "mainAccountRolesChanged": false,
+    "destructiveMigrations": false,
+    "securityGucChanged": false
+  },
+  "files": {
+    "testerMigration": "../supabase/migrations/20261026174842_inventory171_root_scoped_tester.sql",
+    "cutoverMigration": "../supabase/migrations/20261026180134_inventory171_portal_security_cutover.sql",
+    "localMigrationVersionsAlignedWithCloudReceipts": true
+  },
+  "notes": [
+    "Initial function-SET GUC attempts rolled back; final mechanism only checks safe logging context and accepts no password/hash input.",
+    "A failed early setup fixture was cleaned by exact ID+marker; retirement, fixture cleanup and Root logout now have independent finally blocks.",
+    "No repeat readiness cycle; this receipt records actual executed cutover and postflight."
+  ]
+}

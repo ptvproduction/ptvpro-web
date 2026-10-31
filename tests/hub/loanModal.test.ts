@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { loanBasketStore } from '../../src/products/hub/inventaris/loanBasketStore';
 import { inventarisService } from '../../src/products/hub/inventaris/inventarisService';
-import { peminjamanService } from '../../src/products/hub/peminjaman/peminjamanService';
+import { LocalPeminjamanService } from '../../src/products/hub/peminjaman/peminjamanService';
+const peminjamanService = LocalPeminjamanService.getInstance();
 
 describe('LoanModal & LoanBasket Store Regression Tests', () => {
   beforeEach(() => {

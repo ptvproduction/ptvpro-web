@@ -1,0 +1,14 @@
+{
+  "session": "PTV-DEV-165",
+  "date": "2026-10-26",
+  "projectRef": "swadgljnyelsjstqqxbm",
+  "status": "LOCAL_PASS_CLOUD_POSITIVE_PARTIAL",
+  "local": { "testFiles": 10, "testsPassed": 145, "typecheck": "PASS", "lint": "PASS", "stagingBuild": "PASS" },
+  "runtime": { "mode": "staging", "port": 5174, "authBackend": "vercel", "inventoryBackend": "supabase", "projectVerified": true, "anonymousHttp": "PASS", "ownServerClosed": true },
+  "cloudReadOnly": { "masters": 164, "units": 251, "canonicalLoans": 2, "activeLoans": 0, "loansMissingUnit": 0, "fixture165Remaining": 0, "gateEnabled": true, "rootProfiles": 1 },
+  "cloudPositive": { "status": "NOT_RUN_PRIVATE_CREDENTIAL_UNAVAILABLE", "loginRequestSent": false, "inventoryOrStorageWrites": false, "credentialsOrTokensLogged": false },
+  "remaining": ["Direct native Data API grants/policies not cut over", "Positive owner-authenticated CRUD and Storage not verified", "Inventory RPC authorization remains API-side before service-role RPC"],
+  "productionAccessed": false,
+  "migrationsApplied": false,
+  "commitPushDeploy": false
+}

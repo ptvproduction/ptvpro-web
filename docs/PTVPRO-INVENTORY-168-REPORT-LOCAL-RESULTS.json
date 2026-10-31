@@ -1,0 +1,26 @@
+{
+  "scope": "LOCAL_ACTUAL_REPORT_SOURCE_EARLY_GATES_ONLY",
+  "fullCloudOperationParity": false,
+  "cloudChanges": false,
+  "status": "PASS",
+  "checks": [
+    "loopback isolated database verified",
+    "actual source fingerprint matches cloud baseline",
+    "proposal requires explicit approval marker",
+    "source patched; ACL owner security config preserved",
+    "proposal idempotent",
+    "native damage rejected before account resolution",
+    "native Lost Found retains original account gate",
+    "spoofed server account rejected",
+    "service damage retains original account gate",
+    "service Lost Found retains original account gate",
+    "rollback restores exact source and attributes",
+    "rollback idempotent",
+    "source drift blocks proposal",
+    "source drift blocks rollback"
+  ],
+  "checksPassed": 14,
+  "cleaned": true,
+  "proposalSha256": "11c252add3f0dc5b89a66a37ea4ef97d2a242dc2583b336f04383f18796f9ff0",
+  "rollbackSha256": "ad353743da60d2c21ec0c684c71ca6c48a51ba0b280deea489a4d44f71d443fd"
+}

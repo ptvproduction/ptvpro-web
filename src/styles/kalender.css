@@ -1,0 +1,1372 @@
+/* ============================================================
+   PTV HUB — MODUL KALENDER R03 STYLESHEET
+   Scoped to .r03-kalender & official modal elements
+   Follows PTV Unified Continuous Curve Governance
+   ============================================================ */
+
+.r03-kalender {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding-bottom: calc(var(--dock-h, 64px) + var(--sab, env(safe-area-inset-bottom, 0px)) + 28px);
+  font-family: var(--font-sans, "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif);
+}
+
+/* ── Pill Filter Bar (Horizontal Scrollable with Edge Affordance) ── */
+.r03-kalender .kal-filter-bar-wrap {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.r03-kalender .kal-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 6px 8px 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.r03-kalender .kal-filter-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.r03-kalender .kal-filter-scroll-hint {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .r03-kalender .kal-filter-bar-wrap {
+    margin-bottom: 16px;
+  }
+}
+
+.r03-kalender .kal-nav-pill-btn {
+  padding: 8px 18px;
+  border-radius: var(--ptv-curve-pill, 9999px);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--line-2, #e2e8f0);
+  background: #ffffff;
+  color: var(--ink, #1e293b);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.r03-kalender .kal-nav-pill-btn:hover {
+  background: var(--bg-2, #f8fafc);
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-nav-pill-btn {
+  background: var(--surface, #1B1E21);
+  border-color: var(--line, #34383D);
+  color: var(--ink, #E8EAED);
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-nav-pill-btn:hover {
+  background: var(--surface-2, #24282C);
+}
+
+/* Selected States: Solid Color Bersih Sesuai Identitas Masing-Masing */
+.r03-kalender .kal-nav-pill-btn.active-ptv {
+  border-color: #1D6EE5;
+  background: #1D6EE5;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(29, 110, 229, 0.25);
+}
+
+.r03-kalender .kal-nav-pill-btn.active-pesantren {
+  border-color: #059669;
+  background: #059669;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(5, 150, 105, 0.25);
+}
+
+.r03-kalender .kal-nav-pill-btn.active-sekolah {
+  border-color: #6D28D9;
+  background: #6D28D9;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(109, 40, 217, 0.25);
+}
+
+/* ── Layout Grid (Desktop: 2 Kolom 60:40, Mobile/Tablet: Stack Vertikal) ── */
+.r03-kalender .kal-layout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
+  gap: 24px;
+  align-items: start;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Kolom Kiri (~60%): Kalender Bulanan di atas & Acara Liputan tepat di bawahnya */
+.r03-kalender .kal-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Kolom Kanan (~40%): Momentum & Ide Planner seluruh bulan */
+.r03-kalender .kal-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+}
+
+.r03-kalender .kal-grid-calendar-area {
+  width: 100%;
+  min-width: 0;
+}
+
+.r03-kalender .kal-grid-agenda-area {
+  width: 100%;
+  min-width: 0;
+}
+
+.r03-kalender .kal-grid-momentum-area {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Mobile & Tablet Reflow (Sesuai Breakpoint Guide Book PTVPRO < 1024px) */
+@media (max-width: 1023px) {
+  .r03-kalender .kal-layout-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .r03-kalender .kal-col-left {
+    gap: 20px;
+    width: 100%;
+  }
+
+  .r03-kalender .kal-col-right {
+    gap: 20px;
+    width: 100%;
+  }
+}
+
+/* ── Surface Cards (Solid White Surface pada Light Mode) ── */
+.r03-kalender .kal-surface-card {
+  container-type: inline-size;
+  background: #ffffff;
+  border-radius: var(--ptv-curve-xl, 22px);
+  border: 1px solid var(--line, rgba(11, 42, 74, 0.08));
+  padding: 20px 22px;
+  box-shadow: var(--shadow-s, 0 1px 3px rgba(0, 0, 0, 0.03));
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-surface-card {
+  background: var(--surface, #24282C);
+  border-color: var(--line, #34383D);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 640px) {
+  .r03-kalender .kal-surface-card {
+    padding: 14px 10px;
+    border-radius: var(--ptv-curve-xl, 20px);
+  }
+}
+
+@media (max-width: 360px) {
+  .r03-kalender .kal-surface-card {
+    padding: 10px 4px;
+    border-radius: var(--ptv-curve-lg);
+  }
+}
+
+/* ── Header Tanggal Terpilih (Clean Editorial Banner - Solid Surface) ── */
+.r03-kalender .kal-selected-banner {
+  background: #ffffff;
+  border: 1px solid var(--line-2, #e2e8f0);
+  border-radius: var(--ptv-curve-xl, 16px);
+  padding: 16px 20px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-selected-banner {
+  background: var(--surface-2, #24282C);
+  border-color: var(--line, #34383D);
+}
+
+.r03-kalender .kal-selected-meta-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted, #64748b);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.r03-kalender .kal-selected-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink, #0f172a);
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-selected-title {
+  color: #f1f5f9;
+}
+
+.r03-kalender .kal-selected-sub {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted, #64748b);
+  margin-top: 4px;
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-selected-sub {
+  color: #94a3b8;
+}
+
+.r03-kalender .kal-selected-bullet {
+  color: var(--line-2, #cbd5e1);
+  font-weight: 400;
+}
+
+.r03-kalender .kal-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: var(--ptv-curve-pill);
+  padding: 3px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+/* ── Clean Editorial Calendar Header (Mobile First Central Alignment) ── */
+.r03-kalender .cal-editorial-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0 12px 0;
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  gap: 4px;
+}
+
+.r03-kalender .cal-editorial-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.r03-kalender .cal-editorial-header-spacer {
+  display: none;
+}
+
+.r03-kalender .cal-editorial-title {
+  font-size: clamp(17px, 4vw, 20px);
+  font-weight: 600;
+  color: var(--ink, #0f172a);
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.25;
+  text-align: center;
+  flex: 1;
+  padding: 0 8px;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-editorial-title {
+  color: #f1f5f9;
+}
+
+.r03-kalender .cal-editorial-nav-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--line-2, #e2e8f0);
+  background: #ffffff;
+  color: var(--ink, #1e293b);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+  padding: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  flex-shrink: 0;
+}
+
+.r03-kalender .cal-editorial-nav-btn:hover {
+  background: var(--bg-2, #f8fafc);
+  color: #2563eb;
+  border-color: #cbd5e1;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-editorial-nav-btn {
+  background: var(--surface-2, #24282C);
+  border-color: var(--line, #34383D);
+  color: #e2e8f0;
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-editorial-nav-btn:hover {
+  background: #2E3338;
+  color: #60a5fa;
+}
+
+.r03-kalender .cal-editorial-today-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.r03-kalender .cal-editorial-today-btn {
+  height: 28px;
+  padding: 0 16px;
+  border-radius: var(--ptv-curve-pill, 9999px);
+  border: 1px solid var(--line-2, #e2e8f0);
+  background: #ffffff;
+  color: var(--ink, #1e293b);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.r03-kalender .cal-editorial-today-btn:hover {
+  background: var(--bg-2, #f8fafc);
+  color: #2563eb;
+  border-color: #cbd5e1;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-editorial-today-btn {
+  background: var(--surface-2, #24282C);
+  border-color: var(--line, #34383D);
+  color: #e2e8f0;
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-editorial-today-btn:hover {
+  background: #2E3338;
+  color: #60a5fa;
+}
+
+.r03-kalender .cal-editorial-hijri-range {
+  font-size: clamp(12px, 3vw, 13px);
+  font-weight: 500;
+  color: var(--muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  width: 100%;
+  margin-top: -3px;
+  margin-bottom: 2px;
+  letter-spacing: -0.01em;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-editorial-hijri-range {
+  color: #94a3b8;
+}
+
+.r03-kalender .cal-editorial-divider {
+  height: 1px;
+  background: var(--line-2, #e2e8f0);
+  margin: 0 0 16px 0;
+  width: 100%;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-editorial-divider {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+/* ── Day of Week (DOW) Headers (AHAD - SABTU) ── */
+.r03-kalender .cal-dow-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.r03-kalender .cal-dow-col {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted, #64748b);
+  letter-spacing: 0.02em;
+  padding: 6px 2px;
+  user-select: none;
+  text-transform: uppercase;
+}
+
+.r03-kalender .cal-dow-col.cal-dow-sunday {
+  color: #dc2626 !important;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-dow-col.cal-dow-sunday {
+  color: #ef4444 !important;
+}
+
+/* ── Calendar Days Grid (Editorial Rounded Rectangle Cards) ── */
+.r03-kalender .cal-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-days-grid {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* ── Calendar Day Cell (Editorial Rounded Rectangle Card) ── */
+.r03-kalender .cal-day-cell {
+  aspect-ratio: 1 / 0.65;
+  min-height: 52px;
+  max-height: 64px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--surface, #ffffff);
+  padding: 6px 8px 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px !important;
+  outline: none;
+  user-select: none;
+}
+
+.r03-kalender .cal-day-cell:hover:not(.sel):not(.out) {
+  background: var(--bg, #f8fafc);
+  border-color: #cbd5e1 !important;
+  z-index: 1;
+}
+
+.r03-kalender .cal-day-cell:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #2563eb !important;
+  border-color: #2563eb !important;
+  z-index: 3;
+}
+
+.r03-kalender .cal-day-cell.out {
+  background: #fafbfc;
+  border-color: #f1f5f9 !important;
+  opacity: 1;
+}
+
+.r03-kalender .cal-day-cell.out .cal-cell-masehi {
+  color: #d1d5db !important;
+}
+
+.r03-kalender .cal-day-cell.out .cal-cell-hijri,
+.r03-kalender .cal-day-cell.out .calendar-hijri-number {
+  color: #e2e8f0 !important;
+}
+
+.r03-kalender .cal-day-cell.out .cal-cell-weton {
+  color: #e2e8f0 !important;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-day-cell {
+  background: var(--surface, #24282C);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-day-cell:hover:not(.sel):not(.out) {
+  background: #2E3338;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.out {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  opacity: 1;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.out .cal-cell-masehi,
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.out .cal-cell-hijri,
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.out .calendar-hijri-number,
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.out .cal-cell-weton {
+  color: #4b5563 !important;
+}
+
+/* Sunday column Masehi numbers in Red */
+.r03-kalender .cal-day-cell.cal-cell-sunday:not(.out) .cal-cell-masehi {
+  color: #dc2626 !important;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.cal-cell-sunday:not(.out) .cal-cell-masehi {
+  color: #ef4444 !important;
+}
+
+/* ── Selected Date State (PTVPRO Soft Blue Highlight with Rounded 6px Card) ── */
+.r03-kalender .cal-day-cell.sel {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 1px #2563eb !important;
+  border-radius: 6px !important;
+  z-index: 2;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.sel {
+  background: rgba(37, 99, 235, 0.18) !important;
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 1px #60a5fa !important;
+}
+
+.r03-kalender .cal-day-cell.sel .cal-cell-masehi {
+  color: #1d4ed8 !important;
+  font-weight: 700;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.sel .cal-cell-masehi {
+  color: #93c5fd !important;
+}
+
+.r03-kalender .cal-day-cell.sel .cal-cell-hijri,
+.r03-kalender .cal-day-cell.sel .calendar-hijri-number {
+  color: #2563eb !important;
+  font-weight: 600;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.sel .cal-cell-hijri,
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.sel .calendar-hijri-number {
+  color: #60a5fa !important;
+}
+
+.r03-kalender .cal-day-cell.sel .cal-cell-weton {
+  color: #1e40af !important;
+  font-weight: 600;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.sel .cal-cell-weton {
+  color: #bfdbfe !important;
+}
+
+/* ── Today State (Subtle editorial highlight with crisp border) ── */
+.r03-kalender .cal-day-cell.today:not(.sel) {
+  background: rgba(37, 99, 235, 0.04);
+  border-color: rgba(37, 99, 235, 0.38) !important;
+  border-radius: 6px !important;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.today:not(.sel) {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(96, 165, 250, 0.4) !important;
+}
+
+.r03-kalender .cal-day-cell.today:not(.sel) .cal-cell-masehi {
+  font-weight: 700;
+  color: var(--b-700, #1d4ed8);
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-day-cell.today:not(.sel) .cal-cell-masehi {
+  color: #93c5fd;
+}
+
+/* ── Baris Atas Sel: Masehi (Kiri Atas) & Hijriah Arab (Kanan Atas) ── */
+.r03-kalender .cal-cell-header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.r03-kalender .cal-cell-masehi {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  color: #1e293b;
+  letter-spacing: -0.015em;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-cell-masehi {
+  color: #f1f5f9;
+}
+
+.r03-kalender .cal-cell-hijri,
+.r03-kalender .calendar-hijri-number {
+  font-family: "Amiri", "Noto Naskh Arabic", serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ok, #059669);
+  line-height: 1;
+  user-select: none;
+  display: inline-block;
+  vertical-align: baseline;
+  font-feature-settings: "kern" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-cell-hijri,
+:root[data-theme="dark"] .r03-kalender .calendar-hijri-number {
+  color: var(--ok, #34d399);
+}
+
+/* ── Baris Bawah Sel: Weton Jawa (Kiri Bawah) & Titik Indikator (Kanan Bawah) ── */
+.r03-kalender .cal-cell-sub-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: auto;
+  gap: 2px;
+}
+
+.r03-kalender .cal-cell-weton {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-2, #38587A);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-cell-weton {
+  color: var(--ink-2, #cbd5e1);
+}
+
+/* Titik Indikator Kecil */
+.r03-kalender .cal-cell-dots {
+  display: flex;
+  align-items: center;
+  gap: 3.5px;
+  flex-shrink: 0;
+}
+
+.r03-kalender .cal-dot {
+  width: 4.5px;
+  height: 4.5px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.r03-kalender .cal-dot-event {
+  background: #059669;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-dot-event {
+  background: #10b981;
+}
+
+.r03-kalender .cal-dot-planner {
+  background: #f59e0b;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-dot-planner {
+  background: #fbbf24;
+}
+
+/* ── Legend Ringkas Editorial ── */
+.r03-kalender .cal-editorial-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-2, #e2e8f0);
+  font-size: 11.5px;
+  color: var(--muted, #64748b);
+  flex-wrap: wrap;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-editorial-legend {
+  border-top-color: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+.r03-kalender .cal-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.r03-kalender .cal-legend-swatch-sel {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid #2563eb;
+  border-radius: var(--ptv-curve-xs, 3px);
+  background: #eff6ff;
+  display: inline-block;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-legend-swatch-sel {
+  border-color: #60a5fa;
+  background: rgba(37, 99, 235, 0.2);
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-nu-dot-event {
+  background: #10b981;
+}
+
+/* Titik Momentum / Planner (Amber / Gold) */
+.r03-kalender .cal-nu-dot-planner {
+  background: #f59e0b;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-nu-dot-planner {
+  background: #fbbf24;
+}
+
+.r03-kalender .cal-event-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: var(--bg-2, #f1f5f9);
+  font-size: 11px;
+  line-height: 1.3;
+  cursor: pointer;
+  border-left: 3px solid #2563eb;
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  transition: background 0.12s ease;
+  box-sizing: border-box;
+}
+
+.r03-kalender .cal-event-chip:hover {
+  background: #e2e8f0;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-event-chip {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-event-chip:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+
+/* Kategori warna border kiri event chip */
+.r03-kalender .cal-event-chip.chip-internal {
+  border-left-color: #2563eb;
+}
+
+.r03-kalender .cal-event-chip.chip-liputan {
+  border-left-color: #059669;
+}
+
+.r03-kalender .cal-event-chip.chip-siaran {
+  border-left-color: #d97706;
+}
+
+.r03-kalender .cal-event-chip.chip-live {
+  border-left-color: #dc2626;
+}
+
+.r03-kalender .cal-chip-live-dot {
+  color: #ef4444;
+  font-size: 7.5px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.r03-kalender .cal-chip-time {
+  font-weight: 700;
+  color: var(--ink, #0f172a);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  letter-spacing: -0.015em;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-chip-time {
+  color: #e2e8f0;
+}
+
+.r03-kalender .cal-chip-name {
+  color: var(--ink-2, #334155);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  font-size: 10.5px;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-chip-name {
+  color: #cbd5e1;
+}
+
+/* Tombol +N lagi */
+.r03-kalender .cal-more-events-btn {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #2563eb;
+  padding: 1px 2px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  text-align: left;
+  display: block;
+  width: fit-content;
+  margin-top: 1px;
+  transition: color 0.12s ease;
+  line-height: 1.2;
+}
+
+.r03-kalender .cal-more-events-btn:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+
+:root[data-theme="dark"] .r03-kalender .cal-more-events-btn {
+  color: #60a5fa;
+}
+
+/* ── Responsive Mobile Adaptations (Editorial Landscape Cell Layout) ── */
+@media (max-width: 768px) {
+  .r03-kalender .cal-dow-row,
+  .r03-kalender .cal-days-grid {
+    gap: 4px;
+  }
+
+  .r03-kalender .cal-day-cell {
+    min-height: 48px;
+    max-height: 58px;
+    padding: 5px 6px 4px;
+    border-radius: 5px !important;
+  }
+
+  .r03-kalender .cal-cell-masehi {
+    font-size: 13.5px;
+  }
+
+  .r03-kalender .cal-cell-hijri,
+  .r03-kalender .calendar-hijri-number {
+    font-size: 12.5px;
+  }
+
+  .r03-kalender .cal-cell-weton {
+    font-size: 9.5px;
+  }
+
+  .r03-kalender .cal-dot {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+@container (max-width: 520px) {
+  .r03-kalender .cal-editorial-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .r03-kalender .cal-editorial-header-spacer {
+    display: none;
+  }
+
+  .r03-kalender .cal-editorial-header-center,
+  .r03-kalender .cal-editorial-header-left {
+    width: 100%;
+    align-items: center;
+    text-align: center;
+    padding: 0;
+  }
+
+  .r03-kalender .cal-editorial-title {
+    text-align: center;
+  }
+
+  .r03-kalender .cal-editorial-hijri-range {
+    text-align: center;
+    margin-top: -3px;
+  }
+
+  .r03-kalender .cal-editorial-header-right {
+    width: 100%;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .r03-kalender .cal-editorial-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .r03-kalender .cal-editorial-header-spacer {
+    display: none;
+  }
+
+  .r03-kalender .cal-editorial-header-center,
+  .r03-kalender .cal-editorial-header-left {
+    width: 100%;
+    align-items: center;
+    text-align: center;
+    padding: 0;
+  }
+
+  .r03-kalender .cal-editorial-title {
+    font-size: 17px;
+    text-align: center;
+  }
+
+  .r03-kalender .cal-editorial-hijri-range {
+    text-align: center;
+    margin-top: -3px;
+  }
+
+  .r03-kalender .cal-editorial-header-right {
+    width: 100%;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .r03-kalender .cal-dow-col {
+    font-size: 10px;
+    padding: 5px 1px;
+    letter-spacing: 0.02em;
+  }
+
+  .r03-kalender .cal-day-cell {
+    min-height: 54px;
+    max-height: none;
+    padding: 5px 4px 4px;
+    aspect-ratio: auto;
+  }
+
+  .r03-kalender .cal-cell-masehi {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .r03-kalender .cal-cell-hijri,
+  .r03-kalender .calendar-hijri-number {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .r03-kalender .cal-cell-weton {
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .r03-kalender .cal-dot {
+    width: 3.5px;
+    height: 3.5px;
+  }
+
+  .r03-kalender .cal-cell-dots {
+    gap: 2px;
+  }
+}
+
+@media (max-width: 360px) {
+  .r03-kalender .cal-dow-row,
+  .r03-kalender .cal-days-grid {
+    gap: 2.5px;
+  }
+
+  .r03-kalender .cal-dow-col {
+    font-size: 9px;
+    padding: 4px 1px;
+  }
+
+  .r03-kalender .cal-day-cell {
+    min-height: 50px;
+    max-height: none;
+    padding: 4px 3px 3px;
+    aspect-ratio: auto;
+    border-radius: 6px !important;
+  }
+
+  .r03-kalender .cal-cell-masehi {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .r03-kalender .cal-cell-hijri,
+  .r03-kalender .calendar-hijri-number {
+    font-size: 11.5px;
+  }
+
+  .r03-kalender .cal-cell-weton {
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .r03-kalender .cal-dot {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+/* ── Modals & Dialogs (Global Fullscreen Portal) ── */
+.kal-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: kalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+@keyframes kalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes kalZoomIn {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.kal-modal-card {
+  position: relative;
+  background: var(--surface);
+  border-radius: var(--ptv-curve-2xl);
+  width: 100%;
+  max-width: 580px;
+  max-height: min(90vh, 760px);
+  box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.28), 0 8px 24px -4px rgba(15, 23, 42, 0.12);
+  border: 1px solid var(--line-2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  animation: kalZoomIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kal-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line-2);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.kal-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.kal-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--line-2);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.kal-form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 5px;
+}
+
+.kal-form-hint {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.kal-form-input {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--ptv-curve-md);
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13.5px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.kal-form-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.kal-btn {
+  padding: 8px 16px;
+  border-radius: var(--ptv-curve-md);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.kal-btn-primary {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.kal-btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.kal-btn-success {
+  background: #059669;
+  color: #ffffff;
+}
+
+.kal-btn-success:hover {
+  background: #047857;
+}
+
+.kal-btn-danger {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.kal-btn-danger:hover {
+  background: #b91c1c;
+}
+
+.kal-btn-secondary {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line-2);
+}
+
+.kal-btn-secondary:hover {
+  background: var(--bg-2);
+}
+
+@media (max-width: 640px) {
+  .kal-modal-backdrop {
+    padding: 10px;
+    align-items: flex-end;
+  }
+  .kal-modal-card {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: var(--ptv-curve-2xl) var(--ptv-curve-2xl) 0 0;
+  }
+  .kal-modal-header {
+    padding: 14px 16px;
+  }
+  .kal-modal-body {
+    padding: 16px;
+  }
+  .kal-modal-footer {
+    padding: 12px 16px;
+  }
+}
+
+/* ── Compact Editorial Momentum & Ide Konten List ── */
+.r03-kalender .kal-planner-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.r03-kalender .kal-planner-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.r03-kalender .kal-planner-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.r03-kalender .kal-planner-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.r03-kalender .kal-planner-section-sub {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.r03-kalender .kal-planner-items-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Event Item Shared Styling (Acara Liputan & Momentum - Solid Surface) */
+.r03-kalender .kal-event-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1px solid var(--line-2, #e2e8f0);
+  border-radius: var(--ptv-curve-lg);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  text-align: left;
+  width: 100%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.r03-kalender .kal-event-item:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px -2px rgba(0, 0, 0, 0.05);
+}
+
+.r03-kalender .kal-grid-momentum-area .kal-event-item:hover {
+  border-color: rgba(37, 99, 235, 0.35);
+  background: #f8fafc;
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-event-item {
+  background: var(--surface-2, #24282C);
+  border-color: var(--line, #34383D);
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-event-item:hover {
+  background: #2E3338;
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-grid-momentum-area .kal-event-item:hover {
+  border-color: rgba(96, 165, 250, 0.35);
+  background: #2E3338;
+}
+
+/* ── Momentum Badges (Editorial Accent) ── */
+.r03-kalender .kal-momentum-badge {
+  transition: all 0.15s ease;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-badge-pondok {
+  background: rgba(52, 211, 153, 0.12) !important;
+  color: #6ee7b7 !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-badge-hijriah {
+  background: rgba(251, 191, 36, 0.12) !important;
+  color: #fde68a !important;
+  border-color: rgba(251, 191, 36, 0.25) !important;
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-badge-masehi {
+  background: rgba(96, 165, 250, 0.12) !important;
+  color: #93c5fd !important;
+  border-color: rgba(96, 165, 250, 0.25) !important;
+}
+
+:root[data-theme="dark"] .r03-kalender .kal-badge-program {
+  background: rgba(167, 139, 250, 0.12) !important;
+  color: #c4b5fd !important;
+  border-color: rgba(167, 139, 250, 0.25) !important;
+}
+
+/* Mobile Responsive Refinements */
+@media (max-width: 640px) {
+  .r03-kalender .kal-event-item {
+    gap: 8px;
+    padding: 9px 12px;
+  }
+}
+
+

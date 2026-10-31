@@ -1,123 +1,189 @@
-import { CrewMember, CrewFilterParams } from './types';
+import type { CrewMember, CrewFilterParams, CrewStats, LoginHistoryItem } from './types';
+import type { AcaraCrewMember } from '@products/hub/acara/types';
 
-export interface IKruService {
-  getCrewList(filters?: CrewFilterParams): Promise<CrewMember[]>;
-  getCrewByPtvId(ptvId: string): Promise<CrewMember | null>;
+export interface CreatedAccountCredentials {
+  username: string;
+  temporary_password: string;
+  full_name: string;
+  ptv_id: string;
+  must_change_password: boolean;
 }
 
-/**
- * Local development repository for Kru module.
- * Mock implementation to protect production database during scaffold.
- */
-export class LocalKruService implements IKruService {
-  private mockData: CrewMember[] = [
-    {
-      id: '00000000-0000-0000-0000-000000000001',
-      ptv_id: 'PTV-ROOT',
-      full_name: 'PTV Studio Master Root',
-      division: 'Master Control',
-      position: 'Institutional Root Executive',
-      angkatan: 2020,
-      status_organisasi: 'active',
-      status_akun: 'active',
-      assigned_profiles: ['root_executive'],
-      allowed_overrides: [],
-    },
-    {
-      id: '00000000-0000-0000-0000-000000000002',
-      ptv_id: 'PTV-001',
-      full_name: 'Ahmad Executive',
-      division: 'Leadership',
-      position: 'Ketua Umum',
-      angkatan: 2022,
-      status_organisasi: 'active',
-      status_akun: 'active',
-      assigned_profiles: ['eksekutif'],
-      allowed_overrides: [],
-    },
-    {
-      id: '00000000-0000-0000-0000-000000000003',
-      ptv_id: 'PTV-010',
-      full_name: 'Farid Technical',
-      division: 'Technical',
-      position: 'Ketua Technical',
-      angkatan: 2023,
-      status_organisasi: 'active',
-      status_akun: 'active',
-      assigned_profiles: ['kepolo_kepali'],
-      allowed_overrides: [],
-    },
-    {
-      id: '00000000-0000-0000-0000-000000000004',
-      ptv_id: 'PTV-025',
-      full_name: 'Zidna Santri',
-      division: 'Technical',
-      position: 'Crew Operator',
-      angkatan: 2024,
-      status_organisasi: 'active',
-      status_akun: 'active',
-      assigned_profiles: ['crew'],
-      allowed_overrides: [],
-    },
-    {
-      id: '00000000-0000-0000-0000-000000000005',
-      ptv_id: 'PTV-023',
-      full_name: 'Farsya Crew Finance',
-      division: 'Technical',
-      position: 'Crew Operator & Kasir',
-      angkatan: 2023,
-      status_organisasi: 'active',
-      status_akun: 'active',
-      assigned_profiles: ['crew'],
-      allowed_overrides: ['finance.operator'],
-    },
-    {
-      id: '00000000-0000-0000-0000-000000000007',
-      ptv_id: 'PTV-099',
-      full_name: 'Alumni PTV',
-      division: 'Editor',
-      position: 'Alumni Anggota',
-      angkatan: 2021,
-      status_organisasi: 'inactive',
-      status_akun: 'active',
-      assigned_profiles: ['crew'],
-      allowed_overrides: [],
-    },
-  ];
+export interface IKruService {
+  getCrewList(filters?: CrewFilterParams, forceRefresh?: boolean): Promise<CrewMember[]>;
+  getCrewByPtvId(ptvId: string): Promise<CrewMember | null>;
+  getStats(): Promise<CrewStats>;
+  getLoginHistory(): Promise<LoginHistoryItem[]>;
+  getActiveCrewCandidates(): Promise<AcaraCrewMember[]>;
+  createCrew(data: Omit<CrewMember, 'id'>): Promise<CrewMember>;
+  updateCrew(id: string, updates: Partial<CrewMember>): Promise<CrewMember>;
+  createAccountByRoot(crewId: string): Promise<{ success: boolean; message: string; credentials: CreatedAccountCredentials; crew: CrewMember }>;
+  toggleAccountStatus(crewId: string, currentAccountStatus?: string): Promise<{ success: boolean; message: string; crew: CrewMember; status_akun: string }>;
+  resetPasswordByRoot(crewId: string, newPassword: string, reason?: string): Promise<{ success: boolean; message: string }>;
+  updateUsernameByRoot(crewId: string, newUsername: string): Promise<{ success: boolean; message: string; crew: CrewMember; username: string }>;
+  uploadAvatar(base64Data: string, ptvId?: string): Promise<string>;
+}
 
-  async getCrewList(filters?: CrewFilterParams): Promise<CrewMember[]> {
-    await new Promise((resolve) => setTimeout(resolve, 150));
+async function request(url: string, init?: RequestInit) {
+  const res = await fetch(url, { ...init, credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(15000) });
+  const body = await res.json();
+  if (!res.ok || !body.success) throw new Error(body.error || `Permintaan Kru gagal (HTTP ${res.status}).`);
+  return body;
+}
 
-    let result = [...this.mockData];
+export function personnelFields(data: Partial<CrewMember>) {
+  const keys = [
+    'version',
+    'ptv_id',
+    'full_name',
+    'category',
+    'division',
+    'position',
+    'angkatan',
+    'nim',
+    'jurusan',
+    'birth_date',
+    'tanggal_lahir',
+    'address',
+    'alamat',
+    'phone',
+    'email',
+    'foto_url',
+    'status_kru',
+  ] as const;
+  return Object.fromEntries(keys.filter(key => data[key] !== undefined).map(key => [key, data[key]]));
+}
 
-    if (filters?.division && filters.division !== 'all') {
-      result = result.filter((k) => k.division.toLowerCase() === filters.division?.toLowerCase());
-    }
+export class StagingKruService implements IKruService {
+  async fetchFromBackend(_forceRefresh = false): Promise<{ crew: CrewMember[]; stats: CrewStats }> {
+    const body = await request('/api/kru');
+    return {
+      crew: body.crew || [],
+      stats: body.stats || {
+        total: (body.crew || []).length,
+        aktif: (body.crew || []).filter((c: CrewMember) => c.status_kru === 'Aktif').length,
+        nonaktif: (body.crew || []).filter((c: CrewMember) => c.status_kru === 'Nonaktif').length,
+      },
+    };
+  }
 
-    if (filters?.search) {
-      const q = filters.search.toLowerCase();
-      result = result.filter(
-        (k) =>
-          k.full_name.toLowerCase().includes(q) ||
-          k.ptv_id.toLowerCase().includes(q) ||
-          k.position.toLowerCase().includes(q)
-      );
-    }
-
-    return result;
+  async getCrewList(filters?: CrewFilterParams, forceRefresh = false): Promise<CrewMember[]> {
+    const { crew } = await this.fetchFromBackend(forceRefresh);
+    if (!filters) return crew;
+    return crew.filter((m) => {
+      if (filters.search) {
+        const q = filters.search.toLowerCase();
+        const matchName = m.full_name?.toLowerCase().includes(q);
+        const matchPtvId = m.ptv_id?.toLowerCase().includes(q);
+        const matchUsername = m.username?.toLowerCase().includes(q);
+        if (!matchName && !matchPtvId && !matchUsername) return false;
+      }
+      if (filters.division && filters.division !== 'Semua' && m.division !== filters.division) return false;
+      if (filters.categoryTab && filters.categoryTab !== 'Semua') {
+        if (filters.categoryTab === 'Aktif' || filters.categoryTab === 'Nonaktif') {
+          if (m.status_kru !== filters.categoryTab) return false;
+        } else {
+          if (m.category !== filters.categoryTab) return false;
+        }
+      }
+      return true;
+    });
   }
 
   async getCrewByPtvId(ptvId: string): Promise<CrewMember | null> {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    return this.mockData.find((k) => k.ptv_id.toLowerCase() === ptvId.toLowerCase()) || null;
+    const list = await this.getCrewList();
+    return list.find((m) => m.ptv_id.toLowerCase() === ptvId.toLowerCase()) || null;
+  }
+
+  async getStats(): Promise<CrewStats> {
+    const { stats } = await this.fetchFromBackend();
+    return stats;
+  }
+
+  async getLoginHistory(): Promise<LoginHistoryItem[]> {
+    try {
+      const body = await request('/api/kru?view=login_history');
+      return body.history || [];
+    } catch {
+      return [];
+    }
+  }
+
+  async getActiveCrewCandidates(): Promise<AcaraCrewMember[]> {
+    const list = await this.getCrewList();
+    return list
+      .filter((m) => m.status_kru === 'Aktif')
+      .map((m) => ({
+        id: m.id,
+        ptv_id: m.ptv_id,
+        name: m.full_name,
+        job: m.position || m.division || 'Kru',
+        role: m.position || m.division || 'Kru',
+        division: m.division || 'Umum',
+        photo: m.foto_url,
+      }));
+  }
+
+  async createCrew(data: Omit<CrewMember, 'id'>): Promise<CrewMember> {
+    return (await request('/api/kru', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(personnelFields(data)),
+    })).crew;
+  }
+
+  async updateCrew(id: string, updates: Partial<CrewMember>): Promise<CrewMember> {
+    return (await request(`/api/kru?id=${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(personnelFields(updates)),
+    })).crew;
+  }
+
+  async createAccountByRoot(crewId: string): Promise<{ success: boolean; message: string; credentials: CreatedAccountCredentials; crew: CrewMember }> {
+    return await request(`/api/kru?id=${encodeURIComponent(crewId)}&action=create_account`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create_account', id: crewId }),
+    });
+  }
+
+  async toggleAccountStatus(crewId: string, currentAccountStatus?: string) {
+    const nextStatus = currentAccountStatus === 'Aktif' ? 'inactive' : 'active';
+    return await request(`/api/kru?id=${encodeURIComponent(crewId)}&action=toggle_account`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'toggle_account', id: crewId, status_akun: nextStatus }),
+    });
+  }
+
+  async resetPasswordByRoot(crewId: string, newPassword: string, reason?: string) {
+    return await request(`/api/kru?id=${encodeURIComponent(crewId)}&action=reset_password`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'reset_password', id: crewId, newPassword, reason }),
+    });
+  }
+
+  async updateUsernameByRoot(crewId: string, newUsername: string) {
+    return await request(`/api/kru?id=${encodeURIComponent(crewId)}&action=update_username`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'update_username', id: crewId, username: newUsername }),
+    });
+  }
+
+  async uploadAvatar(base64Data: string, ptvId?: string): Promise<string> {
+    const body = await request('/api/upload-avatar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: base64Data, ptv_id: ptvId }),
+    });
+    return body.url;
   }
 }
 
-let kruServiceInstance: IKruService | null = null;
-
+let instance: IKruService | null = null;
 export function getKruService(): IKruService {
-  if (!kruServiceInstance) {
-    kruServiceInstance = new LocalKruService();
-  }
-  return kruServiceInstance;
+  return instance ||= new StagingKruService();
 }

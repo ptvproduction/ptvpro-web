@@ -248,6 +248,28 @@ INSERT INTO profile_capabilities (profile_id, capability_key) VALUES
 ('pembina', 'settings.personal')
 ON CONFLICT (profile_id, capability_key) DO NOTHING;
 
+-- Strict Quarantine Assertion: Reconcile any existing privilege drift on Pembina
+DELETE FROM public.profile_capabilities 
+WHERE profile_id = 'pembina' 
+  AND (capability_key LIKE 'finance.%' OR capability_key LIKE 'inventory.valuation.%');
+
+-- Institutional Reference Tables Privileges
+REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON 
+    public.organization, 
+    public.organization_division, 
+    public.access_profile, 
+    public.capability_registry, 
+    public.profile_capabilities 
+FROM anon, authenticated, PUBLIC;
+
+GRANT SELECT ON 
+    public.organization, 
+    public.organization_division, 
+    public.access_profile, 
+    public.capability_registry, 
+    public.profile_capabilities 
+TO anon, authenticated;
+
 COMMIT;
 
 -- ----------------------------------------------------------------------------

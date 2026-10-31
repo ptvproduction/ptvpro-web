@@ -1,0 +1,107 @@
+{
+  "session": "PTV-DEV-170",
+  "operator": "zidnal",
+  "datesLocal": "26–27 Oktober 2026 (Asia/Jakarta)",
+  "status": "PARTIAL",
+  "supabaseProject": "swadgljnyelsjstqqxbm",
+  "authorization": {
+    "preview": true,
+    "reportGuardAndRollbackWithPrerequisites": true,
+    "roufConsentPlan169Confirmed": true,
+    "primaryAccountPrivilegeChanges": false
+  },
+  "hosted": {
+    "projectId": "prj_U1Rtauj8BlOwusamXhsEKATqCYdM",
+    "deploymentId": "dpl_FfuFc5Z6bdGY5sZxkJgf5RK5CGWU",
+    "url": "https://ptvpro-9sjo6ryow-ptvpro-web.vercel.app",
+    "state": "READY",
+    "vercelTarget": null,
+    "aliases": [],
+    "mode": "staging",
+    "backendPinned": true,
+    "protectionDisabled": false,
+    "gateway": "single bundled ESM API, explicit whitelist21; rejects non-Preview or non-Staging project",
+    "deployedGatewaySha256": "a098104ba664d12bf44a7978f7d1d00b384366bee0ebd85df6885d508011df2a",
+    "environmentTargets": [
+      "preview"
+    ],
+    "secretsPrinted": false,
+    "actualOperationsPassed": [
+      "anonymous401",
+      "jid login200 and real cookie",
+      "rouf login200, Secure/HttpOnly/SameSite=Lax cookie, live session authenticated, logout",
+      "catalog200",
+      "foreign photo namespace403",
+      "immutable photo upload",
+      "atomic create/replay/edit units",
+      "valuation persistence with zero book value",
+      "checkout unit/master identity",
+      "single+remaining return/history",
+      "damage/QC before guard",
+      "damage/QC after guard",
+      "shared LostFound create/update/delete after guard",
+      "logout",
+      "fixture cleanup and data digest restored"
+    ],
+    "initialDeploymentIssuesResolved": [
+      "Hobby12 function limit: preview-only gateway packaging",
+      "ESM extensionless import failure: bundled gateway",
+      "CLI protection bypass requires full URL",
+      "LostFound cleanup must use API rather than service-role direct DELETE"
+    ]
+  },
+  "reportGuard": {
+    "migration": "inventory_170_native_damage_portal_guard",
+    "version": "20261026170344",
+    "proposalSha256": "11c252add3f0dc5b89a66a37ea4ef97d2a242dc2583b336f04383f18796f9ff0",
+    "status": "EXECUTED_VERIFIED",
+    "beforeMd5": "050ec0fe8d7414999c6654e9e7c41ee9",
+    "afterMd5": "7f66a228d7369f1572a442aa5d4ef7a1",
+    "nativeAuthenticatedRoleDamageRejected42501": true,
+    "nativeTestPersonImpersonation": false,
+    "dataAclOwnerSearchPathUnchanged": true,
+    "rollback": "docs/PTVPRO-INVENTORY-168-REPORT-ROLLBACK.sql",
+    "rollbackLocalChecksPreviouslyPassed": 14,
+    "cloudRollbackExecuted": false
+  },
+  "negativeCapability": {
+    "status": "NOT_EXECUTED",
+    "consent": "CONFIRMED_BY_OPERATOR_FROM_ROUF",
+    "testerCreated": false,
+    "credentialsCreated": false,
+    "overridesChanged": false,
+    "blocker": "service_role has no INSERT on account/identity/membership/overrides/credentials; existing guarded private enrollment launcher is pre-bootstrap-only and rejects active gate/Root. Owner-operated post-bootstrap private enrollment channel is required; do not bypass DPAPI/manual-console guard or close global gate."
+  },
+  "cutover": {
+    "status": "NOT_EXECUTED_NO_GO",
+    "oldGrantsRevoked": false,
+    "reason": "Restricted-account cloud negative tests not PASS; final combined privilege package not rehearsed after that gate. Candidate166 remains locked.",
+    "rollbackAvailable": "166 ACL/policy snapshot + rollback;168 report rollback; valuation167 retained"
+  },
+  "verification": {
+    "regressionTests": 83,
+    "testFiles": 7,
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "stagingBuild": "PASS",
+    "existingBuildWarning": "chunk >500kB",
+    "gatewayAdditionalLocalChecks": 5
+  },
+  "cleanup": {
+    "master": 164,
+    "units": 251,
+    "valuation": 114,
+    "loans": 2,
+    "damageReports": 1,
+    "inventoryFixtures": 0,
+    "operationalTableDigestsMatchPreGuard": true,
+    "auditsPreserved": true
+  },
+  "production": {
+    "readOnly": true,
+    "originalDeploymentId": "dpl_8Zd2kbvW3JekKXDh1GuwA9Px4szw",
+    "state": "READY",
+    "domainsUnchanged": true
+  },
+  "nextHumanAction": "Provide/run legitimate owner-operated private post-bootstrap tester provisioning+credential enrollment; consent already received, no further privilege consent assumed or requested."
+}

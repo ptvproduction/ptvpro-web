@@ -1,0 +1,72 @@
+{
+  "session": "PTV-DEV-166",
+  "date": "2026-10-26",
+  "projectRef": "swadgljnyelsjstqqxbm",
+  "status": "PARTIAL_CUTOVER_NO_GO",
+  "privateMechanism": {
+    "existingOwnerArtifacts": 2,
+    "aclGuard": "PASS",
+    "nativeDpapi": "PASS",
+    "bypass": false,
+    "newPassword": false,
+    "secretOrCookieLogged": false,
+    "childModulePathRepair": "TRANSIENT_NATIVE_MODULES_CASE_INSENSITIVE"
+  },
+  "realLogin": {
+    "jid": 200,
+    "rouf": 200,
+    "logout": "PASS"
+  },
+  "realCloud": {
+    "anonymousApi": 401,
+    "catalog": "PASS",
+    "foreignPhotoNamespace": 403,
+    "upload": "PASS",
+    "createReplayTwoUnits": "PASS",
+    "editUnits": "PASS",
+    "valuation": {
+      "status": 503,
+      "sqlstate": "42P10",
+      "cause": "No unique inventaris_id arbiter",
+      "duplicateGroups": 0
+    },
+    "checkout": "PASS",
+    "singleAndRemainingReturn": "PASS",
+    "historyUnitLink": "PASS",
+    "damage": "PASS",
+    "qc": "PASS",
+    "restrictedCapabilityAccount": "UNAVAILABLE_BOTH_ACTIVE_ACCOUNTS_HAVE_ALL_INVENTORY_GRANTS"
+  },
+  "directAnon": {
+    "catalog": 200,
+    "units": 200,
+    "valuation": 401,
+    "storageMetadata": 200
+  },
+  "cutover": {
+    "executed": false,
+    "reason": "Prerequisites not satisfied",
+    "rollback": "SNAPSHOT_AND_GUARDED_SQL_PREPARED_NOT_REHEARSED_NOT_APPLIED",
+    "privilegeOrSchemaChanges": false
+  },
+  "postflight": {
+    "tableAclUnchanged": true,
+    "rpcAclUnchanged": true,
+    "storagePoliciesUnchanged": true,
+    "masters": 164,
+    "units": 251,
+    "valuations": 114,
+    "loans": 2,
+    "fixtureRemaining": 0,
+    "loanOrphans": 0
+  },
+  "validation": {
+    "testFiles": 5,
+    "tests": 57,
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "stagingBuild": "PASS"
+  },
+  "productionAccessed": false,
+  "commitPushDeploy": false
+}

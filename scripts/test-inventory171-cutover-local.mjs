@@ -1,0 +1,93 @@
+import { spawnSync } from 'node:child_process';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { resolve, join } from 'node:path';
+import assert from 'node:assert/strict';
+
+assert(process.argv.length === 2);
+const root = resolve('.gemini/scratch/inventory167-pg');
+assert(root.startsWith(resolve('.gemini/scratch') + '\\') && existsSync(join(root, 'PG_VERSION')) && readFileSync(join(root, 'inventory167-local-only.marker'), 'utf8') === 'SYNTHETIC_INVENTORY167_ONLY');
+const db = `inventory171_cutover_${Date.now()}`;
+const env = { ...process.env, PGHOST: '127.0.0.1', PGHOSTADDR: '127.0.0.1', PGPORT: '55439', PGUSER: 'postgres', PGPASSWORD: '', PGSSLMODE: 'disable' };
+for (const k of ['PGSERVICE', 'PGSERVICEFILE', 'PGOPTIONS', 'PGPASSFILE']) delete env[k];
+const run = (name, args, extra = {}) => spawnSync('C:/Program Files/PostgreSQL/17/bin/' + name, args, { env, encoding: 'utf8', windowsHide: true, timeout: 60000, ...extra });
+const query = (input, database = db) => run('psql.exe', ['-X', '--no-password', '-h', '127.0.0.1', '-p', '55439', '-U', 'postgres', '-qAt', '-v', 'ON_ERROR_STOP=1', '-d', database], { input });
+const sql = (input, database) => { const r = query(input, database); assert(r.status === 0, 'LOCAL_SQL_FAILED'); return r.stdout.trim(); };
+const checks = []; const check = (name, ok) => { assert(ok, name); checks.push(name); };
+const reject = (name, input, reason) => { const r = query(input); check(name, r.status !== 0 && r.stderr.includes(reason)); };
+const snapshot = JSON.parse(readFileSync('docs/PTVPRO-INVENTORY-171-ACL-SNAPSHOT.json', 'utf8'));
+const negativeBytes = readFileSync('docs/PTVPRO-INVENTORY-171-NEGATIVE-RESULTS.json');
+const negative = JSON.parse(negativeBytes); assert(negative.status === 'PASS' && negative.retired && negative.cleaned);
+const source = readFileSync('supabase/migrations/20261026180134_inventory171_portal_security_cutover.sql', 'utf8');
+const rollback = readFileSync('docs/PTVPRO-INVENTORY-171-CUTOVER-ROLLBACK.sql', 'utf8');
+const aclQuery = source.match(/IF \(SELECT digest FROM \((with [\s\S]+?)\) snapshot\)/i)[1];
+let started = false; let created = false; let success = false;
+try {
+  assert(run('pg_ctl.exe', ['-D', root, 'status']).status !== 0);
+  assert(run('pg_ctl.exe', ['-D', root, '-l', join(root, 'server.log'), '-o', '-h 127.0.0.1 -p 55439 -c max_connections=20', '-w', 'start'], { stdio: 'ignore' }).status === 0);
+  started = true; sql(`CREATE DATABASE ${db}`, 'postgres'); created = true;
+  check('loopback isolated database verified', sql(`SELECT inet_server_addr()='127.0.0.1'::inet AND current_database()='${db}'`) === 't');
+  sql(`CREATE SCHEMA storage; CREATE SCHEMA auth; CREATE SCHEMA ptv_auth_private; CREATE SCHEMA ptv_report_private; CREATE SCHEMA ptv_inventory_test_private;
+    CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql AS $$ SELECT NULL::uuid $$;
+    CREATE FUNCTION public.has_capability(text) RETURNS boolean LANGUAGE sql AS $$ SELECT true $$;
+    CREATE TABLE public.ptv_inventaris(id uuid DEFAULT gen_random_uuid(),foto_url text);
+    CREATE TABLE public.ptv_inventaris_unit(id uuid DEFAULT gen_random_uuid()); CREATE TABLE public.ptv_nilai_inventaris(id uuid DEFAULT gen_random_uuid());
+    CREATE TABLE public.ptv_peminjaman(id uuid DEFAULT gen_random_uuid()); CREATE TABLE public.ptv_lapor_masalah(id uuid DEFAULT gen_random_uuid());
+    CREATE TABLE public.canonical_identity(id uuid,metadata jsonb); CREATE TABLE public.user_account(id uuid,identity_id uuid,username text,status_akun text);
+    CREATE TABLE public.auth_credentials(account_id uuid,password_hash text); CREATE TABLE ptv_auth_private.sessions(account_id uuid,revoked_at timestamptz,expires_at timestamptz);
+    CREATE TABLE public.auth_audit_log(actor_id uuid,event_type text,metadata jsonb);
+    CREATE TABLE storage.objects(id uuid DEFAULT gen_random_uuid(),bucket_id text,name text,owner uuid);
+    ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY; GRANT USAGE ON SCHEMA storage TO anon,authenticated,service_role; GRANT ALL ON storage.objects TO anon,authenticated,service_role;
+    CREATE POLICY synthetic_other_bucket ON storage.objects FOR ALL TO anon,authenticated USING(bucket_id='finance-proofs') WITH CHECK(bucket_id='finance-proofs');
+    CREATE FUNCTION ptv_report_private.write_report(text,text,uuid,jsonb,uuid,bigint) RETURNS jsonb LANGUAGE sql AS $$ SELECT '{}'::jsonb $$;
+    CREATE FUNCTION ptv_inventory_test_private.manage(jsonb,uuid,text) RETURNS jsonb LANGUAGE sql AS $$ SELECT '{}'::jsonb $$;
+    CREATE FUNCTION public.rpc_inventory_test171(jsonb,uuid,text) RETURNS jsonb LANGUAGE sql AS $$ SELECT '{}'::jsonb $$;
+    GRANT USAGE ON SCHEMA ptv_inventory_test_private TO service_role;
+    INSERT INTO storage.objects(bucket_id,name) VALUES('inventory','synthetic-original'),('finance-proofs','synthetic-original');
+    INSERT INTO public.canonical_identity VALUES('10000000-0000-4000-8000-000000000001',jsonb_build_object('run_id','${negative.runId}'));
+    INSERT INTO public.user_account VALUES('20000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000001','stg-inventory-neg-171','inactive');`);
+  const funcs = [...new Set(snapshot.value.grants.filter(g => g.kind === 'function').map(g => g.object))];
+  for (const f of funcs) {
+    assert(/^[a-z_]+\([a-z,\[\] ]*\)$/.test(f));
+    sql(`CREATE FUNCTION public.${f} RETURNS jsonb LANGUAGE sql AS $$ SELECT '{}'::jsonb $$; REVOKE ALL ON FUNCTION public.${f} FROM PUBLIC,anon,authenticated,service_role;`);
+  }
+  for (const g of snapshot.value.grants) {
+    assert(['postgres', 'anon', 'authenticated', 'service_role', 'PUBLIC'].includes(g.grantee));
+    sql(`GRANT ${g.privilege} ON ${g.kind.toUpperCase()} public.${g.object} TO ${g.grantee}${g.grantable ? ' WITH GRANT OPTION' : ''};`);
+  }
+  for (const p of snapshot.value.policies) sql(`CREATE POLICY ${p.policyname} ON storage.objects AS ${p.permissive} FOR ${p.cmd} TO ${p.roles.map(r => r === 'public' ? 'PUBLIC' : r).join(',')} ${p.qual ? `USING (${p.qual})` : ''} ${p.with_check ? `WITH CHECK (${p.with_check})` : ''};`);
+  const localAcl = sql(`SELECT digest FROM (${aclQuery}) x`);
+  check('fresh cloud ACL/policy semantics reproduced', localAcl === snapshot.digest);
+  const physical = sql('SELECT md5(system_identifier::text) FROM pg_control_system()');
+  const guard = sql("SELECT md5(prosrc) FROM pg_proc WHERE oid='ptv_report_private.write_report(text,text,uuid,jsonb,uuid,bigint)'::regprocedure");
+  const local = source.replaceAll('72737c1de8ff53d24950c9d2b30bd42d', physical).replaceAll('7f66a228d7369f1572a442aa5d4ef7a1', guard);
+  const undo = rollback.replaceAll('72737c1de8ff53d24950c9d2b30bd42d', physical);
+  const approval = "SET ptv.inventory171.cutover_approved='swadgljnyelsjstqqxbm';\n";
+  reject('cutover requires explicit approval', local, 'CUTOVER171_APPROVAL_REQUIRED');
+  reject('cutover requires negative evidence', approval + local, 'NEGATIVE_PROOF_REQUIRED');
+  const sha = source.match(/receipt_sha256'='([0-9a-f]{64})'/)[1];
+  sql(`INSERT INTO public.auth_audit_log VALUES(NULL,'inventory_test171_negative_verified',jsonb_build_object('run_id','${negative.runId}','receipt_sha256','${sha}'));`);
+  sql(approval + local);
+  check('five tables closed for native clients', sql("SELECT bool_and(NOT has_table_privilege('anon',oid,'SELECT') AND NOT has_table_privilege('authenticated',oid,'SELECT')) FROM pg_class WHERE relname IN ('ptv_inventaris','ptv_inventaris_unit','ptv_nilai_inventaris','ptv_peminjaman','ptv_lapor_masalah')") === 't');
+  check('six native RPCs closed; service create preserved', funcs.every(f => sql(`SELECT NOT has_function_privilege('authenticated','public.${f}','EXECUTE')`) === 't') && sql("SELECT has_function_privilege('service_role','rpc_create_inventaris(jsonb,jsonb)','EXECUTE')") === 't');
+  check('one-run administration path closed', sql("SELECT NOT has_function_privilege('service_role','rpc_inventory_test171(jsonb,uuid,text)','EXECUTE')") === 't');
+  check('native inventory metadata hidden', sql("SET ROLE anon; SELECT count(*) FROM storage.objects WHERE bucket_id='inventory'; RESET ROLE;") === '0');
+  reject('native upload denied', "SET ROLE authenticated; INSERT INTO storage.objects(bucket_id,name) VALUES('inventory','must-not-write');", 'row-level security');
+  check('native update cannot alter inventory', sql("SET ROLE authenticated; UPDATE storage.objects SET name='changed' WHERE bucket_id='inventory' RETURNING name; RESET ROLE;") === '');
+  check('native delete cannot remove inventory', sql("SET ROLE authenticated; DELETE FROM storage.objects WHERE bucket_id='inventory' RETURNING name; RESET ROLE;") === '');
+  check('other bucket select preserved', sql("SET ROLE anon; SELECT count(*) FROM storage.objects WHERE bucket_id='finance-proofs'; RESET ROLE;") === '1');
+  check('other bucket insert/update/delete preserved without inventory table grant', sql("SET ROLE authenticated; INSERT INTO storage.objects(bucket_id,name) VALUES('finance-proofs','synthetic-new'); UPDATE storage.objects SET name='synthetic-updated' WHERE name='synthetic-new'; DELETE FROM storage.objects WHERE name='synthetic-updated' RETURNING name; RESET ROLE;") === 'synthetic-updated');
+  check('service storage access preserved', sql("SET ROLE service_role; SELECT count(*) FROM storage.objects WHERE bucket_id='inventory'; RESET ROLE;") === '1');
+  reject('rollback requires explicit approval', undo, 'ROLLBACK171_APPROVAL_REQUIRED');
+  sql("SET ptv.inventory171.rollback_approved='swadgljnyelsjstqqxbm';\n" + undo);
+  check('rollback restores exact client ACL/policies', sql(`SELECT digest FROM (${aclQuery}) x`) === snapshot.digest);
+  sql("SET ptv.inventory171.rollback_approved='swadgljnyelsjstqqxbm';\n" + undo);
+  check('rollback idempotent', sql(`SELECT digest FROM (${aclQuery}) x`) === snapshot.digest);
+  check('storage rows preserved', sql("SELECT count(*)=2 AND bool_and(name='synthetic-original') FROM storage.objects") === 't');
+  success = true;
+} finally {
+  let cleaned = !created || query(`DROP DATABASE ${db}`, 'postgres').status === 0;
+  if (started) cleaned = run('pg_ctl.exe', ['-D', root, '-m', 'fast', '-w', 'stop'], { stdio: 'ignore' }).status === 0 && cleaned;
+  const result = { scope: 'LOCAL_ISOLATED_FINAL_ACL_POLICY_PACKAGE', reportAndRpcBodies: 'permission model stubs only; hosted actual bodies already verified', status: success && cleaned ? 'PASS' : 'FAIL', checks, checksPassed: checks.length, cleaned };
+  writeFileSync('docs/PTVPRO-INVENTORY-171-CUTOVER-LOCAL-RESULTS.json', JSON.stringify(result, null, 2) + '\n');
+  process.stdout.write(JSON.stringify(result) + '\n'); if (!success || !cleaned) process.exitCode = 1;
+}

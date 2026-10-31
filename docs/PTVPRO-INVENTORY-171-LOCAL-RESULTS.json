@@ -1,0 +1,28 @@
+{
+  "scope": "LOCAL_ISOLATED_SYNTHETIC_NEW_TESTER_RPC",
+  "cloudChanges": false,
+  "sessionRegistryFixture": "local stub; actual registry checked hosted separately",
+  "status": "PASS",
+  "checksPassed": 18,
+  "checks": [
+    "isolated loopback only",
+    "unmodified migration rejects non-Staging database",
+    "migration repeat safe",
+    "anonymous RPC denied",
+    "authenticated RPC denied",
+    "forged Root session rejected",
+    "unsafe nested logging rejected before credential creation",
+    "non-Root valid session rejected",
+    "one transient password returned; no profile copied",
+    "phase A hub-only allow and nine mutation denies",
+    "bcrypt stored without plaintext audit",
+    "provision replay cannot rotate or disclose password",
+    "different run cannot manage existing tester",
+    "phase B allow set idempotent",
+    "retirement revokes all sessions and removes credential",
+    "retirement repeat safe",
+    "primary unchanged",
+    "all operations audited without password field"
+  ],
+  "cleaned": true
+}

@@ -1,11 +1,18 @@
 import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { inventarisService } from './inventarisService';
+import { inventarisService, normalizeKondisiUnit, isUnitAvailable } from './inventarisService';
 import { ItemInventaris, InventarisUnit } from './types';
 import { loanBasketStore, LoanBasketItem } from './loanBasketStore';
 import { peminjamanService } from '../peminjaman/peminjamanService';
 import { PeminjamanRecord } from '../peminjaman/types';
 import { LoanModal } from '../peminjaman/LoanModal';
+import { useSessionStore } from '@core/session';
+import { EditAlatModal } from './EditAlatModal';
+import { UnitBarcodesSection } from './UnitBarcodesSection';
+import { resolveInventoryPhotoUrl } from './utils/inventoryPhotoUtils';
+import { canDeleteInventory } from './utils/inventoryPermissions';
+import { SmartDeleteInventarisModal } from './components/SmartDeleteInventarisModal';
+import { DocDetailSkeleton } from '@/shared/components';
 
 export const AlatDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,50 +21,100 @@ export const AlatDetailPage: React.FC = () => {
   const [asset, setAsset] = useState<ItemInventaris | null>(null);
   const [loans, setLoans] = useState<PeminjamanRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loansLoading, setLoansLoading] = useState(false);
+  const [loansError, setLoansError] = useState<string | null>(null);
   const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSmartDeleteModalOpen, setIsSmartDeleteModalOpen] = useState(false);
+  const { can, user } = useSessionStore();
+  const canDelete = canDeleteInventory(user, can);
+  const fetchIdRef = React.useRef(0);
 
   // Reactive subscription to loanBasketStore
   useSyncExternalStore(
     (cb) => loanBasketStore.subscribe(cb),
-    () => loanBasketStore.getItems()
+    () => loanBasketStore.getItems(),
+    () => []
   );
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchData = async () => {
-      if (!id) return;
-      setLoading(true);
-      try {
-        const [assetData, allLoans] = await Promise.all([
-          inventarisService.getInventarisById(id),
-          peminjamanService.getPeminjamanList(),
-        ]);
-        if (isMounted) {
-          setAsset(assetData);
-          if (assetData) {
-            // Match loans for this asset
-            const matched = allLoans.filter((l) =>
-              assetData.units.some((u) => u.id === l.unit_id || u.kode_unit === l.kode_unit) ||
-              l.nama_alat.toLowerCase().includes(assetData.nama_alat.toLowerCase())
-            );
-            setLoans(matched);
-          }
-        }
-      } finally {
-        if (isMounted) setLoading(false);
+  const fetchLoansForAsset = async (assetData: ItemInventaris) => {
+    setLoansLoading(true);
+    setLoansError(null);
+    try {
+      const allLoans = await peminjamanService.getPeminjamanList();
+
+      const validUnitIds = new Set<string>();
+      const validUnitCodes = new Set<string>();
+
+      if (assetData.id) validUnitIds.add(String(assetData.id).trim().toLowerCase());
+      if (assetData.kode) validUnitCodes.add(String(assetData.kode).trim().toLowerCase());
+
+      for (const u of assetData.units || []) {
+        if (u.id) validUnitIds.add(String(u.id).trim().toLowerCase());
+        if (u.kode_unit) validUnitCodes.add(String(u.kode_unit).trim().toLowerCase());
       }
-    };
+
+      const cleanAssetName = (assetData.nama_alat || '').trim().toLowerCase();
+
+      const matched = allLoans.filter((l) => {
+        const loanUnitId = (l.unit_id || '').trim().toLowerCase();
+        const loanUnitCode = (l.kode_unit || '').trim().toLowerCase();
+        const loanItemName = (l.nama_alat || '').trim().toLowerCase();
+
+        // 1. Cocokkan ID unit fisik atau master inventaris
+        if (loanUnitId && validUnitIds.has(loanUnitId)) return true;
+
+        // 2. Cocokkan kode unit fisik atau kode master inventaris
+        if (loanUnitCode && validUnitCodes.has(loanUnitCode)) return true;
+
+        // 3. Cocokkan prefix kode unit (misal 'INV-001-01' saat asset.kode adalah 'INV-001')
+        if (assetData.kode && loanUnitCode && loanUnitCode.startsWith(assetData.kode.trim().toLowerCase() + '-')) return true;
+
+        // 4. Fallback nama alat identik (transaksi warisan)
+        if (cleanAssetName && loanItemName === cleanAssetName) return true;
+
+        return false;
+      });
+
+      // Urutkan riwayat: pinjaman terbaru di atas
+      matched.sort((a, b) => {
+        const dateA = a.created_at || a.tanggal_pinjam || '';
+        const dateB = b.created_at || b.tanggal_pinjam || '';
+        return dateB.localeCompare(dateA);
+      });
+
+      setLoans(matched);
+    } catch (err: any) {
+      setLoansError(err?.message || 'Gagal memuat riwayat peminjaman dari sistem.');
+    } finally {
+      setLoansLoading(false);
+    }
+  };
+
+  const fetchData = async (silent = false) => {
+    if (!id) return;
+    const currentFetchId = ++fetchIdRef.current;
+    if (!silent) setLoading(true);
+    try {
+      const assetData = await inventarisService.getInventarisById(id);
+      if (currentFetchId !== fetchIdRef.current) return;
+      setAsset(assetData);
+      if (assetData) {
+        await fetchLoansForAsset(assetData);
+      }
+    } finally {
+      if (currentFetchId === fetchIdRef.current && !silent) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
-    return () => {
-      isMounted = false;
-    };
   }, [id]);
 
-  if (loading) {
+  if (loading && !asset) {
     return (
-      <div className="page" style={{ padding: '40px 16px', textAlign: 'center', color: 'var(--muted)' }}>
-        <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '24px', marginBottom: '10px', display: 'block' }} />
-        <span>Memuat rincian aset inventaris...</span>
+      <div className="page" style={{ maxWidth: '1060px', margin: '0 auto', padding: '16px' }}>
+        <DocDetailSkeleton />
       </div>
     );
   }
@@ -84,10 +141,12 @@ export const AlatDetailPage: React.FC = () => {
     );
   }
 
-  const total = asset.total_unit;
-  const avail = asset.unit_tersedia;
-  const borrowed = total - avail;
-  const damaged = asset.units.filter((u) => u.kondisi === 'rusak').length;
+  const total = asset.units.length || asset.total_unit;
+  const avail = asset.units.filter((u) => isUnitAvailable(u.status_peminjaman, u.kondisi)).length;
+  const borrowed = asset.units.filter((u) => (u.status_peminjaman || '').toLowerCase() === 'dipinjam').length;
+  const damaged = asset.units.filter((u) => normalizeKondisiUnit(u.kondisi) === 'rusak').length;
+  const inService = asset.units.filter((u) => normalizeKondisiUnit(u.kondisi) === 'perlu_servis').length;
+  const lost = asset.units.filter((u) => normalizeKondisiUnit(u.kondisi) === 'hilang').length;
 
   const inBasket = loanBasketStore.hasAsset(asset.id);
 
@@ -110,7 +169,47 @@ export const AlatDetailPage: React.FC = () => {
     }
   };
 
+  const isUnitEligibleForLoan = (u: InventarisUnit) => {
+    return isUnitAvailable(u.status_peminjaman, u.kondisi);
+  };
+
+  const getKondisiSummary = (units: InventarisUnit[]) => {
+    if (!units || units.length === 0) {
+      return {
+        label: 'Belum Ada Unit',
+        color: 'var(--muted)',
+        icon: 'fa-circle-question',
+      };
+    }
+    const bagusCount = units.filter((u) => normalizeKondisiUnit(u.kondisi) === 'bagus').length;
+    const perluServisCount = units.filter((u) => normalizeKondisiUnit(u.kondisi) === 'perlu_servis').length;
+    const rusakCount = units.filter((u) => normalizeKondisiUnit(u.kondisi) === 'rusak').length;
+    const hilangCount = units.filter((u) => normalizeKondisiUnit(u.kondisi) === 'hilang').length;
+
+    if (bagusCount === units.length) {
+      return {
+        label: 'Semua Baik',
+        color: 'var(--ok)',
+        icon: 'fa-shield-halved',
+      };
+    }
+
+    const parts: string[] = [];
+    if (bagusCount > 0) parts.push(`${bagusCount} Baik`);
+    if (perluServisCount > 0) parts.push(`${perluServisCount} Perlu Servis`);
+    if (rusakCount > 0) parts.push(`${rusakCount} Rusak`);
+    if (hilangCount > 0) parts.push(`${hilangCount} Hilang`);
+
+    const hasDanger = rusakCount > 0 || hilangCount > 0;
+    return {
+      label: parts.join(' · '),
+      color: hasDanger ? 'var(--dang)' : 'var(--warn)',
+      icon: hasDanger ? 'fa-triangle-exclamation' : 'fa-wrench',
+    };
+  };
+
   const handleUnitBasketToggle = (u: InventarisUnit, unitIndex: number) => {
+    if (!isUnitEligibleForLoan(u)) return; // Blokir keras unit yang tidak layak pinjam
     const key = `${asset.id}_${u.id}`;
     const basketItem: LoanBasketItem = {
       key,
@@ -118,7 +217,7 @@ export const AlatDetailPage: React.FC = () => {
       unitId: u.id,
       unitNo: unitIndex + 1,
       unitCode: u.kode_unit,
-      unitName: `Unit ${unitIndex + 1}`,
+      unitName: u.nama_unit?.trim() || `Unit ${unitIndex + 1}`,
       assetName: asset.nama_alat,
       invCode: asset.kode,
     };
@@ -126,7 +225,7 @@ export const AlatDetailPage: React.FC = () => {
   };
 
   const handleQuickAddFirstAvailable = () => {
-    const firstAvailIdx = asset.units.findIndex((u) => u.status_peminjaman === 'tersedia');
+    const firstAvailIdx = asset.units.findIndex((u) => isUnitEligibleForLoan(u));
     if (firstAvailIdx !== -1) {
       handleUnitBasketToggle(asset.units[firstAvailIdx], firstAvailIdx);
     }
@@ -150,23 +249,42 @@ export const AlatDetailPage: React.FC = () => {
   return (
     <div className="page">
       <div className="prod-detail-container">
-        {/* ── 1. BREADCRUMBS NAVIGATION (1:1 LEGACY) ── */}
-        <div className="prod-breadcrumb">
-          <button type="button" onClick={() => navigate('/hub/inventaris')}>
-            <i className="fa-solid fa-boxes-stacked" /> Inventaris
+        {/* ── BACK BUTTON & BREADCRUMBS ── */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '14px', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            className="btn sec sm"
+            onClick={() => navigate(-1)}
+            style={{
+              borderRadius: 'var(--ptv-curve-pill, 9999px)',
+              padding: '6px 14px',
+              fontSize: '12.5px',
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <i className="fa-solid fa-arrow-left" />
+            <span>Kembali ke Inventaris</span>
           </button>
-          <span className="sep">
-            <i className="fa-solid fa-chevron-right" />
-          </span>
-          <button type="button" onClick={() => navigate('/hub/inventaris')}>
-            {asset.kategori}
-          </button>
-          <span className="sep">
-            <i className="fa-solid fa-chevron-right" />
-          </span>
-          <span style={{ color: 'var(--ink)', fontWeight: 700 }} className="trunc">
-            {asset.nama_alat}
-          </span>
+          <div className="prod-breadcrumb" style={{ margin: 0 }}>
+            <button type="button" onClick={() => navigate('/hub/inventaris')}>
+              <i className="fa-solid fa-boxes-stacked" /> Inventaris
+            </button>
+            <span className="sep">
+              <i className="fa-solid fa-chevron-right" />
+            </span>
+            <button type="button" onClick={() => navigate('/hub/inventaris')}>
+              {asset.kategori}
+            </button>
+            <span className="sep">
+              <i className="fa-solid fa-chevron-right" />
+            </span>
+            <span style={{ color: 'var(--ink)', fontWeight: 700 }} className="trunc">
+              {asset.nama_alat}
+            </span>
+          </div>
         </div>
 
         {/* ── 2. MAIN SHOWCASE CARD (2 COLUMNS 1:1 LEGACY) ── */}
@@ -174,37 +292,70 @@ export const AlatDetailPage: React.FC = () => {
           {/* Left Column: Gallery & Image Showcase */}
           <div className="prod-gallery-col">
             <div className="prod-main-photo-wrap" id="prodMainPhotoWrap">
-              {asset.foto_url ? (
-                <img
-                  id="prodMainImg"
-                  src={asset.foto_url}
-                  alt={asset.nama_alat}
-                  onError={(e) => {
-                    (e.currentTarget as HTMLElement).style.display = 'none';
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (fallback) fallback.style.display = 'flex';
-                  }}
-                />
-              ) : null}
-              <div
-                className="prod-photo-fallback"
-                style={{ display: asset.foto_url ? 'none' : 'flex' }}
-              >
-                {getCatIconMarkup(asset.kategori)}
-              </div>
+              {(() => {
+                const resolvedPhoto = resolveInventoryPhotoUrl(asset.foto_url);
+                return (
+                  <>
+                    {resolvedPhoto ? (
+                      <img
+                        id="prodMainImg"
+                        src={resolvedPhoto}
+                        alt={asset.nama_alat}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLElement).style.display = 'none';
+                          const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="prod-photo-fallback"
+                      style={{ display: resolvedPhoto ? 'none' : 'flex' }}
+                    >
+                      {getCatIconMarkup(asset.kategori)}
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
 
           {/* Right Column: Specs, Stats, Highlight Banner & CTAs */}
           <div className="prod-info-col">
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '6px' }}>
-                <span className="chip blue" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.02em', padding: '2px 8px' }}>
-                  {asset.kode}
-                </span>
-                <span className="chip" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)', background: 'var(--bg-2)', border: '1px solid var(--line-2)' }}>
-                  {asset.kategori}
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span className="chip blue" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.02em', padding: '2px 8px' }}>
+                    {asset.kode}
+                  </span>
+                  <span className="chip" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)', background: 'var(--bg-2)', border: '1px solid var(--line-2)' }}>
+                    {asset.kategori}
+                  </span>
+                </div>
+                {can('inventory.edit') && (
+                  <button
+                    type="button"
+                    className="btn sec sm"
+                    id="btnEditAlat"
+                    style={{
+                      borderRadius: 'var(--r-ref-full, 9999px)',
+                      fontWeight: 600,
+                      fontSize: '12px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '4px 14px',
+                      border: '1px solid var(--line-2)',
+                      background: 'var(--surface, var(--card-bg, #ffffff))',
+                      color: 'var(--ink)',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => setIsEditModalOpen(true)}
+                  >
+                    <i className="fa-solid fa-pen-to-square" style={{ color: 'var(--b-600)' }} />
+                    <span>Edit Data Alat</span>
+                  </button>
+                )}
               </div>
               <h1 className="prod-main-title">{asset.nama_alat}</h1>
               <div className="prod-subhead">
@@ -215,17 +366,24 @@ export const AlatDetailPage: React.FC = () => {
 
             {/* Curated gear health & stats pills */}
             <div className="prod-stats-bar">
+              {(() => {
+                const cond = getKondisiSummary(asset.units);
+                return (
+                  <span className="prod-stat-pill" title={`Kondisi Fisik: ${cond.label}`}>
+                    <i className={`fa-solid ${cond.icon}`} style={{ color: cond.color }} />
+                    <span>Kondisi Fisik: <b style={{ color: cond.color }}>{cond.label}</b></span>
+                  </span>
+                );
+              })()}
+              {loans.length > 0 && (
+                <span className="prod-stat-pill">
+                  <i className="fa-solid fa-clock-rotate-left" style={{ color: 'var(--b-600)' }} />
+                  <span><b>{loans.length}x</b> Dipinjam</span>
+                </span>
+              )}
               <span className="prod-stat-pill">
-                <i className="fa-solid fa-shield-halved" style={{ color: '#2563eb' }} />
-                <span>Kondisi Fisik: <b>Prima</b></span>
-              </span>
-              <span className="prod-stat-pill">
-                <i className="fa-solid fa-clock-rotate-left" style={{ color: '#6366f1' }} />
-                <span><b>{loans.length}x</b> Dipinjam</span>
-              </span>
-              <span className="prod-stat-pill">
-                <i className="fa-solid fa-cubes-stacked" style={{ color: avail > 0 ? '#16a34a' : '#d97706' }} />
-                <span>Ketersediaan: <b style={{ color: avail > 0 ? '#16a34a' : '#d97706' }}>{avail}/{total} Unit</b></span>
+                <i className="fa-solid fa-cubes-stacked" style={{ color: avail > 0 ? 'var(--ok)' : 'var(--warn)' }} />
+                <span>Ketersediaan: <b style={{ color: avail > 0 ? 'var(--ok)' : 'var(--warn)' }}>{avail}/{total} Unit</b></span>
               </span>
             </div>
 
@@ -236,22 +394,26 @@ export const AlatDetailPage: React.FC = () => {
                   <i className={`fa-solid ${avail > 0 ? 'fa-circle-check' : 'fa-triangle-exclamation'}`} /> STATUS KESIAPAN ALAT
                 </span>
                 <div className="prod-price-val">
-                  {avail > 0 ? `${avail} Unit Siap Digunakan` : (borrowed > 0 ? 'Semua Unit Sedang Dipinjam' : 'Dalam Pemeliharaan / Servis')}
+                  {avail > 0
+                    ? `${avail} Unit Siap Digunakan`
+                    : borrowed > 0
+                    ? 'Semua Unit Sedang Dipinjam'
+                    : inService > 0
+                    ? 'Dalam Pemeliharaan / Butuh Servis'
+                    : lost > 0
+                    ? 'Unit Dilaporkan Hilang'
+                    : 'Seluruh Unit Rusak'}
                 </div>
-                <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, marginTop: '2px' }}>
-                  <i className="fa-solid fa-building-columns" style={{ color: '#2563eb', marginRight: '4px' }} />
-                  Sumber Dana: <b>{asset.sumber_perolehan || 'Yayasan'}</b> &bull; Lokasi: <b>{asset.units[0]?.lokasi_penyimpanan || 'Studio PTV'}</b>
-                </span>
               </div>
               <div
                 className="prod-price-badge"
                 style={{
-                  background: avail > 0 ? '#22c55e' : (damaged > 0 ? '#ef4444' : '#f59e0b'),
+                  background: avail > 0 ? 'var(--ok)' : (damaged > 0 ? 'var(--dang)' : 'var(--warn)'),
                   color: '#ffffff',
                 }}
               >
                 <i className={`fa-solid ${avail > 0 ? 'fa-check' : 'fa-info'}`} />
-                <span>{avail > 0 ? `${avail} Tersedia` : 'Tidak Ada'}</span>
+                <span>{avail > 0 ? `${avail} Siap` : 'Tidak Ada'}</span>
               </div>
             </div>
 
@@ -288,7 +450,7 @@ export const AlatDetailPage: React.FC = () => {
             </div>
 
             {/* Primary Borrow CTA Buttons */}
-            <div className="prod-cta-area" style={{ marginTop: 'auto', paddingTop: '14px' }}>
+            <div className="prod-cta-area" style={{ paddingTop: '14px' }}>
               {avail > 0 ? (
                 <>
                   <button
@@ -326,7 +488,7 @@ export const AlatDetailPage: React.FC = () => {
           <div className="prod-unit-section full-width">
             <div className="prod-unit-header">
               <span>Rincian Tiap Unit Fisik ({total} Unit)</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div className="prod-unit-desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div className="inv-cat-nav-btns" style={{ display: 'inline-flex', marginRight: '2px' }}>
                   <button
                     type="button"
@@ -357,24 +519,62 @@ export const AlatDetailPage: React.FC = () => {
             {/* List Menyamping Unit Cards */}
             <div className="prod-unit-cards-scroll" id="prodUnitCardsScroll">
               {asset.units.map((u, idx) => {
-                const isAvail = u.status_peminjaman === 'tersedia';
-                const isBorrowed = u.status_peminjaman === 'dipinjam';
-                const isDamaged = u.kondisi === 'rusak';
+                const isBorrowed = (u.status_peminjaman || '').toLowerCase() === 'dipinjam';
+                const normK = normalizeKondisiUnit(u.kondisi);
+                const isDamaged = normK === 'rusak';
+                const isServiceNeeded = normK === 'perlu_servis';
+                const isLost = normK === 'hilang';
+                const isEligible = isUnitEligibleForLoan(u);
+
                 const uKey = `${asset.id}_${u.id}`;
                 const isUnitInBasket = loanBasketStore.has(uKey);
 
                 let cardClass = '';
                 if (isBorrowed) cardClass += ' is-borrowed';
-                if (isDamaged) cardClass += ' is-damaged';
+                if (isDamaged || isServiceNeeded || isLost) cardClass += ' is-damaged';
 
-                const statusLabel = isAvail ? 'Tersedia' : isDamaged ? 'Rusak' : 'Dipinjam';
-                const statusChipClass = isAvail ? 'ok' : isDamaged ? 'dang' : 'warn';
+                // Status chip & dot: pisahkan kondisi fisik dari status peminjaman
+                let statusLabel = 'Siap Digunakan';
+                let statusChipClass = 'ok';
+                let statusDotColor = 'var(--ok)';
+                let statusReason = '';
+
+                if (isBorrowed) {
+                  statusLabel = 'Dipinjam';
+                  statusChipClass = 'warn';
+                  statusDotColor = 'var(--warn)';
+                  statusReason = 'Unit sedang dipinjam';
+                } else if (isDamaged) {
+                  statusLabel = 'Rusak';
+                  statusChipClass = 'dang';
+                  statusDotColor = 'var(--dang)';
+                  statusReason = 'Unit rusak — tidak dapat dipinjam';
+                } else if (isServiceNeeded) {
+                  statusLabel = 'Perlu Servis';
+                  statusChipClass = 'warn';
+                  statusDotColor = 'var(--warn)';
+                  statusReason = 'Unit butuh servis — tidak dapat dipinjam';
+                } else if (isLost) {
+                  statusLabel = 'Hilang';
+                  statusChipClass = 'dang';
+                  statusDotColor = 'var(--dang)';
+                  statusReason = 'Unit dilaporkan hilang';
+                }
+
+                // Kondisi label ramah pengguna
+                const kondisiLabel =
+                  normK === 'bagus' ? 'Baik' : normK === 'perlu_servis' ? 'Perlu Servis' : normK === 'hilang' ? 'Hilang' : 'Rusak';
+                const kondisiColor =
+                  normK === 'bagus' ? 'var(--ok)' : normK === 'perlu_servis' ? 'var(--warn)' : 'var(--dang)';
+
+                const unitDisplayName = u.nama_unit?.trim() || `Unit ${idx + 1}`;
+                const serialNumberDisplay = u.nomor_seri && u.nomor_seri.trim() ? u.nomor_seri.trim() : 'Belum diisi';
 
                 return (
                   <div key={u.id} className={`prod-unit-hcard${cardClass}`}>
                     <div className="prod-unit-hcard-header" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '6px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '6px' }}>
-                        <span className="chip" style={{ fontSize: '10.5px', fontWeight: 700, color: '#2563eb', background: '#eff6ff', padding: '1px 7px' }}>
+                        <span className="chip" style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--b-600)', background: 'var(--b-050)', padding: '1px 7px' }}>
                           Unit {idx + 1}
                         </span>
                         <span className={`chip ${statusChipClass}`} style={{ fontSize: '10px', padding: '1px 7px', fontWeight: 700 }}>
@@ -389,10 +589,10 @@ export const AlatDetailPage: React.FC = () => {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            background: isAvail ? '#22c55e' : isDamaged ? '#ef4444' : '#f59e0b',
+                            background: statusDotColor,
                           }}
                         />
-                        <span className="prod-unit-hcard-name">Unit #{idx + 1}</span>
+                        <span className="prod-unit-hcard-name" title={unitDisplayName}>{unitDisplayName}</span>
                         <span className="chip blue" style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.02em', padding: '1px 7px' }}>
                           {u.kode_unit}
                         </span>
@@ -400,16 +600,15 @@ export const AlatDetailPage: React.FC = () => {
                     </div>
 
                     <div className="prod-unit-hcard-body">
-                      <span className="prod-unit-hcard-cond">
-                        Kondisi: <b>{u.kondisi.toUpperCase()}</b>
-                      </span>
-                      {u.nomor_seri && (
-                        <span style={{ fontSize: '11px', color: 'var(--muted)', display: 'block', marginTop: '2px' }}>
-                          SN: {u.nomor_seri}
-                        </span>
-                      )}
+                      <div className="prod-unit-hcard-cond" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>Kondisi Fisik:</span>
+                        <b style={{ color: kondisiColor }}>{kondisiLabel}</b>
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>
+                        Nomor Seri: <b style={{ fontFamily: 'monospace', color: u.nomor_seri ? 'var(--ink)' : 'var(--muted)' }}>{serialNumberDisplay}</b>
+                      </div>
                       {isBorrowed && (
-                        <span className="prod-unit-hcard-loan">
+                        <span className="prod-unit-hcard-loan" style={{ marginTop: '4px' }}>
                           <i className="fa-solid fa-user-clock" style={{ marginRight: '4px' }} />
                           Sedang Dipinjam
                         </span>
@@ -417,7 +616,7 @@ export const AlatDetailPage: React.FC = () => {
                     </div>
 
                     <div className="prod-unit-hcard-actions">
-                      {isAvail ? (
+                      {isEligible ? (
                         <button
                           type="button"
                           className={`btn sm ${isUnitInBasket ? '' : 'pri'}`}
@@ -436,15 +635,25 @@ export const AlatDetailPage: React.FC = () => {
                           {isUnitInBasket ? 'Dipilih' : 'Pinjam Unit Ini'}
                         </button>
                       ) : (
-                        <span style={{ flex: 1, fontSize: '11px', color: 'var(--muted)', textAlign: 'center', alignSelf: 'center' }}>
-                          {isBorrowed ? 'Unit sedang dipinjam' : 'Unit butuh perbaikan'}
+                        <span
+                          style={{
+                            flex: 1,
+                            fontSize: '11px',
+                            color: isDamaged ? 'var(--dang)' : isServiceNeeded ? 'var(--warn)' : 'var(--muted)',
+                            textAlign: 'center',
+                            alignSelf: 'center',
+                            fontWeight: 600,
+                            lineHeight: 1.3,
+                          }}
+                        >
+                          {statusReason}
                         </span>
                       )}
                       <button
                         type="button"
                         className="btn sm"
-                        onClick={() => navigate('/hub/kerusakan')}
-                        style={{ fontSize: '11.5px', padding: '5px 9px', minHeight: '30px', color: '#d97706', borderRadius: 'var(--ptv-curve-sm)' }}
+                        onClick={() => navigate(`/hub/kerusakan?asset=${encodeURIComponent(asset.id)}&unit=${encodeURIComponent(u.id)}`)}
+                        style={{ fontSize: '11.5px', padding: '5px 9px', minHeight: '30px', color: 'var(--warn)', borderRadius: 'var(--ptv-curve-sm)' }}
                         title="Lapor Kerusakan"
                       >
                         <i className="fa-solid fa-wrench" />
@@ -459,29 +668,39 @@ export const AlatDetailPage: React.FC = () => {
 
         {/* ── 3. BOTTOM INFORMATION SECTIONS (1:1 LEGACY) ── */}
         <div className="prod-bottom-sections">
-          {/* Spesifikasi Teknis & Catatan */}
-          <div className="prod-section-card">
-            <div className="prod-section-header">
-              <div className="prod-section-title-wrap">
-                <div className="prod-section-icon-badge">
-                  <i className="fa-solid fa-file-lines" />
-                </div>
-                <div>
-                  <h3 className="prod-section-title">Spesifikasi &amp; Catatan Teknis</h3>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, marginTop: '2px' }}>
-                    Dokumentasi operasional dan rincian parameter alat
+          {/* Spesifikasi Teknis & Catatan (INV-08: Hanya tampil jika berbeda dari deskripsi utama) */}
+          {(() => {
+            const primaryDesc = (asset.spesifikasi || '').trim();
+            const additionalNotes = (asset.nilai_inventaris?.catatan || '').trim();
+            const hasDistinctSpecs = additionalNotes && additionalNotes.toLowerCase() !== primaryDesc.toLowerCase();
+            if (!hasDistinctSpecs) return null;
+
+            return (
+              <div className="prod-section-card">
+                <div className="prod-section-header">
+                  <div className="prod-section-title-wrap">
+                    <div className="prod-section-icon-badge">
+                      <i className="fa-solid fa-file-lines" />
+                    </div>
+                    <div>
+                      <h3 className="prod-section-title">Spesifikasi &amp; Catatan Teknis</h3>
+                      <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 500, marginTop: '2px' }}>
+                        Dokumentasi operasional dan rincian parameter tambahan alat
+                      </div>
+                    </div>
                   </div>
                 </div>
+                <div className="prod-tech-specs-box">
+                  <p className="prod-tech-specs-body">{additionalNotes}</p>
+                </div>
               </div>
-            </div>
-            <div className="prod-tech-specs-box">
-              <p className="prod-tech-specs-body">
-                {asset.spesifikasi || 'Spesifikasi operasional standar laboratorium Progresif TV.'}
-              </p>
-            </div>
-          </div>
+            );
+          })()}
 
-          {/* Riwayat Peminjaman Alat (Jejak Sirkulasi) */}
+          {/* ── LABEL BARCODE UNIT (STANDAR CODE 128 SCANNER FISIK) ── */}
+          <UnitBarcodesSection asset={asset} />
+
+          {/* Riwayat Peminjaman Alat (Jejak Sirkulasi) — INV-09: Ringkas & tanpa leak internal */}
           <div className="prod-section-card">
             <div className="prod-section-header">
               <div className="prod-section-title-wrap">
@@ -490,30 +709,77 @@ export const AlatDetailPage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="prod-section-title">
-                    <span>Riwayat Aktivitas &amp; Peminjaman</span>
-                    <span className="prod-section-count-chip">{loans.length} Log</span>
+                    <span>Riwayat Peminjaman</span>
+                    <span className="prod-section-count-chip">
+                      {loansLoading ? '...' : `${loans.length} Log`}
+                    </span>
                   </h3>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, marginTop: '2px' }}>
-                    Jejak sirkulasi penggunaan unit alat oleh praktikan atau teknisi
+                  <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 500, marginTop: '2px' }}>
+                    Jejak sirkulasi dan histori penggunaan unit alat
                   </div>
                 </div>
               </div>
-              <span style={{ fontSize: '11.5px', color: '#94a3b8', fontWeight: 600 }}>
-                Total: {loans.length} peminjaman
-              </span>
+              {!loansLoading && !loansError && loans.length > 0 && (
+                <span style={{ fontSize: '11.5px', color: 'var(--muted)', fontWeight: 600 }}>
+                  Total: {loans.length} peminjaman
+                </span>
+              )}
             </div>
 
-            {loans.length > 0 ? (
+            {loansLoading ? (
+              <div className="prod-empty-history-compact" style={{ padding: '24px 16px' }}>
+                <div className="prod-empty-history-icon-compact">
+                  <i className="fa-solid fa-circle-notch fa-spin" />
+                </div>
+                <div>
+                  <h4 className="prod-empty-history-title-compact">Memuat Riwayat Peminjaman...</h4>
+                  <p className="prod-empty-history-desc-compact">
+                    Mengambil catatan transaksi peminjaman asli dari sistem.
+                  </p>
+                </div>
+              </div>
+            ) : loansError ? (
+              <div
+                style={{
+                  padding: '16px',
+                  background: 'var(--dang-bg, #fef2f2)',
+                  border: '1px solid var(--dang-border, #fecaca)',
+                  borderRadius: 'var(--ptv-curve-md)',
+                  color: 'var(--dang, #dc2626)',
+                  fontSize: '13px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <i className="fa-solid fa-circle-exclamation" style={{ fontSize: '16px', flexShrink: 0 }} />
+                  <span>{loansError}</span>
+                </div>
+                <button
+                  type="button"
+                  className="btn sm"
+                  onClick={() => asset && fetchLoansForAsset(asset)}
+                  style={{ fontSize: '12px', padding: '4px 10px' }}
+                >
+                  <i className="fa-solid fa-rotate-right" style={{ marginRight: '4px' }} />
+                  Coba Lagi
+                </button>
+              </div>
+            ) : loans.length > 0 ? (
               <div className="stack gap12">
                 {loans.map((l) => {
                   const isBack = l.status === 'dikembalikan';
+                  const isLate = l.status === 'terlambat';
                   return (
                     <div
                       key={l.id}
                       className="loan-hist-card"
                       style={{
-                        background: '#ffffff',
-                        border: '1.5px solid #e2e8f0',
+                        background: 'var(--surface, var(--bg-card, #ffffff))',
+                        border: '1px solid var(--line-2)',
                         borderRadius: 'var(--ptv-curve-lg)',
                         padding: '14px 16px',
                         boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
@@ -528,29 +794,38 @@ export const AlatDetailPage: React.FC = () => {
                           width: '40px',
                           height: '40px',
                           borderRadius: 'var(--ptv-curve-md)',
-                          background: '#f8fafc',
-                          border: '1px solid #e2e8f0',
+                          background: 'var(--bg-2)',
+                          border: '1px solid var(--line-2)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: isBack ? '#16a34a' : '#2563eb',
+                          color: isBack ? 'var(--ok)' : isLate ? 'var(--dang)' : 'var(--b-600)',
                           flexShrink: 0,
                         }}
                       >
-                        <i className={`fa-solid ${isBack ? 'fa-circle-check' : 'fa-hand-holding'}`} />
+                        <i className={`fa-solid ${isBack ? 'fa-circle-check' : isLate ? 'fa-triangle-exclamation' : 'fa-hand-holding'}`} />
                       </div>
                       <div className="loan-hist-main" style={{ flex: 1, minWidth: 0 }}>
                         <div className="loan-hist-row-top" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                          <span className="loan-hist-name" style={{ fontSize: '13.5px', fontWeight: 700, color: '#0f172a' }}>
+                          <span className="loan-hist-name" style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--ink)' }}>
                             {l.peminjam_nama}
                           </span>
-                          <span className="loan-hist-dot" style={{ color: '#cbd5e1' }}>&bull;</span>
-                          <span className="loan-hist-range" style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>
-                            {fmtDate(l.tanggal_pinjam)} &rarr; {isBack ? `${fmtDate(l.tanggal_kembali)} (Kembali)` : <span style={{ color: '#d97706', fontWeight: 600 }}>Belum kembali</span>}
+                          {l.kode_unit && (
+                            <span className="chip blue" style={{ fontSize: '10px', padding: '1px 6px', fontWeight: 700 }}>
+                              {l.kode_unit}
+                            </span>
+                          )}
+                          <span className="loan-hist-dot" style={{ color: 'var(--muted)' }}>&bull;</span>
+                          <span className="loan-hist-range" style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 500 }}>
+                            {fmtDate(l.tanggal_pinjam)} &rarr; {isBack ? `${fmtDate(l.tanggal_kembali || l.tenggat_kembali)} (Kembali)` : isLate ? <span style={{ color: 'var(--dang)', fontWeight: 600 }}>Terlambat (Tenggat: {fmtDate(l.tenggat_kembali)})</span> : <span style={{ color: 'var(--warn)', fontWeight: 600 }}>Tenggat: {fmtDate(l.tenggat_kembali)}</span>}
                           </span>
                           {isBack ? (
                             <span className="chip ok" style={{ fontSize: '10.5px', padding: '2px 8px', fontWeight: 700 }}>
                               <i className="fa-solid fa-check" style={{ marginRight: '4px' }} /> Dikembalikan
+                            </span>
+                          ) : isLate ? (
+                            <span className="chip dang" style={{ fontSize: '10.5px', padding: '2px 8px', fontWeight: 700 }}>
+                              <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: '4px' }} /> Terlambat
                             </span>
                           ) : (
                             <span className="chip info" style={{ fontSize: '10.5px', padding: '2px 8px', fontWeight: 700 }}>
@@ -559,8 +834,8 @@ export const AlatDetailPage: React.FC = () => {
                           )}
                         </div>
                         {l.keperluan && (
-                          <div className="loan-hist-desc" style={{ fontSize: '12px', color: '#475569', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <i className="fa-regular fa-bookmark" style={{ fontSize: '10px', color: '#94a3b8' }} />
+                          <div className="loan-hist-desc" style={{ fontSize: '12px', color: 'var(--ink)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <i className="fa-regular fa-bookmark" style={{ fontSize: '10px', color: 'var(--muted)' }} />
                             <span>{l.keperluan}</span>
                           </div>
                         )}
@@ -570,21 +845,49 @@ export const AlatDetailPage: React.FC = () => {
                 })}
               </div>
             ) : (
-              <div className="prod-empty-history">
-                <div className="prod-empty-history-icon">
+              <div className="prod-empty-history-compact">
+                <div className="prod-empty-history-icon-compact">
                   <i className="fa-solid fa-clock-rotate-left" />
                 </div>
-                <h4 className="prod-empty-history-title">Belum Ada Riwayat Peminjaman</h4>
-                <p className="prod-empty-history-desc">
-                  Alat ini belum pernah tercatat dipinjam. Seluruh unit siap digunakan untuk kebutuhan laboratorium dan kegiatan.
-                </p>
-                <div className="prod-empty-history-badge">
-                  <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: '#16a34a' }} />
-                  <span>Semua Unit Tersedia</span>
+                <div>
+                  <h4 className="prod-empty-history-title-compact">Belum Ada Riwayat Peminjaman</h4>
+                  <p className="prod-empty-history-desc-compact">
+                    Alat ini belum memiliki catatan transaksi peminjaman aktif. Seluruh unit siap digunakan.
+                  </p>
                 </div>
               </div>
             )}
           </div>
+
+          {/* ── 4. ZONA PENGELOLAAN & KEAMANAN ASET (ADMINISTRATIF) ── */}
+          {canDelete && (
+            <div className="prod-section-card prod-danger-zone-card" id="dangerZoneSection">
+              <div className="prod-danger-zone-inner">
+                <div className="prod-danger-zone-info">
+                  <div className="prod-danger-zone-icon">
+                    <i className="fa-solid fa-shield-halved" />
+                  </div>
+                  <div>
+                    <h4 className="prod-danger-zone-title">Pengelolaan &amp; Keamanan Aset</h4>
+                    <p className="prod-danger-zone-desc">
+                      Audit keterkaitan sirkulasi alat, riwayat peminjaman, serta prosedur pengarsipan atau penghapusan data aset inventaris.
+                    </p>
+                  </div>
+                </div>
+                <div className="prod-danger-zone-action">
+                  <button
+                    type="button"
+                    id="btnSmartDeleteAsset"
+                    className="btn-danger-outline"
+                    onClick={() => setIsSmartDeleteModalOpen(true)}
+                  >
+                    <i className="fa-regular fa-trash-can" />
+                    <span>Hapus / Arsipkan Inventaris</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -594,7 +897,33 @@ export const AlatDetailPage: React.FC = () => {
         onClose={() => setIsLoanModalOpen(false)}
         presetAssetId={asset.id}
         presetUnit={1}
+        onSuccess={() => fetchData(true)}
       />
+      {/* ── EDIT ALAT MODAL ── */}
+      {asset && (
+        <EditAlatModal
+          isOpen={isEditModalOpen}
+          asset={asset}
+          onClose={() => setIsEditModalOpen(false)}
+          onSuccess={(updated) => {
+            setAsset(updated);
+            setIsEditModalOpen(false);
+            fetchData(true);
+          }}
+        />
+      )}
+      {/* ── SMART DELETE & ARSIP MODAL ── */}
+      {asset && (
+        <SmartDeleteInventarisModal
+          isOpen={isSmartDeleteModalOpen}
+          asset={asset}
+          onClose={() => setIsSmartDeleteModalOpen(false)}
+          onSuccess={() => {
+            setIsSmartDeleteModalOpen(false);
+            navigate('/hub/inventaris');
+          }}
+        />
+      )}
     </div>
   );
 };

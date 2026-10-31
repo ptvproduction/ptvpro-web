@@ -19,6 +19,8 @@ export interface PeminjamanRecord {
   actor_id?: string;
   actor_nama?: string;
   created_at: string;
+  is_historical?: boolean;
+  foto_url?: string;
 }
 
 export interface PeminjamanFilterParams {

@@ -1,0 +1,81 @@
+{
+  "session": "PTV-DEV-167",
+  "date": "2026-10-26",
+  "projectRef": "swadgljnyelsjstqqxbm",
+  "decisions": {
+    "valuation": "GO_EXECUTED_VERIFIED",
+    "securityCutover": "NO_GO",
+    "privilegeChangeAuthorized": false
+  },
+  "approval": {
+    "scope": "DDL valuasi167 Staging saja",
+    "explicitUserApproval": true,
+    "sha256": "fe9f5756ea4b56933da2505d5d3f0db0c9ab365bd921ed067472734e1326cfa9"
+  },
+  "migration": {
+    "name": "inventory_167_valuation_asset_unique",
+    "receipt": [
+      {
+        "name": "inventory_167_valuation_asset_unique",
+        "version": "20261026135324"
+      }
+    ],
+    "indexValid": true,
+    "rollbackCloudExecuted": false
+  },
+  "preflight": {
+    "rows": 114,
+    "rowDigest": "07e843fe8b56b1965a6f6788b9052f6c",
+    "aclDigest": "f4dff8fc656149258f032acad0cd17a5",
+    "storagePolicyDigest": "6355744bf24d458a477c11ba1292f5e1",
+    "nulls": 0,
+    "duplicateGroups": 0,
+    "orphans": 0,
+    "nameFree": true
+  },
+  "postflight": {
+    "valuationRows": 114,
+    "existingValuationDataUnchanged": true,
+    "grantsUnchanged": true,
+    "storagePoliciesUnchanged": true,
+    "masterRows": 164,
+    "unitRows": 251,
+    "fixtureRows": 0
+  },
+  "cloudValuation": {
+    "create": "PASS",
+    "update": "PASS_SAME_ID",
+    "retry": "PASS_ONE_ROW",
+    "metadataAndZeroValues": "PASS",
+    "auditConfirmedEvents": 3,
+    "logout": "PASS",
+    "ownFixtureCleanup": "PASS"
+  },
+  "localRehearsal": {
+    "userApproved": true,
+    "scope": "LOCAL_POSTGRESQL17_SYNTHETIC_STAGING_MODEL_ONLY",
+    "checks": 28,
+    "status": "PASS",
+    "databaseRemoved": true,
+    "ownServerStopped": true,
+    "cloudRollbackRehearsed": false
+  },
+  "negativeTest": {
+    "reviewedExistingIdentity": null,
+    "status": "PENDING_IDENTITY_AND_AUTHORIZATION",
+    "roleMutation": false,
+    "newCredentials": false,
+    "template": "PTVPRO-INVENTORY-167-NEGATIVE-TEST-PLAN.json"
+  },
+  "validation": {
+    "testFiles": 4,
+    "vitestTests": 54,
+    "status": "PASS",
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "stagingBuild": "PASS"
+  },
+  "productionAccessed": false,
+  "grantsRevoked": false,
+  "commitPushDeploy": false
+}

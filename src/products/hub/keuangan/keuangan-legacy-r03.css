@@ -1,0 +1,584 @@
+/* ============================================================
+   PTV PRO — KEUANGAN LEGACY R03 VISUAL SPECIFICATION
+   Faithful recreation of approved PHP Legacy Keuangan UI
+   ============================================================ */
+
+/* 1. TOP REMINDER BANNER (BANNER PENGINGAT TUNGGAKAN KAS PRIBADI) */
+.fin-legacy-reminder-banner {
+  background: #fff5f5;
+  border: 1px solid #fee2e2;
+  border-radius: 20px;
+  padding: 22px 28px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 24px;
+  box-shadow: 0 2px 10px rgba(220, 38, 38, 0.03);
+}
+
+.fin-legacy-reminder-banner.lunas {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  box-shadow: 0 2px 10px rgba(5, 150, 105, 0.03);
+}
+
+.fin-reminder-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.fin-reminder-pill {
+  align-self: flex-start;
+  background: #fee2e2;
+  color: #dc2626;
+  border-radius: 9999px;
+  padding: 4px 12px;
+  font-size: 11.5px;
+  font-weight: 750;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.fin-reminder-pill.ok {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.fin-dot-red {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #dc2626;
+  display: inline-block;
+}
+
+.fin-dot-green {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #15803d;
+  display: inline-block;
+}
+
+.fin-reminder-title {
+  font-size: 24px;
+  font-weight: 850;
+  color: #0f172a;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+
+.fin-reminder-desc {
+  font-size: 14px;
+  color: #334155;
+  margin: 0 0 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.fin-reminder-unpaid-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fin-unpaid-tag {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-radius: 9999px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.fin-reminder-right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  min-width: 200px;
+}
+
+.fin-reminder-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.fin-reminder-total {
+  font-size: 32px;
+  font-weight: 900;
+  color: #dc2626;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 2px;
+}
+
+.fin-reminder-total.ok {
+  color: #059669;
+}
+
+.fin-reminder-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.fin-reminder-cta {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #dc2626;
+  margin-top: auto;
+}
+
+.fin-reminder-cta.ok {
+  color: #059669;
+}
+
+@media (max-width: 768px) {
+  .fin-legacy-reminder-banner {
+    flex-direction: column;
+    padding: 18px 20px;
+    gap: 16px;
+  }
+  .fin-reminder-right {
+    text-align: left;
+    align-items: flex-start;
+    border-top: 1px dashed #fecaca;
+    padding-top: 14px;
+    width: 100%;
+  }
+}
+
+/* 2. EMPAT KARTU RINGKASAN KEUANGAN (4 BENTO SUMMARY CARDS) */
+.fin-legacy-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+  .fin-legacy-bento-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .fin-legacy-bento-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fin-legacy-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 110px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fin-legacy-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+}
+
+.fin-legacy-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fin-legacy-card-title {
+  font-size: 12.5px;
+  font-weight: 750;
+  color: #1e293b;
+}
+
+.fin-legacy-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  font-size: 13.5px;
+}
+
+.fin-legacy-card-icon.saldo {
+  background: #e6f4ea;
+  color: #0e4f40;
+}
+
+.fin-legacy-card-icon.pem {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.fin-legacy-card-icon.pen {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.fin-legacy-card-icon.tunggakan {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.fin-legacy-card-val {
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin: 10px 0 4px;
+  color: #0f172a;
+}
+
+.fin-legacy-card-val.pem-val {
+  color: #059669;
+}
+
+.fin-legacy-card-val.pen-val {
+  color: #dc2626;
+}
+
+.fin-legacy-card-val.tunggakan-val {
+  color: #ea580c;
+}
+
+.fin-legacy-card-sub {
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 550;
+}
+
+/* 3. TAB NAVIGATION ROW */
+.fin-legacy-nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.fin-legacy-tab-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.fin-legacy-tab-btn {
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 750;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fin-legacy-tab-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.fin-legacy-tab-btn.active {
+  background: #0e4f40;
+  color: #ffffff;
+  border-color: #0e4f40;
+}
+
+.fin-legacy-settings-btn {
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 8px 18px;
+  font-size: 12.5px;
+  font-weight: 750;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fin-legacy-settings-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* 4. SEARCH & FILTER CARD */
+.fin-legacy-filter-bar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 10px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  flex-wrap: wrap;
+}
+
+.fin-legacy-search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 260px;
+  max-width: 520px;
+}
+
+.fin-legacy-search-icon {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.fin-legacy-search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 13.5px;
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.fin-legacy-search-input::placeholder {
+  color: #94a3b8;
+}
+
+.fin-legacy-filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.fin-legacy-pill-kru {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 7px 18px;
+  font-size: 12.5px;
+  font-weight: 750;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 5. MATRIX TABLE FOR IURAN KAS KRU */
+.fin-legacy-table-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+.fin-legacy-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.fin-legacy-table thead tr {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.fin-legacy-table th {
+  padding: 16px 18px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.fin-legacy-table th.center {
+  text-align: center;
+}
+
+.fin-legacy-month-title {
+  font-size: 12px;
+  font-weight: 750;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+
+.fin-legacy-month-nominal {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0e4f40;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.fin-legacy-month-nominal:hover {
+  text-decoration: underline;
+}
+
+.fin-legacy-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.fin-legacy-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.fin-legacy-kru-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fin-legacy-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.fin-legacy-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fin-legacy-kru-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.fin-legacy-kru-name-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fin-legacy-kru-name {
+  font-size: 13.5px;
+  font-weight: 750;
+  color: #0f172a;
+}
+
+.fin-legacy-badge-aktif {
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 10.5px;
+  font-weight: 750;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  line-height: 1.2;
+}
+
+.fin-legacy-kru-role {
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* Radio-style Circular Matrix Action */
+.fin-legacy-circle-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.15s ease;
+  border: 1.8px solid #cbd5e1;
+  color: transparent;
+}
+
+.fin-legacy-circle-btn:hover {
+  border-color: #059669;
+  background: rgba(5, 150, 105, 0.08);
+}
+
+.fin-legacy-circle-btn.paid {
+  background: #059669;
+  border-color: #059669;
+  color: #ffffff;
+  font-size: 11px;
+}
+
+.fin-legacy-circle-btn.paid:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.fin-legacy-circle-btn.paid .ic-undo {
+  display: none;
+}
+
+.fin-legacy-circle-btn.paid:hover .ic-check {
+  display: none;
+}
+
+.fin-legacy-circle-btn.paid:hover .ic-undo {
+  display: inline-block;
+}
+
+.fin-legacy-total-tunggakan {
+  font-size: 13.5px;
+  font-weight: 850;
+  color: #dc2626;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.fin-legacy-total-tunggakan.lunas {
+  color: #059669;
+  font-size: 12px;
+}

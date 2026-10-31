@@ -26,11 +26,11 @@ export const SOFT_SURFACE_LIGHT: SurfaceStyleConfig = {
 };
 
 export const SOFT_SURFACE_DARK: SurfaceStyleConfig = {
-  fill: '#0e1b2d',
+  fill: '#24282C',
   stroke: 'rgba(255, 255, 255, 0.12)',
   strokeWidth: 0.75,
   shadow: 'drop-shadow(0 10px 22px rgba(0, 0, 0, 0.45)) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.25))',
-  textColor: '#e6f0fc',
+  textColor: '#E8EAED',
 };
 
 export const SOFT_SURFACE_ELEVATED: SurfaceStyleConfig = {
@@ -70,7 +70,7 @@ export function getSurfaceStyle(variant: SurfaceVariant = 'soft', isDark = false
     if (variant === 'flat') {
       return {
         ...SOFT_SURFACE_DARK,
-        fill: '#122238',
+        fill: '#1B1E21',
         shadow: 'none',
       };
     }

@@ -1,0 +1,256 @@
+{
+  "dateLocal": "2026-10-26",
+  "target": "swadgljnyelsjstqqxbm",
+  "status": "PARTIAL: ACCOUNTS DISABLED; NATIVE GLOBAL SIGNOUT NOT EXECUTED",
+  "approval": "Explicit operator ACC: disable two testing accounts and revoke sessions; retain identities/history",
+  "fingerprintMatched": true,
+  "exactAccountAndIdentityManifestMatched": true,
+  "baseline26TablesMatchedAcc1BeforeMutation": true,
+  "applicationTransaction": {
+    "atomic": true,
+    "targets": 2,
+    "status": "inactive",
+    "tokensValidAfterUpdated": true,
+    "auditRowsInserted": 2,
+    "event": "testing_account_access_disabled",
+    "principal": "postgres direct trusted administrative transaction",
+    "profilesOverridesMembershipsUnchanged": true
+  },
+  "nativeAuth": {
+    "officialMethod": "auth.admin.updateUserById(userId,{ban_duration:'876000h'})",
+    "completed": 2,
+    "passwordOrCredentialPayloadSent": false,
+    "nativeUsersDeleted": false,
+    "banIsFinite": true,
+    "globalSignOutExecuted": false,
+    "reason": "Installed official admin.signOut requires a valid logged-in user access token. None supplied or collected; no token fabrication, login, password reset or raw internal Auth DELETE.",
+    "nativeSessionsRetained": 4,
+    "unexpiredJwtRisk": "Existing signed JWTs may still work on routes/policies checking signature/auth.uid only until exp. Ban is not global signout or immediate JWT revocation.",
+    "references": [
+      "https://supabase.com/docs/guides/auth/managing-user-data",
+      "https://supabase.com/docs/guides/auth/signout"
+    ]
+  },
+  "portal": {
+    "registeredSessionsBefore": 0,
+    "registeredSessionsAfter": 0,
+    "oldTokensInvalidatedByInactiveAndCutoff": true,
+    "liveOldCookieOrJwtReplayTest": false
+  },
+  "postflight": {
+    "root": 0,
+    "counts": {
+      "audit": 4,
+      "accounts": 2,
+      "archives": 94,
+      "profiles": 2,
+      "identities": 2,
+      "credentials": 0,
+      "memberships": 2,
+      "native_users": 2,
+      "native_sessions": 4
+    },
+    "accounts": [
+      {
+        "ptv_id": "PTV-STG-ADM",
+        "inactive": true,
+        "ban_until": "2126-10-01T17:44:27.433853+00:00",
+        "portal_sessions": 0,
+        "token_cutoff_set": true,
+        "native_login_banned": true,
+        "effective_capabilities": 0,
+        "native_sessions_retained": 1
+      },
+      {
+        "ptv_id": "PTV-STG-KRU",
+        "inactive": true,
+        "ban_until": "2126-10-01T17:44:27.524696+00:00",
+        "portal_sessions": 0,
+        "token_cutoff_set": true,
+        "native_login_banned": true,
+        "effective_capabilities": 0,
+        "native_sessions_retained": 3
+      }
+    ],
+    "policy_off": true,
+    "disable_audit_count": 2,
+    "other_active_clients": 0,
+    "has_capability_inactive_guard": true
+  },
+  "tableComparisons": [
+    {
+      "table": "auth.identities",
+      "rowsBefore": 2,
+      "rowsAfter": 2,
+      "unchanged": true
+    },
+    {
+      "table": "auth.sessions",
+      "rowsBefore": 4,
+      "rowsAfter": 4,
+      "unchanged": true
+    },
+    {
+      "table": "auth.users",
+      "rowsBefore": 2,
+      "rowsAfter": 2,
+      "unchanged": false
+    },
+    {
+      "table": "public.access_profile",
+      "rowsBefore": 5,
+      "rowsAfter": 5,
+      "unchanged": true
+    },
+    {
+      "table": "public.account_capability_overrides",
+      "rowsBefore": 0,
+      "rowsAfter": 0,
+      "unchanged": true
+    },
+    {
+      "table": "public.account_profiles",
+      "rowsBefore": 2,
+      "rowsAfter": 2,
+      "unchanged": true
+    },
+    {
+      "table": "public.auth_audit_log",
+      "rowsBefore": 2,
+      "rowsAfter": 4,
+      "unchanged": false
+    },
+    {
+      "table": "public.auth_credentials",
+      "rowsBefore": 0,
+      "rowsAfter": 0,
+      "unchanged": true
+    },
+    {
+      "table": "public.canonical_identity",
+      "rowsBefore": 2,
+      "rowsAfter": 2,
+      "unchanged": true
+    },
+    {
+      "table": "public.capability_registry",
+      "rowsBefore": 53,
+      "rowsAfter": 53,
+      "unchanged": true
+    },
+    {
+      "table": "public.legacy_archive_kru",
+      "rowsBefore": 94,
+      "rowsAfter": 94,
+      "unchanged": true
+    },
+    {
+      "table": "public.organization_membership",
+      "rowsBefore": 2,
+      "rowsAfter": 2,
+      "unchanged": true
+    },
+    {
+      "table": "public.profile_capabilities",
+      "rowsBefore": 177,
+      "rowsAfter": 177,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_allocations",
+      "rowsBefore": 55,
+      "rowsAfter": 55,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_audit_log",
+      "rowsBefore": 9,
+      "rowsAfter": 9,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_categories",
+      "rowsBefore": 14,
+      "rowsAfter": 14,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_kas_payments",
+      "rowsBefore": 0,
+      "rowsAfter": 0,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_kas_records",
+      "rowsBefore": 0,
+      "rowsAfter": 0,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_loan_payments",
+      "rowsBefore": 0,
+      "rowsAfter": 0,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_loans",
+      "rowsBefore": 0,
+      "rowsAfter": 0,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_pockets",
+      "rowsBefore": 3,
+      "rowsAfter": 3,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_semesters",
+      "rowsBefore": 2,
+      "rowsAfter": 2,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_settings",
+      "rowsBefore": 1,
+      "rowsAfter": 1,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_source_references",
+      "rowsBefore": 53,
+      "rowsAfter": 53,
+      "unchanged": true
+    },
+    {
+      "table": "public.ptv_finance_transactions",
+      "rowsBefore": 58,
+      "rowsAfter": 58,
+      "unchanged": true
+    },
+    {
+      "table": "public.user_account",
+      "rowsBefore": 2,
+      "rowsAfter": 2,
+      "unchanged": false
+    }
+  ],
+  "maintenance": {
+    "local5174Listeners": 0,
+    "writersNotReopened": true,
+    "lifecyclePasswordFlags": "Previously verified OFF; environment unchanged; database policy OFF verified now"
+  },
+  "excluded": {
+    "productionAccess": false,
+    "historicalDelete": false,
+    "actorReassignment": false,
+    "newAccount": false,
+    "enrollment": false,
+    "linking": false,
+    "bootstrap": false,
+    "rootActivation": false,
+    "frontendOrEnvironmentChange": false,
+    "deploy": false
+  },
+  "next": "Prepare/review a narrow idempotent provisioning and initial personnel mapping proposal for PTV-001/PTV-002; no execution or gate activation before separate ACC. Native signout residual must be resolved before maintenance release."
+}

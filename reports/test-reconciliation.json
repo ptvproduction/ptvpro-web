@@ -1,0 +1,63 @@
+{
+  "started_at": "2026-10-31T03:01:00.507Z",
+  "mode": "backfill",
+  "is_dry_run": true,
+  "source_mode": "bundle",
+  "legacy_source_type": "local_sql_dump",
+  "target_project": "https://swadgljnyelsjstqqxbm.supabase.co",
+  "counts": {
+    "legacy_total": 5,
+    "incremental_candidates": 4,
+    "synced_ready": 3,
+    "skipped_unchanged": 1,
+    "conflicts_quarantined": 0,
+    "unmapped_identities": 0
+  },
+  "tables": {
+    "ptv_surat_izin": {
+      "total": 2,
+      "ready": 1,
+      "unmapped": 0,
+      "conflicts": 0
+    },
+    "ptv_surat_tugas": {
+      "total": 0,
+      "ready": 0,
+      "unmapped": 0,
+      "conflicts": 0
+    },
+    "ptv_surat_barang": {
+      "total": 0,
+      "ready": 0,
+      "unmapped": 0,
+      "conflicts": 0
+    },
+    "ptv_catatan": {
+      "total": 1,
+      "ready": 1,
+      "unmapped": 0,
+      "conflicts": 0
+    },
+    "ptv_pengumuman": {
+      "total": 1,
+      "ready": 1,
+      "unmapped": 0,
+      "conflicts": 0
+    },
+    "ptv_ebook": {
+      "total": 1,
+      "ready": 0,
+      "unique_titles": 1
+    }
+  },
+  "quarantine": [],
+  "unmapped_identities_log": [],
+  "conflicts_log": [],
+  "orphan_retention_log": [],
+  "next_sequences": {
+    "SI": 2,
+    "ST": 1,
+    "SBB": 1
+  },
+  "completed_at": "2026-10-31T03:01:00.509Z"
+}

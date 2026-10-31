@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS user_account (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     identity_id UUID NOT NULL UNIQUE REFERENCES canonical_identity(id) ON DELETE RESTRICT,
     auth_user_id UUID UNIQUE NULL, -- Maps to Supabase auth.users.id
+    google_sub VARCHAR(255) UNIQUE NULL, -- Permanent Google OAuth Subject ID (Vercel Direct Auth)
     username VARCHAR(64) NOT NULL UNIQUE,
     status_akun VARCHAR(16) NOT NULL DEFAULT 'active' CHECK (status_akun IN ('active', 'inactive')),
     failed_login_attempts INT NOT NULL DEFAULT 0,
@@ -400,14 +401,20 @@ CREATE TABLE IF NOT EXISTS ptv_inventaris (
     foto_url TEXT NULL,
     harga_beli NUMERIC(15, 2) NULL,
     sumber_perolehan VARCHAR(128) NULL,
+    created_by UUID NULL REFERENCES auth.users(id) ON DELETE SET NULL,
+    request_payload_hash TEXT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE ptv_inventaris ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+ALTER TABLE ptv_inventaris ADD COLUMN IF NOT EXISTS request_payload_hash TEXT;
 
 CREATE TABLE IF NOT EXISTS ptv_inventaris_unit (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     inventaris_id UUID NOT NULL REFERENCES ptv_inventaris(id) ON DELETE CASCADE,
     kode_unit VARCHAR(64) NOT NULL UNIQUE,
+    nama_unit VARCHAR(128) NULL,
     nomor_seri VARCHAR(128) NULL,
     kondisi VARCHAR(32) NOT NULL DEFAULT 'bagus',
     status_peminjaman VARCHAR(32) NOT NULL DEFAULT 'tersedia',
@@ -416,15 +423,31 @@ CREATE TABLE IF NOT EXISTS ptv_inventaris_unit (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+ALTER TABLE ptv_inventaris_unit ADD COLUMN IF NOT EXISTS nama_unit VARCHAR(128) NULL;
+
 CREATE TABLE IF NOT EXISTS ptv_nilai_inventaris (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    inventaris_id UUID NOT NULL REFERENCES ptv_inventaris(id) ON DELETE CASCADE,
+    inventaris_id UUID NOT NULL UNIQUE REFERENCES ptv_inventaris(id) ON DELETE CASCADE,
     nilai_perolehan NUMERIC(15, 2) NOT NULL DEFAULT 0,
     nilai_buku_saat_ini NUMERIC(15, 2) NOT NULL DEFAULT 0,
     tanggal_valuasi DATE NOT NULL DEFAULT CURRENT_DATE,
     catatan_akuntansi TEXT NULL,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+DO $
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conrelid = 'public.ptv_nilai_inventaris'::regclass 
+          AND contype = 'u' 
+          AND conkey = ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid = 'public.ptv_nilai_inventaris'::regclass AND attname = 'inventaris_id')]
+    ) THEN
+        ALTER TABLE public.ptv_nilai_inventaris ADD CONSTRAINT uq_ptv_nilai_inventaris_id UNIQUE (inventaris_id);
+    END IF;
+EXCEPTION
+    WHEN undefined_table THEN NULL;
+END $;
 
 CREATE TABLE IF NOT EXISTS ptv_peminjaman (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -741,13 +764,14 @@ CREATE TABLE IF NOT EXISTS ptv_pengumuman (
 -- 8. COMPATIBILITY LAYER & VIEW (ptv_kru_legacy_compat)
 -- ----------------------------------------------------------------------------
 
-CREATE OR REPLACE VIEW ptv_kru_legacy_compat AS
+CREATE OR REPLACE VIEW ptv_kru_legacy_compat
+WITH (security_invoker = true) AS
 SELECT 
     ci.legacy_id AS id,
     ci.ptv_id AS crew_id,
     ci.full_name AS nama,
     ua.username AS username,
-    ac.password_hash AS password_hash,
+    NULL::text AS password_hash, -- Redacted for credential protection (auth_credentials isolated)
     ac.oauth_email AS oauth_email,
     ic.phone AS telepon,
     ic.whatsapp AS no_wa,
@@ -771,6 +795,9 @@ LEFT JOIN identity_contact ic ON ic.identity_id = ci.id
 LEFT JOIN organization_membership om ON om.identity_id = ci.id AND om.is_current = TRUE
 LEFT JOIN organization_division od ON od.id = om.division_id
 LEFT JOIN account_profiles ap ON ap.account_id = ua.id;
+
+REVOKE ALL ON public.ptv_kru_legacy_compat FROM PUBLIC, anon;
+GRANT SELECT ON public.ptv_kru_legacy_compat TO authenticated;
 
 -- ----------------------------------------------------------------------------
 -- 9. SERVER-SIDE SECURITY & CAPABILITY RESOLVER FUNCTIONS
@@ -868,6 +895,15 @@ BEGIN
     v_status_akun := v_claims ->> 'status_akun';
     v_status_organisasi := v_claims ->> 'status_organisasi';
     v_token_issued_at := (v_claims ->> 'iat')::bigint;
+
+    -- Resolusi account_id langsung dari auth.uid() jika klaim belum diinjeksi ke token GoTrue
+    IF v_account_id IS NULL THEN
+        SELECT ua.id, ua.status_akun, extract(epoch from ua.tokens_valid_after)::bigint, om.status_organisasi
+        INTO v_account_id, v_status_akun, v_tokens_valid_after, v_status_organisasi
+        FROM public.user_account ua
+        LEFT JOIN public.organization_membership om ON om.identity_id = ua.identity_id AND om.is_current = TRUE
+        WHERE ua.auth_user_id = auth.uid();
+    END IF;
 
     -- Look up capability metadata
     SELECT is_mutation, is_sensitive INTO v_is_mutation, v_is_sensitive 
@@ -1216,7 +1252,7 @@ BEGIN
 
     -- 5. Verifikasi Kapabilitas Pengembalian (Fail-Closed 3VL)
     IF public.has_capability('loans.return') IS NOT TRUE THEN
-        RAISE EXCEPTION 'UNAUTHORIZED: loans.return capability required' USING ERRCODE = 'P0001';
+        RAISE EXCEPTION 'UNAUTHORIZED: loans.return capability required' USING ERRCODE = '42501';
     END IF;
 
     -- 6. Validasi Input Parameter
@@ -1367,7 +1403,7 @@ BEGIN
 
     -- 5. Verifikasi Kapabilitas Pengembalian (Fail-Closed 3VL)
     IF public.has_capability('loans.return') IS NOT TRUE THEN
-        RAISE EXCEPTION 'UNAUTHORIZED: loans.return capability required' USING ERRCODE = 'P0001';
+        RAISE EXCEPTION 'UNAUTHORIZED: loans.return capability required' USING ERRCODE = '42501';
     END IF;
 
     -- 6. Validasi Input Parameter
@@ -1456,8 +1492,10 @@ BEGIN
     -- Guard Kapabilitas Internal (Fail-Closed 3VL)
     IF (auth.jwt() ->> 'role') = 'service_role' OR current_setting('request.jwt.claim.role', true) = 'service_role' THEN
         NULL;
+    ELSIF auth.uid() IS NULL THEN
+        RAISE EXCEPTION 'UNAUTHORIZED: Authentication required' USING ERRCODE = '28000';
     ELSIF (public.has_capability('inventory.create') IS NOT TRUE) AND (public.has_capability('inventory.units.manage') IS NOT TRUE) THEN
-        RAISE EXCEPTION 'UNAUTHORIZED: inventory management capability required' USING ERRCODE = 'P0001';
+        RAISE EXCEPTION 'UNAUTHORIZED: inventory management capability required' USING ERRCODE = '42501';
     END IF;
 
     -- Advisory lock untuk serialisasi nomor inventaris
@@ -1552,7 +1590,7 @@ BEGIN
 
     -- 5. Verifikasi Kapabilitas Pembuatan Dokumen (Fail-Closed 3VL)
     IF (public.has_capability('documents.request') IS NOT TRUE) AND (public.has_capability('documents.generate') IS NOT TRUE) THEN
-        RAISE EXCEPTION 'UNAUTHORIZED: documents.request or documents.generate capability required' USING ERRCODE = 'P0001';
+        RAISE EXCEPTION 'UNAUTHORIZED: documents.request or documents.generate capability required' USING ERRCODE = '42501';
     END IF;
 
     -- 6. Validasi Input Parameter
@@ -1710,6 +1748,7 @@ ALTER TABLE identity_contact ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_account ENABLE ROW LEVEL SECURITY;
 ALTER TABLE auth_credentials ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ptv_inventaris ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ptv_inventaris_unit ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ptv_nilai_inventaris ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ptv_peminjaman ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ptv_lapor_masalah ENABLE ROW LEVEL SECURITY;

@@ -1,0 +1,41 @@
+{
+  "session": "PTV-DEV-171",
+  "scope": "CLOUD_STAGING_NATIVE_ANONYMOUS_POST_CUTOVER",
+  "status": "PASS",
+  "checks": [
+    {
+      "table": "ptv_inventaris",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "table": "ptv_inventaris_unit",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "table": "ptv_nilai_inventaris",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "table": "ptv_peminjaman",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "table": "ptv_lapor_masalah",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "operation": "storage metadata",
+      "pass": true
+    },
+    {
+      "operation": "storage native upload",
+      "pass": true
+    }
+  ],
+  "credentialOrDataPrinted": false
+}

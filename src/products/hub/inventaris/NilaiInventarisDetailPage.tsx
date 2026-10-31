@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSessionStore } from '@core/session';
 import { inventarisService } from './inventarisService';
 import { ItemInventaris } from './types';
-import { formatRupiah, formatDateIndo } from './NilaiInventarisPage';
-import { PTVSelect } from '@shared/components';
+import { formatRupiah, formatDateIndo, getCatCompanionClass, getCatIconClass } from './NilaiInventarisPage';
+import { PTVSelect, DocDetailSkeleton } from '@shared/components';
+import { resolveInventoryPhotoUrl } from './utils/inventoryPhotoUtils';
 
 export const NilaiInventarisDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -125,11 +127,10 @@ export const NilaiInventarisDetailPage: React.FC = () => {
     );
   }
 
-  if (loading) {
+  if (loading && !item) {
     return (
-      <div className="page" style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)' }}>
-        <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: '8px' }} />
-        Memuat detail nilai inventaris...
+      <div className="page" style={{ maxWidth: '1060px', margin: '0 auto', padding: '16px' }}>
+        <DocDetailSkeleton />
       </div>
     );
   }
@@ -166,30 +167,29 @@ export const NilaiInventarisDetailPage: React.FC = () => {
   return (
     <div className="page subview-fade ptv-nilai-detail-page" style={{ paddingTop: '4px' }}>
       {/* Simulation Banner Notice */}
-      <div style={{ background: 'var(--b-050, #eff6ff)', border: '1px solid var(--b-200, #bfdbfe)', borderRadius: 'var(--ptv-curve-md)', padding: '10px 14px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <i className="fa-solid fa-circle-info" style={{ color: 'var(--b-600, #2563eb)', fontSize: '16px', flexShrink: 0 }} />
-        <span style={{ fontSize: '12.5px', color: 'var(--b-800, #1e40af)', lineHeight: 1.4 }}>
+      <div className="ptv-nilai-notice-banner">
+        <i className="fa-solid fa-circle-info ptv-nilai-notice-icon" />
+        <span className="ptv-nilai-notice-text">
           <strong>Data Simulasi Finansial:</strong> Nilai perolehan dan catatan valuasi di bawah ini merupakan data simulasi untuk keperluan verifikasi antarmuka dan operasional sistem, bukan nilai buku riil aset Progresif TV.
         </span>
       </div>
 
-      {/* ── Breadcrumb / Header Navigation 1:1 Legacy ── */}
+      {/* ── Breadcrumb / Header Navigation ── */}
       <div className="ptv-nilai-detail-header">
         <div className="ptv-nilai-detail-header-left">
           <button
             type="button"
-            className="btn sm"
-            onClick={() => navigate('/hub/inventaris/nilai')}
-            style={{ background: '#fff', border: '1.5px solid #e2e8f0', borderRadius: 'var(--ptv-curve-md)', padding: '6px 12px', fontWeight: 700, color: '#334155', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            className="ptv-nilai-btn-catalog"
+            onClick={() => navigate(-1)}
           >
             <i className="fa-solid fa-arrow-left" />
             <span>Kembali</span>
           </button>
           <div style={{ minWidth: 0 }}>
-            <h1 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: 0, lineHeight: 1.25 }}>
+            <h1 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink)', margin: 0, lineHeight: 1.25 }}>
               Detail Nilai Inventaris
             </h1>
-            <div style={{ fontSize: '12px', color: 'var(--muted, #64748b)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {item.kode} &bull; {item.nama_alat}
             </div>
           </div>
@@ -198,28 +198,18 @@ export const NilaiInventarisDetailPage: React.FC = () => {
         <div className="ptv-nilai-detail-actions">
           <button
             type="button"
-            className="btn sm"
+            className="ptv-nilai-btn-detail"
             onClick={() => navigate(`/hub/inventaris/${item.id}`)}
-            style={{ background: '#f1f5f9', border: '1.5px solid #cbd5e1', borderRadius: 'var(--ptv-curve-md)', fontWeight: 700, color: '#1e293b', padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            <i className="fa-solid fa-box" style={{ color: '#2563eb' }} />
+            <i className="fa-solid fa-box" />
             <span>Detail Fisik Alat</span>
           </button>
 
           {canManage && (
             <button
               type="button"
-              className="btn sm pri"
+              className="ptv-nilai-btn-edit"
               onClick={() => setIsEditOpen(true)}
-              style={{
-                borderRadius: 'var(--ptv-curve-md)',
-                padding: '6px 14px',
-                fontWeight: 700,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: hasVal ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : 'linear-gradient(135deg, #059669, #10b981)',
-              }}
             >
               <i className={`fa-solid ${hasVal ? 'fa-pen-to-square' : 'fa-plus'}`} />
               <span>{hasVal ? 'Ubah Nilai' : 'Catat Nilai'}</span>
@@ -229,9 +219,9 @@ export const NilaiInventarisDetailPage: React.FC = () => {
           {canDelete && hasVal && (
             <button
               type="button"
-              className="btn sm"
+              className="ptv-nilai-btn-del"
               onClick={handleDeleteNilai}
-              style={{ background: '#fff', border: '1.5px solid #fee2e2', color: '#dc2626', borderRadius: 'var(--ptv-curve-md)', padding: '6px 12px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              aria-label="Hapus catatan nilai finansial"
             >
               <i className="fa-regular fa-trash-can" />
               <span>Hapus</span>
@@ -248,7 +238,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
             {/* Header Box */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--line-2, #f1f5f9)', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: 'var(--ptv-curve-md)', background: '#ecfdf5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: 'var(--ptv-curve-md)', background: 'var(--ok-bg, #ecfdf5)', color: 'var(--ok, #059669)', border: '1px solid var(--ok-border, #a7f3d0)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>
                   <i className="fa-solid fa-receipt" />
                 </div>
                 <div style={{ minWidth: 0 }}>
@@ -270,15 +260,15 @@ export const NilaiInventarisDetailPage: React.FC = () => {
               <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted, #64748b)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Total Nilai Inventaris
               </span>
-              <div className="ptv-nilai-detail-price-val" style={{ color: hasVal ? '#047857' : '#94a3b8' }}>
+              <div className="ptv-nilai-detail-price-val" style={{ color: hasVal ? 'var(--ptv-kpi-total-val-fg)' : 'var(--muted)' }}>
                 {nilaiPerolehan}
               </div>
               {hasVal && v && totalUnits > 1 && (
-                <div style={{ marginTop: '8px', padding: '6px 12px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 'var(--ptv-curve-sm)', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#166534', fontWeight: 700, flexWrap: 'wrap' }}>
+                <div className="ptv-nilai-unit-calc-summary">
                   <span>Harga 1 Unit: <b>{formatRupiah(Math.round(v.nilai_perolehan / totalUnits))}</b></span>
-                  <span style={{ color: '#86efac' }}>&bull;</span>
+                  <span className="dot-separator" style={{ color: '#86efac' }}>&bull;</span>
                   <span>Jumlah: <b>{totalUnits} Unit</b></span>
-                  <span style={{ color: '#86efac' }}>&bull;</span>
+                  <span className="dot-separator" style={{ color: '#86efac' }}>&bull;</span>
                   <span>Total: <b>{nilaiPerolehan}</b></span>
                 </div>
               )}
@@ -383,25 +373,53 @@ export const NilaiInventarisDetailPage: React.FC = () => {
           {/* Asset Overview Card */}
           <div className="ptv-nilai-detail-card">
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: 'var(--ptv-curve-lg)', background: 'var(--bg-2, #f8fafc)', border: '1.5px solid var(--line, #e2e8f0)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {item.foto_url ? (
-                  <img src={item.foto_url} alt={item.nama_alat} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <div style={{ color: '#64748b', fontSize: '26px' }}>
-                    <i className="fa-solid fa-boxes-stacked" />
-                  </div>
-                )}
+              <div
+                className={`ptv-nilai-thumb ${getCatCompanionClass(item.kategori)}`}
+                data-cat={item.kategori.toLowerCase()}
+                style={{ width: '64px', height: '64px', borderRadius: 'var(--ptv-curve-lg)', overflow: 'hidden' }}
+              >
+                {(() => {
+                  const resolvedPhoto = resolveInventoryPhotoUrl(item.foto_url);
+                  return (
+                    <>
+                      {resolvedPhoto ? (
+                        <img
+                          src={resolvedPhoto}
+                          alt={item.nama_alat}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLElement).style.display = 'none';
+                            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        style={{
+                          display: resolvedPhoto ? 'none' : 'flex',
+                          width: '100%',
+                          height: '100%',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '26px',
+                        }}
+                      >
+                        <i className={`fa-solid ${getCatIconClass(item.kategori)}`} />
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'inline-block', padding: '1px 8px', background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', borderRadius: 'var(--ptv-curve-xs)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', marginBottom: '4px' }}>
+                <span style={{ display: 'inline-block', padding: '1px 8px', background: 'var(--bg-2, #f1f5f9)', color: 'var(--ink, #334155)', border: '1px solid var(--line-2, #cbd5e1)', borderRadius: 'var(--ptv-curve-xs)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', marginBottom: '4px' }}>
                   {item.kode}
                 </span>
                 <h2 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: '0 0 4px 0', lineHeight: 1.3, wordBreak: 'break-word' }}>
                   {item.nama_alat}
                 </h2>
                 <div style={{ fontSize: '11.5px', color: 'var(--muted, #64748b)', marginTop: '4px' }}>
-                  <i className="fa-solid fa-location-dot" style={{ color: '#ef4444', marginRight: '4px' }} />
+                  <i className="fa-solid fa-location-dot" style={{ color: 'var(--muted)', marginRight: '4px' }} />
                   {locName} &bull; {item.kategori}
                 </div>
               </div>
@@ -423,7 +441,7 @@ export const NilaiInventarisDetailPage: React.FC = () => {
           <div className="ptv-nilai-detail-card">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: 'var(--ptv-curve-sm)', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: 'var(--ptv-curve-sm)', background: 'var(--b-050, #eff6ff)', color: 'var(--b-600, #2563eb)', border: '1px solid var(--b-200, #bfdbfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
                   <i className="fa-solid fa-boxes-stacked" />
                 </div>
                 <h3 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -478,91 +496,74 @@ export const NilaiInventarisDetailPage: React.FC = () => {
       </div>
 
       {/* ── Modal Edit / Catat Nilai ── */}
-      {isEditOpen && (
+      {isEditOpen && typeof document !== 'undefined' && createPortal(
         <div
           role="dialog"
           aria-modal="true"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(15, 23, 42, 0.65)',
-            backdropFilter: 'blur(4px)',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '16px',
+          className="ptv-nilai-modal-backdrop"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsEditOpen(false);
           }}
         >
-          <div
-            style={{
-              background: 'var(--surface, #ffffff)',
-              borderRadius: 'var(--ptv-curve-2xl)',
-              width: '100%',
-              maxWidth: '520px',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              maxHeight: '90vh',
-            }}
-          >
+          <form onSubmit={handleSaveEdit} className="ptv-nilai-modal-card">
             {/* Modal Header */}
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line-2, #f1f5f9)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div className="ptv-nilai-modal-header">
               <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: 'var(--ink, #0f172a)' }}>
+                <h3 className="ptv-nilai-modal-title">
                   {hasVal ? 'Ubah Catatan Nilai' : 'Catat Nilai Inventaris'}
                 </h3>
-                <span style={{ fontSize: '12px', color: 'var(--muted, #64748b)' }}>
+                <span className="ptv-nilai-modal-sub">
                   {item.kode} &bull; {item.nama_alat}
                 </span>
               </div>
               <button
                 type="button"
+                className="ptv-nilai-modal-close-btn"
                 onClick={() => setIsEditOpen(false)}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--muted, #94a3b8)', fontSize: '16px' }}
+                aria-label="Tutup modal"
               >
                 <i className="fa-solid fa-xmark" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <form onSubmit={handleSaveEdit} style={{ padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                  Total Nilai Perolehan (Rp) *
+            <div className="ptv-nilai-modal-body">
+              <div className="ptv-nilai-form-group">
+                <label className="ptv-nilai-form-label">
+                  <span>Total Nilai Perolehan (Rp)</span>
+                  <span className="req">*</span>
                 </label>
                 <input
                   type="number"
-                  className="input"
+                  className="ptv-nilai-form-input"
                   required
                   placeholder="Contoh: 58000000"
                   value={editForm.nilai_perolehan}
                   onChange={(e) => setEditForm({ ...editForm, nilai_perolehan: e.target.value })}
-                  style={{ width: '100%', boxSizing: 'border-box' }}
                 />
-                <span style={{ fontSize: '11px', color: 'var(--muted, #64748b)', marginTop: '2px', display: 'block' }}>
+                <span className="ptv-nilai-form-hint">
                   Format Rupiah: {editForm.nilai_perolehan ? formatRupiah(editForm.nilai_perolehan) : 'Rp 0'}
                 </span>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                    Tanggal Perolehan *
+              <div className="ptv-nilai-form-row-2col">
+                <div className="ptv-nilai-form-group">
+                  <label className="ptv-nilai-form-label">
+                    <span>Tanggal Perolehan</span>
+                    <span className="req">*</span>
                   </label>
                   <input
                     type="date"
-                    className="input"
+                    className="ptv-nilai-form-input"
                     required
                     value={editForm.tanggal_perolehan}
                     onChange={(e) => setEditForm({ ...editForm, tanggal_perolehan: e.target.value })}
-                    style={{ width: '100%', boxSizing: 'border-box' }}
                   />
                 </div>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                    Sumber Dana *
+                <div className="ptv-nilai-form-group">
+                  <label className="ptv-nilai-form-label">
+                    <span>Sumber Dana</span>
+                    <span className="req">*</span>
                   </label>
                   <PTVSelect
                     value={editForm.sumber_perolehan}
@@ -578,71 +579,68 @@ export const NilaiInventarisDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                    Vendor / Toko
-                  </label>
+              <div className="ptv-nilai-form-row-2col">
+                <div className="ptv-nilai-form-group">
+                  <label className="ptv-nilai-form-label">Vendor / Toko</label>
                   <input
                     type="text"
-                    className="input"
+                    className="ptv-nilai-form-input"
                     placeholder="Contoh: JPC Kemang"
                     value={editForm.vendor}
                     onChange={(e) => setEditForm({ ...editForm, vendor: e.target.value })}
-                    style={{ width: '100%', boxSizing: 'border-box' }}
                   />
                 </div>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                    Nomor Invoice
-                  </label>
+                <div className="ptv-nilai-form-group">
+                  <label className="ptv-nilai-form-label">Nomor Invoice</label>
                   <input
                     type="text"
-                    className="input"
+                    className="ptv-nilai-form-input"
                     placeholder="Contoh: INV/2024/001"
                     value={editForm.nomor_invoice}
                     onChange={(e) => setEditForm({ ...editForm, nomor_invoice: e.target.value })}
-                    style={{ width: '100%', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink, #334155)', display: 'block', marginBottom: '4px' }}>
-                  Catatan Administratif
-                </label>
+              <div className="ptv-nilai-form-group">
+                <label className="ptv-nilai-form-label">Catatan Administratif</label>
                 <textarea
-                  className="input"
+                  className="ptv-nilai-form-textarea"
                   rows={2}
                   placeholder="Catatan kondisi atau keperluan pembelian..."
                   value={editForm.catatan}
                   onChange={(e) => setEditForm({ ...editForm, catatan: e.target.value })}
-                  style={{ width: '100%', boxSizing: 'border-box', height: 'auto', padding: '8px' }}
                 />
               </div>
+            </div>
 
-              {/* Modal Actions */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
-                <button
-                  type="button"
-                  className="btn sm"
-                  onClick={() => setIsEditOpen(false)}
-                  style={{ background: '#f1f5f9', border: 'none', borderRadius: 'var(--ptv-curve-md)', padding: '8px 16px', fontWeight: 700 }}
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="btn sm pri"
-                  style={{ borderRadius: 'var(--ptv-curve-md)', padding: '8px 20px', fontWeight: 700 }}
-                >
-                  {submitting ? 'Menyimpan...' : 'Simpan Catatan Nilai'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+            {/* Modal Actions */}
+            <div className="ptv-nilai-modal-footer">
+              <button
+                type="button"
+                className="ptv-nilai-btn-cancel-modal"
+                onClick={() => setIsEditOpen(false)}
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="ptv-nilai-btn-submit-modal"
+              >
+                {submitting ? (
+                  <>
+                    <i className="fa-solid fa-spinner fa-spin" />
+                    <span>Menyimpan...</span>
+                  </>
+                ) : (
+                  <span>Simpan Catatan Nilai</span>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>,
+        document.body
       )}
     </div>
   );
