@@ -60,3 +60,10 @@ export async function readFinanceOperational(
     feeHistory: tariffConfig.feeHistory,
   };
 }
+
+
+export default function handler(_req: unknown, res: { status: (c: number) => { json: (d: unknown) => void } }) {
+  if (res && typeof res.status === 'function') {
+    return res.status(404).json({ error: 'Endpoint not found' });
+  }
+}

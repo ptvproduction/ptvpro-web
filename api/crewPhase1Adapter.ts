@@ -58,3 +58,10 @@ export async function readPhase1PersonnelRows(db:SupabaseClient,rows:RawLegacyKr
    jabatan:membership.position_title,status:membership.status_organisasi==='active'?'aktif':'nonaktif',metadata_json:{...row.metadata_json,category,phase1_assigned_profiles:assigned,phase1_link_pending:pendingArchiveIds.has(row.archive_id)}};
  })};
 }
+
+
+export default function handler(_req: unknown, res: { status: (c: number) => { json: (d: unknown) => void } }) {
+  if (res && typeof res.status === 'function') {
+    return res.status(404).json({ error: 'Endpoint not found' });
+  }
+}

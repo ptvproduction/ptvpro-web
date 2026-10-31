@@ -53,3 +53,10 @@ export async function handleLoanWrite(req: IncomingMessage, res: ServerResponse,
     res.statusCode = 400; res.end(JSON.stringify({ error: error instanceof Error ? error.message : 'Penyimpanan belum dikonfirmasi.' }));
   }
 }
+
+
+export default function handler(_req: unknown, res: { status: (c: number) => { json: (d: unknown) => void } }) {
+  if (res && typeof res.status === 'function') {
+    return res.status(404).json({ error: 'Endpoint not found' });
+  }
+}
