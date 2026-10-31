@@ -137,7 +137,7 @@ export const BerandaPage: React.FC = () => {
   ];
 
   return (
-    <div className="page">
+    <div className="page beranda-page">
       {/* Error Retry Banner */}
       {loadError && (
         <div

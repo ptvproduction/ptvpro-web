@@ -564,7 +564,20 @@ async function portalSessionValid(db, session) {
   return result.data === true;
 }
 function trustedIngress(req) {
-  const value = process.env.VERCEL === "1" ? req.headers["x-forwarded-for"] : req.socket?.remoteAddress;
+  let value;
+  if (process.env.VERCEL === "1") {
+    const realIp = req.headers["x-real-ip"];
+    if (typeof realIp === "string" && realIp.trim()) {
+      value = realIp.trim();
+    } else {
+      const fwd = req.headers["x-forwarded-for"];
+      if (typeof fwd === "string") {
+        value = fwd.split(",")[0].trim();
+      }
+    }
+  } else {
+    value = typeof req.socket?.remoteAddress === "string" ? req.socket.remoteAddress : void 0;
+  }
   if (typeof value !== "string" || !isIP(value.trim())) throw new Error("Trusted ingress unavailable");
   const ip = value.trim().toLowerCase();
   const ipv4 = ip.startsWith("::ffff:") ? ip.slice(7) : ip;
@@ -2013,6 +2026,29 @@ function sanitizeAcaraCrew(crewInput) {
   return sanitized;
 }
 async function parseJsonBody(req) {
+  const existingBody = req.body;
+  if (existingBody !== void 0) {
+    if (typeof existingBody === "object" && existingBody !== null) {
+      return existingBody;
+    }
+    if (typeof existingBody === "string") {
+      if (!existingBody.trim()) return {};
+      try {
+        return JSON.parse(existingBody);
+      } catch {
+        throw new Error("Format data JSON tidak valid.");
+      }
+    }
+    if (Buffer.isBuffer(existingBody)) {
+      const str = existingBody.toString("utf8");
+      if (!str.trim()) return {};
+      try {
+        return JSON.parse(str);
+      } catch {
+        throw new Error("Format data JSON tidak valid.");
+      }
+    }
+  }
   return new Promise((resolve, reject) => {
     let body = "";
     req.on("data", (chunk) => {
@@ -10175,18 +10211,31 @@ async function handler16(req, res) {
     global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(15e3) }) }
   });
   try {
-    let bodyStr = "";
-    req.on("data", (chunk) => {
-      bodyStr += chunk;
-      if (bodyStr.length > 10 * 1024 * 1024) {
-        throw new Error("Ukuran file foto maksimal 10MB.");
+    let parsed;
+    const existingBody = req.body;
+    if (existingBody !== void 0) {
+      if (typeof existingBody === "object" && existingBody !== null) {
+        parsed = existingBody;
+      } else if (typeof existingBody === "string") {
+        parsed = JSON.parse(existingBody || "{}");
+      } else if (Buffer.isBuffer(existingBody)) {
+        parsed = JSON.parse(existingBody.toString("utf8") || "{}");
       }
-    });
-    await new Promise((resolve, reject) => {
-      req.on("end", () => resolve());
-      req.on("error", reject);
-    });
-    const parsed = JSON.parse(bodyStr || "{}");
+    }
+    if (!parsed) {
+      let bodyStr = "";
+      req.on("data", (chunk) => {
+        bodyStr += chunk;
+        if (bodyStr.length > 10 * 1024 * 1024) {
+          throw new Error("Ukuran file foto maksimal 10MB.");
+        }
+      });
+      await new Promise((resolve, reject) => {
+        req.on("end", () => resolve());
+        req.on("error", reject);
+      });
+      parsed = JSON.parse(bodyStr || "{}");
+    }
     const { data: base64Data, ptv_id: ptvId } = parsed;
     if (!base64Data || typeof base64Data !== "string") {
       res.statusCode = 400;
@@ -10204,7 +10253,18 @@ async function handler16(req, res) {
       else if (mimeType.includes("webp")) extension = "webp";
       else if (mimeType.includes("gif")) extension = "gif";
     }
+    const allowedMimes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!allowedMimes.includes(mimeType)) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: "Format file tidak didukung. Gunakan JPG, PNG, WEBP, atau GIF." }));
+      return;
+    }
     const buffer = Buffer.from(rawBase64, "base64");
+    if (buffer.length > 10 * 1024 * 1024) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: "Ukuran file foto maksimal 10MB." }));
+      return;
+    }
     const cleanId = (ptvId || session.ptv_id || "crew").toLowerCase().replace(/[^a-z0-9]/g, "_");
     const fileName = `avatars/crew_${cleanId}_${Date.now()}.${extension}`;
     const { error: uploadError } = await supabase.storage.from("inventory").upload(fileName, buffer, {
@@ -10767,14 +10827,20 @@ async function handler19(req, res) {
       res.end(JSON.stringify({ error: "Identitas dan password (minimal 4 karakter) wajib diisi dengan format yang didukung." }));
       return;
     }
-    let issuedToken;
-    let identityResult;
-    if (passwordLoginEnabled()) {
-      if (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host) {
+    if (req.headers.origin) {
+      const originHost = new URL(req.headers.origin).host.toLowerCase();
+      const requestHost = (req.headers.host || "").toLowerCase();
+      const isExactMatch = originHost === requestHost;
+      const isCanonicalPair = originHost === "ptvpro.com" && requestHost === "www.ptvpro.com" || originHost === "www.ptvpro.com" && requestHost === "ptvpro.com";
+      if (!isExactMatch && !isCanonicalPair) {
         res.statusCode = 403;
         res.end(JSON.stringify({ error: "Origin tidak diizinkan." }));
         return;
       }
+    }
+    let issuedToken;
+    let identityResult;
+    if (passwordLoginEnabled()) {
       const result = await authenticatePortalPassword(req, identifier, password);
       if (!result.session || !result.token) {
         res.statusCode = result.status;

@@ -68,13 +68,23 @@ export default async function handler(req: ApiRequest, res: ApiResponse): Promis
       return;
     }
 
+    // 0. CSRF Protection: Validate Origin strictly
+    if (req.headers.origin) {
+      const originHost = new URL(req.headers.origin).host.toLowerCase();
+      const requestHost = (req.headers.host || '').toLowerCase();
+      const isExactMatch = originHost === requestHost;
+      const isCanonicalPair =
+        (originHost === 'ptvpro.com' && requestHost === 'www.ptvpro.com') ||
+        (originHost === 'www.ptvpro.com' && requestHost === 'ptvpro.com');
+      if (!isExactMatch && !isCanonicalPair) {
+        res.statusCode = 403; res.end(JSON.stringify({ error: 'Origin tidak diizinkan.' })); return;
+      }
+    }
+
     // 1. Resolve identity and verify status & capabilities
     let issuedToken: string | undefined;
     let identityResult;
     if (passwordLoginEnabled()) {
-      if (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host) {
-        res.statusCode = 403; res.end(JSON.stringify({ error: 'Origin tidak diizinkan.' })); return;
-      }
       const result = await authenticatePortalPassword(req, identifier, password);
       if (!result.session || !result.token) {
         res.statusCode = result.status;

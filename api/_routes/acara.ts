@@ -213,6 +213,30 @@ function sanitizeAcaraCrew(crewInput: any): any[] {
 }
 
 async function parseJsonBody(req: IncomingMessage): Promise<any> {
+  const existingBody = (req as any).body;
+  if (existingBody !== undefined) {
+    if (typeof existingBody === 'object' && existingBody !== null) {
+      return existingBody;
+    }
+    if (typeof existingBody === 'string') {
+      if (!existingBody.trim()) return {};
+      try {
+        return JSON.parse(existingBody);
+      } catch {
+        throw new Error('Format data JSON tidak valid.');
+      }
+    }
+    if (Buffer.isBuffer(existingBody)) {
+      const str = existingBody.toString('utf8');
+      if (!str.trim()) return {};
+      try {
+        return JSON.parse(str);
+      } catch {
+        throw new Error('Format data JSON tidak valid.');
+      }
+    }
+  }
+
   return new Promise((resolve, reject) => {
     let body = '';
     req.on('data', (chunk) => {

@@ -2,6 +2,17 @@
 
 # PIKET DEV — PTV PRO
 
+- **PTV-DEV-252 / zidnal / Selesai (IMPLEMENTASI & AUDIT: Local vs Production Parity Fixes).**
+  - **Aktivitas:** Mengaudit dan langsung mengimplementasikan perbaikan terarah untuk seluruh temuan paritas UI & API antara localhost dan Vercel Production tanpa mengubah database atau arsitektur.
+  - **Solusi & Implementasi:**
+    1. *CSS Parity:* Mengeliminasi konflik penimpaan selektor .chip dengan menyelaraskan border-radius ke pill (9999px) di dashboard.css, menambahkan namespace spesifisitas .beranda-page pada BerandaPage.tsx & beranda.css (0,2,0) sehingga aturan R03 tidak tertimpa dashboard.css saat Rollup bundling, serta menyelaraskan dimensi/radius .qa-ref-btn.
+    2. *API Stream Body:* Menangani pre-parsed body di acara.ts dan upload-avatar.ts sehingga tidak menggantung pada stream tertutup di serverless Vercel (mencegah timeout 504), dengan validasi MIME dan limit 10MB tetap aktif.
+    3. *Trusted Ingress:* Menangani multi-proxy IP berpemisah koma di x-forwarded-for dan memprioritaskan x-real-ip pada portalLifecycle.ts (mencegah error 503).
+    4. *Kanonikal Host Login:* Mengizinkan pasangan kanonikal ptvpro.com dan www.ptvpro.com pada validasi origin CSRF di login.ts dengan tetap menolak domain asing (403).
+  - **File:** api/_routes/acara.ts, api/_routes/upload-avatar.ts, api/_routes/auth/_utils/portalLifecycle.ts, api/_routes/auth/login.ts, api/index.js, src/products/hub/beranda/BerandaPage.tsx, src/styles/beranda.css, src/styles/dashboard.css, tests/parityFixes.test.ts, docs/audits/PTVPRO_LOCAL_PRODUCTION_PARITY.md, piketdev.md.
+  - **Validasi:** npm run typecheck PASS (0 errors), npm test tests/apiRouter.test.ts PASS, tests/parityFixes.test.ts PASS, tests/auth/*.test.ts PASS (40/40), npm run build PASS (built in 18.71s, 0 errors).
+  - **Code Hygiene:** CLN-279.
+
 - **PTV-DEV-251 / zidnal / Selesai (HOTFIX: SPA Fallback Routing di Vercel Production).**
   - **Akar Masalah:**
     1. Di vercel.json, konfigurasi cleanUrls: true dan trailingSlash: false menyebabkan edge CDN Vercel mencari file statis .html fisik untuk sub-route (seperti /hub.html atau /hub/index.html). Karena Vite hanya menghasilkan satu dist/index.html, pencarian file fisik tersebut gagal dan memicu status 404 NOT_FOUND sebelum SPA catch-all rewrite dieksekusi.

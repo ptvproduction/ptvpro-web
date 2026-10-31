@@ -47,20 +47,32 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   try {
     // Parse JSON payload containing base64 data and metadata
-    let bodyStr = '';
-    req.on('data', (chunk) => {
-      bodyStr += chunk;
-      if (bodyStr.length > 10 * 1024 * 1024) {
-        throw new Error('Ukuran file foto maksimal 10MB.');
+    let parsed: any;
+    const existingBody = (req as any).body;
+    if (existingBody !== undefined) {
+      if (typeof existingBody === 'object' && existingBody !== null) {
+        parsed = existingBody;
+      } else if (typeof existingBody === 'string') {
+        parsed = JSON.parse(existingBody || '{}');
+      } else if (Buffer.isBuffer(existingBody)) {
+        parsed = JSON.parse(existingBody.toString('utf8') || '{}');
       }
-    });
+    }
+    if (!parsed) {
+      let bodyStr = '';
+      req.on('data', (chunk) => {
+        bodyStr += chunk;
+        if (bodyStr.length > 10 * 1024 * 1024) {
+          throw new Error('Ukuran file foto maksimal 10MB.');
+        }
+      });
 
-    await new Promise<void>((resolve, reject) => {
-      req.on('end', () => resolve());
-      req.on('error', reject);
-    });
-
-    const parsed = JSON.parse(bodyStr || '{}');
+      await new Promise<void>((resolve, reject) => {
+        req.on('end', () => resolve());
+        req.on('error', reject);
+      });
+      parsed = JSON.parse(bodyStr || '{}');
+    }
     const { data: base64Data, ptv_id: ptvId } = parsed;
 
     if (!base64Data || typeof base64Data !== 'string') {
@@ -83,7 +95,19 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       else if (mimeType.includes('gif')) extension = 'gif';
     }
 
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedMimes.includes(mimeType)) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Format file tidak didukung. Gunakan JPG, PNG, WEBP, atau GIF.' }));
+      return;
+    }
+
     const buffer = Buffer.from(rawBase64, 'base64');
+    if (buffer.length > 10 * 1024 * 1024) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Ukuran file foto maksimal 10MB.' }));
+      return;
+    }
     const cleanId = (ptvId || session.ptv_id || 'crew').toLowerCase().replace(/[^a-z0-9]/g, '_');
     const fileName = `avatars/crew_${cleanId}_${Date.now()}.${extension}`;
 

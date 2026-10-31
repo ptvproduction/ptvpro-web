@@ -32,7 +32,20 @@ export async function portalSessionValid(db: SupabaseClient, session: SessionPay
 }
 
 function trustedIngress(req: ApiRequest) {
-  const value = process.env.VERCEL === '1' ? req.headers['x-forwarded-for'] : req.socket?.remoteAddress;
+  let value: string | undefined;
+  if (process.env.VERCEL === '1') {
+    const realIp = req.headers['x-real-ip'];
+    if (typeof realIp === 'string' && realIp.trim()) {
+      value = realIp.trim();
+    } else {
+      const fwd = req.headers['x-forwarded-for'];
+      if (typeof fwd === 'string') {
+        value = fwd.split(',')[0].trim();
+      }
+    }
+  } else {
+    value = typeof req.socket?.remoteAddress === 'string' ? req.socket.remoteAddress : undefined;
+  }
   if (typeof value !== 'string' || !isIP(value.trim())) throw new Error('Trusted ingress unavailable');
   const ip = value.trim().toLowerCase();
   const ipv4 = ip.startsWith('::ffff:') ? ip.slice(7) : ip;
