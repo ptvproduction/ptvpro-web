@@ -95,10 +95,15 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       metadata_json
     `);
 
-    if (normalizedId.startsWith('PTV-') && normalizedId.length <= 16) {
+    // Dukung pencarian baik berdasarkan PTV-ID, angka Smart ID, maupun nama personel
+    const isExplicitPtvId = /^PTV-[A-Z0-9-]+$/i.test(rawClean);
+    const isPureDigits = /^\d{1,4}$/.test(rawClean);
+
+    if (isExplicitPtvId || isPureDigits) {
       query = query.eq('ptv_id', normalizedId);
     } else {
-      query = query.ilike('full_name', `%${rawClean}%`);
+      // Jika input string/nama: cari berdasarkan ptv_id yang cocok ATAU nama lengkap yang cocok
+      query = query.or(`ptv_id.eq.${normalizedId},full_name.ilike.%${rawClean}%`);
     }
 
     const { data: rows, error: queryErr } = await query.limit(2);

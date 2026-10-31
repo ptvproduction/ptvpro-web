@@ -10703,10 +10703,12 @@ async function handler18(req, res) {
       canonical_identity_id,
       metadata_json
     `);
-    if (normalizedId.startsWith("PTV-") && normalizedId.length <= 16) {
+    const isExplicitPtvId = /^PTV-[A-Z0-9-]+$/i.test(rawClean);
+    const isPureDigits = /^\d{1,4}$/.test(rawClean);
+    if (isExplicitPtvId || isPureDigits) {
       query = query.eq("ptv_id", normalizedId);
     } else {
-      query = query.ilike("full_name", `%${rawClean}%`);
+      query = query.or(`ptv_id.eq.${normalizedId},full_name.ilike.%${rawClean}%`);
     }
     const { data: rows, error: queryErr } = await query.limit(2);
     if (queryErr) {
