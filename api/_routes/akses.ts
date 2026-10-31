@@ -124,43 +124,46 @@ export default async function handler(req: IncomingMessage & { body?: unknown },
 
     // === METHOD GET ===
     if (req.method === 'GET') {
-      const snapshot = await readAccessAccounts(db);
+      // Optimasi Performa: Jalankan pembacaan akun dan riwayat audit secara paralel
+      const [snapshot, auditLogsRes] = await Promise.all([
+        readAccessAccounts(db),
+        actor.can('audit.logs.view')
+          ? db
+              .from('auth_audit_log')
+              .select('id,event_type,created_at,metadata,actor_id')
+              .in('event_type', ['account_access_changed', 'password_reset_by_root', 'position_capabilities_updated'])
+              .order('created_at', { ascending: false })
+              .limit(50)
+          : Promise.resolve({ data: [], error: null })
+      ]);
+
       let history: any[] = [];
-      if (actor.can('audit.logs.view')) {
-        const result = await db
-          .from('auth_audit_log')
-          .select('id,event_type,created_at,metadata,actor_id')
-          .in('event_type', ['account_access_changed', 'password_reset_by_root', 'position_capabilities_updated'])
-          .order('created_at', { ascending: false })
-          .limit(50);
+      if (!auditLogsRes.error && Array.isArray(auditLogsRes.data) && auditLogsRes.data.length > 0) {
+        // Reuse canonical identity mapping yang sudah dibaca dalam snapshot
+        const idMap = new Map((snapshot.accounts || []).map(a => [a.identityId, { id: a.identityId, full_name: a.name, ptv_id: a.ptvId }]));
 
-        if (!result.error && Array.isArray(result.data)) {
-          // Enrich audit log history with actor name and human description
-          const identities = await db.from('canonical_identity').select('id, full_name, ptv_id');
-          const idMap = new Map((identities.data || []).map(i => [i.id, i]));
-
-          history = result.data.map(h => {
-            const actorObj = idMap.get(h.actor_id);
-            const targetAccount = snapshot.accounts.find(a => a.id === h.metadata?.target_account_id);
-            return {
-              id: h.id,
-              event_type: h.event_type,
-              created_at: h.created_at,
-              actor_name: actorObj?.full_name || 'Administrator',
-              actor_ptv_id: actorObj?.ptv_id || '',
-              target_username: targetAccount?.username || h.metadata?.target_username || h.metadata?.after?.username || '—',
-              target_name: targetAccount?.name || h.metadata?.target_name || '—',
-              target_ptv_id: targetAccount?.ptvId || h.metadata?.target_ptv_id || '',
-              target_position: targetAccount?.position || h.metadata?.position || '—',
-              reason: h.metadata?.after?.reason || h.metadata?.reason || (h.event_type === 'password_reset_by_root' ? 'Atur ulang password oleh ROOT' : 'Perubahan izin akses'),
-              source: h.metadata?.source || 'Manajemen Akun',
-              before: h.metadata?.before || null,
-              after: h.metadata?.after || null,
-              metadata: h.metadata,
-            };
-          });
-        }
+        history = auditLogsRes.data.map(h => {
+          const actorObj = idMap.get(h.actor_id);
+          const targetAccount = snapshot.accounts.find(a => a.id === h.metadata?.target_account_id);
+          return {
+            id: h.id,
+            event_type: h.event_type,
+            created_at: h.created_at,
+            actor_name: actorObj?.full_name || 'Administrator',
+            actor_ptv_id: actorObj?.ptv_id || '',
+            target_username: targetAccount?.username || h.metadata?.target_username || h.metadata?.after?.username || '—',
+            target_name: targetAccount?.name || h.metadata?.target_name || '—',
+            target_ptv_id: targetAccount?.ptvId || h.metadata?.target_ptv_id || '',
+            target_position: targetAccount?.position || h.metadata?.position || '—',
+            reason: h.metadata?.after?.reason || h.metadata?.reason || (h.event_type === 'password_reset_by_root' ? 'Atur ulang password oleh ROOT' : 'Perubahan izin akses'),
+            source: h.metadata?.source || 'Manajemen Akun',
+            before: h.metadata?.before || null,
+            after: h.metadata?.after || null,
+            metadata: h.metadata,
+          };
+        });
       }
+
       return send(200, {
         ...snapshot,
         history,

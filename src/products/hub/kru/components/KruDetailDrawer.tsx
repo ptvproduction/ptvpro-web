@@ -49,8 +49,9 @@ export const KruDetailDrawer: React.FC<KruDetailDrawerProps> = ({
   const [savingUsername, setSavingUsername] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
 
-  // State Buat Akun (PTV-DEV-227)
+  // State Buat Akun & Toggle Status (PTV-DEV-263)
   const [creatingAccount, setCreatingAccount] = useState(false);
+  const [togglingAccount, setTogglingAccount] = useState(false);
   const [createdCredentials, setCreatedCredentials] = useState<CreatedAccountCredentials | null>(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
@@ -355,19 +356,30 @@ export const KruDetailDrawer: React.FC<KruDetailDrawerProps> = ({
                   <button
                     type="button"
                     className="btn"
-                    onClick={() => onToggleAccountStatus?.(localCrew.id, localCrew.status_akun)}
+                    disabled={togglingAccount}
+                    onClick={async () => {
+                      if (togglingAccount) return;
+                      setTogglingAccount(true);
+                      try {
+                        await onToggleAccountStatus?.(localCrew.id, localCrew.status_akun);
+                      } finally {
+                        setTogglingAccount(false);
+                      }
+                    }}
                     style={{
                       fontSize: '12px',
                       padding: '5px 12px',
                       borderRadius: 'var(--ptv-curve-pill)',
                       fontWeight: 600,
+                      opacity: togglingAccount ? 0.7 : 1,
+                      cursor: togglingAccount ? 'wait' : 'pointer',
                       borderColor: isAccountActive ? 'var(--dang-border, rgba(239, 68, 68, 0.4))' : 'var(--ok-border, rgba(34, 197, 94, 0.4))',
                       color: isAccountActive ? 'var(--dang, #dc2626)' : 'var(--ok, #16a34a)',
                       background: isAccountActive ? 'var(--dang-bg, rgba(239, 68, 68, 0.08))' : 'var(--ok-bg, rgba(34, 197, 94, 0.08))',
                     }}
                   >
-                    <i className={`fa-solid ${isAccountActive ? 'fa-user-lock' : 'fa-user-check'}`} style={{ marginRight: '6px' }} />
-                    <span>{isAccountActive ? 'Nonaktifkan Akun' : 'Aktifkan Akun'}</span>
+                    <i className={`fa-solid ${togglingAccount ? 'fa-spinner fa-spin' : isAccountActive ? 'fa-user-lock' : 'fa-user-check'}`} style={{ marginRight: '6px' }} />
+                    <span>{togglingAccount ? 'Memproses...' : isAccountActive ? 'Nonaktifkan Akun' : 'Aktifkan Akun'}</span>
                   </button>
                 )}
 

@@ -2883,34 +2883,33 @@ async function handler(req, res) {
     const urlObj = new URL(req.url || "", "http://localhost");
     const actionParam = urlObj.searchParams.get("action") || "";
     if (req.method === "GET") {
-      const snapshot2 = await readAccessAccounts(db);
+      const [snapshot2, auditLogsRes] = await Promise.all([
+        readAccessAccounts(db),
+        actor.can("audit.logs.view") ? db.from("auth_audit_log").select("id,event_type,created_at,metadata,actor_id").in("event_type", ["account_access_changed", "password_reset_by_root", "position_capabilities_updated"]).order("created_at", { ascending: false }).limit(50) : Promise.resolve({ data: [], error: null })
+      ]);
       let history = [];
-      if (actor.can("audit.logs.view")) {
-        const result = await db.from("auth_audit_log").select("id,event_type,created_at,metadata,actor_id").in("event_type", ["account_access_changed", "password_reset_by_root", "position_capabilities_updated"]).order("created_at", { ascending: false }).limit(50);
-        if (!result.error && Array.isArray(result.data)) {
-          const identities = await db.from("canonical_identity").select("id, full_name, ptv_id");
-          const idMap = new Map((identities.data || []).map((i) => [i.id, i]));
-          history = result.data.map((h) => {
-            const actorObj = idMap.get(h.actor_id);
-            const targetAccount = snapshot2.accounts.find((a) => a.id === h.metadata?.target_account_id);
-            return {
-              id: h.id,
-              event_type: h.event_type,
-              created_at: h.created_at,
-              actor_name: actorObj?.full_name || "Administrator",
-              actor_ptv_id: actorObj?.ptv_id || "",
-              target_username: targetAccount?.username || h.metadata?.target_username || h.metadata?.after?.username || "\u2014",
-              target_name: targetAccount?.name || h.metadata?.target_name || "\u2014",
-              target_ptv_id: targetAccount?.ptvId || h.metadata?.target_ptv_id || "",
-              target_position: targetAccount?.position || h.metadata?.position || "\u2014",
-              reason: h.metadata?.after?.reason || h.metadata?.reason || (h.event_type === "password_reset_by_root" ? "Atur ulang password oleh ROOT" : "Perubahan izin akses"),
-              source: h.metadata?.source || "Manajemen Akun",
-              before: h.metadata?.before || null,
-              after: h.metadata?.after || null,
-              metadata: h.metadata
-            };
-          });
-        }
+      if (!auditLogsRes.error && Array.isArray(auditLogsRes.data) && auditLogsRes.data.length > 0) {
+        const idMap = new Map((snapshot2.accounts || []).map((a) => [a.identityId, { id: a.identityId, full_name: a.name, ptv_id: a.ptvId }]));
+        history = auditLogsRes.data.map((h) => {
+          const actorObj = idMap.get(h.actor_id);
+          const targetAccount = snapshot2.accounts.find((a) => a.id === h.metadata?.target_account_id);
+          return {
+            id: h.id,
+            event_type: h.event_type,
+            created_at: h.created_at,
+            actor_name: actorObj?.full_name || "Administrator",
+            actor_ptv_id: actorObj?.ptv_id || "",
+            target_username: targetAccount?.username || h.metadata?.target_username || h.metadata?.after?.username || "\u2014",
+            target_name: targetAccount?.name || h.metadata?.target_name || "\u2014",
+            target_ptv_id: targetAccount?.ptvId || h.metadata?.target_ptv_id || "",
+            target_position: targetAccount?.position || h.metadata?.position || "\u2014",
+            reason: h.metadata?.after?.reason || h.metadata?.reason || (h.event_type === "password_reset_by_root" ? "Atur ulang password oleh ROOT" : "Perubahan izin akses"),
+            source: h.metadata?.source || "Manajemen Akun",
+            before: h.metadata?.before || null,
+            after: h.metadata?.after || null,
+            metadata: h.metadata
+          };
+        });
       }
       return send(200, {
         ...snapshot2,
@@ -7466,10 +7465,16 @@ async function handler5(req, res) {
           }
         });
         if (rpcRes.error) {
-          res.statusCode = 500;
-          res.end(JSON.stringify({ error: `Gagal memperbarui status akun: ${rpcRes.error.message}` }));
+          const code = rpcRes.error.code;
+          const status = code === "PGRST202" || code === "42883" ? 503 : code === "42501" ? 403 : code === "40001" ? 409 : 400;
+          res.statusCode = status;
+          res.end(JSON.stringify({
+            error: code === "42501" ? "Akses ditolak: Anda tidak memiliki izin untuk mengubah status akun ini." : code === "40001" ? "Status akun telah diperbarui oleh pengguna lain. Silakan muat ulang halaman." : `Gagal memperbarui status akun: ${rpcRes.error.message}`,
+            code: rpcRes.error.code
+          }));
           return;
         }
+        clearLiveAccessCache(targetAccount.id);
         const updatedCrew = mapLegacyKruRowToCrewMember(crewRow, nextAccountStatus);
         res.statusCode = 200;
         res.end(JSON.stringify({

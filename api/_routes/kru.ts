@@ -506,10 +506,23 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         });
 
         if (rpcRes.error) {
-          res.statusCode = 500;
-          res.end(JSON.stringify({ error: `Gagal memperbarui status akun: ${rpcRes.error.message}` }));
+          const code = rpcRes.error.code;
+          const status = code === 'PGRST202' || code === '42883' ? 503
+            : code === '42501' ? 403
+            : code === '40001' ? 409
+            : 400;
+          res.statusCode = status;
+          res.end(JSON.stringify({
+            error: code === '42501' ? 'Akses ditolak: Anda tidak memiliki izin untuk mengubah status akun ini.'
+              : code === '40001' ? 'Status akun telah diperbarui oleh pengguna lain. Silakan muat ulang halaman.'
+              : `Gagal memperbarui status akun: ${rpcRes.error.message}`,
+            code: rpcRes.error.code,
+          }));
           return;
         }
+
+        // Invalidasi live access memoization cache agar perubahan status langsung efektif
+        clearLiveAccessCache(targetAccount.id);
 
         const updatedCrew = mapLegacyKruRowToCrewMember(crewRow, nextAccountStatus);
         res.statusCode = 200;

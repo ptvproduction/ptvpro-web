@@ -5,6 +5,14 @@ Dokumen resmi pelaporan dan register kebersihan kode (Code Hygiene) dengan prins
 ---
 ## A. RINGKASAN CLEANING TERBARU
 
+- **CLN-290 | PTV-DEV-263 | Critical Account Management 504/500 Hotfix & Safe Status Mutation (31 Oktober 2026, rouf / Antigravity):**
+  - **Scope:** `api/_routes/kru.ts`, `api/_routes/akses.ts`, `src/products/hub/kru/components/KruDetailDrawer.tsx`, `api/index.js`, `piketdev.md`, `cleanings.md`, `roadmap.md`.
+  - **Tindakan Kebersihan & Resolusi Akar Masalah:**
+    1. *Resolusi 500 Internal Server Error pada `PATCH /api/kru?action=toggle_account`:* Mengidentifikasi bahwa saat mutasi status akun melalui fungsi RPC atomik `rpc_manage_account_access` melempar exception basis data (seperti `42501 forbidden`, `40001 stale version`, atau `22023 missing`), handler lama secara naif memaksakan status HTTP 500 generik tanpa menangkap status kode sesungguhnya. Selain itu, handler lama tidak menginvalidasi in-memory cache live access pada session worker. Solusi: memetakan error code PostgreSQL secara aman (`42501` -> 403 Forbidden, `40001` -> 409 Conflict, format error -> 400 Bad Request, unavailability -> 503 Service Unavailable), serta menambahkan pemanggilan `clearLiveAccessCache(targetAccount.id)` pasca mutasi sukses sehingga status baru langsung aktif di seluruh worker.
+    2. *Resolusi 504 Gateway Timeout pada `/hub/akses` (`/api/akses`):* Pada method GET `api/_routes/akses.ts`, serverless handler mengeksekusi `readAccessAccounts(db)` (9 query paralel) lalu secara serial menembak `auth_audit_log` dan query N+1 `canonical_identity` untuk memetakan nama aktor audit. Beban beruntun ini memperlambat TTFB hingga menabrak timeout serverless. Solusi: memparalelkan pembacaan `readAccessAccounts` dan `auth_audit_log` menggunakan `Promise.all()`, serta mendaur ulang data kanonikal identitas yang sudah termuat di dalam snapshot tanpa melakukan kueri ulang ke tabel `canonical_identity`.
+    3. *Pemberian Double-Submit Guard & UI Loading State:* Menambahkan state `togglingAccount` dan atribut `disabled` pada tombol "Aktifkan/Nonaktifkan Akun" di `KruDetailDrawer.tsx` agar pengguna tidak dapat melakukan klik ganda (double-submit) saat mutasi akun sedang diproses oleh database.
+  - **Hasil:** `npm run typecheck` PASS (0 errors), `vitest` PASS (33/33 tests), bundel Universal Router `api/index.js` tersinkronisasi, Vite production build PASS (built in 18.62s).
+
 - **CLN-289 | PTV-DEV-262 | Cross-Module Performance Optimization & Systemic 504 Gateway Timeout Elimination (31 Oktober 2026, rouf / Antigravity):**
   - **Scope:** `api/_routes/auth/_utils/liveAccess.ts`, `api/_routes/kru.ts`, `api/_routes/akses.ts`, `api/_routes/peminjaman.ts`, `api/_routes/dokumen.ts`, `api/_routes/lapor-kerusakan.ts`, `api/_routes/lost-found.ts`, `api/_routes/portofolio.ts`, `api/index.js`, `piketdev.md`, `cleanings.md`, `roadmap.md`.
   - **Tindakan Kebersihan & Resolusi Akar Masalah:**

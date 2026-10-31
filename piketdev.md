@@ -1,5 +1,15 @@
 # PIKET DEV — PTV PRO
 
+- **PTV-DEV-263 / rouf / Selesai (HOTFIX: Critical Account Management 504/500 Resolution & Status Toggle Protection).**
+  - **Aktivitas:** Menginvestigasi dan menyelesaikan insiden 504 Gateway Timeout pada Manajemen Akun (`/hub/akses`) serta 500 Internal Server Error pada aksi toggle status akun (`PATCH /api/kru?action=toggle_account`), memetakan exception RPC secara aman, menginvalidasi memoized live access cache pasca mutasi, memparalelkan kueri audit snapshot, dan menambahkan perlindungan double-submit pada antarmuka.
+  - **Akar Masalah & Solusi:**
+    1. *Root Cause 500 toggle_account:* Handler `toggle_account` di `api/_routes/kru.ts` mengembalikan 500 generik saat RPC atomik `rpc_manage_account_access` mengembalikan error status bisnis (misal versi stale 40001 atau izin 42501), serta tidak memanggil `clearLiveAccessCache(targetAccount.id)`. Solusi: menambahkan pemetaan error kode HTTP granular (403/409/400/503) dengan pesan ramah pengguna, memanggil `clearLiveAccessCache` instan setelah mutasi berhasil, dan memperbarui status akun di memori secara aman.
+    2. *Root Cause 504 /hub/akses:* Handler GET `api/_routes/akses.ts` mengeksekusi kueri `readAccessAccounts` lalu secara serial mengeksekusi kueri `auth_audit_log` dan query berulang ke `canonical_identity` untuk memetakan nama aktor. Solusi: memparalelkan `readAccessAccounts` dan `auth_audit_log` melalui `Promise.all()`, serta me-reuse map identitas yang sudah ada di snapshot tanpa query tambahan.
+    3. *Double-submit Guard:* Tombol toggle status akun di `KruDetailDrawer.tsx` kini dilindungi dengan state `togglingAccount` dan status visual pemrosesan (spinner & disabled).
+  - **File:** `api/_routes/kru.ts`, `api/_routes/akses.ts`, `src/products/hub/kru/components/KruDetailDrawer.tsx`, `api/index.js`, `piketdev.md`, `cleanings.md`, `roadmap.md`.
+  - **Validasi:** `npm run typecheck` PASS (0 errors), `vitest` PASS (33/33 tests), `npm run build` PASS (0 errors, 18.62s), router bundle `api/index.js` tersinkronisasi.
+  - **Code Hygiene:** CLN-290.
+
 - **PTV-DEV-262 / rouf / Selesai (INVESTIGASI & OPTIMASI: Cross-Module Performance & 504 Resolution).**
   - **Aktivitas:** Menginvestigasi akar masalah sistemik kelambatan pemuatan data lintas 14 halaman PTV Hub (Beranda, Catatan Bersama, Inventaris, Nilai Inventaris, Peminjaman, Lapor Kerusakan, Lost & Found, Manajemen Akun, Kontak Eksternal, Keuangan, Pengajuan Perizinan, Surat & Arsip, Pengelolaan Portal, Portofolio Saya), menyelesaikan timeout 504 pada `/hub/keuangan` dan `/hub/kru`, mengaudit shared bottleneck (universal router, withAuth/withCapability, Supabase queries & connection pooling, duplicate waterfall fetching), melakukan profiling latensi terukur, mengimplementasikan optimasi backend & frontend aman, dan memverifikasi dengan sesi kru authenticated sah.
   - **Akar Masalah & Solusi:**
