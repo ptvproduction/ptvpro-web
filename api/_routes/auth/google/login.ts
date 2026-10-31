@@ -44,6 +44,17 @@ export default async function handler(req: ApiRequest, res: ApiResponse): Promis
   const rawRedirectUri = process.env.GOOGLE_REDIRECT_URI || `${origin}/api/auth/google/callback`;
   const redirectUri = rawRedirectUri.trim().replace(/^["']|["']$/g, '');
 
+  // Never let a development flag select identities on a live backend.
+  const isMockAllowed = process.env.NODE_ENV === 'test' && !process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  // Guard: Jangan biarkan mock-client-id bocor ke Google di production/staging live
+  if (!isMockAllowed && (!process.env.GOOGLE_CLIENT_ID || clientId === 'mock-google-client-id')) {
+    res.statusCode = 302;
+    res.setHeader?.('Location', `/hub/login?auth_error=${encodeURIComponent('Kredensial GOOGLE_CLIENT_ID belum dikonfigurasi pada server Vercel.')}&auth_status=error`);
+    res.end();
+    return;
+  }
+
   // Jika action adalah linking akun, wajib verifikasi bahwa pengguna saat ini sedang login secara sah
   let linkingAccountId: string | undefined;
   let linkingPtvId: string | undefined;
@@ -110,8 +121,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse): Promis
   googleAuthUrl.searchParams.set('prompt', 'select_account');
   googleAuthUrl.searchParams.set('access_type', 'offline');
 
-  // Never let a development flag select identities on a live backend.
-  const isMockAllowed = process.env.NODE_ENV === 'test' && !process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (isMockAllowed && urlObj.searchParams.get('mock') === 'true') {
     const mockCallbackUrl = new URL(redirectUri);
     mockCallbackUrl.searchParams.set('code', 'mock-auth-code');
@@ -133,5 +142,3 @@ export default async function handler(req: ApiRequest, res: ApiResponse): Promis
   res.setHeader?.('Location', googleAuthUrl.toString());
   res.end();
 }
-
-

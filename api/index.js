@@ -11471,6 +11471,13 @@ async function handler24(req, res) {
   const origin = `${req.headers["x-forwarded-proto"] || "http"}://${req.headers.host || "localhost:5174"}`;
   const rawRedirectUri = process.env.GOOGLE_REDIRECT_URI || `${origin}/api/auth/google/callback`;
   const redirectUri = rawRedirectUri.trim().replace(/^["']|["']$/g, "");
+  const isMockAllowed = process.env.NODE_ENV === "test" && !process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!isMockAllowed && (!process.env.GOOGLE_CLIENT_ID || clientId === "mock-google-client-id")) {
+    res.statusCode = 302;
+    res.setHeader?.("Location", `/hub/login?auth_error=${encodeURIComponent("Kredensial GOOGLE_CLIENT_ID belum dikonfigurasi pada server Vercel.")}&auth_status=error`);
+    res.end();
+    return;
+  }
   let linkingAccountId;
   let linkingPtvId;
   if (action === "link") {
@@ -11522,7 +11529,6 @@ async function handler24(req, res) {
   googleAuthUrl.searchParams.set("code_challenge_method", "S256");
   googleAuthUrl.searchParams.set("prompt", "select_account");
   googleAuthUrl.searchParams.set("access_type", "offline");
-  const isMockAllowed = process.env.NODE_ENV === "test" && !process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (isMockAllowed && urlObj.searchParams.get("mock") === "true") {
     const mockCallbackUrl = new URL(redirectUri);
     mockCallbackUrl.searchParams.set("code", "mock-auth-code");
