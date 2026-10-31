@@ -1,0 +1,365 @@
+@import './tokens.css';
+@import './dashboard.css';
+@import './shell.css';
+@import './skeletons.css';
+@import './login.css';
+@import './loanModal.css';
+@import './peminjaman.css';
+@import './nilaiInventaris.css';
+@import './kruKomunikasi.css';
+@import './perizinan.css';
+@import './arsip.css';
+@import './splash.css';
+
+:root {
+  /* Compatibility aliases for shared components */
+  --bg-primary: var(--bg);
+  --bg-secondary: var(--surface);
+  --bg-surface: var(--surface);
+  --bg-surface-hover: var(--b-050);
+  --bg-card: var(--surface);
+  --bg-card-border: var(--line);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-2);
+  --text-muted: var(--muted);
+  --accent-blue: var(--b-700);
+  --accent-cyan: var(--b-600);
+  --status-success: var(--ok);
+  --status-success-bg: var(--ok-bg);
+  --status-warning: var(--warn);
+  --status-warning-bg: var(--warn-bg);
+  --status-danger: var(--dang);
+  --status-danger-bg: var(--dang-bg);
+  --status-info: var(--info);
+  --status-info-bg: var(--info-bg);
+  --radius-xs: var(--ptv-corner-xs);
+  --radius-sm: var(--ptv-corner-sm);
+  --radius-md: var(--ptv-corner-md);
+  --radius-lg: var(--ptv-corner-lg);
+  --radius-xl: var(--ptv-corner-xl);
+  --radius-2xl: var(--ptv-corner-2xl);
+  --radius-pill: var(--ptv-corner-pill);
+  --radius-full: var(--ptv-corner-pill);
+}
+
+/* ── Universal Lightbox Modal Styles (R03 Standard) ── */
+.ptv-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 42, 74, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: ptvFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ptv-lightbox-container {
+  background: var(--surface, #FFFFFF);
+  border-radius: var(--ptv-curve-xl, 22px);
+  border: 1px solid var(--line, rgba(11, 42, 74, 0.12));
+  box-shadow: 0 24px 50px rgba(11, 42, 74, 0.28);
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ptv-lightbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line, rgba(11, 42, 74, 0.08));
+  background: var(--surface, #FFFFFF);
+}
+
+.ptv-lightbox-title-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ptv-lightbox-icon {
+  color: var(--b-700, #0B5FBF);
+}
+
+.ptv-lightbox-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink, #0B2A4A);
+}
+
+.ptv-lightbox-close {
+  background: rgba(11, 42, 74, 0.05);
+  border: 1px solid var(--line, rgba(11, 42, 74, 0.08));
+  border-radius: 9999px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-2, #38587A);
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.ptv-lightbox-close:hover {
+  background: rgba(11, 42, 74, 0.12);
+  color: var(--ink, #0B2A4A);
+}
+
+.ptv-lightbox-body {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F8FAFC;
+  overflow: auto;
+  max-height: calc(85vh - 110px);
+}
+
+.ptv-lightbox-img {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.ptv-lightbox-caption {
+  padding: 12px 20px;
+  border-top: 1px solid var(--line, rgba(11, 42, 74, 0.08));
+  background: var(--surface, #FFFFFF);
+  font-size: 13px;
+  color: var(--ink-2, #38587A);
+  text-align: center;
+}
+
+@keyframes ptvFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ── Global Back to Top Button (R03 Standard) ── */
+.ptv-back-to-top-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1px solid rgba(11, 42, 74, 0.12);
+  box-shadow: 0 4px 14px rgba(11, 42, 74, 0.16);
+  color: #0B2A4A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  cursor: pointer;
+  z-index: 75;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ptv-back-to-top-btn.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.ptv-back-to-top-btn:hover {
+  background: var(--b-050, #EFF6FF);
+  color: var(--b-700, #1D4ED8);
+  box-shadow: 0 6px 18px rgba(11, 42, 74, 0.22);
+  transform: translateY(-2px);
+}
+
+.ptv-back-to-top-btn:active {
+  transform: translateY(0);
+}
+
+.ptv-back-to-top-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(18, 115, 230, 0.3);
+}
+
+@media (max-width: 768px) {
+  .ptv-back-to-top-btn {
+    bottom: calc(var(--dock-h, 56px) + var(--sab, 0px) + 16px);
+    right: 18px;
+    z-index: 55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ptv-back-to-top-btn {
+    transition: none !important;
+  }
+}
+
+:root[data-theme="dark"] .ptv-back-to-top-btn {
+  background: #1E293B;
+  border-color: #334155;
+  color: #38BDF8;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="dark"] .ptv-back-to-top-btn:hover {
+  background: #334155;
+  color: #7DD3FC;
+}
+
+/* ── Universal Anti Auto-Zoom iPhone & Mobile Form Audit (PTV-DEV-190) ── */
+/* Menjamin semua editable fields, select, textarea, date picker, search memiliki computed font-size minimal 16px pada mobile */
+@media (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
+  select,
+  textarea,
+  .form-control,
+  .input,
+  .lk-input,
+  .ptv-select-trigger,
+  .prz-modal-input,
+  .prz-modal-select,
+  .prz-modal-textarea,
+  .damage-form-input,
+  .damage-form-select,
+  .damage-form-textarea,
+  .damage-search-input,
+  .catatan-modal-input,
+  .catatan-modal-select,
+  .catatan-modal-textarea,
+  .loan-search-input-pill,
+  .mso-input,
+  .lf-input,
+  .lf-textarea,
+  .ptv-nilai-form-input,
+  .ptv-nilai-form-select,
+  .ptv-nilai-form-textarea,
+  .ptv-workspace-search-input,
+  [contenteditable="true"] {
+    font-size: 16px !important;
+  }
+}
+
+input[type="date"] {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+@media (max-width: 480px) {
+  input[type="date"] {
+    font-size: 16px !important;
+  }
+  .loan-date-grid,
+  .form-grid-date-2,
+  .date-range-grid,
+  .prz-date-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   PTVPRO HUB: SMOOTH THEME TRANSITION (APPLE-LIKE CROSSFADE)
+   350ms ease-in-out smooth color/background transition without layout shift
+   ============================================================ */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-old(root) {
+  animation-name: ptv-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: ptv-fade-in;
+}
+
+@keyframes ptv-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ptv-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Fallback class for browsers without View Transitions */
+.ptv-theme-transition,
+.ptv-theme-transition *,
+.ptv-theme-transition *::before,
+.ptv-theme-transition *::after {
+  transition: background-color 350ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 350ms cubic-bezier(0.4, 0, 0.2, 1),
+              color 350ms cubic-bezier(0.4, 0, 0.2, 1),
+              fill 350ms cubic-bezier(0.4, 0, 0.2, 1),
+              stroke 350ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 350ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-delay: 0s !important;
+}
+
+.ptv-theme-instant,
+.ptv-theme-instant *,
+.ptv-theme-instant *::before,
+.ptv-theme-instant *::after {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Global Anti Auto-Zoom Mobile Rule (iOS Safari / Mobile WebKit) ── */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea,
+  .pub-formal-input,
+  .form-control,
+  .set-input,
+  .acara-field-input,
+  .arsip-select-filter {
+    font-size: 16px !important;
+  }
+}
+
+
+

@@ -1,0 +1,63 @@
+import { spawnSync } from 'node:child_process';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { resolve, join } from 'node:path';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+
+assert(process.argv.length === 2, 'No connection arguments accepted');
+const root = resolve('.gemini/scratch/inventory167-pg');
+assert(root.startsWith(resolve('.gemini/scratch') + '\\'));
+assert(existsSync(join(root, 'PG_VERSION')) && readFileSync(join(root, 'inventory167-local-only.marker'), 'utf8') === 'SYNTHETIC_INVENTORY167_ONLY');
+const bin = 'C:/Program Files/PostgreSQL/17/bin/';
+const database = `inventory168_fixture_${Date.now()}`;
+const env = { ...process.env, PGHOST: '127.0.0.1', PGHOSTADDR: '127.0.0.1', PGPORT: '55439', PGUSER: 'postgres', PGDATABASE: database, PGPASSWORD: '', PGSSLMODE: 'disable' };
+for (const key of ['PGSERVICE', 'PGSERVICEFILE', 'PGOPTIONS', 'PGPASSFILE']) delete env[key];
+const run = (name, args, extra = {}) => spawnSync(bin + name, args, { env, encoding: 'utf8', windowsHide: true, timeout: 60000, ...extra });
+const query = (input, db = database) => run('psql.exe', ['-X', '--no-password', '-h', '127.0.0.1', '-p', '55439', '-U', 'postgres', '-qAt', '-v', 'ON_ERROR_STOP=1', '-d', db], { input });
+const sql = (input, db) => { const r = query(input, db); assert(r.status === 0, 'LOCAL_SQL_FAILED'); return r.stdout.trim(); };
+const checks = [];
+const check = (name, ok) => { assert(ok, name); checks.push(name); };
+const reject = (name, input, reason) => { const r = query(input); check(name, r.status !== 0 && r.stderr.includes(reason)); };
+const proposal = readFileSync('docs/PTVPRO-INVENTORY-168-REPORT-PROPOSAL.sql', 'utf8');
+const rollback = readFileSync('docs/PTVPRO-INVENTORY-168-REPORT-ROLLBACK.sql', 'utf8');
+const approval = "SET ptv.inventory168.approved_project='swadgljnyelsjstqqxbm';\n";
+const signature = 'ptv_report_private.write_report(text,text,uuid,jsonb,uuid,bigint)';
+const state = () => sql(`SELECT md5(prosrc)||'|'||coalesce(proacl::text,'')||'|'||proowner||'|'||prosecdef||'|'||proconfig::text FROM pg_proc WHERE oid='${signature}'::regprocedure`);
+const call = (module, account = 'NULL', jwtRole = 'authenticated') => `SET request.jwt.claims='{"role":"${jwtRole}"}'; SELECT ptv_report_private.write_report('${module}','create','10000000-0000-4000-8000-000000000001','{}',${account},1);`;
+let started = false; let created = false; let success = false;
+try {
+  assert(run('pg_ctl.exe', ['-D', root, 'status']).status !== 0, 'Existing server must not be controlled');
+  assert(run('pg_ctl.exe', ['-D', root, '-l', join(root, 'server.log'), '-o', '-h 127.0.0.1 -p 55439 -c max_connections=20', '-w', 'start'], { stdio: 'ignore' }).status === 0);
+  started = true; sql(`CREATE DATABASE ${database}`, 'postgres'); created = true;
+  check('loopback isolated database verified', sql(`SELECT inet_server_addr()='127.0.0.1'::inet AND current_database()='${database}'`) === 't');
+  sql(`CREATE SCHEMA auth; CREATE SCHEMA ptv_report_private;
+    CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql AS $$ SELECT '20000000-0000-4000-8000-000000000001'::uuid $$;
+    CREATE TABLE public.ptv_inventaris_unit(id uuid);
+    CREATE TABLE public.user_account(id uuid,identity_id uuid,auth_user_id uuid,status_akun text);
+    CREATE TABLE public.canonical_identity(id uuid,full_name text);`);
+  sql(readFileSync('docs/PTVPRO-INVENTORY-168-REPORT-BASELINE.sql', 'utf8'));
+  const before = state();
+  check('actual source fingerprint matches cloud baseline', before.startsWith('050ec0fe8d7414999c6654e9e7c41ee9|'));
+  reject('proposal requires explicit approval marker', proposal, 'INVENTORY168_EXPLICIT_APPROVAL_REQUIRED');
+  sql(approval + proposal); const after = state();
+  check('source patched; ACL owner security config preserved', after.startsWith('7f66a228d7369f1572a442aa5d4ef7a1|') && after.slice(33) === before.slice(33));
+  sql(approval + proposal); check('proposal idempotent', state() === after);
+  reject('native damage rejected before account resolution', call('damage'), 'Portal session required for damage');
+  reject('native Lost Found retains original account gate', call('lostfound'), 'Active account required');
+  reject('spoofed server account rejected', call('damage', "'30000000-0000-4000-8000-000000000001'"), 'Server-only report operation');
+  reject('service damage retains original account gate', call('damage', "'30000000-0000-4000-8000-000000000001'", 'service_role'), 'Active account required');
+  reject('service Lost Found retains original account gate', call('lostfound', "'30000000-0000-4000-8000-000000000001'", 'service_role'), 'Active account required');
+  sql(approval + rollback); check('rollback restores exact source and attributes', state() === before);
+  sql(approval + rollback); check('rollback idempotent', state() === before);
+  sql(`DO $drift$ BEGIN EXECUTE replace(pg_get_functiondef('${signature}'::regprocedure), E'BEGIN\\n', E'BEGIN\\n  PERFORM 1;\\n'); END $drift$`);
+  reject('source drift blocks proposal', approval + proposal, 'INVENTORY168_SOURCE_DRIFT');
+  reject('source drift blocks rollback', approval + rollback, 'INVENTORY168_SOURCE_DRIFT');
+  success = true;
+} finally {
+  let cleaned = !created || query(`DROP DATABASE ${database}`, 'postgres').status === 0;
+  if (started) cleaned = run('pg_ctl.exe', ['-D', root, '-m', 'fast', '-w', 'stop'], { stdio: 'ignore' }).status === 0 && cleaned;
+  const result = { scope: 'LOCAL_ACTUAL_REPORT_SOURCE_EARLY_GATES_ONLY', fullCloudOperationParity: false, cloudChanges: false, status: success && cleaned ? 'PASS' : 'FAIL', checks, checksPassed: checks.length, cleaned,
+    proposalSha256: createHash('sha256').update(proposal).digest('hex'), rollbackSha256: createHash('sha256').update(rollback).digest('hex') };
+  writeFileSync('docs/PTVPRO-INVENTORY-168-REPORT-LOCAL-RESULTS.json', JSON.stringify(result, null, 2) + '\n');
+  process.stdout.write(JSON.stringify(result) + '\n'); if (!success || !cleaned) process.exitCode = 1;
+}

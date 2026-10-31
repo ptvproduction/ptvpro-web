@@ -1,0 +1,319 @@
+/* ── Haul & Harlah PPBS Stylesheet (R03 Standard) ── */
+
+.haul-page {
+  padding: 16px 20px 48px;
+  max-width: var(--maxw, 1160px);
+  margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.haul-coming-wrap {
+  max-width: 640px;
+  margin: 36px auto;
+  text-align: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.haul-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  border-radius: var(--ptv-curve-pill, 9999px);
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(14, 79, 64, 0.08);
+  color: var(--ptv-green, #0e4f40);
+  margin-bottom: 24px;
+  border: 1px solid rgba(14, 79, 64, 0.15);
+  box-shadow: 0 1px 3px rgba(14, 79, 64, 0.06);
+}
+
+[data-theme="dark"] .haul-badge {
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.25);
+}
+
+.haul-badge i {
+  font-size: 11px;
+}
+
+.haul-title {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+
+.haul-subtitle {
+  font-size: 15px;
+  color: var(--muted);
+  margin: 0 0 32px;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+/* Status Pills */
+.haul-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--ptv-curve-pill, 9999px);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.haul-status-pill.coming-soon {
+  background: var(--b-050, #edf4ff);
+  color: var(--b-700, #0b5fbf);
+  border: 1px solid rgba(11, 95, 191, 0.2);
+}
+
+.haul-status-pill.ongoing {
+  background: var(--ok-bg, #e1f5ee);
+  color: var(--ok, #0f7a5a);
+  border: 1px solid var(--ok-border, rgba(15, 122, 90, 0.25));
+}
+
+.haul-status-pill.past {
+  background: var(--neutral-bg, #e9f0f9);
+  color: var(--neutral-fg, #5a7793);
+  border: 1px solid rgba(90, 119, 147, 0.2);
+}
+
+/* Countdown Grid */
+.haul-countdown {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.haul-cd-box {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line, rgba(11, 42, 74, 0.1));
+  border-radius: var(--ptv-curve-xl, 22px);
+  padding: 18px 22px;
+  min-width: 84px;
+  box-shadow: var(--shadow-s);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.haul-cd-box:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-m);
+}
+
+.haul-cd-box .cd-num {
+  display: block;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ptv-green, #0e4f40);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+[data-theme="dark"] .haul-cd-box .cd-num {
+  color: #34d399;
+}
+
+.haul-cd-box .cd-lbl {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* Info Card */
+.haul-info-card {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line, rgba(11, 42, 74, 0.1));
+  border-radius: var(--ptv-curve-xl, 22px);
+  padding: 16px;
+  text-align: left;
+  margin-top: 20px;
+  box-shadow: var(--shadow-s);
+}
+
+.haul-info-card p {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.6;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.haul-info-card p:last-child {
+  margin: 0;
+}
+
+.haul-info-card p i {
+  margin-top: 3px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.haul-info-card .hint {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-style: italic;
+  border-top: 1px dashed var(--line);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+/* Event Ongoing / Concluded Alert Box */
+.haul-event-banner {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line, rgba(11, 42, 74, 0.1));
+  border-radius: var(--ptv-curve-xl, 22px);
+  padding: 22px 24px;
+  margin-bottom: 28px;
+  text-align: center;
+  box-shadow: var(--shadow-s);
+}
+
+.haul-event-banner.ongoing {
+  border-color: var(--ok-border, rgba(15, 122, 90, 0.3));
+  background: linear-gradient(180deg, var(--surface, #ffffff) 0%, rgba(15, 122, 90, 0.04) 100%);
+}
+
+.haul-event-banner.past {
+  border-color: var(--line, rgba(11, 42, 74, 0.15));
+  background: linear-gradient(180deg, var(--surface, #ffffff) 0%, var(--neutral-bg, #edf4ff) 100%);
+}
+
+.haul-event-banner-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.haul-event-banner-desc {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Metadata Grid */
+.haul-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.haul-meta-item {
+  background: var(--bg, #f8fafd);
+  border: 1px solid var(--line-2, rgba(11, 42, 74, 0.055));
+  border-radius: var(--ptv-curve-md, 12px);
+  padding: 12px 14px;
+  text-align: left;
+}
+
+[data-theme="dark"] .haul-meta-item {
+  background: var(--surface-2, #122238);
+}
+
+.haul-meta-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.haul-meta-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+  .haul-page {
+    padding: 12px 8px 36px;
+    overflow-x: hidden;
+  }
+
+  .haul-coming-wrap {
+    margin: 20px auto;
+    padding: 0 4px;
+    overflow-x: hidden;
+  }
+
+  .haul-title {
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    word-break: break-word;
+  }
+
+  .haul-subtitle {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .haul-countdown {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    width: 100%;
+    margin-bottom: 24px;
+    box-sizing: border-box;
+  }
+
+  .haul-cd-box {
+    min-width: 0 !important;
+    padding: 10px 0;
+    border-radius: var(--ptv-curve-md, 12px);
+    overflow: hidden;
+  }
+
+  .haul-cd-box .cd-num {
+    font-size: 19px;
+  }
+
+  .haul-cd-box .cd-lbl {
+    font-size: 9px;
+    letter-spacing: 0.02em;
+  }
+
+  .haul-info-card {
+    padding: 18px 16px;
+    border-radius: var(--ptv-curve-lg, 16px);
+  }
+
+  .haul-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}

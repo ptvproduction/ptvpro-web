@@ -1,0 +1,83 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
+import { setTimeout as delay } from 'node:timers/promises';
+import { Client } from 'pg';
+import { enrollInactiveAccount, enrollmentSurfaceSql } from './private-enrollment.mjs';
+
+export async function testPrivateEnrollment({manifest,database,sql,checks,logPath,system}) {
+ const check=(label,value)=>{assert.ok(value,label);checks.push(label);};
+ const connect=async()=>{const c=new Client({host:'127.0.0.1',port:55439,user:'postgres',database,password:'',ssl:false});await c.connect();return c;};
+ const client=await connect(),other=await connect();
+ const password='SYNTHETIC-ENROLLMENT-CANARY-ONLY-123!';
+ const reviewFor=t=>({project_ref:'swadgljnyelsjstqqxbm',scope:'ENROLL_INACTIVE_ACCOUNT_ONLY',operation_id:randomUUID(),account_id:t.account_uuid,identity_id:t.source_uuid,source_uuid:t.source_uuid,ptv_id:t.ptv_id,username:t.username,expected_account_version:sql(`SELECT updated_at FROM public.user_account WHERE id='${t.account_uuid}'`),security_surface_sha256:sql(enrollmentSurfaceSql),approval_reference:'SYNTHETIC-ONLY-ACC',privacy_logging_approved:true,owner_verified:true,owner_evidence_reference:'SYNTHETIC-OWNER-PROOF',recovery_evidence_reference:'SYNTHETIC-RECOVERY-PROOF',owner_verified_at:new Date().toISOString(),expires_at:new Date(Date.now()+3600000).toISOString()});
+ const enroll=(review,secret=password,c=client)=>enrollInactiveAccount(c,review,secret,{synthetic:true});
+ const expected=sql(`SELECT jsonb_build_object('accounts',(SELECT jsonb_agg(to_jsonb(x) ORDER BY id) FROM public.user_account x),'memberships',(SELECT jsonb_agg(to_jsonb(x) ORDER BY id) FROM public.organization_membership x),'archives',(SELECT jsonb_agg(to_jsonb(x) ORDER BY archive_id) FROM public.legacy_archive_kru x),'profiles',(SELECT jsonb_agg(to_jsonb(x) ORDER BY to_jsonb(x)::text) FROM public.account_profiles x))`);
+ const baselineSql=`SELECT jsonb_build_object('accounts',(SELECT jsonb_agg(to_jsonb(x) ORDER BY id) FROM public.user_account x),'memberships',(SELECT jsonb_agg(to_jsonb(x) ORDER BY id) FROM public.organization_membership x),'archives',(SELECT jsonb_agg(to_jsonb(x) ORDER BY archive_id) FROM public.legacy_archive_kru x),'profiles',(SELECT jsonb_agg(to_jsonb(x) ORDER BY to_jsonb(x)::text) FROM public.account_profiles x))`;
+ try {
+  sql('CREATE EXTENSION IF NOT EXISTS pg_stat_statements; SELECT pg_stat_statements_reset()');
+  const review=reviewFor(manifest.targets[0]);
+  const logStart=readFileSync(logPath).length;
+  await assert.rejects(enroll({...review,owner_verified:false}));checks.push('ownership proof is required before transport');
+  await assert.rejects(enroll({...review,security_surface_sha256:'0'.repeat(64)}));checks.push('unreviewed executable surface rejected before COPY');
+  await assert.rejects(enroll({...review,username:'SYNTHETIC-WRONG-OWNER-CANARY'}));checks.push('username mismatch rejected without leaking supplied identity');
+  const race=await Promise.all([enroll(review),enroll(review,password,other)]);
+  check('two concurrent connections enroll exactly once and replay safely',race.filter(r=>!r.noOp).length===1&&race.filter(r=>r.noOp).length===1);
+  await assert.rejects(enroll(review,'SYNTHETIC-WRONG-PASSWORD-CANARY'));
+  checks.push('replay verifies the owner password without replacing existing credential');
+  check('one enrollment audit receipt only',sql(`SELECT count(*) FROM public.auth_audit_log WHERE event_type='password_credential_enrolled'`)==='1');
+  check('account, membership, history and access profiles unchanged',sql(baselineSql)===expected);
+  check('inactive account remains without Auth binding; Root zero and gate OFF',sql("SELECT NOT EXISTS(SELECT FROM public.user_account WHERE username LIKE 'synthetic-new-%' AND (status_akun<>'inactive' OR auth_user_id IS NOT NULL)) AND NOT EXISTS(SELECT FROM public.account_profiles WHERE profile_id='root_executive') AND NOT EXISTS(SELECT FROM ptv_auth_private.policy WHERE enabled)")==='t');
+  await client.query(`SET request.jwt.claims='{"role":"service_role"}'`);await assert.rejects(enroll(review));await client.query("SET request.jwt.claims=''");checks.push('service-role actor claim cannot enroll');
+  await client.query("SET auto_explain.log_parameter_max_length='-1'");await assert.rejects(enroll(review));await client.query("SET auto_explain.log_parameter_max_length='0'");checks.push('unsafe plan parameter logging rejected before COPY');
+  await client.query("SET auto_explain.log_nested_statements='on'");await assert.rejects(enroll(review));await client.query("SET auto_explain.log_nested_statements='off'");checks.push('nested plan logging rejected before COPY');
+  await client.query("SET pgaudit.log='write'; SET pgaudit.log_parameter='on'");await assert.rejects(enroll(review));await client.query("SET pgaudit.log='none'; SET pgaudit.log_parameter='off'");checks.push('pgAudit parameter logging configuration rejected (module not installed)');
+  const second=reviewFor(manifest.targets[1]);
+  sql("CREATE FUNCTION public.enrollment_fail() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION '%',NEW.metadata; END $$; CREATE TRIGGER enrollment_fail BEFORE INSERT ON public.auth_audit_log FOR EACH ROW EXECUTE FUNCTION public.enrollment_fail()");
+  await assert.rejects(enroll(second));checks.push('new audit trigger requires a fresh reviewed surface');
+  second.security_surface_sha256=sql(enrollmentSurfaceSql);
+  await assert.rejects(enroll(second));checks.push('audit exception containing metadata is caught and rolls back credential');
+  check('failed audit leaves no credential or receipt',sql(`SELECT NOT EXISTS(SELECT FROM public.auth_credentials WHERE account_id='${second.account_id}') AND NOT EXISTS(SELECT FROM public.auth_audit_log WHERE event_type='password_credential_enrolled' AND metadata->>'enrollment_id'='${second.operation_id}')`)==='t');
+  sql('DROP TRIGGER enrollment_fail ON public.auth_audit_log');
+  sql("CREATE FUNCTION public.credential_fail() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION '%',NEW.password_hash; END $$; CREATE TRIGGER credential_fail BEFORE INSERT ON public.auth_credentials FOR EACH ROW EXECUTE FUNCTION public.credential_fail()");
+  second.security_surface_sha256=sql(enrollmentSurfaceSql);
+  await assert.rejects(enroll(second));checks.push('credential trigger exception containing hash is caught and rolls back');
+  sql('DROP TRIGGER credential_fail ON public.auth_credentials');
+  sql('ALTER TABLE public.auth_credentials ADD CONSTRAINT enrollment_fail_constraint CHECK(password_hash IS NULL) NOT VALID');
+  second.security_surface_sha256=sql(enrollmentSurfaceSql);await assert.rejects(enroll(second));checks.push('constraint error containing credential row is caught without partial enrollment');
+  check('constraint failure leaves no credential',sql(`SELECT NOT EXISTS(SELECT FROM public.auth_credentials WHERE account_id='${second.account_id}')`)==='t');
+  sql('ALTER TABLE public.auth_credentials DROP CONSTRAINT enrollment_fail_constraint');
+  const third=reviewFor(manifest.targets[2]);
+  sql(`INSERT INTO public.auth_credentials(account_id,oauth_provider,oauth_subject_id) VALUES('${third.account_id}','google','SYNTHETIC-SUBJECT')`);
+  await assert.rejects(enroll(third));checks.push('existing OAuth binding requires separate ownership review');
+  const fourth=reviewFor(manifest.targets[3]);
+  sql(`INSERT INTO public.account_profiles(account_id,profile_id) VALUES('${fourth.account_id}','eksekutif')`);await assert.rejects(enroll(fourth));sql(`DELETE FROM public.account_profiles WHERE account_id='${fourth.account_id}' AND profile_id='eksekutif'`);checks.push('unexpected administrative profile rejects inactive-only legacy enrollment');
+  await other.query('SELECT pg_advisory_lock(149,1)');
+  const waiting=enroll({...fourth,expires_at:new Date(Date.now()+200).toISOString()});
+  const rejected=assert.rejects(waiting);await delay(400);await other.query('SELECT pg_advisory_unlock(149,1)');await rejected;checks.push('approval expiry is checked again after a database lock wait');
+  await assert.rejects(enroll({...fourth,expected_account_version:'2000-01-01T00:00:00Z'}));checks.push('stale account version rejects enrollment');
+  sql('UPDATE ptv_auth_private.policy SET enabled=true');await assert.rejects(enroll(fourth));sql('UPDATE ptv_auth_private.policy SET enabled=false');checks.push('open issuance gate blocks this inactive-only enrollment procedure');
+  const logs=readFileSync(logPath).subarray(logStart).toString('utf8');
+  const stats=sql('SELECT coalesce(string_agg(query,chr(10)),\'\') FROM pg_stat_statements');
+  const canaries=[password,'SYNTHETIC-WRONG-OWNER-CANARY','SYNTHETIC-WRONG-PASSWORD-CANARY'];
+  check('password and supplied private identity canaries absent from server logs and query statistics',canaries.every(v=>!logs.includes(v)&&!stats.includes(v)));
+  check('bcrypt hashes absent from server logs and query statistics',!(/\$2[aby]\$10\$[./A-Za-z0-9]{53}/.test(logs+stats)));
+  sql("CREATE TABLE public.ptv_push_subscriptions(id uuid PRIMARY KEY,identity_id uuid,endpoint text NOT NULL,p256dh text NOT NULL,auth text NOT NULL,created_at timestamptz NOT NULL DEFAULT now()); ALTER TABLE public.ptv_push_subscriptions ENABLE ROW LEVEL SECURITY; GRANT ALL ON public.ptv_push_subscriptions TO anon,authenticated,service_role; CREATE POLICY allow_client_insert_sub ON public.ptv_push_subscriptions FOR INSERT WITH CHECK(auth.uid() IS NOT NULL); CREATE POLICY block_client_read_sub ON public.ptv_push_subscriptions FOR SELECT USING(false)");
+  const nativeClaim=`SET request.jwt.claims='{"sub":"${randomUUID()}","role":"authenticated"}';`;
+  const insert=`INSERT INTO public.ptv_push_subscriptions(id,endpoint,p256dh,auth) VALUES('${randomUUID()}','synthetic-only','synthetic-only','synthetic-only');`;
+  await client.query('SET ROLE authenticated');await client.query(nativeClaim);await client.query(insert);await client.query('RESET ROLE');await client.query("SET request.jwt.claims=''");checks.push('reproduces native JWT-only push insert with no active account (synthetic)');
+  const proposal=readFileSync('docs/PTVPRO-PHASE1-PUSH-CONTAINMENT-PROPOSAL.sql','utf8').replace('__APPROVED_DATABASE_SYSTEM_IDENTIFIER__',system);
+  await assert.rejects(client.query(proposal.replace(system,'0')));await client.query('ROLLBACK');checks.push('push containment rejects a different physical database before DDL');
+  sql("CREATE FUNCTION public.push_containment_fail() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.event_type='phase1_push_access_contained' THEN RAISE EXCEPTION 'synthetic containment audit failure'; END IF; RETURN NEW; END $$; CREATE TRIGGER push_containment_fail BEFORE INSERT ON public.auth_audit_log FOR EACH ROW EXECUTE FUNCTION public.push_containment_fail()");
+  await assert.rejects(client.query(proposal));await client.query('ROLLBACK');
+  check('failed containment audit rolls back policy and privileges atomically',sql("SELECT has_table_privilege('authenticated','public.ptv_push_subscriptions','INSERT') AND EXISTS(SELECT FROM pg_policies WHERE tablename='ptv_push_subscriptions' AND policyname='allow_client_insert_sub' AND with_check='(auth.uid() IS NOT NULL)') AND NOT EXISTS(SELECT FROM public.auth_audit_log WHERE event_type='phase1_push_access_contained')")==='t');
+  sql('DROP TRIGGER push_containment_fail ON public.auth_audit_log');
+  sql(proposal);sql(proposal);
+  check('containment replay has one audit and preserves subscription rows',sql("SELECT count(*)=1 AND (SELECT count(*) FROM public.auth_audit_log WHERE event_type='phase1_push_access_contained')=1 FROM public.ptv_push_subscriptions")==='t');
+  for(const role of ['anon','authenticated']){
+   await client.query('SET ROLE '+role);await client.query(nativeClaim);
+   await assert.rejects(client.query(insert));await client.query('RESET ROLE');await client.query("SET request.jwt.claims=''");checks.push(role+' cannot insert through native push policy after containment');
+  }
+  check('containment removes direct client TRUNCATE as well as DML grants',sql("SELECT NOT has_table_privilege('anon','public.ptv_push_subscriptions','TRUNCATE') AND NOT has_table_privilege('authenticated','public.ptv_push_subscriptions','INSERT')")==='t');
+ }finally{await Promise.all([client.end(),other.end()]);}
+}

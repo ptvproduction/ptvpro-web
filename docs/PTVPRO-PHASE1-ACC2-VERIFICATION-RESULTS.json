@@ -1,0 +1,122 @@
+{
+  "scope": "ACC-2 conditional account/personnel verification",
+  "dateLocal": "2026-10-26",
+  "target": "swadgljnyelsjstqqxbm",
+  "status": "BLOCKED BEFORE IDENTITY MUTATION",
+  "cloudAccess": "READ ONLY ONLY; no mutating statement executed",
+  "fingerprintMatched": true,
+  "candidates": [
+    {
+      "linked": false,
+      "ptv_id": "PTV-002",
+      "archive_reference": "17aa6608109e",
+      "canonical_reference": null,
+      "reconciliation_status": "unlinked",
+      "source_uuid_reference": "0ee0cd077f6e",
+      "same_source_uuid_archive_count": 1,
+      "canonical_provenance_candidates": 0,
+      "status": "PENDING",
+      "operatorConfirmedPersonnel": true,
+      "verifiedAccount": null,
+      "verifiedCanonical": null,
+      "ownershipProofAvailable": false,
+      "recoveryIndependenceVerified": false
+    },
+    {
+      "linked": false,
+      "ptv_id": "PTV-001",
+      "archive_reference": "ae5e2f3fdbe6",
+      "canonical_reference": null,
+      "reconciliation_status": "unlinked",
+      "source_uuid_reference": "6b9f8c2e58bf",
+      "same_source_uuid_archive_count": 1,
+      "canonical_provenance_candidates": 0,
+      "status": "PENDING",
+      "operatorConfirmedPersonnel": true,
+      "verifiedAccount": null,
+      "verifiedCanonical": null,
+      "ownershipProofAvailable": false,
+      "recoveryIndependenceVerified": false
+    }
+  ],
+  "existingAccountOptions": [
+    {
+      "status": "active",
+      "profiles": [
+        "eksekutif"
+      ],
+      "canonical_ptv_id": "PTV-STG-ADM",
+      "membership_count": 1,
+      "native_providers": [
+        "email"
+      ],
+      "account_reference": "1719faf48d78",
+      "native_auth_bound": true,
+      "native_auth_exists": true,
+      "portal_credentials": 0,
+      "canonical_reference": "54fe4642689e",
+      "linked_archive_count": 0,
+      "native_signin_recorded": true,
+      "portal_ownership_proofs": 0
+    },
+    {
+      "status": "active",
+      "profiles": [
+        "crew"
+      ],
+      "canonical_ptv_id": "PTV-STG-KRU",
+      "membership_count": 1,
+      "native_providers": [
+        "email"
+      ],
+      "account_reference": "27e931c95822",
+      "native_auth_bound": true,
+      "native_auth_exists": true,
+      "portal_credentials": 0,
+      "canonical_reference": "b3e53d914d52",
+      "linked_archive_count": 0,
+      "native_signin_recorded": true,
+      "portal_ownership_proofs": 0
+    }
+  ],
+  "wordpressConflict": "PENDING: no independently verified WordPress account-to-personnel provenance or ownership evidence supplied; no Production access",
+  "linking": {
+    "executed": false,
+    "rpcInstalled": false,
+    "proposalRequiresBootstrapRecoveryAttestation": true,
+    "pendingAcc4": true,
+    "additionalConstraint": "Existing proposal rejects self and Root identity links; do not assume ACC-4 alone makes candidate links executable. Requires review of a supported scoped administrative path; no guard bypass or new DDL approved."
+  },
+  "enrollment": {
+    "executed": false,
+    "reason": "No verified account ownership/target mapping or reviewed credential manifest; do not create or replace credentials by assumption."
+  },
+  "postflight": {
+    "root": 0,
+    "audit": 2,
+    "accounts": 2,
+    "archives": 94,
+    "identities": 2,
+    "policy_off": true,
+    "credentials": 0,
+    "memberships": 2,
+    "native_sessions": 4,
+    "portal_sessions": 0,
+    "link_function_absent": true,
+    "other_active_clients": 0,
+    "crosslinked_candidates": 0,
+    "duplicate_identity_accounts": 0,
+    "recovery_requires_bootstrap": true
+  },
+  "baseline": {
+    "tables": 26,
+    "rowcountsAndPrivateDigestsUnchangedSinceAcc1": true,
+    "digestsIncluded": false
+  },
+  "maintenance": {
+    "local5174Listeners": 0,
+    "writersNotReopened": true,
+    "scope": "Known local listener checked; no claim of permanent global writer exclusion"
+  },
+  "nextOperatorAction": "Privately supply a reviewed, nonsecret ownership/mapping attestation for each candidate: exact existing account UUID, canonical UUID, personnel source UUID, independent owner-control verification reference, separate recovery-control attestation; resolve WordPress PTV-002 source conflict. Do not send passwords, tokens, recovery codes or hashes to chat."
+}

@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-10-30T17:16:28.521Z",
+  "session_id": "PTV-DEV-236",
+  "operator": "zidnal",
+  "mode": "dry_run",
+  "legacy_source": {
+    "project": "jthzuhkblxcaohiuypqq",
+    "pemasukan_total": 49,
+    "pemasukan_active": 44,
+    "pemasukan_batal": 5,
+    "pemasukan_nominal_aktif": 1269200,
+    "pengeluaran_total": 12,
+    "pengeluaran_nominal": 675924,
+    "kas_sebenarnya": 593276
+  },
+  "staging_target": {
+    "project": "swadgljnyelsjstqqxbm",
+    "saldo_sebelum": 593276,
+    "saldo_sesudah": 593276,
+    "selisih_terselesaikan": 0,
+    "match_with_legacy": true
+  },
+  "synced_records": []
+}

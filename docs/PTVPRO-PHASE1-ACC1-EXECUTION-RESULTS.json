@@ -1,0 +1,112 @@
+{
+  "scope": "PHASE1 ACC1 BACKEND STAGING EXECUTION ONLY",
+  "status": "PASS; MAINTENANCE HELD",
+  "dateLocal": "2026-10-26",
+  "target": "swadgljnyelsjstqqxbm",
+  "physicalFingerprintMatched": true,
+  "operatorApproval": "Explicit ACC-1 installation approval in conversation; ACC-2/3/4 not granted",
+  "sourceHashes": {
+    "prebootstrap": "e429e47aa0f3fabf6d0ce7a330f2bc810ef954b4f9277dffefab690f18c1de0d",
+    "access152": "8dd31fa59439435352be604c4cb5b6528e73561f64e9e8f2652e4e71877de4b0",
+    "lifecycle": "8004f402a307f49c5fc68db3e54c576220d663a355add2610a248d8524eeaf31"
+  },
+  "renderedHashes": [
+    {
+      "name": "prebootstrap",
+      "rendered_hash": "f61795a40d8a7a6cd87e4bb8ecc841b8070eba5c6ded0df9c9942ea2b0b989da"
+    },
+    {
+      "name": "access152",
+      "rendered_hash": "87f6679ce59e9d7c36e7b1b75c9b134ca2922fefa69620219a01ab5486b336ab"
+    },
+    {
+      "name": "lifecycle",
+      "rendered_hash": "026c04acd68bcdd68036fda99eae8ae83297c3f0cfbcf325b76156a91243f1a7"
+    }
+  ],
+  "applied": [
+    {
+      "name": "ptvpro_access149_prebootstrap_acc1",
+      "version": "20261025165846"
+    },
+    {
+      "name": "ptvpro_access152_alignment154_acc1",
+      "version": "20261025170005"
+    },
+    {
+      "name": "ptvpro_lifecycle_phase1_acc1",
+      "version": "20261025170047"
+    }
+  ],
+  "baseline": {
+    "comparedTables": 26,
+    "allRowCountsAndPrivateDigestsUnchanged": true,
+    "counts": {
+      "accounts": 2,
+      "audit_rows": 2,
+      "identities": 2,
+      "credentials": 0,
+      "memberships": 2,
+      "native_sessions": 4,
+      "personnel_archives": 94
+    },
+    "rootAssignments": 0,
+    "protectedEvents": 0,
+    "note": "Private aggregate digests and row contents not included; no new backup."
+  },
+  "postflight": {
+    "capturedAtUtc": "2026-10-25T17:03:10.737285+00:00",
+    "mutatorsClosed": true,
+    "storeWriteClosed": true,
+    "auditInsertRetained": true,
+    "lifecycleRpcExact": true,
+    "lifecyclePolicy": {
+      "rows": 1,
+      "all_disabled": true
+    },
+    "lifecycleOperationalEmpty": true,
+    "lifecycleTablesSecure": true,
+    "lifecycleHelpersClosed": true,
+    "hasCapabilityGuarded": true,
+    "originalTableRlsPreserved": true,
+    "otherActiveClients": 0,
+    "metadataComparisons": {
+      "constraintsPreserved": true,
+      "policiesPreserved": true,
+      "indexesPreservedWithOneIntendedAddition": true,
+      "defaultPrivilegesUnchanged": true,
+      "roleFlagsUnchanged": true,
+      "onlyThreeApprovedMigrationsAdded": true
+    },
+    "rootTriggersOwnerSearchPathVerified": true,
+    "independentAdminAvailable": true
+  },
+  "maintenance": {
+    "active": true,
+    "stagingBrowserTabsClosed": 1,
+    "remainingStagingTabs": 0,
+    "viteStopped": true,
+    "pid": 21192,
+    "remainingKnownNodeWriters": 0,
+    "matchingScheduledTasks": 0,
+    "restarted": false
+  },
+  "runtime": {
+    "lifecycleFlag": "OFF verified before stopping Vite; environment unchanged",
+    "passwordFlag": "OFF verified before stopping Vite; environment unchanged",
+    "postInstallHttpProbe": "Not performed: listener held stopped"
+  },
+  "rollback": "Not needed or executed; all three installation transactions succeeded",
+  "excluded": {
+    "productionAccess": false,
+    "finance151Migration": false,
+    "enrollment": false,
+    "linking": false,
+    "bootstrap": false,
+    "rootActivation": false,
+    "environmentChange": false,
+    "backupCreated": false,
+    "deploy": false
+  },
+  "next": "Review and separately approve scoped ACC-2 ownership/mapping work; do not reopen unrestricted writers or activate login/Root."
+}

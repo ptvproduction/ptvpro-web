@@ -1,6 +1,47 @@
-node_modules/
-.vercel
-*.log
+node_modules
+dist
+.env
+.env.*
+.env.local
+.env*.local
+.env.*.local
 .DS_Store
 Thumbs.db
-.env*.local
+
+# Agent & AI Scratches
+.gemini/
+.agents/
+
+# Backups & Data files
+backups/
+*.xlsx
+*.tsbuildinfo
+
+# Prototype HTML
+PTVPRO - Prototype interaktif.html
+
+# Logs and Debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test artifacts and caches
+coverage/
+.eslintcache
+.vite/
+test-results/
+
+# Temporary scratch directories
+temp/
+scratch/
+
+# Production bundle & backup files
+production-bundle*.json
+*backup*.json
+*backup*.sql
+*.backup
+
+scratch_*.json
+*.tmp
+*.temp

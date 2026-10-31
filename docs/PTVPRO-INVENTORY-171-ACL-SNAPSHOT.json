@@ -1,0 +1,1337 @@
+{
+  "value": {
+    "grants": [
+      {
+        "kind": "function",
+        "object": "rpc_checkout_loan(text,text,text,date,date,text,uuid[],uuid)",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_checkout_loan(text,text,text,date,date,text,uuid[],uuid)",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_create_inventaris(jsonb,jsonb)",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_create_inventaris(jsonb,jsonb)",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_create_inventaris(jsonb,jsonb)",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_get_next_inv_code()",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_get_next_inv_code()",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_get_next_inv_code()",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_return_loan(text,date,text,text,uuid)",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_return_loan(text,date,text,text,uuid)",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_return_single_unit(uuid,uuid,text,uuid)",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_return_single_unit(uuid,uuid,text,uuid)",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_update_inventaris(jsonb,jsonb)",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_update_inventaris(jsonb,jsonb)",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "function",
+        "object": "rpc_update_inventaris(jsonb,jsonb)",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "EXECUTE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_inventaris_unit",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_lapor_masalah",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_nilai_inventaris",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "anon",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "authenticated",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "postgres",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "DELETE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "INSERT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "MAINTAIN"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "REFERENCES"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "SELECT"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRIGGER"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "TRUNCATE"
+      },
+      {
+        "kind": "table",
+        "object": "ptv_peminjaman",
+        "grantee": "service_role",
+        "grantor": "postgres",
+        "grantable": false,
+        "privilege": "UPDATE"
+      }
+    ],
+    "policies": [
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "permissive": "PERMISSIVE",
+        "policyname": "inventory_authenticated_upload",
+        "with_check": "((bucket_id = 'inventory'::text) AND ((has_capability('inventory.create'::text) IS TRUE) OR (has_capability('inventory.edit'::text) IS TRUE)))"
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((bucket_id = 'inventory'::text) AND ((has_capability('inventory.delete'::text) IS TRUE) OR (has_capability('inventory.manage'::text) IS TRUE)))",
+        "roles": [
+          "authenticated"
+        ],
+        "permissive": "PERMISSIVE",
+        "policyname": "inventory_manager_delete",
+        "with_check": null
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((bucket_id = 'inventory'::text) AND (owner = auth.uid()) AND (has_capability('inventory.create'::text) IS TRUE) AND (NOT (EXISTS ( SELECT 1\n   FROM ptv_inventaris pi\n  WHERE ((pi.foto_url IS NOT NULL) AND (pi.foto_url ~~ ('%'::text || objects.name)))))))",
+        "roles": [
+          "authenticated"
+        ],
+        "permissive": "PERMISSIVE",
+        "policyname": "inventory_owner_cleanup",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(bucket_id = 'inventory'::text)",
+        "roles": [
+          "public"
+        ],
+        "permissive": "PERMISSIVE",
+        "policyname": "inventory_public_view",
+        "with_check": null
+      }
+    ]
+  },
+  "digest": "f31d82f815f34f85778e692fc8b173f7"
+}

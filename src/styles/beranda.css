@@ -1,0 +1,770 @@
+/**
+ * PTV PRO Authentic Beranda Styles
+ * Ported 1:1 from page-dasbor.php (Style #2)
+ */
+
+/* ── Hero Greeting & Date Section ── */
+.hero {
+  position: relative;
+  padding: 2px 0 0;
+  margin-bottom: 20px;
+}
+
+.hero-hd {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 18px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.hero-greet {
+  flex: 1;
+  min-width: 180px;
+}
+
+.hero-eyebrow {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.hero-name {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin: 3px 0 0;
+  color: var(--ink);
+}
+
+.hero-card {
+  position: relative;
+  width: 100%;
+  min-height: 168px;
+  border-radius: var(--ptv-curve-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px 24px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-m);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.hero-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(11, 60, 116, 0.16);
+}
+
+.hero-card-cnt {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hero-card .lbl {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #60a5fa;
+  text-transform: uppercase;
+}
+
+.hero-card .ttl {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 2px 0 6px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+.hero-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Quick Access (Mobile Squircle Buttons) ── */
+.quick-access-wrap {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 18px 0 24px;
+}
+
+@media (min-width: 1024px) {
+  .only-mobile {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .only-desktop {
+    display: none !important;
+  }
+}
+
+.qa-ref-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  text-align: center;
+}
+
+.qa-ref-btn {
+  width: 58px;
+  height: 58px;
+  border-radius: var(--ptv-curve-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--b-700);
+  font-size: 20px;
+  transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.qa-ref-item:active .qa-ref-btn {
+  transform: scale(0.92);
+}
+
+.qa-ref-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  line-height: 1.2;
+}
+
+/* ── Desktop Bento Grid Quick Access ── */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) {
+  .bento-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.bento-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  min-height: 76px;
+  box-sizing: border-box;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--ptv-curve-xl);
+  box-shadow: var(--shadow-s);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.bento-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--b-300);
+  box-shadow: var(--shadow-m);
+}
+
+.bento-ic {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--ptv-curve-md);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* ── Bento Shortcut Feature Mappings (Icon Foreground & Background Pairs) ── */
+.bento-ic.shortcut-surat,
+.bento-card.shortcut-surat .bento-ic {
+  background: var(--shortcut-surat-bg);
+  color: var(--shortcut-surat-fg) !important;
+  border: 1px solid var(--shortcut-surat-border);
+}
+.bento-card.shortcut-surat:hover {
+  border-color: var(--shortcut-surat-hover-border);
+}
+
+.bento-ic.shortcut-pinjam,
+.bento-card.shortcut-pinjam .bento-ic {
+  background: var(--shortcut-pinjam-bg);
+  color: var(--shortcut-pinjam-fg) !important;
+  border: 1px solid var(--shortcut-pinjam-border);
+}
+.bento-card.shortcut-pinjam:hover {
+  border-color: var(--shortcut-pinjam-hover-border);
+}
+
+.bento-ic.shortcut-masalah,
+.bento-card.shortcut-masalah .bento-ic {
+  background: var(--shortcut-masalah-bg);
+  color: var(--shortcut-masalah-fg) !important;
+  border: 1px solid var(--shortcut-masalah-border);
+}
+.bento-card.shortcut-masalah:hover {
+  border-color: var(--shortcut-masalah-hover-border);
+}
+
+.bento-ic.shortcut-lostfound,
+.bento-card.shortcut-lostfound .bento-ic {
+  background: var(--shortcut-lostfound-bg);
+  color: var(--shortcut-lostfound-fg) !important;
+  border: 1px solid var(--shortcut-lostfound-border);
+}
+.bento-card.shortcut-lostfound:hover {
+  border-color: var(--shortcut-lostfound-hover-border);
+}
+
+.bento-ic.shortcut-tugas,
+.bento-card.shortcut-tugas .bento-ic {
+  background: var(--shortcut-tugas-bg);
+  color: var(--shortcut-tugas-fg) !important;
+  border: 1px solid var(--shortcut-tugas-border);
+}
+.bento-card.shortcut-tugas:hover {
+  border-color: var(--shortcut-tugas-hover-border);
+}
+
+.bento-ic.shortcut-id,
+.bento-card.shortcut-id .bento-ic {
+  background: var(--shortcut-id-bg);
+  color: var(--shortcut-id-fg) !important;
+  border: 1px solid var(--shortcut-id-border);
+}
+.bento-card.shortcut-id:hover {
+  border-color: var(--shortcut-id-hover-border);
+}
+
+/* Backward compatibility for color classnames */
+.bento-ic.blue { background: var(--shortcut-surat-bg); color: var(--shortcut-surat-fg) !important; }
+.bento-ic.indigo { background: var(--shortcut-pinjam-bg); color: var(--shortcut-pinjam-fg) !important; }
+.bento-ic.amber { background: var(--shortcut-masalah-bg); color: var(--shortcut-masalah-fg) !important; }
+.bento-ic.teal { background: var(--shortcut-lostfound-bg); color: var(--shortcut-lostfound-fg) !important; }
+.bento-ic.emerald { background: var(--shortcut-tugas-bg); color: var(--shortcut-tugas-fg) !important; }
+.bento-ic.purple { background: var(--shortcut-id-bg); color: var(--shortcut-id-fg) !important; }
+
+/* ── Mobile Quick Access Buttons Mappings ── */
+.qa-ref-item.shortcut-surat .qa-ref-btn {
+  background: var(--shortcut-surat-bg);
+  color: var(--shortcut-surat-fg) !important;
+  border-color: var(--shortcut-surat-border);
+}
+.qa-ref-item.shortcut-pinjam .qa-ref-btn {
+  background: var(--shortcut-pinjam-bg);
+  color: var(--shortcut-pinjam-fg) !important;
+  border-color: var(--shortcut-pinjam-border);
+}
+.qa-ref-item.shortcut-masalah .qa-ref-btn {
+  background: var(--shortcut-masalah-bg);
+  color: var(--shortcut-masalah-fg) !important;
+  border-color: var(--shortcut-masalah-border);
+}
+.qa-ref-item.shortcut-lostfound .qa-ref-btn {
+  background: var(--shortcut-lostfound-bg);
+  color: var(--shortcut-lostfound-fg) !important;
+  border-color: var(--shortcut-lostfound-border);
+}
+
+/* ── Icon Color Cascade Protection ── */
+.bento-ic i,
+.qa-ref-btn i,
+.agenda-row-ic i,
+.equipment-ic i {
+  color: inherit !important;
+}
+
+.bento-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.bento-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.bento-desc {
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.bento-arrow {
+  color: var(--muted);
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+/* ── 2 Columns Layout (.cols) ── */
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .cols {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.sec {
+  margin-top: 24px;
+  box-sizing: border-box;
+}
+
+.sec-hd {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 0 2px;
+}
+
+.sec-hd h2 {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink-2);
+  margin: 0;
+}
+
+.sec-hd .link,
+.link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--b-600);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  margin: -3px -8px;
+  border-radius: 9px;
+  background: none;
+  border: none;
+  transition: all 0.16s ease;
+  touch-action: manipulation;
+}
+
+.sec-hd .link:hover,
+.link:hover {
+  color: var(--b-800);
+  background: var(--b-050);
+  text-decoration: none;
+  transform: translateX(2px);
+}
+
+.sec-hd .link:active,
+.link:active {
+  transform: scale(0.95);
+}
+
+/* ── Editorial List: Agenda Berikutnya (Blends seamlessly with page background) ── */
+.agenda-editorial-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+:root[data-theme="dark"] #berandaAnnounceWrap {
+  --announcement-overlay: var(--surface);
+  --announcement-hover: var(--surface-2);
+  --announcement-shadow: none;
+}
+:root[data-theme="dark"] #berandaAnnounceWrap .ann-card { color: var(--ink); }
+:root[data-theme="dark"] #berandaAnnounceWrap .ann-card .muted { color: var(--ink-2); }
+
+.agenda-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 6px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line-2);
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.16s ease;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.agenda-row:last-child {
+  border-bottom: none;
+}
+
+.agenda-row:hover {
+  background: rgba(18, 115, 230, 0.04);
+}
+
+.agenda-row:hover .agenda-row-title {
+  color: var(--b-700);
+}
+
+.agenda-row:hover .agenda-row-ic {
+  transform: scale(1.06);
+}
+
+
+.agenda-row-ic {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: rgba(18, 115, 230, 0.10);
+  color: #1273E6;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: transform 0.16s ease;
+}
+
+.agenda-row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.agenda-row-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.16s ease;
+}
+
+.agenda-row-meta {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* ── Equipment Card / Loan Items ── */
+.equipment-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  width: 100%;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.equipment-ic {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: rgba(18, 115, 230, 0.10);
+  color: #1273E6;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.equipment-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.equipment-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.equipment-due {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* ── Announcement Cards (.stack, .ann) ── */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ann-card {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.t-md {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.t-xs {
+  font-size: 12px;
+}
+
+.clamp2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.row-b {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* ── Stat Counters (.grid-2, .stat) ── */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stat-card b.num {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--b-700);
+  line-height: 1.1;
+  transition: color 0.18s ease;
+}
+
+.stat-card b.num.num-ok {
+  color: var(--ok, #0F7A5A);
+}
+:root[data-theme="dark"] .stat-card b.num.num-ok {
+  color: var(--ok, #4FC79B);
+}
+
+.stat-card b.num.num-warn {
+  color: var(--warn, #9A6B08);
+}
+:root[data-theme="dark"] .stat-card b.num.num-warn {
+  color: var(--warn, #E3BA63);
+}
+
+.stat-card.stat-approved:hover {
+  border-color: var(--ok-border, rgba(15, 122, 90, 0.40));
+}
+.stat-card.stat-pending:hover {
+  border-color: var(--warn-border, rgba(217, 119, 6, 0.40));
+}
+
+.stat-card span {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ── Chip Badges (.chip) ── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--ptv-curve-pill, 9999px);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
+  flex: none;
+  box-sizing: border-box;
+}
+
+.chip.ok {
+  background: var(--ok-bg, #E1F5EE);
+  color: var(--ok, #0F7A5A);
+  border: 1px solid var(--ok-border, rgba(15, 122, 90, 0.25));
+}
+
+.chip.info {
+  background: var(--info-bg, #E2EDFD);
+  color: var(--info, #0B5FBF);
+  border: 1px solid var(--info-border, rgba(11, 95, 191, 0.25));
+}
+
+.chip.warn {
+  background: var(--warn-bg, #FCF0D6);
+  color: var(--warn, #9A6B08);
+  border: 1px solid var(--warn-border, rgba(154, 107, 8, 0.25));
+}
+
+.chip.gold {
+  background: var(--warn-bg, #FCF0D6);
+  color: var(--warn, #9A6B08);
+  border: 1px solid var(--warn-border, rgba(154, 107, 8, 0.25));
+}
+
+.chip.dang {
+  background: var(--dang-bg, #FDE8E6);
+  color: var(--dang, #B02B23);
+  border: 1px solid var(--dang-border, rgba(176, 43, 35, 0.25));
+}
+
+.chip.muted {
+  background: var(--line-2);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+/* ── Pengumuman Penting Harmonized Amber Styling ── */
+.ann-card.ann-important {
+  border-color: var(--warn-border, rgba(217, 119, 6, 0.28)) !important;
+}
+.ann-card.ann-important:hover {
+  border-color: var(--warn, #D97706) !important;
+}
+:root[data-theme="dark"] .ann-card.ann-important {
+  border-color: var(--warn-border, rgba(227, 186, 99, 0.35)) !important;
+}
+:root[data-theme="dark"] .ann-card.ann-important:hover {
+  border-color: var(--warn, #E3BA63) !important;
+}
+
+/* ── Universal Continuous Profile D Surface Overrides ── */
+.hero-card.hero-continuous,
+.bento-card.bento-continuous,
+.bento-ic.ptv-continuous-surface,
+.qa-ref-btn-continuous,
+.agenda-row-ic.ptv-continuous-surface,
+.equipment-card.equipment-continuous,
+.equipment-ic.ptv-continuous-surface,
+.ann-card.ann-continuous,
+.stat-card.stat-continuous,
+.li.li-continuous,
+.li-ic.ptv-continuous-surface,
+.ann.ann-continuous,
+.stat.stat-continuous,
+.sec.sec-continuous,
+.chip.chip-continuous,
+.empty.empty-continuous {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+.hero-card.hero-continuous {
+  overflow: visible !important;
+}
+
+.hero-card.hero-continuous:focus-visible,
+.bento-card.bento-continuous:focus-visible,
+.li.li-continuous:focus-visible,
+.ann.ann-continuous:focus-visible,
+.stat.stat-continuous:focus-visible,
+.qa-ref-item:focus-visible {
+  outline: 2px solid var(--b-500);
+  outline-offset: 3px;
+}
+
+/* Ensure inner content layer of fixed icon buttons and chips is perfectly centered and inherits intended color */
+.qa-ref-btn-continuous > div,
+.qa-ref-btn-continuous > span,
+.bento-ic.ptv-continuous-surface > div,
+.bento-ic.ptv-continuous-surface > span,
+.agenda-row-ic.ptv-continuous-surface > div,
+.agenda-row-ic.ptv-continuous-surface > span,
+.equipment-ic.ptv-continuous-surface > div,
+.equipment-ic.ptv-continuous-surface > span,
+.li-ic.ptv-continuous-surface > div,
+.li-ic.ptv-continuous-surface > span,
+.chip.chip-continuous > span {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  color: inherit !important;
+}

@@ -1,0 +1,18 @@
+{
+  "project": "swadgljnyelsjstqqxbm",
+  "status": "EXECUTED_VERIFIED",
+  "proposalSha256": "25273cfaef837d63f3988bba51ec3eeab6b0641c7561d3fe89396b34855859f6",
+  "migration": "phase1_push_access_containment",
+  "receiptId": 6,
+  "transactionId": "2323",
+  "preflight": {"physicalTargetVerified": true, "trustedPostgres": true, "emptyJwtClaims": true, "otherActiveClients": 0},
+  "postflight": {"anonAuthenticatedAllTablePrivilegesDenied": true, "insertPolicyFalse": true, "subscriptionRows": 0, "accountIdentityMembershipProfilesArchiveDigestsUnchanged": true, "credentials": 0, "root": 0, "gate": "OFF", "retainedNativeSessions": 4},
+  "jwtLimit": "No INSERT privilege for authenticated role regardless of JWT; no user token obtained or native Auth session deleted. Does not claim universal JWT invalidation.",
+  "browserSmoke": {"runtime": "staging mode, isolated loopback 5185", "realCookiesIgnored": true, "otherApiPathsBlocked": true, "anonymousSession": "PASS", "passwordLoginGateOffDenial": "PASS", "accessPageRedirectWithoutSession": "PASS", "positiveRealAccountLogin": "NOT_RUN_NOT_AUTHORIZED", "temporaryServerAndTabClosed": true},
+  "tests": {"targetedRegression": 91, "passed": true, "fullSuiteRerun": false, "previousPostgres32EvidenceReused": true},
+  "qualityGates": {"typecheck": "PASS", "lint": "PASS", "build": "PASS_EXISTING_CHUNK_SIZE_WARNING"},
+  "maintenance": "ON",
+  "realAccountCredentialOrRootChanges": false,
+  "productionAccess": false,
+  "commitPushDeploy": false
+}

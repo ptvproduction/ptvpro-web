@@ -1,0 +1,133 @@
+{
+  "dateLocal": "2026-10-26",
+  "scope": "FINAL REVIEW ONLY; NO CLOUD EXECUTION ACC",
+  "status": "BLOCKED FINAL PAYLOAD",
+  "source": "jthzuhkblxcaohiuypqq READ ONLY",
+  "staging": "swadgljnyelsjstqqxbm READ ONLY",
+  "targetCount": 25,
+  "targetPtvIds": [
+    "PTV-001",
+    "PTV-002",
+    "PTV-003",
+    "PTV-004",
+    "PTV-005",
+    "PTV-006",
+    "PTV-016",
+    "PTV-019",
+    "PTV-020",
+    "PTV-021",
+    "PTV-022",
+    "PTV-023",
+    "PTV-024",
+    "PTV-025",
+    "PTV-026",
+    "PTV-027",
+    "PTV-028",
+    "PTV-029",
+    "PTV-030",
+    "PTV-031",
+    "PTV-032",
+    "PTV-033",
+    "PTV-034",
+    "PTV-035",
+    "PTV-036"
+  ],
+  "excludedHoldCount": 14,
+  "holdPtvIds": [
+    "PTV-015",
+    "PTV-017",
+    "PTV-018",
+    "PTV-037",
+    "PTV-040",
+    "PTV-043",
+    "PTV-045",
+    "PTV-055",
+    "PTV-057",
+    "PTV-062",
+    "PTV-068",
+    "PTV-070",
+    "PTV-086",
+    "PTV-089"
+  ],
+  "sourceReview": {
+    "rows": 25,
+    "sourceUuidUsernameVersionMatches": true,
+    "uniqueSourceUuids": 25,
+    "uniqueUsernames": 25,
+    "sourceUsernameCollisionGroups": 0,
+    "stagingIdentityAccountCollisionCount": 0,
+    "archiveUuidAndProvenanceUnique": true
+  },
+  "dataReview": {
+    "historicalNameDifferencePtvIds": [
+      "PTV-022"
+    ],
+    "differenceType": "Same verified UUID/archive/username, different source versus archive display name; not whitespace/Unicode/HTML entity normalization. No merge or automatic rename.",
+    "canonicalNameSelection": "UNDECIDED: current proposal copies archive.full_name; current source name differs",
+    "membershipPeriodStart": "NOT PRESENT in eligible-only pseudonym manifest; no historical join date inferred"
+  },
+  "preflight": {
+    "constraints": true,
+    "indexes": true,
+    "policies": true,
+    "rlsEnabled": true,
+    "writeGrantsClosed": true,
+    "enrollmentClosed": true,
+    "adminPrincipal": true,
+    "migrationCount": 6,
+    "rolesUnchanged": true,
+    "defaultPrivilegesUnchanged": true,
+    "physicalFingerprintMatched": true,
+    "root": 0,
+    "gateOff": true,
+    "testingAccountsInactive": 2,
+    "nativeUsersBanned": 2,
+    "nativeSessionsRetained": 4,
+    "portalCredentials": 0,
+    "portalSessions": 0,
+    "priorProvisionReceipts": 0,
+    "adminProfileAssignedToTargets": false,
+    "crewProfileAdministrativeManagementCapabilities": false
+  },
+  "plannedRows": {
+    "canonical_identity": 25,
+    "organization_membership": 25,
+    "user_account": 25,
+    "account_profiles": 25,
+    "auth_audit_log": 1,
+    "total": 101,
+    "auth_credentials": 0,
+    "nativeAuthUsers": 0,
+    "archiveUpdates": 0,
+    "historyUpdates": 0
+  },
+  "transaction": {
+    "singleTransaction": true,
+    "locks": "advisory149/1 plus table and row locks",
+    "idempotency": "operation+manifest+target-state receipt",
+    "validationEvidence": "45 PostgreSQL17 synthetic checks from prior changed-guard batch; not repeated during read-only final review"
+  },
+  "postflightPlan": "PTVPRO-PHASE1-LEGACY-MIGRATION-POSTFLIGHT.sql plus complete private baseline rowset and metadata comparison",
+  "containment": {
+    "preCommit": "Transaction rollback on any target/audit failure, tested synthetically",
+    "postCommit": "Keep accounts inactive/gates OFF/writers held; preserve receipt/audit/history; scoped forward repair needs separate ACC",
+    "snapshot155": "Logical restore rehearsal PASS for captured scope; older than current baseline, not a blind restore point for this operation",
+    "stagingRecoveryExecuted": false
+  },
+  "unchanged": {
+    "all26TablesDuringReview": true,
+    "history23TablesAgainstBaseline": true,
+    "rlsGrantsPolicies": true,
+    "maintenance5174Listeners": 0
+  },
+  "payload": {
+    "finalExecutableIssued": false,
+    "finalExecutableSha256": null,
+    "reason": "PTV-022 canonical-name choice and target membership period_start not fixed; eligible manifest is pseudonym review data, not a fully bound execution manifest",
+    "templatePath": "docs/PTVPRO-PHASE1-LEGACY-MIGRATION-PROPOSAL.sql",
+    "templateSha256": "6a8cbebaf1f69e71867a2b9e72edb59486a682b904226b3ab50ab390b589d715",
+    "templateStillHasUnboundPlaceholders": true
+  },
+  "qualityGate": "No application/SQL/guard changes during review; tests not repeated",
+  "nextOperatorDecision": "Confirm canonical name source for PTV-022 (current Production or preserved archive) and the explicit period_start date/basis for target memberships; then bind/review final SQL and seek separate execution ACC."
+}

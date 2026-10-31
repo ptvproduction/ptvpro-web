@@ -1,0 +1,39 @@
+{
+  "project_ref": "swadgljnyelsjstqqxbm",
+  "approval_scope": "PROVISION_TWO_INACTIVE_CREW_ACCOUNTS",
+  "approval_reference": "__OPERATOR_ACC_REFERENCE__",
+  "operation_id": "__NEW_OPERATION_UUID__",
+  "expires_at": "__APPROVED_EXPIRY_UTC_MAX_24H__",
+  "targets": [
+    {
+      "ptv_id": "PTV-001",
+      "source_uuid": "__PTV001_EXISTING_PRODUCTION_UUID__",
+      "archive_uuid": "__PTV001_EXISTING_ARCHIVE_UUID__",
+      "archive_sha256": "__PTV001_CURRENT_PRIVATE_ROW_SHA256__",
+      "account_uuid": "__PTV001_NEW_ACCOUNT_UUID__",
+      "membership_uuid": "__PTV001_NEW_MEMBERSHIP_UUID__",
+      "username": "__PTV001_OWNER_CHOSEN_USERNAME__",
+      "category": "__CONFIRMED_CATEGORY__",
+      "division_id": "__CONFIRMED_DIVISION_OR_JSON_NULL__",
+      "cohort": "__CONFIRMED_INTEGER_STRING_OR_JSON_NULL__",
+      "membership_status": "__CONFIRMED_MEMBERSHIP_STATUS__",
+      "membership_period_start": "__APPROVED_DATE_YYYY_MM_DD__",
+      "initial_profile": "crew"
+    },
+    {
+      "ptv_id": "PTV-002",
+      "source_uuid": "__PTV002_EXISTING_PRODUCTION_UUID__",
+      "archive_uuid": "__PTV002_EXISTING_ARCHIVE_UUID__",
+      "archive_sha256": "__PTV002_CURRENT_PRIVATE_ROW_SHA256__",
+      "account_uuid": "__PTV002_NEW_ACCOUNT_UUID__",
+      "membership_uuid": "__PTV002_NEW_MEMBERSHIP_UUID__",
+      "username": "__PTV002_OWNER_CHOSEN_USERNAME__",
+      "category": "__CONFIRMED_CATEGORY__",
+      "division_id": "__CONFIRMED_DIVISION_OR_JSON_NULL__",
+      "cohort": "__CONFIRMED_INTEGER_STRING_OR_JSON_NULL__",
+      "membership_status": "__CONFIRMED_MEMBERSHIP_STATUS__",
+      "membership_period_start": "__APPROVED_DATE_YYYY_MM_DD__",
+      "initial_profile": "crew"
+    }
+  ]
+}

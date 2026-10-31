@@ -1,0 +1,336 @@
+{
+  "timestamp": "2026-10-21T07:14:35.474Z",
+  "mode": "live_execution",
+  "targetProject": "swadgljnyelsjstqqxbm",
+  "mainPocket": {
+    "name": "Kas Utama Studio",
+    "id": "60e8d033-2794-4219-a960-c56bedca0111",
+    "finalBalanceRupiah": 520276
+  },
+  "counts": {
+    "posted": 49,
+    "reversed": 4,
+    "skipped": 0,
+    "totalProvenanceMapped": 53
+  },
+  "executionManifest": [
+    {
+      "index": 1,
+      "source": "ptv_pemasukan:00dc3860-f2a2-48c6-911b-e0e92d2ba574",
+      "action": "posted",
+      "txId": "de2f987c-1f5c-46eb-b0e8-b11e80029d1f"
+    },
+    {
+      "index": 2,
+      "source": "ptv_pemasukan:08581418-8486-4005-8406-566badf9ebd1",
+      "action": "posted",
+      "txId": "f90de314-82c0-40e6-a30a-e671c3814841"
+    },
+    {
+      "index": 3,
+      "source": "ptv_pemasukan:12857e92-3a8d-46b8-b490-2ded449ae79f",
+      "action": "posted",
+      "txId": "8d3b0abd-d572-4f09-a041-01f6a21353b1"
+    },
+    {
+      "index": 4,
+      "source": "ptv_pemasukan:1c0477a5-1125-4301-acaa-fd0f33d29e9a",
+      "action": "posted",
+      "txId": "6f008e5e-3459-4fd8-8fb7-523851e9f1db"
+    },
+    {
+      "index": 5,
+      "source": "ptv_pemasukan:1e12e264-a55f-48b7-ae11-7b42cabbf5c9",
+      "action": "posted",
+      "txId": "f6296cf8-4a44-49ee-8704-c0a674e0d031"
+    },
+    {
+      "index": 6,
+      "source": "ptv_pemasukan:1f88e634-5234-49e5-916b-b8d3dbd139c8",
+      "action": "posted",
+      "txId": "2a3c2006-5385-499e-ace1-8434cf1f6185"
+    },
+    {
+      "index": 7,
+      "source": "ptv_pemasukan:26d0bf3f-1f97-4dca-b485-a92cbdcbfe87",
+      "action": "posted",
+      "txId": "d9223341-e615-4761-9fc9-59743d13ca71"
+    },
+    {
+      "index": 8,
+      "source": "ptv_pemasukan:2f3293d1-5ef3-4228-bc51-fb2f3482e403",
+      "action": "posted",
+      "txId": "18afb321-4b1d-4155-bc44-f1cb01b2d762"
+    },
+    {
+      "index": 9,
+      "source": "ptv_pemasukan:385abef7-852e-4deb-8fe7-a146446211a3",
+      "action": "posted",
+      "txId": "17ab54a7-637f-4ae6-95ea-e80f42dc1796"
+    },
+    {
+      "index": 10,
+      "source": "ptv_pemasukan:4b5d3e01-cf20-4aa6-a16e-f764fb66bed7",
+      "action": "posted",
+      "txId": "01ab3de0-384a-4915-897d-686ebae00dd4"
+    },
+    {
+      "index": 11,
+      "source": "ptv_pemasukan:51cc500f-c53e-4efc-98cd-f2de01b5c540",
+      "action": "posted",
+      "txId": "1ef3e9ee-3fc2-4f81-a63e-5fbe9c2491ba"
+    },
+    {
+      "index": 12,
+      "source": "ptv_pemasukan:58187443-a77f-4c1d-bf3e-34ad40248c4a",
+      "action": "posted",
+      "txId": "307a3d97-ffb7-4004-9225-9d9ab11aa2cd"
+    },
+    {
+      "index": 13,
+      "source": "ptv_pemasukan:5abc0f47-4c7d-4d5d-aafb-31e88a83c6ae",
+      "action": "posted",
+      "txId": "dd9ddb46-78ec-486d-b0d7-3af56b38bfd5"
+    },
+    {
+      "index": 14,
+      "source": "ptv_pemasukan:671a5d61-2674-4e49-9cf6-1c51ff50fadd",
+      "action": "posted",
+      "txId": "ae1b218c-d6b5-4ecc-aead-98a4202573ba"
+    },
+    {
+      "index": 15,
+      "source": "ptv_pemasukan:6b7487bc-32c7-4300-9b53-6f816fe3c8c7",
+      "action": "posted",
+      "txId": "5addea41-63f9-4d98-8ab7-2d0bbdb28f7c"
+    },
+    {
+      "index": 16,
+      "source": "ptv_pemasukan:6c622311-d04d-4fda-be32-88ce47a55ca3",
+      "action": "posted",
+      "txId": "f133f8ef-1804-4ee2-980b-6f1918861948"
+    },
+    {
+      "index": 17,
+      "source": "ptv_pemasukan:74607b8a-d5c0-4bac-b34c-bcf6cd464db1",
+      "action": "posted",
+      "txId": "32acc12a-1121-4969-b4a4-43578fc132d1"
+    },
+    {
+      "index": 18,
+      "source": "ptv_pemasukan:7534c988-4fc0-418c-97f1-b9c928f219ac",
+      "action": "posted",
+      "txId": "dd58f7d8-ece1-4d3a-99a3-14b1cc3f3014"
+    },
+    {
+      "index": 19,
+      "source": "ptv_pemasukan:8c8d2021-bca2-4c57-857e-e38368037864",
+      "action": "posted",
+      "txId": "d15eee01-0299-47fa-b5cb-0a6bcb25fcf0"
+    },
+    {
+      "index": 20,
+      "source": "ptv_pemasukan:b4183981-47f3-4824-b67a-cbc5361bf7bf",
+      "action": "posted",
+      "txId": "f7865617-961d-4021-91b7-883a0ff06e6f"
+    },
+    {
+      "index": 21,
+      "source": "ptv_pemasukan:b564782f-6785-4f5e-b4e5-516257719a7d",
+      "action": "posted",
+      "txId": "2d6dd948-0b23-4449-a3ca-f4f8013d4e67"
+    },
+    {
+      "index": 22,
+      "source": "ptv_pemasukan:c5df179b-c754-4902-bbbb-d889b0ecf7f5",
+      "action": "posted",
+      "txId": "729a42f4-7dfb-458d-88ab-a77db47bd9ac"
+    },
+    {
+      "index": 23,
+      "source": "ptv_pemasukan:cc303a03-4d16-496e-8ee0-0ea2289e620a",
+      "action": "posted",
+      "txId": "065778e2-6422-4378-a6f3-7f1ee6536be8"
+    },
+    {
+      "index": 24,
+      "source": "ptv_pemasukan:cd83e579-39d1-4d0e-8126-3bdcebe5a8a9",
+      "action": "posted",
+      "txId": "6537834f-84dd-4c12-b5ac-ac75f71b138b"
+    },
+    {
+      "index": 25,
+      "source": "ptv_pemasukan:df97471f-b1d2-4bfa-8f02-0049854f4978",
+      "action": "posted",
+      "txId": "c00113cd-0d69-41cd-8636-b67a54297145"
+    },
+    {
+      "index": 26,
+      "source": "ptv_pemasukan:e083ed2e-a014-4b4d-9015-cda8ea4789db",
+      "action": "posted",
+      "txId": "080be20b-4fa2-456e-aa06-b5d9a22a8f8b"
+    },
+    {
+      "index": 27,
+      "source": "ptv_pemasukan:e352cf41-7a2c-4c28-aa6a-ece78816de8f",
+      "action": "posted",
+      "txId": "21e929a6-63cc-410a-a069-45ae2356bafe"
+    },
+    {
+      "index": 28,
+      "source": "ptv_pemasukan:fbda5df8-868c-404e-a54d-6a60d21b28ed",
+      "action": "posted",
+      "txId": "2ed7625a-7634-42ac-bb65-e4ec0cdb9cc3"
+    },
+    {
+      "index": 29,
+      "source": "ptv_pemasukan:fd42af24-7ffb-483e-9a05-6e32e8cf687d",
+      "action": "posted",
+      "txId": "b480e722-19ba-43a8-826a-294a97d53e50"
+    },
+    {
+      "index": 30,
+      "source": "ptv_pengeluaran:b0435461-dc04-42af-bc18-2233cc4d2ba1",
+      "action": "posted",
+      "txId": "84cdf64c-0851-4c84-8bda-02dce15cdd8d"
+    },
+    {
+      "index": 31,
+      "source": "ptv_pemasukan:2e2d085b-3dbe-4f3b-9521-4fcd83af2a95",
+      "action": "posted",
+      "txId": "955a4e65-7a48-404d-86da-a6bf0dccd3ba"
+    },
+    {
+      "index": 32,
+      "source": "ptv_pemasukan:3c12539f-092b-49ab-be0a-388f80bfb107",
+      "action": "posted",
+      "txId": "a595abcc-d761-40e5-abf3-e0670a848f24"
+    },
+    {
+      "index": 33,
+      "source": "ptv_pemasukan:625dc321-e6a0-4bcd-9a70-6a0d2c2a4e04",
+      "action": "posted",
+      "txId": "3fc1a854-8a3f-4db1-a3d0-152353191903"
+    },
+    {
+      "index": 34,
+      "source": "ptv_pemasukan:f73cce27-5c7d-4c57-a241-675ac93ca57e",
+      "action": "posted",
+      "txId": "c1518f9f-6c4f-43ba-8a51-600b2243695d"
+    },
+    {
+      "index": 35,
+      "source": "ptv_pengeluaran:8db72353-90ae-4cf2-a15b-54dea21b5877",
+      "action": "posted",
+      "txId": "16e47805-5fc1-4383-b17e-49457f811cce"
+    },
+    {
+      "index": 36,
+      "source": "ptv_pemasukan:2bd8cd88-f2e0-422d-ba8a-7fe57590d39c",
+      "action": "posted",
+      "txId": "e99e1015-f5b5-444b-86c6-929b0e9c5ce0"
+    },
+    {
+      "index": 37,
+      "source": "ptv_pengeluaran:85fbb09f-bfe7-4dfa-904a-18fa32940482",
+      "action": "posted",
+      "txId": "f0dcb83c-b31e-4a96-aaa3-bcd9144bf3ed"
+    },
+    {
+      "index": 38,
+      "source": "ptv_pengeluaran:b9ef1b0d-e118-4dbc-917e-5756e6a90e87",
+      "action": "posted",
+      "txId": "d2631532-bb89-46d4-86c6-90d974e3e1b4"
+    },
+    {
+      "index": 39,
+      "source": "ptv_pengeluaran:5517077f-9cf6-43a6-9609-020f1787df1b",
+      "action": "posted",
+      "txId": "d6312189-67e5-4f6e-8423-77663c669c6a"
+    },
+    {
+      "index": 40,
+      "source": "ptv_pemasukan:41d406c4-bd23-48ce-83a8-51cc0787b69e",
+      "action": "posted",
+      "txId": "e5e32537-a432-476a-9203-324de4b1f527"
+    },
+    {
+      "index": 41,
+      "source": "ptv_pemasukan:46d1c687-63ad-4971-9f16-9d0aa9053322",
+      "action": "posted",
+      "txId": "1b4cc2ac-563a-4669-8bbf-55164fd1c6d1"
+    },
+    {
+      "index": 42,
+      "source": "ptv_pemasukan:6ae6608c-c132-466b-b1ea-8552f6f5e0f3",
+      "action": "posted",
+      "txId": "9fc18040-2d23-42be-b02c-8c59f0da1b6d"
+    },
+    {
+      "index": 43,
+      "source": "ptv_pemasukan:8032aee8-7b11-44a1-95bc-52cf2f0eccd0",
+      "action": "posted",
+      "txId": "5f3f3d3c-18a1-496f-801e-55d49787c93c"
+    },
+    {
+      "index": 44,
+      "source": "ptv_pemasukan:d3d28d2f-396a-4839-8c2b-cf04a0c29052",
+      "action": "posted",
+      "txId": "cfb29351-b4d4-47f9-b3eb-41b37d0d61d2"
+    },
+    {
+      "index": 45,
+      "source": "ptv_pengeluaran:0b27dc31-d694-419c-a6d3-f649b183ae7f",
+      "action": "posted",
+      "txId": "9dd8f164-b069-4a70-b5a8-c7bb834a8cd2"
+    },
+    {
+      "index": 46,
+      "source": "ptv_pengeluaran:9e14cb19-ddc0-4341-a462-e373937c5f8a",
+      "action": "posted",
+      "txId": "ed39fd8f-b97e-471a-b892-f995de079040"
+    },
+    {
+      "index": 47,
+      "source": "ptv_pengeluaran:bcc00994-902a-4198-a0f6-ed9525bb5933",
+      "action": "posted",
+      "txId": "8588779f-8041-45bc-b7aa-817dbf5ce7a2"
+    },
+    {
+      "index": 48,
+      "source": "ptv_pengeluaran:be83381c-5bc0-4ce5-b139-edeacb7a1aee",
+      "action": "posted",
+      "txId": "2a4c7020-6666-41f9-b124-25d9192bcf24"
+    },
+    {
+      "index": 49,
+      "source": "ptv_pengeluaran:ac23e115-708b-4d12-9eb5-bec20264bbfb",
+      "action": "posted",
+      "txId": "1fedd17f-1d68-49ad-a28b-bcf977788de4"
+    },
+    {
+      "index": 50,
+      "source": "ptv_pemasukan:093acc53-2ed8-4eb3-9b6d-ccc0719700cc",
+      "action": "reversed_linked",
+      "txId": "4ce4203c-5f70-480d-95b0-35f82be96bf0"
+    },
+    {
+      "index": 51,
+      "source": "ptv_pemasukan:5e23c352-08b8-49d1-87b7-3b24fe117955",
+      "action": "reversed_linked",
+      "txId": "7eed7ec6-ea6a-4120-9b14-51044170190b"
+    },
+    {
+      "index": 52,
+      "source": "ptv_pemasukan:c06aa984-848e-462c-ba8e-cac8d46854e3",
+      "action": "reversed_linked",
+      "txId": "76412403-6a0d-45f8-97ba-35617a4fd997"
+    },
+    {
+      "index": 53,
+      "source": "ptv_pemasukan:ef35a758-ab66-41db-a42f-cd99f97ccd8e",
+      "action": "reversed_linked",
+      "txId": "d4b26581-0273-4782-987f-15c48618d0db"
+    }
+  ]
+}

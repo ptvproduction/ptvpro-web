@@ -1,0 +1,31 @@
+{
+  "projectRef": "swadgljnyelsjstqqxbm",
+  "status": "NOT_EXECUTED_REQUIRES_REVIEWED_EXISTING_TESTER",
+  "identity": { "accountId": null, "loginIdentifier": null, "ownerAuthorizationReference": null, "approvalReference": null },
+  "requirements": [
+    "Existing legitimate account with hub.access and owner consent",
+    "Existing private credential available through the established guarded mechanism",
+    "Expected denied capabilities confirmed live before sending requests",
+    "Do not alter Root/recovery roles, impersonate users, provision passwords or grant temporary privileges"
+  ],
+  "cases": [
+    { "operation": "list", "whenDenied": "inventory.view", "expectedHttp": 403 },
+    { "operation": "create", "whenDenied": "inventory.create", "expectedHttp": 403 },
+    { "operation": "update", "whenDenied": "inventory.edit", "expectedHttp": 403 },
+    { "operation": "valuations", "whenDenied": "inventory.valuation.view", "expectedHttp": 403 },
+    { "operation": "valuation-save/valuation-delete", "whenDenied": "inventory.valuation.manage", "expectedHttp": 403 },
+    { "operation": "upload", "whenAllDenied": ["inventory.create", "inventory.edit"], "expectedHttp": 403 },
+    { "operation": "checkout", "whenDenied": "loans.checkout", "expectedHttp": 403 },
+    { "operation": "return", "whenDenied": "loans.return", "expectedHttp": 403 },
+    { "operation": "damage/QC", "whenDenied": "operation-specific damage capability", "expectedHttp": 403 }
+  ],
+  "fixturePolicy": "Use only independently authorized actor-owned Staging fixtures; never target operational assets for denied-write tests",
+  "verification": [
+    "Resolve identity and permission from real Portal cookie, never browser-supplied actor fields",
+    "Compare fixture rows and object counts before/after denied operations",
+    "Do not label skipped/inapplicable cases as PASS",
+    "Logout, verify durable revocation, clean only own fixture resources, retain audit events"
+  ],
+  "secretsInReviewOrOutput": false,
+  "cloudPrivilegeChanges": false
+}

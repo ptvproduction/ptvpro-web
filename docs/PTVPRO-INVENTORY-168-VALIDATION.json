@@ -1,0 +1,53 @@
+{
+  "session": "PTV-DEV-168",
+  "operator": "zidnal",
+  "projectRef": "swadgljnyelsjstqqxbm",
+  "decision": "NO_GO_CUTOVER",
+  "cloudMutations": false,
+  "commitPushDeploy": false,
+  "runtimeConfig": {
+    "mode": "staging",
+    "appEnv": "staging",
+    "authBackend": "vercel",
+    "inventoryBackend": "supabase",
+    "runtimeHostedVerified": false
+  },
+  "tests": {
+    "vitestFiles": 5,
+    "vitestPassed": 64,
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "stagingBuild": "PASS",
+    "existingWarning": "bundle >500kB",
+    "reportLocalChecks": 14,
+    "reportLocalScope": "actual source early gates/CAS/attributes/rollback only"
+  },
+  "cloudReadOnly": {
+    "activeAccounts": 2,
+    "totalAccounts": 27,
+    "inventoryProfileGrantsPerActiveAccount": [
+      7,
+      7
+    ],
+    "inventoryDeniesOnActiveAccounts": 0,
+    "reportSourceMd5": "050ec0fe8d7414999c6654e9e7c41ee9",
+    "oldGrantsRevoked": false
+  },
+  "hosted": {
+    "project": "ptvpro-web",
+    "projectId": "prj_U1Rtauj8BlOwusamXhsEKATqCYdM",
+    "previewDeploymentsFound": 0,
+    "lastAvailableDeployment": "dpl_8Zd2kbvW3JekKXDh1GuwA9Px4szw",
+    "target": "production",
+    "state": "READY",
+    "commit": "d6ce79868943fcb95979af4b2cef57b0c1a44459",
+    "sourceTreeResult": "404 not_found",
+    "stagingActivation": "NOT_VERIFIED"
+  },
+  "blockers": [
+    "Report proposal requires separate explicit Staging DDL approval and operation verification",
+    "No authorized limited active tester confirmed",
+    "No proven hosted Staging deployment activation",
+    "Final privilege package requires fresh snapshot/rehearsal and separate approval; revocation prohibited this session"
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "dateLocal": "2026-10-26",
+  "target": "swadgljnyelsjstqqxbm",
+  "classificationSource": "Explicit operator statement: PTV-STG-ADM/PTV-STG-KRU are testing accounts, not Root candidates",
+  "classificationLocation": "Local manifest only; cloud unchanged",
+  "fkDependencies": [
+    {
+      "dependency": "auth.identities.user_id",
+      "delete_action": "c",
+      "matched_rows": 2
+    },
+    {
+      "dependency": "auth.sessions.user_id",
+      "delete_action": "c",
+      "matched_rows": 4
+    },
+    {
+      "dependency": "auth.refresh_tokens.session_id",
+      "delete_action": "c",
+      "matched_rows": 84
+    },
+    {
+      "dependency": "auth.mfa_factors.user_id",
+      "delete_action": "c",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "auth.mfa_amr_claims.session_id",
+      "delete_action": "c",
+      "matched_rows": 4
+    },
+    {
+      "dependency": "public.identity_contact.identity_id",
+      "delete_action": "c",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "auth.one_time_tokens.user_id",
+      "delete_action": "c",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.user_account.identity_id",
+      "delete_action": "r",
+      "matched_rows": 2
+    },
+    {
+      "dependency": "auth.oauth_authorizations.user_id",
+      "delete_action": "c",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "auth.oauth_consents.user_id",
+      "delete_action": "c",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.auth_credentials.account_id",
+      "delete_action": "c",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "auth.webauthn_credentials.user_id",
+      "delete_action": "c",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "auth.webauthn_challenges.user_id",
+      "delete_action": "c",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "auth.scim_users.user_id",
+      "delete_action": "n",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "auth.mfa_recovery_code_sets.user_id",
+      "delete_action": "c",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.organization_membership.identity_id",
+      "delete_action": "r",
+      "matched_rows": 2
+    },
+    {
+      "dependency": "public.account_profiles.account_id",
+      "delete_action": "c",
+      "matched_rows": 2
+    },
+    {
+      "dependency": "public.account_capability_overrides.account_id",
+      "delete_action": "c",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.account_capability_overrides.granted_by",
+      "delete_action": "a",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.auth_audit_log.actor_id",
+      "delete_action": "a",
+      "matched_rows": 2
+    },
+    {
+      "dependency": "public.ptv_login_history.user_id",
+      "delete_action": "a",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_acara.created_by",
+      "delete_action": "a",
+      "matched_rows": 2
+    },
+    {
+      "dependency": "public.ptv_content_planner.pic_id",
+      "delete_action": "a",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_peminjaman.actor_id",
+      "delete_action": "a",
+      "matched_rows": 2
+    },
+    {
+      "dependency": "public.ptv_lapor_masalah.pelapor_id",
+      "delete_action": "a",
+      "matched_rows": 1
+    },
+    {
+      "dependency": "public.ptv_lapor_masalah.qc_approved_by",
+      "delete_action": "a",
+      "matched_rows": 1
+    },
+    {
+      "dependency": "public.ptv_surat_tugas.disetujui_oleh",
+      "delete_action": "a",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_surat_izin.disetujui_oleh",
+      "delete_action": "a",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_surat_barang.disetujui_oleh",
+      "delete_action": "a",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_keuangan.pic_id",
+      "delete_action": "a",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_kas_kru.identity_id",
+      "delete_action": "r",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_catatan.author_id",
+      "delete_action": "a",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_push_subscriptions.identity_id",
+      "delete_action": "c",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_surat_tugas.diajukan_oleh",
+      "delete_action": "r",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_surat_izin.diajukan_oleh",
+      "delete_action": "r",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_surat_barang.diajukan_oleh",
+      "delete_action": "r",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "public.ptv_inventaris.created_by",
+      "delete_action": "n",
+      "matched_rows": 1
+    },
+    {
+      "dependency": "public.legacy_archive_kas_kru.canonical_identity_id",
+      "delete_action": "a",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "ptv_auth_private.attempts.account_id",
+      "delete_action": "a",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "ptv_auth_private.sessions.account_id",
+      "delete_action": "a",
+      "matched_rows": 0
+    }
+  ],
+  "softReferences": [
+    {
+      "dependency": "finance_transactions.created_by",
+      "matched_rows": 58
+    },
+    {
+      "dependency": "finance_audit.actor_id",
+      "matched_rows": 9
+    },
+    {
+      "dependency": "finance_loans.borrower_id",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "catatan.created_by_id",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "auth.refresh_tokens.user_id",
+      "matched_rows": 84
+    },
+    {
+      "dependency": "auth.flow_state.user_id",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "archive_personnel.canonical_identity_id",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "audit.metadata.reference_match",
+      "matched_rows": 0
+    },
+    {
+      "dependency": "surat_tugas.kru_terlibat.reference_match",
+      "matched_rows": 0
+    }
+  ],
+  "deleteApproved": false,
+  "deleteProposed": false,
+  "provisioningExecuted": false,
+  "plan": "PTVPRO-PHASE1-ACC2-TESTING-PLAN.md",
+  "maintenanceHeld": true
+}

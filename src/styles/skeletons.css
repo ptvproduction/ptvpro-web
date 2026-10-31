@@ -1,0 +1,175 @@
+/**
+ * PTVPRO R03 Unified Contextual Skeleton System
+ * Smooth, accessible shimmer animation matching actual content layouts.
+ */
+
+:root {
+  --ptv-skel-base: rgba(11, 42, 74, 0.05);
+  --ptv-skel-highlight: rgba(11, 42, 74, 0.12);
+  --ptv-skel-border: rgba(11, 42, 74, 0.06);
+}
+
+:root[data-theme="dark"] {
+  --ptv-skel-base: rgba(255, 255, 255, 0.06);
+  --ptv-skel-highlight: rgba(255, 255, 255, 0.14);
+  --ptv-skel-border: rgba(255, 255, 255, 0.08);
+}
+
+@keyframes ptvShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Atomic Skeleton Block */
+.ptv-skeleton-block {
+  background: linear-gradient(
+    90deg,
+    var(--ptv-skel-base) 20%,
+    var(--ptv-skel-highlight) 50%,
+    var(--ptv-skel-base) 80%
+  );
+  background-size: 200% 100%;
+  animation: ptvShimmer 1.8s ease-in-out infinite;
+  border-radius: var(--ptv-corner-sm, 8px);
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ptv-skeleton-block {
+    animation: none !important;
+    background: var(--ptv-skel-base) !important;
+  }
+}
+
+/* Skeleton Containers */
+.ptv-skel-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ptv-skel-header {
+  margin-bottom: 24px;
+}
+
+.ptv-skel-card {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--ptv-skel-border);
+  border-radius: var(--ptv-curve-lg, 16px);
+  padding: 16px 20px;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .ptv-skel-card {
+  background: #202428;
+}
+
+/* Skeletons Layouts */
+.ptv-skel-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ptv-skel-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.ptv-skel-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.ptv-skel-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .ptv-skel-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Calendar Month Grid Skeleton */
+.ptv-skel-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.ptv-skel-calendar-cell {
+  aspect-ratio: 1.1 / 1;
+  min-height: 70px;
+  border-radius: 12px;
+  padding: 8px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--ptv-skel-border);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+:root[data-theme="dark"] .ptv-skel-calendar-cell {
+  background: #202428;
+}
+
+/* Table Skeleton */
+.ptv-skel-table-wrapper {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--ptv-skel-border);
+  border-radius: var(--ptv-curve-lg, 16px);
+  overflow: hidden;
+  width: 100%;
+}
+
+:root[data-theme="dark"] .ptv-skel-table-wrapper {
+  background: #202428;
+}
+
+.ptv-skel-table-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  gap: 16px;
+  border-bottom: 1px solid var(--ptv-skel-border);
+}
+
+.ptv-skel-table-row:last-child {
+  border-bottom: none;
+}
+
+/* Global Page Transition: Subtle Fade + Lift (200ms) */
+@keyframes ptvFadeLift {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ptv-page-transition {
+  animation: ptvFadeLift 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ptv-page-transition {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+

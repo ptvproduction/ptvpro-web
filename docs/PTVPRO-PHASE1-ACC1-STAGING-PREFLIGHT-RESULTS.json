@@ -1,0 +1,416 @@
+{
+  "scope": "PHASE1 ACC1 STAGING AND RUNTIME READ-ONLY PREFLIGHT",
+  "operatorApproval": "Explicit read-only Staging and related Vercel runtime approval in conversation; no migration approval",
+  "dateLocal": "2026-10-25",
+  "capturedAtUtc": "2026-10-25T13:29:07.006424+00:00",
+  "status": "HISTORICAL PREFLIGHT PASS; ACC-1 SUBSEQUENTLY EXECUTED PASS; MAINTENANCE HELD",
+  "subsequentExecutionEvidence": "PTVPRO-PHASE1-ACC1-EXECUTION-RESULTS.json",
+  "cloudTarget": {
+    "ref": "swadgljnyelsjstqqxbm",
+    "name": "ptvpro-staging",
+    "databaseHost": "db.swadgljnyelsjstqqxbm.supabase.co",
+    "postgresVersion": "17.11",
+    "physicalFingerprintMatches153": true,
+    "readOnlyVerified": true,
+    "sqlPrincipal": "postgres",
+    "superuser": false,
+    "bypassRls": true
+  },
+  "scopeLimits": {
+    "productionAccessed": false,
+    "ddlDmlExecuted": false,
+    "migrationExecuted": false,
+    "accountOrSessionMutationExecuted": false,
+    "enrollmentLinkingBootstrapExecuted": false,
+    "backupCreated": false,
+    "vercelLoginPerformed": false
+  },
+  "queryScope": {
+    "sqlCalls": 6,
+    "allTransactions": "BEGIN TRANSACTION READ ONLY / ROLLBACK",
+    "preparedPreflightExecuted": true,
+    "statementTimeoutSeconds": 10,
+    "credentialValuesReadOrPrinted": false,
+    "personnelRowsExported": false,
+    "multipleReadOnlyTransactionsNotFrozenGlobalSnapshot": true
+  },
+  "database": {
+    "baseline": {
+      "accounts": 2,
+      "audit_rows": 2,
+      "identities": 2,
+      "credentials": 0,
+      "memberships": 2,
+      "native_sessions": 4,
+      "protected_events": 0,
+      "root_assignments": 0,
+      "personnel_archives": 94
+    },
+    "ownerCatalogChecks": {
+      "roots": 0,
+      "db_create": true,
+      "public_create": true,
+      "protected_events": 0,
+      "physical_identity_read": true,
+      "current_user_is_postgres": true,
+      "required_helpers_present": true
+    },
+    "finalCheckpoint": {
+      "audit_rows": 2,
+      "credentials": 0,
+      "active_accounts": 2,
+      "native_sessions": 4,
+      "root_assignments": 0,
+      "native_deadline_column": true,
+      "principal_matches_installer": true
+    },
+    "collisions": {
+      "audit_index": false,
+      "access_schema": false,
+      "personnel_rpc": false,
+      "management_rpc": false,
+      "lifecycle_schema": false
+    },
+    "additionalObjectCollisions": [],
+    "requiredColumns": [
+      {
+        "type": "uuid",
+        "table": "sessions",
+        "column": "id",
+        "schema": "auth",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "sessions",
+        "column": "user_id",
+        "schema": "auth",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "sessions",
+        "column": "not_after",
+        "schema": "auth",
+        "nullable": "YES"
+      },
+      {
+        "type": "uuid",
+        "table": "auth_credentials",
+        "column": "account_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "character varying",
+        "table": "auth_credentials",
+        "column": "password_hash",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "character varying",
+        "table": "auth_credentials",
+        "column": "hash_algorithm",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "boolean",
+        "table": "auth_credentials",
+        "column": "needs_rehash",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "auth_credentials",
+        "column": "password_updated_at",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "auth_credentials",
+        "column": "updated_at",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "user_account",
+        "column": "id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "user_account",
+        "column": "identity_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "user_account",
+        "column": "auth_user_id",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "character varying",
+        "table": "user_account",
+        "column": "status_akun",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "user_account",
+        "column": "lockout_until",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "user_account",
+        "column": "tokens_valid_after",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "user_account",
+        "column": "updated_at",
+        "schema": "public",
+        "nullable": "NO"
+      }
+    ],
+    "ownerCanReadNativeSessions": true,
+    "all11AccessTablesRlsEnabled": true,
+    "all11OwnedByPostgres": true,
+    "forceRlsEnabled": false,
+    "defaultPublicFunctionExecuteGrantees": [
+      "anon",
+      "authenticated",
+      "postgres",
+      "service_role"
+    ],
+    "broadWritePrivilegeCombinations": 27,
+    "totalWritePrivilegeCombinations": 27,
+    "writeGrantPresenceDoesNotProveRlsBypassForAnonAuthenticated": true,
+    "comparisonTo153": {
+      "constraintsMatch153": true,
+      "indexesMatch153": true,
+      "policiesMatch153": true,
+      "constraintCounts": [
+        35,
+        35
+      ],
+      "indexCounts": [
+        26,
+        26
+      ],
+      "policyCounts": [
+        4,
+        4
+      ],
+      "migrationHistoryMatches153": true,
+      "helperDefinitionMatches153": true
+    },
+    "helperBeforeMigration": {
+      "owner": "postgres",
+      "config": [
+        "search_path=pg_catalog, public, auth"
+      ],
+      "definer": true,
+      "definition_md5": "942e2785e9b4f1506ad267eb17027254",
+      "checks_not_after": false,
+      "uses_stored_session": false
+    },
+    "membershipGaps": 0,
+    "duplicateAccountIdentities": 0,
+    "accountState": {
+      "active": 2,
+      "locked": 0,
+      "native_bound": 2
+    },
+    "migrationHistory": [
+      {
+        "name": "report_persistence_staging",
+        "version": "20261020164441"
+      },
+      {
+        "name": "report_persistence_cookie_adapter",
+        "version": "20261020165048"
+      },
+      {
+        "name": "loan_persistence_server_adapter",
+        "version": "20261020233530"
+      }
+    ],
+    "hasCapabilityDependentPolicies": 22,
+    "otherActiveClientCountAtOneObservation": 0,
+    "writerFreezeProven": false
+  },
+  "runtime": {
+    "status": "PASS",
+    "runtimeType": "LOCAL VITE STAGING",
+    "origin": "http://localhost:5174",
+    "vercelApplicable": false,
+    "listener": {
+      "port": 5174,
+      "pid": 21192,
+      "nodeBinaryVersion": "24.21.0",
+      "workspaceVite": true,
+      "modeArgument": "staging",
+      "portArgumentVerified": true
+    },
+    "servedModule": {
+      "httpStatus": 200,
+      "mode": "staging",
+      "dev": true,
+      "authBackend": "vercel",
+      "inventoryBackend": "supabase",
+      "databaseTargetMatchesStaging": true,
+      "forbiddenProjectReference": false,
+      "publicCredentialRoleClaim": "anon",
+      "publicCredentialRefClaimMatchesStaging": true,
+      "publicCredentialRefClaimMatchesForbiddenProject": false,
+      "checkedServerSecretsNotExposed": true
+    },
+    "configuration": {
+      "files": [
+        ".env.staging",
+        ".env.staging.local"
+      ],
+      "clientEndpoint": "STAGING",
+      "serverEndpoint": "STAGING",
+      "signingKeyPresent": true,
+      "signingKeyAtLeast32Characters": true,
+      "serverCredentialPresent": true,
+      "serverCredentialRoleClaim": "service_role",
+      "serverCredentialRefClaimMatchesStaging": true,
+      "serverCredentialRefClaimMatchesForbiddenProject": false,
+      "googleRedirectIsLocal5174": true,
+      "credentialClaimsDecodedOnlyNotCryptographicValidation": true,
+      "noCredentialAuthenticationProbePerformed": true
+    },
+    "flags": {
+      "status": "VERIFIED EFFECTIVE GATES OFF",
+      "lifecycleGate": "OFF",
+      "passwordLoginGate": "OFF_BY_LIFECYCLE_GUARD",
+      "flagsDefinedInInspectedEnvFiles": false,
+      "rawPrivateRunningProcessValuesNotDumped": true,
+      "verification": "Reviewed OPTIONS handler without cookie, POST, redirect-follow or cookie jar; HTTP302/no-store/empty-cookie expiration header confirms lifecycle gate OFF, so effective passwordLoginEnabled is false. Empty cookie response was not applied; no real session or database path invoked."
+    },
+    "writerProcessObservation": {
+      "matchingWorkspaceNodeProcesses": 1,
+      "identifiedCronOrImporterProcesses": 0,
+      "matchingWindowsScheduledTasks": 0,
+      "observationDoesNotProveFutureOrExternalWriterFreeze": true
+    },
+    "nodeRuntime": "VERIFIED LOCAL PROCESS 24.21.0",
+    "stagingDeploymentIdentified": true,
+    "cloudDeployment": false,
+    "noAppSourceOrSqlChanged": true
+  },
+  "localEvidence": {
+    "cloneRehearsal": "docs/PTVPRO-PHASE1-ACC1-CLONE-RESULTS.json",
+    "cloneCheckpoints": 39,
+    "localWriterInventory": {
+      "accountAccess": "api/akses.ts RPC",
+      "linkedPersonnel": "api/kru.ts RPC",
+      "unlinkedArchive": "api/kru.ts direct insert/update legacy_archive_kru",
+      "googleProof": "api/auth/_utils/loginProof.ts INSERT audit or lifecycle RPC",
+      "googleCredentialMutation": "Live link/unlink guarded closed"
+    }
+  },
+  "blockers": [],
+  "nextOperatorAction": "Give separate ACC1 backend-installation approval with maintenance window/PIC, limited to the three reviewed proposals and their postflight/containment procedure; no identity or Root activation approval is implied.",
+  "historicalVercelObservation": {
+    "status": "BLOCKED",
+    "officialDashboard": "https://vercel.com/dashboard",
+    "browserResult": "Redirected to Vercel login; no login attempted",
+    "connectorState": "CONNECTED AND AUTHENTICATED; previous connection blocker resolved",
+    "projectDiscovery": {
+      "team": "ptvpro-web",
+      "projectName": "ptvpro-web",
+      "projectId": "prj_U1Rtauj8BlOwusamXhsEKATqCYdM",
+      "configuredProjectNodeVersion": "24.x",
+      "previewDeploymentsVisible": 0,
+      "customEnvironmentsVisible": 0,
+      "latestDeploymentTargetMetadata": "production",
+      "productionDeploymentDetailsInspected": false,
+      "stagingBackendBindingVerified": false,
+      "scope": "Authenticated team; PTV project-name search and project-specific read-only metadata"
+    },
+    "environmentListing": {
+      "decryptRequested": false,
+      "visibleProjectVariables": 0,
+      "hiddenProductionVariableCount": 0,
+      "secretValuesPrintedOrSaved": false,
+      "absenceFromProjectListDoesNotProveImmutableDeploymentConfiguration": true
+    },
+    "stagingDeploymentIdentified": false,
+    "lifecycleFlag": "NOT VERIFIED",
+    "passwordFlag": "NOT VERIFIED",
+    "serverKeyPresence": "NOT VERIFIED",
+    "nodeRuntime": "Project setting 24.x verified; actual Staging deployment runtime NOT VERIFIED",
+    "independentAdminRecovery": "NOT VERIFIED",
+    "deployedWriterInventory": "NOT VERIFIED",
+    "applicableToStaging": false,
+    "reason": "Operator confirmed Vercel ptvpro-web is not the Staging runtime; findings retained as historical only"
+  },
+  "maintenance": {
+    "status": "READY PLAN; NOT EXECUTED",
+    "temporaryMaintenanceRequired": true,
+    "impacts": {
+      "accountAccessAndLinkedPersonnel": "Management RPC remains closed until separately approved bootstrap; read paths retained, no direct-write fallback to reopen",
+      "unlinkedArchive": "Direct legacy_archive_kru insert/update is not stopped by nine-store grant revokes; include in writer freeze",
+      "nativeRls": "has_capability change affects 22 existing policies; test eligible/denied access later only within approved scope",
+      "googleProof": "Existing audit INSERT service grant retained; do not perform OAuth login during installation",
+      "otherClientModules": "Inventory/Finance/reports may depend on has_capability; staged postflight before resuming writers"
+    },
+    "executionCheckpoints": [
+      "Operator approves ACC1 window and PIC; trusted database administration channel remains available independently of localhost",
+      "Stop the verified localhost5174 Vite writer at the approved window and close/suspend Staging browser clients; do not logout or change account/session data",
+      "Hold manual/import/sync/other-machine writers; recheck local processes, scheduler presence and in-flight writes before DDL; do not run Legacy sync",
+      "Bind reviewed SQL to the approved physical Staging cluster, pin rendered hashes and apply only 149 PREBOOTSTRAP -> Access152 alignment154 -> Lifecycle Phase1",
+      "Read-only postflight must preserve approved person/account/credential/native-session/audit/Root baselines, enforce exact grants/RLS, policy.enabled=false, and empty lifecycle operational state; mismatch means STOP",
+      "Keep account/personnel mutation routes closed as designed; do not restore broad grants to make UI work. Resume only flows approved after validation",
+      "On failure before COMMIT rollback transaction; after COMMIT use approved containment and forward repair through admin SQL. No blind old-grant/helper/full-snapshot restoration"
+    ]
+  },
+  "adminRecovery": {
+    "status": "READY FOR ACC1 DATABASE ADMINISTRATION ONLY",
+    "managementChannelAvailable": true,
+    "managementTargetVerifiedStaging": true,
+    "sqlPrincipalObservedInTargetedReadOnlySchedulerQuery": "postgres",
+    "independentOfLocalFrontend": true,
+    "ownerPermissionsEvidence": "Existing successful ACC1 Staging preflight, not rerun",
+    "containmentAndForwardRecoveryEvidence": "Existing actual clone rehearsal39 PASS, not rerun",
+    "existingBackupEvidence": "DEV155 logical restore PASS and source unchanged in clone39; no new backup or decryption in this task",
+    "rootAccountRecovery": "NOT VERIFIED; ownership/linking/two independent portal logins remain later ACC2/3/4",
+    "limits": "No recovery/bootstrap/write performed. Does not certify total platform disaster recovery, DPAPI-key-loss recovery, current direct password validity or account ownership. Full restore would require separate ACC and reconciliation of legitimate post-snapshot changes."
+  },
+  "targetedSchedulerReadOnly": {
+    "sql_role": "postgres",
+    "read_only": "on",
+    "pg_cron_installed": false,
+    "other_active_clients": 0,
+    "pgagent_catalog_present": false,
+    "cron_job_catalog_present": false
+  },
+  "recoveryManagementObservation": {
+    "available": true,
+    "targetMatchesStaging": true,
+    "status": "ACTIVE_HEALTHY"
+  },
+  "executionNotYetApproved": true,
+  "approvalConditions": [
+    "Operator supplies maintenance window/PIC and holds all writers before DDL",
+    "Existing approved target identity and baseline checkpoints must still match at execution; drift or unavailable admin channel aborts",
+    "No enrollment/linking/bootstrap/Root activation/Finance migration/deployment under ACC1"
+  ]
+}

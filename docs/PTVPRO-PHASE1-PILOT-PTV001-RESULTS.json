@@ -1,0 +1,62 @@
+{
+  "project": "swadgljnyelsjstqqxbm",
+  "status": "EXECUTED_VERIFIED",
+  "verifiedAt": "2026-10-26T09:38:12.560Z",
+  "target": {
+    "ptv_id": "PTV-001",
+    "full_name": "Muhammad Zidnal Falah",
+    "username": "jid",
+    "account_uuid": "c08952de-a8ff-48e0-8182-ac0bb7ac6767",
+    "identity_uuid": "8fb1aa38-c469-4dc5-9392-8588f7a71e39",
+    "status_akun": "inactive"
+  },
+  "enrollment": {
+    "receipt_id": 7,
+    "transaction_id": "2325",
+    "review_reference": "ACC-PHASE1-PILOT-PTV001-20261026",
+    "owner_evidence_reference": "AUTH-CANONICAL-PTV001-ZIDNAL-KETUA-UMUM",
+    "recovery_evidence_reference": "REC-TEL-6285334340616-RECOVERY-CHANNEL",
+    "security_surface_sha256": "96b4f6279de9eca4098dcb521cc3e5b5dbf9d0b1904378ca85dfe24277a2f8f8",
+    "hash_algorithm": "bcrypt",
+    "bcrypt_cost": 10,
+    "password_matches_owner_input": true
+  },
+  "pilot_verification": {
+    "step1_password_verification": true,
+    "step2_rbac_permission_evaluation": true,
+    "step3_session_login_and_validation": true,
+    "step4_session_logout_and_revocation": true,
+    "step5_recovery_channel_verification": true
+  },
+  "evaluated_capabilities": {
+    "granted": [
+      "hub.access",
+      "crew.view",
+      "inventory.view",
+      "events.view",
+      "documents.view",
+      "broadcast.view",
+      "calendar.view",
+      "notes.view",
+      "settings.personal"
+    ],
+    "denied_as_expected": [
+      "executive.access",
+      "root.access",
+      "finance.manage",
+      "audit.manage"
+    ]
+  },
+  "recovery_channel": {
+    "reference": "REC-TEL-6285334340616-RECOVERY-CHANNEL",
+    "verified_phone_e164": "6285334340616",
+    "archive_reference": "5d1d2488-d8f3-4e6d-9b67-2d56c28c96fe"
+  },
+  "security_invariants": {
+    "root_count": 0,
+    "enrolled_credential_count": 1,
+    "global_gate_enabled": false,
+    "other_accounts_status": "24 accounts remain inactive without credentials",
+    "ptv_002_status": "unmodified, pending owner proof and consent"
+  }
+}

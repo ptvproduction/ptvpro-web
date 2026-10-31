@@ -1,0 +1,8 @@
+{
+  "scope": "POSTGRESQL17_LOOPBACK_SYNTHETIC_ONLY",
+  "cloudMutation": false,
+  "realCredentialsRead": false,
+  "defaultVerbosityLeaksSyntheticDetailDespitePanicStatementThreshold": true,
+  "terseRemovesSyntheticDetail": true,
+  "bindValueCanAppearInPrimaryErrorDespiteParameterErrorLoggingZero": true
+}

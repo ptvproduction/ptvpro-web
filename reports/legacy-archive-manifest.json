@@ -1,0 +1,262 @@
+{
+  "generated_at": "2026-10-29T16:07:02.977Z",
+  "total_ebooks": 15,
+  "unique_titles_count": 5,
+  "items": [
+    {
+      "id": "da60518c-9dd3-4f69-bd5c-3f598a471fb7",
+      "judul": "Anfasul Mahasin",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://drive.google.com/file/d/1xPhyWXW8nBWjueJ-CxVCzVupgXN5HnfH/preview",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku-3.png",
+      "deskripsi": "<strong data-start=\"0\" data-end=\"49\" data-is-only-node=\"\">Kitab Anfasul Mahasin fi Tafsiri Surati Yasin</strong> merupakan kitab tafsir yang mengupas makna, kandungan, serta rahasia spiritual dalam Surat Yasin. Disusun dengan merangkum pendapat para mufasir dan ulama terpercaya, kitab ini membimbing pembaca agar tidak hanya membaca Surat Yasin, tetapi juga memahami pesan, hikmah, dan hidayah yang terkandung di dalamnya untuk diamalkan dalam kehidupan sehari-hari.",
+      "created_at": "2026-05-14T06:05:14+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "da60518c-9dd3-4f69-bd5c-3f598a471fb7",
+        "table": "ptv_ebook",
+        "storage_type": "google_drive",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "3c2ac1b1-34fa-4913-a88c-54c1011d7c94",
+      "judul": "Awas Hadis Palsu: Keutamaan Sholat Tarawih",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://drive.google.com/file/d/1bjpQ5LYiBjTUawIQgAvjxAl-c1iU5pSM/preview",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku-2.png",
+      "deskripsi": "<strong data-start=\"0\" data-end=\"46\" data-is-only-node=\"\">Awas Hadis Palsu: Keutamaan Sholat Tarawih</strong> adalah e-book islami yang membahas hadis-hadis populer tentang keutamaan sholat Tarawih sekaligus meluruskan riwayat yang tidak sahih. Disusun secara ringkas dan mudah dipahami, buku ini membantu pembaca lebih bijak dalam menerima serta menyebarkan hadis agar ibadah Ramadhan dilakukan berdasarkan dalil yang benar.",
+      "created_at": "2026-05-14T06:02:16+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "3c2ac1b1-34fa-4913-a88c-54c1011d7c94",
+        "table": "ptv_ebook",
+        "storage_type": "google_drive",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "46232975-1916-4915-ba0a-fb4c2d956b96",
+      "judul": "Tuhan yang Maha Ada",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://progresiftv.id/wp-content/uploads/E-BOOK-GUS-SYAIKHUL@Tuhan-yang-Maha-Ada.pdf",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku-1.png",
+      "deskripsi": "Tuhan yang Maha Ada membahas tentang keberadaan Allah sebagai Dzat Yang Maha Wujud, mengajak pembaca memahami keimanan, tauhid, serta kesadaran akan kehadiran Allah dalam setiap aspek kehidupan.",
+      "created_at": "2026-05-14T05:57:22+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "46232975-1916-4915-ba0a-fb4c2d956b96",
+        "table": "ptv_ebook",
+        "storage_type": "wordpress_uploads",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "6b73aafb-f1f9-45f5-bced-6c0ae4740f65",
+      "judul": "Shalawat, Zikir & Doa Mengetuk Pintu Langit",
+      "penulis": "KH. Agoes Ali Masyhuri",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://progresiftv.id/wp-content/uploads/BUKU-WIRID-HARIAN-BUMI-SHALAWAT.pdf",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku2.png",
+      "deskripsi": "Shalawat, Zikir &amp; Doa Mengetuk Pintu Langit adalah kumpulan dzikir, shalawat, dan doa-doa pilihan yang diamalkan secara rutin, sebagai panduan ibadah harian untuk menjaga istiqamah dzikir dan mendekatkan diri kepada Allah.",
+      "created_at": "2026-05-14T05:48:07+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "6b73aafb-f1f9-45f5-bced-6c0ae4740f65",
+        "table": "ptv_ebook",
+        "storage_type": "wordpress_uploads",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "a19a2d81-0287-4c7b-9c8b-ade34107c492",
+      "judul": "Buku Pintar Qurban ala Madzhab Syafi’i",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://progresiftv.id/wp-content/uploads/E-BOOK-GUS-SYAIKHUL@Buku-Pintar-Qurban-ala-Madzhab-Syafii.pdf",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku.png",
+      "deskripsi": "E-Book Gus Syaikhul: Buku Pintar Qurban ala Madzhab Syafi’i merupakan panduan praktis pelaksanaan ibadah qurban berdasarkan tuntunan Gus Syaikhul sesuai dengan fiqh Imam Syafi'i, mencakup hukum, syarat, tata cara, hingga adab berqurban secara ringkas dan mudah dipahami.",
+      "created_at": "2026-05-13T17:03:19+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "a19a2d81-0287-4c7b-9c8b-ade34107c492",
+        "table": "ptv_ebook",
+        "storage_type": "wordpress_uploads",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "8704ddcc-3b7a-4d24-85c1-77ff5d168cee",
+      "judul": "Anfasul Mahasin",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://drive.google.com/file/d/1xPhyWXW8nBWjueJ-CxVCzVupgXN5HnfH/preview",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku-3.png",
+      "deskripsi": "<strong data-start=\"0\" data-end=\"49\" data-is-only-node=\"\">Kitab Anfasul Mahasin fi Tafsiri Surati Yasin</strong> merupakan kitab tafsir yang mengupas makna, kandungan, serta rahasia spiritual dalam Surat Yasin. Disusun dengan merangkum pendapat para mufasir dan ulama terpercaya, kitab ini membimbing pembaca agar tidak hanya membaca Surat Yasin, tetapi juga memahami pesan, hikmah, dan hidayah yang terkandung di dalamnya untuk diamalkan dalam kehidupan sehari-hari.",
+      "created_at": "2026-05-14T06:05:14+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "8704ddcc-3b7a-4d24-85c1-77ff5d168cee",
+        "table": "ptv_ebook",
+        "storage_type": "google_drive",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "127adb51-5e6e-4708-8e24-2b3dc63298e4",
+      "judul": "Tuhan yang Maha Ada",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://progresiftv.id/wp-content/uploads/E-BOOK-GUS-SYAIKHUL@Tuhan-yang-Maha-Ada.pdf",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku-1.png",
+      "deskripsi": "Tuhan yang Maha Ada membahas tentang keberadaan Allah sebagai Dzat Yang Maha Wujud, mengajak pembaca memahami keimanan, tauhid, serta kesadaran akan kehadiran Allah dalam setiap aspek kehidupan.",
+      "created_at": "2026-05-14T05:57:22+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "127adb51-5e6e-4708-8e24-2b3dc63298e4",
+        "table": "ptv_ebook",
+        "storage_type": "wordpress_uploads",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "32d5be36-fa0e-4b9d-9fbb-7466c04de514",
+      "judul": "Buku Pintar Qurban ala Madzhab Syafi’i",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://progresiftv.id/wp-content/uploads/E-BOOK-GUS-SYAIKHUL@Buku-Pintar-Qurban-ala-Madzhab-Syafii.pdf",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku.png",
+      "deskripsi": "E-Book Gus Syaikhul: Buku Pintar Qurban ala Madzhab Syafi’i merupakan panduan praktis pelaksanaan ibadah qurban berdasarkan tuntunan Gus Syaikhul sesuai dengan fiqh Imam Syafi'i, mencakup hukum, syarat, tata cara, hingga adab berqurban secara ringkas dan mudah dipahami.",
+      "created_at": "2026-05-13T17:03:19+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "32d5be36-fa0e-4b9d-9fbb-7466c04de514",
+        "table": "ptv_ebook",
+        "storage_type": "wordpress_uploads",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "f5ddcd6b-c3c0-474f-ae6c-5648f7d0c224",
+      "judul": "Awas Hadis Palsu: Keutamaan Sholat Tarawih",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://drive.google.com/file/d/1bjpQ5LYiBjTUawIQgAvjxAl-c1iU5pSM/preview",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku-2.png",
+      "deskripsi": "<strong data-start=\"0\" data-end=\"46\" data-is-only-node=\"\">Awas Hadis Palsu: Keutamaan Sholat Tarawih</strong> adalah e-book islami yang membahas hadis-hadis populer tentang keutamaan sholat Tarawih sekaligus meluruskan riwayat yang tidak sahih. Disusun secara ringkas dan mudah dipahami, buku ini membantu pembaca lebih bijak dalam menerima serta menyebarkan hadis agar ibadah Ramadhan dilakukan berdasarkan dalil yang benar.",
+      "created_at": "2026-05-14T06:02:16+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "f5ddcd6b-c3c0-474f-ae6c-5648f7d0c224",
+        "table": "ptv_ebook",
+        "storage_type": "google_drive",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "eca1c3a9-f5aa-4bdf-acbb-08d047540a16",
+      "judul": "Shalawat, Zikir & Doa Mengetuk Pintu Langit",
+      "penulis": "KH. Agoes Ali Masyhuri",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://progresiftv.id/wp-content/uploads/BUKU-WIRID-HARIAN-BUMI-SHALAWAT.pdf",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku2.png",
+      "deskripsi": "Shalawat, Zikir &amp; Doa Mengetuk Pintu Langit adalah kumpulan dzikir, shalawat, dan doa-doa pilihan yang diamalkan secara rutin, sebagai panduan ibadah harian untuk menjaga istiqamah dzikir dan mendekatkan diri kepada Allah.",
+      "created_at": "2026-05-14T05:48:07+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "eca1c3a9-f5aa-4bdf-acbb-08d047540a16",
+        "table": "ptv_ebook",
+        "storage_type": "wordpress_uploads",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "5f574607-2d9d-4dd7-a9b2-280ba666e8af",
+      "judul": "Anfasul Mahasin",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://drive.google.com/file/d/1xPhyWXW8nBWjueJ-CxVCzVupgXN5HnfH/preview",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku-3.png",
+      "deskripsi": "<strong data-start=\"0\" data-end=\"49\" data-is-only-node=\"\">Kitab Anfasul Mahasin fi Tafsiri Surati Yasin</strong> merupakan kitab tafsir yang mengupas makna, kandungan, serta rahasia spiritual dalam Surat Yasin. Disusun dengan merangkum pendapat para mufasir dan ulama terpercaya, kitab ini membimbing pembaca agar tidak hanya membaca Surat Yasin, tetapi juga memahami pesan, hikmah, dan hidayah yang terkandung di dalamnya untuk diamalkan dalam kehidupan sehari-hari.",
+      "created_at": "2026-05-14T06:05:14+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "5f574607-2d9d-4dd7-a9b2-280ba666e8af",
+        "table": "ptv_ebook",
+        "storage_type": "google_drive",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "afb29421-0a54-4c50-b5c3-75345efc14cd",
+      "judul": "Awas Hadis Palsu: Keutamaan Sholat Tarawih",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://drive.google.com/file/d/1bjpQ5LYiBjTUawIQgAvjxAl-c1iU5pSM/preview",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku-2.png",
+      "deskripsi": "<strong data-start=\"0\" data-end=\"46\" data-is-only-node=\"\">Awas Hadis Palsu: Keutamaan Sholat Tarawih</strong> adalah e-book islami yang membahas hadis-hadis populer tentang keutamaan sholat Tarawih sekaligus meluruskan riwayat yang tidak sahih. Disusun secara ringkas dan mudah dipahami, buku ini membantu pembaca lebih bijak dalam menerima serta menyebarkan hadis agar ibadah Ramadhan dilakukan berdasarkan dalil yang benar.",
+      "created_at": "2026-05-14T06:02:16+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "afb29421-0a54-4c50-b5c3-75345efc14cd",
+        "table": "ptv_ebook",
+        "storage_type": "google_drive",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "bee7bda0-97d9-43e7-84de-b0099581fdb8",
+      "judul": "Tuhan yang Maha Ada",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://progresiftv.id/wp-content/uploads/E-BOOK-GUS-SYAIKHUL@Tuhan-yang-Maha-Ada.pdf",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku-1.png",
+      "deskripsi": "Tuhan yang Maha Ada membahas tentang keberadaan Allah sebagai Dzat Yang Maha Wujud, mengajak pembaca memahami keimanan, tauhid, serta kesadaran akan kehadiran Allah dalam setiap aspek kehidupan.",
+      "created_at": "2026-05-14T05:57:22+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "bee7bda0-97d9-43e7-84de-b0099581fdb8",
+        "table": "ptv_ebook",
+        "storage_type": "wordpress_uploads",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "b68c8cf9-5425-4c9e-83df-e70df024afd9",
+      "judul": "Shalawat, Zikir & Doa Mengetuk Pintu Langit",
+      "penulis": "KH. Agoes Ali Masyhuri",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://progresiftv.id/wp-content/uploads/BUKU-WIRID-HARIAN-BUMI-SHALAWAT.pdf",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku2.png",
+      "deskripsi": "Shalawat, Zikir &amp; Doa Mengetuk Pintu Langit adalah kumpulan dzikir, shalawat, dan doa-doa pilihan yang diamalkan secara rutin, sebagai panduan ibadah harian untuk menjaga istiqamah dzikir dan mendekatkan diri kepada Allah.",
+      "created_at": "2026-05-14T05:48:07+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "b68c8cf9-5425-4c9e-83df-e70df024afd9",
+        "table": "ptv_ebook",
+        "storage_type": "wordpress_uploads",
+        "has_valid_pdf_link": true
+      }
+    },
+    {
+      "id": "5c1529d2-edab-4990-aa96-0ecd4872d963",
+      "judul": "Buku Pintar Qurban ala Madzhab Syafi’i",
+      "penulis": "Agus H. Syaikhul Islam Ali, Lc., M.Sosio.",
+      "kategori": "Publikasi & Panduan",
+      "file_url": "https://progresiftv.id/wp-content/uploads/E-BOOK-GUS-SYAIKHUL@Buku-Pintar-Qurban-ala-Madzhab-Syafii.pdf",
+      "cover_url": "https://progresiftv.id/wp-content/uploads/Coverbuku.png",
+      "deskripsi": "E-Book Gus Syaikhul: Buku Pintar Qurban ala Madzhab Syafi’i merupakan panduan praktis pelaksanaan ibadah qurban berdasarkan tuntunan Gus Syaikhul sesuai dengan fiqh Imam Syafi'i, mencakup hukum, syarat, tata cara, hingga adab berqurban secara ringkas dan mudah dipahami.",
+      "created_at": "2026-05-13T17:03:19+00:00",
+      "provenance": {
+        "source_system": "legacy_sync",
+        "legacy_id": "5c1529d2-edab-4990-aa96-0ecd4872d963",
+        "table": "ptv_ebook",
+        "storage_type": "wordpress_uploads",
+        "has_valid_pdf_link": true
+      }
+    }
+  ]
+}

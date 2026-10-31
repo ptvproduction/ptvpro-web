@@ -1,0 +1,319 @@
+/**
+ * PTVPRO Finance 2.0 — Unified Content-Aware Skeleton System (R03 Standard)
+ * Designed to mirror actual Finance 2.0 component geometries, typography rhythm,
+ * and responsive layouts without causing layout shift.
+ */
+
+/* ==========================================================================
+   1. ATOMIC SHIMMER BLOCK & MOTION
+   ========================================================================== */
+
+.fin-skel-block {
+  background: linear-gradient(
+    90deg,
+    var(--ptv-skel-base, rgba(11, 42, 74, 0.05)) 20%,
+    var(--ptv-skel-highlight, rgba(11, 42, 74, 0.12)) 50%,
+    var(--ptv-skel-base, rgba(11, 42, 74, 0.05)) 80%
+  );
+  background-size: 200% 100%;
+  animation: ptvShimmer 1.8s ease-in-out infinite;
+  display: block;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .fin-skel-block {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.05) 80%
+  );
+  background-size: 200% 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fin-skel-block {
+    animation: none !important;
+    background: var(--ptv-skel-base, rgba(11, 42, 74, 0.05)) !important;
+  }
+}
+
+/* ==========================================================================
+   2. SHARED SKELETON CONTAINERS & SURFACES
+   ========================================================================== */
+
+.fin-skel-root {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  animation: finSkelFadeIn 0.25s ease-out;
+}
+
+@keyframes finSkelFadeIn {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fin-skel-surface {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line-2, rgba(11, 42, 74, 0.08));
+  border-radius: var(--fin-card-radius, 22px);
+  padding: 20px 24px;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .fin-skel-surface {
+  background: var(--surface, #202428);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================================================
+   3. HERO & HEADER SKELETON
+   ========================================================================== */
+
+.fin-skel-hero-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line-2, rgba(11, 42, 74, 0.08));
+  border-radius: var(--fin-card-radius, 22px);
+  padding: 24px 28px;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .fin-skel-hero-card {
+  background: var(--surface, #202428);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.fin-skel-hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   4. BENTO KPI GRID SKELETON (4 CARDS)
+   ========================================================================== */
+
+.fin-skel-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fin-skel-kpi-card {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line-2, rgba(11, 42, 74, 0.08));
+  border-radius: var(--fin-card-radius, 22px);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 110px;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .fin-skel-kpi-card {
+  background: var(--surface, #202428);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================================================
+   5. TWO-COLUMN GRID SKELETON (OVERVIEW)
+   ========================================================================== */
+
+.fin-skel-two-cols {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   6. POCKETS GRID SKELETON
+   ========================================================================== */
+
+.fin-skel-pockets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fin-skel-pocket-card {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line-2, rgba(11, 42, 74, 0.08));
+  border-radius: var(--fin-card-radius, 22px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 160px;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .fin-skel-pocket-card {
+  background: var(--surface, #202428);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================================================
+   7. TOOLBAR & FILTER SKELETON
+   ========================================================================== */
+
+.fin-skel-toolbar {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line-2, rgba(11, 42, 74, 0.08));
+  border-radius: var(--fin-card-radius, 22px);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+}
+
+:root[data-theme="dark"] .fin-skel-toolbar {
+  background: var(--surface, #202428);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================================================
+   8. TABLE & MATRIX SKELETON
+   ========================================================================== */
+
+.fin-skel-table-card {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line-2, rgba(11, 42, 74, 0.08));
+  border-radius: var(--fin-card-radius, 22px);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .fin-skel-table-card {
+  background: var(--surface, #202428);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.fin-skel-table-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  background: var(--bg-surface-2, rgba(11, 42, 74, 0.02));
+  border-bottom: 1px solid var(--line-2, rgba(11, 42, 74, 0.08));
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .fin-skel-table-header {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.fin-skel-table-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line-2, rgba(11, 42, 74, 0.06));
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .fin-skel-table-row {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.fin-skel-table-row:last-child {
+  border-bottom: none;
+}
+
+/* ==========================================================================
+   9. MOBILE CARDS LIST SKELETON (FALLBACK UNTUK LAYAR KECIL)
+   ========================================================================== */
+
+.fin-skel-mobile-cards {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fin-skel-mobile-item {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line-2, rgba(11, 42, 74, 0.08));
+  border-radius: var(--fin-card-radius-sm, 16px);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .fin-skel-mobile-item {
+  background: var(--surface, #202428);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================================================
+   10. RESPONSIVE BREAKPOINTS (DESKTOP -> TABLET -> MOBILE)
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .fin-skel-two-cols {
+    grid-template-columns: 1fr;
+  }
+
+  .fin-skel-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .fin-skel-hero-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px 20px;
+  }
+
+  .fin-skel-hero-actions {
+    width: 100%;
+  }
+
+  .fin-skel-pockets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fin-skel-table-card.desktop-only {
+    display: none;
+  }
+
+  .fin-skel-mobile-cards {
+    display: flex;
+  }
+}
+
+@media (max-width: 540px) {
+  .fin-skel-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fin-skel-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

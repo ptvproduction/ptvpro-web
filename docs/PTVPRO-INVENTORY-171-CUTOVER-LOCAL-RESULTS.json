@@ -1,0 +1,27 @@
+{
+  "scope": "LOCAL_ISOLATED_FINAL_ACL_POLICY_PACKAGE",
+  "reportAndRpcBodies": "permission model stubs only; hosted actual bodies already verified",
+  "status": "PASS",
+  "checks": [
+    "loopback isolated database verified",
+    "fresh cloud ACL/policy semantics reproduced",
+    "cutover requires explicit approval",
+    "cutover requires negative evidence",
+    "five tables closed for native clients",
+    "six native RPCs closed; service create preserved",
+    "one-run administration path closed",
+    "native inventory metadata hidden",
+    "native upload denied",
+    "native update cannot alter inventory",
+    "native delete cannot remove inventory",
+    "other bucket select preserved",
+    "other bucket insert/update/delete preserved without inventory table grant",
+    "service storage access preserved",
+    "rollback requires explicit approval",
+    "rollback restores exact client ACL/policies",
+    "rollback idempotent",
+    "storage rows preserved"
+  ],
+  "checksPassed": 18,
+  "cleaned": true
+}

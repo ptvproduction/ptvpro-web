@@ -1,0 +1,67 @@
+{
+  "session": "PTV-DEV-169",
+  "projectRef": "swadgljnyelsjstqqxbm",
+  "status": "AWAITING_EXPLICIT_PROVISIONING_AND_ROUF_CONSENT",
+  "coordinator": {
+    "operatorChoice": "Rouf PTV-002",
+    "directOwnerConsentRecorded": false,
+    "primaryAccountChangesAllowed": false
+  },
+  "identity": {
+    "accountId": null,
+    "canonicalIdentityId": null,
+    "proposedUsername": "stg-inventory-neg-169",
+    "existsAtPreflight": false,
+    "sharedWithRoufIdentity": false,
+    "kind": "proposed clearly labelled synthetic Staging tester, not a second Rouf identity"
+  },
+  "provisioningExecuted": false,
+  "requirements": [
+    "Separate explicit authorization for one canonical_identity, one current active ptv_studio membership, one Portal user_account and one guarded private credential enrollment",
+    "No auth.users provisioning unless existing enrollment proves it necessary; auth_user_id may remain NULL",
+    "No account_profiles; do not copy crew, eksekutif, root_executive or Rouf credential",
+    "Tag canonical metadata purpose/test-session/coordinator; actual IDs generated only after approval; preserve audits",
+    "Rouf owner consent must be recorded via human coordination; no messages sent automatically"
+  ],
+  "states": {
+    "A": {
+      "allow": [
+        "hub.access"
+      ],
+      "deny": [
+        "inventory.create",
+        "inventory.edit",
+        "inventory.delete",
+        "inventory.units.manage",
+        "inventory.valuation.manage",
+        "loans.checkout",
+        "loans.return",
+        "damage.report",
+        "damage.qc.approve"
+      ],
+      "expected": "Cookie valid; list/detail/valuations/loan/damage reads403"
+    },
+    "B": {
+      "addAllow": [
+        "inventory.view",
+        "inventory.valuation.view",
+        "loans.view",
+        "damage.view"
+      ],
+      "keepMutationDenies": true,
+      "expected": "Read200; each operation-specific write403 before RPC or Storage write"
+    }
+  },
+  "cloudExecution": {
+    "authorized": false,
+    "sessionForgery": false,
+    "fixtures": "Fixture-scoped own Staging IDs, supplied by independently authorized operator; before/after row and object comparison",
+    "nativeDamage": "Native authenticated role test must use isolated local model unless genuine native tester enrollment separately authorized; Portal-only credential is not Supabase native JWT",
+    "retirement": "Logout/revoke test sessions, set only tester inactive/advance cutoff, remove its allows or preserve disabled reviewed snapshot; preserve audit and primary Rouf. Requires inclusion in provisioning ACC."
+  },
+  "localEvidence": {
+    "test": "tests/hub/inventoryTester169.test.ts",
+    "passed": 11,
+    "label": "POLICY_SIMULATION_ONLY_NO_CLOUD_ACCOUNT"
+  }
+}

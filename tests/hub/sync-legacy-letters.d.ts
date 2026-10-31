@@ -1,0 +1,17 @@
+declare module '*sync-legacy-letters.mjs' {
+  export function parseEnvFiles(baseDir?: string): Record<string, string>;
+  export function resolveLegacyCredentials(env?: Record<string, string>): Promise<{ url: string | null; key: string | null; source: string }>;
+  export function resolveIdentity(rawIdentity: any, identityMap?: Map<string, string>): { id: string | null; unmapped: boolean; raw: string | null };
+  export function normalizeDocumentStatus(rawStatus: any): 'disetujui' | 'revisi' | 'ditolak' | 'menunggu';
+  export function mapLegacySuratIzin(row: any, identityMap?: Map<string, string>): { canonicalRow: any; provenance: any };
+  export function mapLegacySuratTugas(row: any, identityMap?: Map<string, string>): { canonicalRow: any; provenance: any };
+  export function mapLegacySuratBarang(row: any, identityMap?: Map<string, string>): { canonicalRow: any; provenance: any };
+  export function mapLegacyCatatan(row: any, identityMap?: Map<string, string>): { canonicalRow: any; provenance: any };
+  export function mapLegacyPengumuman(row: any): { canonicalRow: any; provenance: any };
+  export function mapLegacyEbook(row: any): { canonicalRow: any; provenance: any };
+  export function detectLetterConflict(incomingRecord: any, existingStagingRecords?: any[], reservedNumbers?: Set<string>): any;
+  export function filterIncrementalRecords(records?: any[], checkpointTimestamp?: string | null): any[];
+  export function calculateDynamicNextSequence(allIssuedAndReservedNumbers?: string[], docType?: string, year?: number): number;
+  export function withExponentialBackoff<T>(fn: () => Promise<T>, maxRetries?: number, initialDelayMs?: number): Promise<T>;
+  export function executeLetterSync(options?: any): Promise<any>;
+}
