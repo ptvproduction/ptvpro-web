@@ -4,8 +4,6 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "installCommand": "npm install --include=dev",
-  "cleanUrls": true,
-  "trailingSlash": false,
   "headers": [
     {
       "source": "/(.*)",
@@ -33,7 +31,7 @@
       "destination": "/api?__route=:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ]

@@ -2,6 +2,18 @@
 
 # PIKET DEV — PTV PRO
 
+- **PTV-DEV-251 / zidnal / Selesai (HOTFIX: SPA Fallback Routing di Vercel Production).**
+  - **Akar Masalah:**
+    1. Di vercel.json, konfigurasi cleanUrls: true dan trailingSlash: false menyebabkan edge CDN Vercel mencari file statis .html fisik untuk sub-route (seperti /hub.html atau /hub/index.html). Karena Vite hanya menghasilkan satu dist/index.html, pencarian file fisik tersebut gagal dan memicu status 404 NOT_FOUND sebelum SPA catch-all rewrite dieksekusi.
+    2. Pola rewrite /(.*) dapat mengalami kendala evaluasi dengan cleanUrls.
+  - **Solusi & Implementasi:**
+    1. Menghapus cleanUrls: true dan trailingSlash: false dari vercel.json.
+    2. Menetapkan format rewrite SPA standar Vercel: /api -> /api, /api/:path* -> /api?__route=:path*, dan /:path* -> /index.html.
+    3. Memastikan seluruh route statis dan asset Vite tetap dilayani secara efisien oleh static file server Vercel, sementara seluruh route frontend (/hub, /verifikasi-identitas, /keabsahan-dokumen, dsb.) dilayani oleh index.html dengan HTTP 200, dan endpoint /api/* tetap sepenuhnya dieksekusi oleh Serverless Function api/index.js.
+  - **File:** vercel.json, piketdev.md.
+  - **Validasi:** npm test tests/apiRouter.test.ts PASS, npm run build PASS, verifikasi HTTP live production pada domain ptvpro.com dan www.ptvpro.com.
+  - **Code Hygiene:** CLN-278.
+
 - **PTV-DEV-250 / zidnal / Selesai (HOTFIX URGENT: Pre-bundled Standalone Router api/index.js & Live Production Success).**
   - **Akar Masalah:**
     1. Node.js ESM pada runtime Linux Vercel mewajibkan ekstensi berkas eksplisit (`.js`) pada impor relatif. Saat Vercel mengeksekusi router TypeScript secara dinamis atau transpilasi parsial, pemanggilan `import('./_routes/...')` memicu `ERR_MODULE_NOT_FOUND: Cannot find module '/var/task/api/_routes/...'`.
