@@ -1,12 +1,35 @@
 export function usesInventoryPortal(env = import.meta.env): boolean {
-  const staging = env.MODE === 'staging' || env.VITE_APP_ENV === 'staging';
-  if (!staging) return false;
-  let valid = false;
-  try {
-    const url = new URL(env.VITE_SUPABASE_URL);
-    valid = url.origin === 'https://swadgljnyelsjstqqxbm.supabase.co';
-  } catch { /* Reject an incomplete Staging configuration before selecting an adapter. */ }
-  if (!valid) throw new Error('Konfigurasi Inventaris Staging tidak cocok dengan project yang diizinkan.');
+  // Production dan Staging wajib menggunakan Serverless API Gateway /api/inventaris
+  // Mengabaikan mock dan mencegah browser direct anonymous REST ke Supabase table ptv_inventaris
+  if (env.VITE_INVENTARIS_BACKEND === 'mock') return false;
+  if (env.MODE === 'test' && env.VITE_INVENTARIS_BACKEND === 'local') return false;
+  
+  const isProdOrStaging = Boolean(
+    env.PROD ||
+    env.MODE === 'production' ||
+    env.MODE === 'staging' ||
+    env.VITE_APP_ENV === 'production' ||
+    env.VITE_APP_ENV === 'staging' ||
+    (typeof window !== 'undefined' && window.location.hostname !== 'localhost')
+  );
+
+  if (!isProdOrStaging) {
+    // Development lokal tanpa staging
+    return env.VITE_INVENTARIS_BACKEND === 'vercel' || env.VITE_INVENTARIS_BACKEND === 'supabase';
+  }
+
+  // Jika URL Supabase dikonfigurasi, validasi target staging swadgljnyelsjstqqxbm
+  if (env.VITE_SUPABASE_URL && !env.VITE_SUPABASE_URL.includes('localhost')) {
+    try {
+      const url = new URL(env.VITE_SUPABASE_URL);
+      if (url.origin !== 'https://swadgljnyelsjstqqxbm.supabase.co') {
+        throw new Error('Konfigurasi Inventaris tidak cocok dengan project yang diizinkan.');
+      }
+    } catch (e: any) {
+      if (e.message?.includes('tidak cocok')) throw e;
+    }
+  }
+
   return true;
 }
 

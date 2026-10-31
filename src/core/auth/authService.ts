@@ -669,6 +669,9 @@ export function getAuthService(): IAuthService {
       authServiceInstance = new SupabaseAuthService();
     } else if (import.meta.env.DEV && import.meta.env.MODE !== 'staging' && (!authBackend || authBackend === 'mock')) {
       authServiceInstance = new LocalMockAuthService();
+    } else if (typeof window !== 'undefined' && (import.meta.env.PROD || import.meta.env.MODE === 'production' || import.meta.env.MODE === 'staging')) {
+      // Production & Staging runtime: default ke VercelAuthService (Serverless Cookie Session)
+      authServiceInstance = new VercelAuthService();
     } else {
       throw new Error('Backend autentikasi belum dikonfigurasi. Akses ditutup; mock hanya tersedia untuk development lokal.');
     }

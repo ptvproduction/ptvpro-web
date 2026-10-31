@@ -5,6 +5,16 @@ Dokumen resmi pelaporan dan register kebersihan kode (Code Hygiene) dengan prins
 ---
 ## A. RINGKASAN CLEANING TERBARU
 
+- **CLN-280 | PTV-DEV-253 | Hotfix: Multi-Module Access Failure Resolution (31 Oktober 2026, zidnal / Antigravity):**
+  - **Scope:** pi/_routes/dokumen.ts, pi/index.js, src/core/auth/authService.ts, src/products/hub/inventaris/services/inventoryPortalClient.ts, piketdev.md, cleanings.md.
+  - **Akar Masalah & Resolusi:**
+    1. *Dokumen 500:* Chaining .catch() ilegal pada PostgrestBuilder dihapus dan diganti dengan block async try/catch standar.
+    2. *Inventaris 401:* Penyesuaian usesInventoryPortal() agar aktif pada build mode production Vite dan tidak bypass ke anonymous Supabase REST.
+    3. *Kru/Broadcast/Auth 401:* Fallback fail-safe VercelAuthService diaktifkan saat runtime web production/staging tanpa mengaktifkan mock auth di production.
+  - **Quality Gates:** 
+pm run typecheck PASS (0 errors), vitest terarah PASS (66/66), 
+pm run build PASS (0 errors, 17.35s).
+
 - **CLN-274 | PTV-DEV-247 | Final Mass Migration ID PTV (31 Oktober 2026, zidnal / Antigravity):**
   - **Scope:** Penyusunan berkas migrasi database atomik dan rekonsiliasi ID PTV final (`docs/PTV-DEV-247-MASS-PTV-ID-MIGRATION-FINAL.sql`, `.gemini/scratch/verified_migration_entries.json`, `roadmap.md`, `piketdev.md`, `cleanings.md`).
   - **Resolusi Masalah & Integritas Data:**

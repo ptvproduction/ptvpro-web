@@ -380,16 +380,24 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     });
 
     try {
-      const [resIzin, resTugas, resBarang, resReg, resLogs] = await Promise.all([
+      let logsData: any[] = [];
+      try {
+        const resLogsQuery = await supabase
+          .from('ptv_surat_verifikasi_logs')
+          .select('id, nomor_surat, nama_pemeriksa, instansi, metadata, accessed_at')
+          .order('accessed_at', { ascending: false });
+        if (resLogsQuery && Array.isArray(resLogsQuery.data)) {
+          logsData = resLogsQuery.data;
+        }
+      } catch {
+        logsData = [];
+      }
+
+      const [resIzin, resTugas, resBarang, resReg] = await Promise.all([
         supabase.from('ptv_surat_izin').select('*').order('created_at', { ascending: false }),
         supabase.from('ptv_surat_tugas').select('*').order('created_at', { ascending: false }),
         supabase.from('ptv_surat_barang').select('*').order('created_at', { ascending: false }),
         supabase.from('ptv_issued_letter_registry').select('nomor_surat'),
-        supabase
-          .from('ptv_surat_verifikasi_logs')
-          .select('id, nomor_surat, nama_pemeriksa, instansi, metadata, accessed_at')
-          .order('accessed_at', { ascending: false })
-          .catch(() => ({ data: [] })),
       ]);
 
       if (resIzin.error || resTugas.error || resBarang.error) throw new Error('Gagal membaca arsip dokumen.');
@@ -411,8 +419,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
       // Index log pemeriksaan resmi dari tabel audit ptv_surat_verifikasi_logs
       const logsByNomor = new Map<string, any[]>();
-      if (Array.isArray((resLogs as any)?.data)) {
-        for (const log of (resLogs as any).data) {
+      if (Array.isArray(logsData)) {
+        for (const log of logsData) {
           if (!log.nomor_surat) continue;
           const list = logsByNomor.get(log.nomor_surat) || [];
           const meta = log.metadata || {};

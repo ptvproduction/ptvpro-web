@@ -2,6 +2,16 @@
 
 # PIKET DEV — PTV PRO
 
+- **PTV-DEV-253 / zidnal / Selesai (HOTFIX PRODUCTION: Multi-Module Access Failure Resolution).**
+  - **Aktivitas:** Mengatasi kegagalan multi-modul di Production (GET /api/dokumen 500, Inventaris 401, Kru & Broadcast 401) pasca deployment 0294b25 tanpa mengubah skema database, RLS, atau menyentuh Supabase project lama.
+  - **Akar Masalah & Solusi:**
+    1. *Dokumen 500:* PostgrestBuilder pada api/_routes/dokumen.ts tidak memiliki method .catch() (merupakan Thenable, bukan native Promise). Memperbaikinya dengan async try/catch eksplisit pada query log audit.
+    2. *Inventaris 401:* usesInventoryPortal() mengevaluasi ke false saat Vite production build (MODE === 'production'), menyebabkan bypass Serverless API Gateway dan memicu penolakan RLS Supabase anon. Memperbaiki usesInventoryPortal() agar selalu mengaktifkan gateway /api/inventaris di runtime production dan staging.
+    3. *Kru, Broadcast, & Sesi 401:* VercelAuthService ter-tree-shake saat compile-time production karena VITE_AUTH_BACKEND tidak termuat secara eksplisit di Vite production mode. Menambahkan fail-safe fallback di getAuthService() untuk runtime web production/staging agar selalu menginisialisasi VercelAuthService.
+  - **File:** api/_routes/dokumen.ts, api/index.js, src/core/auth/authService.ts, src/products/hub/inventaris/services/inventoryPortalClient.ts, piketdev.md.
+  - **Validasi:** npm run typecheck PASS (0 errors), vitest terarah PASS (66/66), npm run build PASS (17.35s), bundle verification PASS (VercelAuthService & /api/inventaris preserved).
+  - **Code Hygiene:** CLN-280.
+
 - **PTV-DEV-252 / zidnal / Selesai (IMPLEMENTASI & AUDIT: Local vs Production Parity Fixes).**
   - **Aktivitas:** Mengaudit dan langsung mengimplementasikan perbaikan terarah untuk seluruh temuan paritas UI & API antara localhost dan Vercel Production tanpa mengubah database atau arsitektur.
   - **Solusi & Implementasi:**

@@ -3916,12 +3916,20 @@ async function handler5(req, res) {
         auth: { persistSession: false, autoRefreshToken: false }
       });
       try {
-        const [resIzin, resTugas, resBarang, resReg, resLogs] = await Promise.all([
+        let logsData = [];
+        try {
+          const resLogsQuery = await supabase.from("ptv_surat_verifikasi_logs").select("id, nomor_surat, nama_pemeriksa, instansi, metadata, accessed_at").order("accessed_at", { ascending: false });
+          if (resLogsQuery && Array.isArray(resLogsQuery.data)) {
+            logsData = resLogsQuery.data;
+          }
+        } catch {
+          logsData = [];
+        }
+        const [resIzin, resTugas, resBarang, resReg] = await Promise.all([
           supabase.from("ptv_surat_izin").select("*").order("created_at", { ascending: false }),
           supabase.from("ptv_surat_tugas").select("*").order("created_at", { ascending: false }),
           supabase.from("ptv_surat_barang").select("*").order("created_at", { ascending: false }),
-          supabase.from("ptv_issued_letter_registry").select("nomor_surat"),
-          supabase.from("ptv_surat_verifikasi_logs").select("id, nomor_surat, nama_pemeriksa, instansi, metadata, accessed_at").order("accessed_at", { ascending: false }).catch(() => ({ data: [] }))
+          supabase.from("ptv_issued_letter_registry").select("nomor_surat")
         ]);
         if (resIzin.error || resTugas.error || resBarang.error) throw new Error("Gagal membaca arsip dokumen.");
         const izinDocs = (resIzin.data || []).map((r) => mapSuratIzinToDoc(r));
@@ -3939,8 +3947,8 @@ async function handler5(req, res) {
           status: "Disetujui"
         }));
         const logsByNomor = /* @__PURE__ */ new Map();
-        if (Array.isArray(resLogs?.data)) {
-          for (const log of resLogs.data) {
+        if (Array.isArray(logsData)) {
+          for (const log of logsData) {
             if (!log.nomor_surat) continue;
             const list = logsByNomor.get(log.nomor_surat) || [];
             const meta = log.metadata || {};
