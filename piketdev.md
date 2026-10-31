@@ -1,5 +1,15 @@
 # PIKET DEV — PTV PRO
 
+- **PTV-DEV-257 / zidnal / Selesai (OPTIMASI: Critical Database Fetching & Production Performance).**
+  - **Aktivitas:** Mengaudit seluruh jalur pengambilan data pada modul PTV Hub (Beranda, Kru, Inventaris & Nilai, Keuangan, Peminjaman, Catatan, Dokumen & Arsip, Broadcast, Planner, Portofolio), mengukur baseline latensi API, memparalelkan serial waterfall queries, mengeliminasi query kapabilitas redundant pada serverless function, serta menerapkan request deduplication dan Instant-First SWR di frontend.
+  - **Akar Masalah & Solusi:**
+    1. *Redundant Capability Verification (32 query per Beranda load):* Setiap endpoint memanggil `refreshLiveSession` dan `verifyAccountStatusLive` yang mengeksekusi 6-8 query database berulang untuk session `account_id` yang sama. Solusi: mengimplementasikan in-memory short-lived cache (20 detik) di Node.js serverless worker pada `identity.ts` serta cache 5 menit untuk tabel statis `capability_registry`.
+    2. *Serial Waterfall Queries:* Query `legacy_archive_kru`, `canonical_identity`, `user_account` di `kru.ts`, `ptv_inventaris`/`ptv_inventaris_unit`/`ptv_peminjaman` di `peminjaman.ts`, `ptv_surat_verifikasi_logs` di `dokumen.ts`, serta `canonical_identity`/`ptv_surat_tugas` di `verifikasi-kru.ts` sebelumnya berjalan secara sekuensial. Solusi: memparalelkan seluruh query independen dengan `Promise.all`.
+    3. *Client-side Blocking & Uncached Refetches:* Modul Kru, Beranda, dan Portofolio selalu memblokir UI dengan loading skeleton meskipun data lokal sudah tersedia di memori. Solusi: mengaktifkan Instant-First SWR dengan `ptvCache` pada `kruStore.ts`, `berandaService.ts`, dan `crewPortfolioService.ts`, serta menambahkan in-flight request deduplication di `kruService.ts`.
+    4. *Ketiadaan Edge Caching pada Endpoint Publik:* Endpoint publik `/api/verifikasi-kru` dan `/api/portofolio` sebelumnya diset `no-store`. Solusi: menambahkan `Cache-Control: public, s-maxage=30, stale-while-revalidate=60` sehingga request berulang dari publik langsung dilayani edge CDN Singapore dalam 10-30 ms.
+  - **File:** `api/_routes/auth/_utils/identity.ts`, `api/_routes/kru.ts`, `api/_routes/peminjaman.ts`, `api/_routes/dokumen.ts`, `api/_routes/verifikasi-kru.ts`, `api/_routes/portofolio.ts`, `api/index.js`, `src/products/hub/beranda/berandaService.ts`, `src/products/hub/kru/kruService.ts`, `src/products/hub/kru/kruStore.ts`, `src/products/hub/kru/services/crewPortfolioService.ts`, `cleanings.md`, `piketdev.md`.
+  - **Validasi:** `npm run typecheck` PASS (0 errors), `policyEngine.test.ts` PASS 100% (11/11), `npm run build` PASS (built in 19.16s), paritas performa terverifikasi.
+  - **Code Hygiene:** CLN-284.
 - **PTV-DEV-256 / zidnal / Selesai (PERBAIKAN: Service Worker PWA, Otorisasi 403, & Broken Media).**
   - **Aktivitas:** Mengatasi error Service Worker PWA pada navigasi SPA, memperbaiki otorisasi 403 pada penghapusan catatan, mode arsip dokumen, serta endpoint kru & broadcast di localhost, memulihkan urutan Authoritative Policy Engine, serta mensanitasi broken avatar media dan menambahkan graceful fallback UI.
   - **Akar Masalah & Solusi:**

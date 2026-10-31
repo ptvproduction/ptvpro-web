@@ -55,16 +55,28 @@ export function personnelFields(data: Partial<CrewMember>) {
 }
 
 export class StagingKruService implements IKruService {
-  async fetchFromBackend(_forceRefresh = false): Promise<{ crew: CrewMember[]; stats: CrewStats }> {
-    const body = await request('/api/kru');
-    return {
-      crew: body.crew || [],
-      stats: body.stats || {
-        total: (body.crew || []).length,
-        aktif: (body.crew || []).filter((c: CrewMember) => c.status_kru === 'Aktif').length,
-        nonaktif: (body.crew || []).filter((c: CrewMember) => c.status_kru === 'Nonaktif').length,
-      },
-    };
+  private inFlightRequest: Promise<{ crew: CrewMember[]; stats: CrewStats }> | null = null;
+
+  async fetchFromBackend(forceRefresh = false): Promise<{ crew: CrewMember[]; stats: CrewStats }> {
+    if (this.inFlightRequest && !forceRefresh) {
+      return this.inFlightRequest;
+    }
+    this.inFlightRequest = (async () => {
+      try {
+        const body = await request('/api/kru');
+        return {
+          crew: body.crew || [],
+          stats: body.stats || {
+            total: (body.crew || []).length,
+            aktif: (body.crew || []).filter((c: CrewMember) => c.status_kru === 'Aktif').length,
+            nonaktif: (body.crew || []).filter((c: CrewMember) => c.status_kru === 'Nonaktif').length,
+          },
+        };
+      } finally {
+        this.inFlightRequest = null;
+      }
+    })();
+    return this.inFlightRequest;
   }
 
   async getCrewList(filters?: CrewFilterParams, forceRefresh = false): Promise<CrewMember[]> {

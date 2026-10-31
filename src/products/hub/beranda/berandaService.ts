@@ -5,6 +5,7 @@ import { broadcastStore } from '../broadcast/broadcastStore';
 import { peminjamanService } from '../peminjaman/peminjamanService';
 import { dokumenService } from '../dokumen-saya/dokumenService';
 import { BerandaAggregatedData, BerandaSummary } from './types';
+import { ptvCache } from '@core/cache/ptvCache';
 import {
   getWibCurrentInfo,
   filterUpcomingEvents,
@@ -17,7 +18,35 @@ export interface IBerandaService {
 }
 
 export class LiveBerandaService implements IBerandaService {
-  async getAggregatedData(user?: AuthUser | null): Promise<BerandaAggregatedData> {
+  private inFlight: Promise<BerandaAggregatedData> | null = null;
+
+  async getAggregatedData(user?: AuthUser | null, forceRefresh = false): Promise<BerandaAggregatedData> {
+    const cacheKey = `beranda_aggregated_${user?.id || user?.username || 'guest'}`;
+    const cached = ptvCache.get<BerandaAggregatedData>(cacheKey);
+    if (!forceRefresh && cached?.data) {
+      if (Date.now() - cached.timestamp > 45000) {
+        void this.fetchNetwork(user, cacheKey);
+      }
+      return cached.data;
+    }
+    return this.fetchNetwork(user, cacheKey);
+  }
+
+  private async fetchNetwork(user: AuthUser | null | undefined, cacheKey: string): Promise<BerandaAggregatedData> {
+    if (this.inFlight) return this.inFlight;
+    this.inFlight = (async () => {
+      try {
+        const data = await this.executeAggregatedFetch(user);
+        ptvCache.set(cacheKey, data, 5 * 60 * 1000);
+        return data;
+      } finally {
+        this.inFlight = null;
+      }
+    })();
+    return this.inFlight;
+  }
+
+  private async executeAggregatedFetch(user?: AuthUser | null): Promise<BerandaAggregatedData> {
     const { todayIso, tomorrowIso } = getWibCurrentInfo();
 
     // 1. Parallel fetch from all authentic services with individual fail-safes

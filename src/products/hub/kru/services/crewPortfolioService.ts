@@ -1,3 +1,4 @@
+import { ptvCache } from '@core/cache/ptvCache';
 export const PLATFORMS = [
   'Instagram',
   'TikTok',
@@ -38,14 +39,28 @@ export interface PortfolioItem {
 
 export const crewPortfolioService = {
   async getCrewPortfolio(ptvId: string): Promise<PortfolioItem[]> {
+    const cleanId = ptvId.trim().toUpperCase();
+    const cacheKey = `crew_portfolio_${cleanId}`;
+    const cached = ptvCache.get<PortfolioItem[]>(cacheKey);
+    if (cached?.data && Array.isArray(cached.data)) {
+      if (Date.now() - cached.timestamp > 120000) {
+        void this.fetchCrewPortfolioNetwork(cleanId, cacheKey);
+      }
+      return cached.data;
+    }
+    return this.fetchCrewPortfolioNetwork(cleanId, cacheKey);
+  },
+
+  async fetchCrewPortfolioNetwork(cleanId: string, cacheKey: string): Promise<PortfolioItem[]> {
     try {
-      const res = await fetch(`/api/portofolio?ptv_id=${encodeURIComponent(ptvId)}`, {
-        cache: 'no-store',
+      const res = await fetch(`/api/portofolio?ptv_id=${encodeURIComponent(cleanId)}`, {
         headers: { Accept: 'application/json' },
       });
       if (!res.ok) return [];
       const data = await res.json();
-      return Array.isArray(data.items) ? data.items : [];
+      const items = Array.isArray(data.items) ? data.items : [];
+      ptvCache.set(cacheKey, items, 10 * 60 * 1000);
+      return items;
     } catch {
       return [];
     }

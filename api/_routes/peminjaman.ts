@@ -131,42 +131,41 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     if (req.method === 'POST') { await handleLoanWrite(req, res, supabase, session); return; }
     res.setHeader('Cache-Control', 'no-store');
     await loanCanRead(supabase, session);
-    // 4. Fetch all inventaris items and units to map master and unit metadata
-    const { data: invItems, error: invError } = await supabase
-      .from('ptv_inventaris')
-      .select('id, kode, nama_alat, kategori, foto_url');
-    if (invError) throw invError;
-    const invMap = new Map((invItems || []).map((i) => [i.id, i]));
+    // 4 & 5. Optimasi Performa: Eksekusi query inventaris, unit, dan peminjaman secara paralel
+    const [resInv, resUnit, resCanon] = await Promise.all([
+      supabase
+        .from('ptv_inventaris')
+        .select('id, kode, nama_alat, kategori, foto_url'),
+      supabase
+        .from('ptv_inventaris_unit')
+        .select('id, inventaris_id, kode_unit, nama_unit, status_peminjaman'),
+      supabase
+        .from('ptv_peminjaman')
+        .select(`
+          id,
+          transaction_id,
+          unit_id,
+          peminjam_nama,
+          keperluan,
+          tanggal_pinjam,
+          tenggat_kembali,
+          tanggal_kembali,
+          status,
+          kondisi_kembali,
+          catatan,
+          actor_id,
+          created_at
+        `)
+        .order('created_at', { ascending: false })
+    ]);
 
-    const { data: unitItems, error: unitError } = await supabase
-      .from('ptv_inventaris_unit')
-      .select('id, inventaris_id, kode_unit, nama_unit, status_peminjaman');
-    if (unitError) throw unitError;
-    const unitMap = new Map((unitItems || []).map((u) => [u.id, u]));
+    if (resInv.error) throw resInv.error;
+    if (resUnit.error) throw resUnit.error;
+    if (resCanon.error) throw resCanon.error;
 
-    // 5. Query canonical loans if any exist
-    const { data: canonicalLoans, error: errCanon } = await supabase
-      .from('ptv_peminjaman')
-      .select(`
-        id,
-        transaction_id,
-        unit_id,
-        peminjam_nama,
-        keperluan,
-        tanggal_pinjam,
-        tenggat_kembali,
-        tanggal_kembali,
-        status,
-        kondisi_kembali,
-        catatan,
-        actor_id,
-        created_at
-      `)
-      .order('created_at', { ascending: false });
-
-    if (errCanon) {
-      throw errCanon;
-    }
+    const invMap = new Map((resInv.data || []).map((i) => [i.id, i]));
+    const unitMap = new Map((resUnit.data || []).map((u) => [u.id, u]));
+    const canonicalLoans = resCanon.data;
 
     // 6. Query historical loans preserved in legacy_archive_unresolved
     const { data: historicalRows, error: errHist } = await supabase

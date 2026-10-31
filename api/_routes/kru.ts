@@ -172,37 +172,39 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   try {
     // === METHOD GET ===
     if (method === 'GET') {
-      const { data: rows, error: queryErr } = await supabase
-        .from('legacy_archive_kru')
-        .select('*')
-        .order('ptv_id', { ascending: true });
+      // Optimasi Performa: Eksekusi query independen secara paralel (Promise.all)
+      const [resKru, resCanonicals, resAccounts] = await Promise.all([
+        supabase
+          .from('legacy_archive_kru')
+          .select('archive_id, source_key, production_id, ptv_id, full_name, username, divisi, jabatan, angkatan, status, role, photo_url, email_masked, telepon_masked, canonical_identity_id, reconciliation_status, metadata_json, imported_at')
+          .order('ptv_id', { ascending: true }),
+        supabase
+          .from('canonical_identity')
+          .select('id, ptv_id, full_name, avatar_url'),
+        supabase
+          .from('user_account')
+          .select('id, identity_id, status_akun')
+      ]);
 
-      if (queryErr) {
+      if (resKru.error) {
         console.error('[API Kru] Pembacaan personel gagal.');
         res.statusCode = 500;
         res.end(
           JSON.stringify({
-            error: `Gagal memuat data kru dari Supabase: ${queryErr.message}`,
+            error: `Gagal memuat data kru dari Supabase: ${resKru.error.message}`,
             code: 'database_query_error',
           })
         );
         return;
       }
 
-      // Baca canonical_identity untuk resolusi identity ID
-      const { data: canonicals } = await supabase
-        .from('canonical_identity')
-        .select('id, ptv_id, full_name, avatar_url');
-      const ciByPtv = new Map((canonicals || []).map(c => [c.ptv_id, c]));
-
-      // Baca akun login untuk resolusi status_akun
-      const { data: accounts } = await supabase
-        .from('user_account')
-        .select('id, identity_id, status_akun');
-      const accByIdentity = new Map((accounts || []).map(a => [a.identity_id, a]));
+      const rows = resKru.data;
+      const ciByPtv = new Map((resCanonicals.data || []).map(c => [c.ptv_id, c]));
+      const accounts = resAccounts.data || [];
+      const accByIdentity = new Map(accounts.map(a => [a.identity_id, a]));
 
       // Baca profil akses untuk resolusi portal role
-      const accIds = (accounts || []).map(a => a.id);
+      const accIds = accounts.map(a => a.id);
       const { data: profiles } = accIds.length
         ? await supabase.from('account_profiles').select('account_id, profile_id').in('account_id', accIds)
         : { data: [] };

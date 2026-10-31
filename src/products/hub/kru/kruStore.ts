@@ -102,21 +102,36 @@ class CrewStore {
     void this.init();
   }
 
-  public async init(_forceRefresh = false) {
+  public async init(forceRefresh = false) {
     const scope = ptvCache.getScopeToken();
     const requestId = ++this.requestId;
-    this.loading = this.members.length === 0;
-    this.error = null;
-    this.notify();
+
+    // 1. Instant-First (SWR): Muat cache seketika jika tersedia
+    const cachedEntry = ptvCache.get<CrewMember[]>('crew_members_list');
+    if (cachedEntry?.data && Array.isArray(cachedEntry.data) && cachedEntry.data.length > 0) {
+      this.members = cachedEntry.data;
+      this.loading = false;
+      this.notify();
+      // Jika cache masih sangat baru (< 60 detik) dan bukan forceRefresh, lewati network fetch
+      if (!forceRefresh && Date.now() - cachedEntry.timestamp < 60 * 1000) {
+        return;
+      }
+    } else {
+      this.loading = this.members.length === 0;
+      this.error = null;
+      this.notify();
+    }
+
     try {
-      const list = await getKruService().getCrewList();
+      const list = await getKruService().getCrewList(undefined, forceRefresh);
       if (scope !== ptvCache.getScopeToken() || requestId !== this.requestId) return;
       this.members = list;
       ptvCache.set('crew_members_list', list, 30 * 60 * 1000);
     } catch (err: any) {
       if (scope !== ptvCache.getScopeToken() || requestId !== this.requestId) return;
-      this.members = [];
-      this.error = err.message || 'Gagal memuat data kru.';
+      if (this.members.length === 0) {
+        this.error = err.message || 'Gagal memuat data kru.';
+      }
     } finally {
       if (scope === ptvCache.getScopeToken() && requestId === this.requestId) {
         this.loading = false;

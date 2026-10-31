@@ -1373,6 +1373,17 @@ function createStagingIdentityClient(url, key) {
   return createClient2(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 async function refreshLiveSession(session, issuingSession = false) {
+  const cacheKey = `${session.account_id}:${session.iat}`;
+  const now = Date.now();
+  const cached = LIVE_SESSION_CACHE.get(cacheKey);
+  if (!issuingSession && cached && now - cached.cachedAt < LIVE_SESSION_CACHE_TTL_MS) {
+    session.capabilities = cached.capabilities;
+    session.assigned_profiles = cached.assigned_profiles;
+    session.status_organisasi = cached.status_organisasi;
+    session.division = cached.division;
+    session.position = cached.position;
+    return session.capabilities;
+  }
   const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!key || !/^https:\/\/swadgljnyelsjstqqxbm\.supabase\.co\/?$/.test(url)) {
@@ -1385,13 +1396,27 @@ async function refreshLiveSession(session, issuingSession = false) {
     const db = createStagingIdentityClient(url, key);
     const live = await resolveLiveAccess(db, session, { issuingSession });
     if (session.identity_id !== live.identity.id) return [];
-    const registry = await db.from("capability_registry").select("key");
-    if (registry.error || !registry.data) return [];
-    session.capabilities = registry.data.filter((r) => live.can(r.key)).map((r) => r.key);
+    let registryKeys = cachedRegistryKeys;
+    if (!registryKeys || now - cachedRegistryAt > REGISTRY_CACHE_TTL_MS) {
+      const registry = await db.from("capability_registry").select("key");
+      if (registry.error || !registry.data) return [];
+      registryKeys = registry.data.map((r) => r.key);
+      cachedRegistryKeys = registryKeys;
+      cachedRegistryAt = now;
+    }
+    session.capabilities = registryKeys.filter((k) => live.can(k));
     session.assigned_profiles = live.profiles;
     session.status_organisasi = live.membership.status_organisasi;
     session.division = live.membership.division_id;
     session.position = live.membership.position_title;
+    LIVE_SESSION_CACHE.set(cacheKey, {
+      capabilities: session.capabilities,
+      assigned_profiles: session.assigned_profiles,
+      status_organisasi: session.status_organisasi,
+      division: session.division,
+      position: session.position,
+      cachedAt: now
+    });
     return session.capabilities;
   } catch {
     if (!process.env.VERCEL && session && Array.isArray(session.capabilities) && session.capabilities.length > 0) {
@@ -1559,6 +1584,12 @@ async function resolveIdentityByGoogleSub(googleSub, userEmail) {
   };
 }
 async function verifyAccountStatusLive(accountId, issuedAt, verifiedSession) {
+  const cacheKey = `${accountId}:${issuedAt || 0}`;
+  const now = Date.now();
+  const cached = ACCOUNT_STATUS_CACHE.get(cacheKey);
+  if (cached && now - cached.cachedAt < ACCOUNT_STATUS_CACHE_TTL_MS) {
+    return cached.active;
+  }
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (supabaseUrl && serviceRoleKey) {
@@ -1567,9 +1598,16 @@ async function verifyAccountStatusLive(accountId, issuedAt, verifiedSession) {
       const { data, error } = await supabase.from("user_account").select("status_akun,lockout_until,tokens_valid_after").eq("id", accountId).maybeSingle();
       if (!error && data) {
         const active = data.status_akun === "active" && (!data.lockout_until || Number.isFinite(Date.parse(data.lockout_until)) && Date.parse(data.lockout_until) <= Date.now()) && Number.isSafeInteger(issuedAt) && issuedAt > 0 && issuedAt * 1e3 <= Date.now() && (!data.tokens_valid_after || Number.isFinite(Date.parse(data.tokens_valid_after)) && issuedAt * 1e3 >= Date.parse(data.tokens_valid_after));
-        if (!active) return false;
-        if (lifecycleEnabled() || verifiedSession && sessionNeedsRegistry(verifiedSession)) return !!verifiedSession && verifiedSession.account_id === accountId && verifiedSession.iat === issuedAt && await portalSessionValid(supabase, verifiedSession);
-        return true;
+        if (!active) {
+          ACCOUNT_STATUS_CACHE.set(cacheKey, { active: false, cachedAt: now });
+          return false;
+        }
+        let isValid = true;
+        if (lifecycleEnabled() || verifiedSession && sessionNeedsRegistry(verifiedSession)) {
+          isValid = !!verifiedSession && verifiedSession.account_id === accountId && verifiedSession.iat === issuedAt && await portalSessionValid(supabase, verifiedSession);
+        }
+        ACCOUNT_STATUS_CACHE.set(cacheKey, { active: isValid, cachedAt: now });
+        return isValid;
       }
     } catch {
     }
@@ -1748,12 +1786,19 @@ async function resolveIdentityByCredentials(identifier, _password) {
     code: "unlinked"
   };
 }
-var LOCAL_LINKED_GOOGLE_ACCOUNTS, LOCAL_GOOGLE_MOCK_USERS;
+var LIVE_SESSION_CACHE, LIVE_SESSION_CACHE_TTL_MS, cachedRegistryKeys, cachedRegistryAt, REGISTRY_CACHE_TTL_MS, ACCOUNT_STATUS_CACHE, ACCOUNT_STATUS_CACHE_TTL_MS, LOCAL_LINKED_GOOGLE_ACCOUNTS, LOCAL_GOOGLE_MOCK_USERS;
 var init_identity = __esm({
   "api/_routes/auth/_utils/identity.ts"() {
     "use strict";
     init_liveAccess();
     init_portalLifecycle();
+    LIVE_SESSION_CACHE = /* @__PURE__ */ new Map();
+    LIVE_SESSION_CACHE_TTL_MS = 2e4;
+    cachedRegistryKeys = null;
+    cachedRegistryAt = 0;
+    REGISTRY_CACHE_TTL_MS = 3e5;
+    ACCOUNT_STATUS_CACHE = /* @__PURE__ */ new Map();
+    ACCOUNT_STATUS_CACHE_TTL_MS = 2e4;
     LOCAL_LINKED_GOOGLE_ACCOUNTS = /* @__PURE__ */ new Map();
     LOCAL_GOOGLE_MOCK_USERS = {
       "google-sub-ptv-025": {
@@ -3983,21 +4028,20 @@ async function handler5(req, res) {
         auth: { persistSession: false, autoRefreshToken: false }
       });
       try {
-        let logsData = [];
-        try {
-          const resLogsQuery = await supabase.from("ptv_surat_verifikasi_logs").select("id, nomor_surat, nama_pemeriksa, instansi, metadata, accessed_at").order("accessed_at", { ascending: false });
-          if (resLogsQuery && Array.isArray(resLogsQuery.data)) {
-            logsData = resLogsQuery.data;
-          }
-        } catch {
-          logsData = [];
-        }
-        const [resIzin, resTugas, resBarang, resReg] = await Promise.all([
+        const [resIzin, resTugas, resBarang, resReg, resLogsQuery] = await Promise.all([
           supabase.from("ptv_surat_izin").select("*").order("created_at", { ascending: false }),
           supabase.from("ptv_surat_tugas").select("*").order("created_at", { ascending: false }),
           supabase.from("ptv_surat_barang").select("*").order("created_at", { ascending: false }),
-          supabase.from("ptv_issued_letter_registry").select("nomor_surat")
+          supabase.from("ptv_issued_letter_registry").select("nomor_surat"),
+          (async () => {
+            try {
+              return await supabase.from("ptv_surat_verifikasi_logs").select("id, nomor_surat, nama_pemeriksa, instansi, metadata, accessed_at").order("accessed_at", { ascending: false });
+            } catch {
+              return { data: [] };
+            }
+          })()
         ]);
+        const logsData = resLogsQuery && Array.isArray(resLogsQuery.data) ? resLogsQuery.data : [];
         if (resIzin.error || resTugas.error || resBarang.error) throw new Error("Gagal membaca arsip dokumen.");
         const izinDocs = (resIzin.data || []).map((r) => mapSuratIzinToDoc(r));
         const tugasDocs = (resTugas.data || []).map((r) => mapSuratTugasToDoc(r));
@@ -7122,23 +7166,27 @@ async function handler9(req, res) {
   }
   try {
     if (method === "GET") {
-      const { data: rows, error: queryErr } = await supabase.from("legacy_archive_kru").select("*").order("ptv_id", { ascending: true });
-      if (queryErr) {
+      const [resKru, resCanonicals, resAccounts] = await Promise.all([
+        supabase.from("legacy_archive_kru").select("archive_id, source_key, production_id, ptv_id, full_name, username, divisi, jabatan, angkatan, status, role, photo_url, email_masked, telepon_masked, canonical_identity_id, reconciliation_status, metadata_json, imported_at").order("ptv_id", { ascending: true }),
+        supabase.from("canonical_identity").select("id, ptv_id, full_name, avatar_url"),
+        supabase.from("user_account").select("id, identity_id, status_akun")
+      ]);
+      if (resKru.error) {
         console.error("[API Kru] Pembacaan personel gagal.");
         res.statusCode = 500;
         res.end(
           JSON.stringify({
-            error: `Gagal memuat data kru dari Supabase: ${queryErr.message}`,
+            error: `Gagal memuat data kru dari Supabase: ${resKru.error.message}`,
             code: "database_query_error"
           })
         );
         return;
       }
-      const { data: canonicals } = await supabase.from("canonical_identity").select("id, ptv_id, full_name, avatar_url");
-      const ciByPtv = new Map((canonicals || []).map((c) => [c.ptv_id, c]));
-      const { data: accounts } = await supabase.from("user_account").select("id, identity_id, status_akun");
-      const accByIdentity = new Map((accounts || []).map((a) => [a.identity_id, a]));
-      const accIds = (accounts || []).map((a) => a.id);
+      const rows = resKru.data;
+      const ciByPtv = new Map((resCanonicals.data || []).map((c) => [c.ptv_id, c]));
+      const accounts = resAccounts.data || [];
+      const accByIdentity = new Map(accounts.map((a) => [a.identity_id, a]));
+      const accIds = accounts.map((a) => a.id);
       const { data: profiles } = accIds.length ? await supabase.from("account_profiles").select("account_id, profile_id").in("account_id", accIds) : { data: [] };
       const profilesByAccount = /* @__PURE__ */ new Map();
       for (const p of profiles || []) {
@@ -8575,30 +8623,31 @@ async function handler12(req, res) {
     }
     res.setHeader("Cache-Control", "no-store");
     await loanCanRead(supabase, session);
-    const { data: invItems, error: invError } = await supabase.from("ptv_inventaris").select("id, kode, nama_alat, kategori, foto_url");
-    if (invError) throw invError;
-    const invMap = new Map((invItems || []).map((i) => [i.id, i]));
-    const { data: unitItems, error: unitError } = await supabase.from("ptv_inventaris_unit").select("id, inventaris_id, kode_unit, nama_unit, status_peminjaman");
-    if (unitError) throw unitError;
-    const unitMap = new Map((unitItems || []).map((u) => [u.id, u]));
-    const { data: canonicalLoans, error: errCanon } = await supabase.from("ptv_peminjaman").select(`
-        id,
-        transaction_id,
-        unit_id,
-        peminjam_nama,
-        keperluan,
-        tanggal_pinjam,
-        tenggat_kembali,
-        tanggal_kembali,
-        status,
-        kondisi_kembali,
-        catatan,
-        actor_id,
-        created_at
-      `).order("created_at", { ascending: false });
-    if (errCanon) {
-      throw errCanon;
-    }
+    const [resInv, resUnit, resCanon] = await Promise.all([
+      supabase.from("ptv_inventaris").select("id, kode, nama_alat, kategori, foto_url"),
+      supabase.from("ptv_inventaris_unit").select("id, inventaris_id, kode_unit, nama_unit, status_peminjaman"),
+      supabase.from("ptv_peminjaman").select(`
+          id,
+          transaction_id,
+          unit_id,
+          peminjam_nama,
+          keperluan,
+          tanggal_pinjam,
+          tenggat_kembali,
+          tanggal_kembali,
+          status,
+          kondisi_kembali,
+          catatan,
+          actor_id,
+          created_at
+        `).order("created_at", { ascending: false })
+    ]);
+    if (resInv.error) throw resInv.error;
+    if (resUnit.error) throw resUnit.error;
+    if (resCanon.error) throw resCanon.error;
+    const invMap = new Map((resInv.data || []).map((i) => [i.id, i]));
+    const unitMap = new Map((resUnit.data || []).map((u) => [u.id, u]));
+    const canonicalLoans = resCanon.data;
     const { data: historicalRows, error: errHist } = await supabase.from("legacy_archive_unresolved").select("source_id, raw_payload, quarantined_at").eq("source_table", "ptv_peminjaman");
     if (errHist) {
       console.warn("[Peminjaman] Historical loans unavailable:", errHist.message);
@@ -10112,12 +10161,15 @@ async function handler15(req, res) {
   if (req.method === "GET") {
     let effectivePtvId = targetPtvId;
     if (isMine) {
+      res.setHeader("Cache-Control", "no-store, private");
       if (!sessionUser) {
         res.statusCode = 401;
         res.end(JSON.stringify({ error: "Sesi login kru diperlukan.", code: "unauthorized" }));
         return;
       }
       effectivePtvId = sessionUser.ptv_id || sessionUser.username;
+    } else {
+      res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
     }
     if (!effectivePtvId) {
       res.statusCode = 400;
@@ -10741,7 +10793,7 @@ function normalizeCrewId(raw) {
 }
 async function handler18(req, res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
   res.setHeader("X-Content-Type-Options", "nosniff");
   if (req.method !== "GET") {
     res.statusCode = 405;
@@ -10827,14 +10879,6 @@ async function handler18(req, res) {
       }
       return clean;
     };
-    let avatarUrl = sanitizeAvatarUrl(crewRow.photo_url || crewRow.metadata_json?.avatar_url || "");
-    if (crewRow.canonical_identity_id) {
-      const { data: canon } = await supabase.from("canonical_identity").select("avatar_url").eq("id", crewRow.canonical_identity_id).maybeSingle();
-      if (canon?.avatar_url) {
-        const canonClean = sanitizeAvatarUrl(canon.avatar_url);
-        if (canonClean) avatarUrl = canonClean;
-      }
-    }
     const rawStatus = (crewRow.status || "").trim();
     let statusKru = "Aktif";
     if (rawStatus.toLowerCase() === "nonaktif" || rawStatus.toLowerCase() === "inactive") {
@@ -10844,8 +10888,17 @@ async function handler18(req, res) {
     }
     const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
     let activeAssignment = null;
+    let avatarUrl = sanitizeAvatarUrl(crewRow.photo_url || crewRow.metadata_json?.avatar_url || "");
     try {
-      const { data: assignments } = await supabase.from("ptv_surat_tugas").select("nomor_surat, subject, jenis_kegiatan, tanggal_mulai, tanggal_selesai, penanggung_jawab, pembawa, recipients, status").lte("tanggal_mulai", today).gte("tanggal_selesai", today).in("status", ["disetujui", "aktif", "Disetujui", "Aktif"]).limit(10);
+      const [canonRes, assignmentsRes] = await Promise.all([
+        crewRow.canonical_identity_id ? supabase.from("canonical_identity").select("avatar_url").eq("id", crewRow.canonical_identity_id).maybeSingle() : Promise.resolve({ data: null, error: null }),
+        supabase.from("ptv_surat_tugas").select("nomor_surat, subject, jenis_kegiatan, tanggal_mulai, tanggal_selesai, penanggung_jawab, pembawa, recipients, status").lte("tanggal_mulai", today).gte("tanggal_selesai", today).in("status", ["disetujui", "aktif", "Disetujui", "Aktif"]).limit(10)
+      ]);
+      if (canonRes.data?.avatar_url) {
+        const canonClean = sanitizeAvatarUrl(canonRes.data.avatar_url);
+        if (canonClean) avatarUrl = canonClean;
+      }
+      const assignments = assignmentsRes.data;
       if (assignments && Array.isArray(assignments)) {
         const foundAss = assignments.find((a) => {
           const recip = Array.isArray(a.recipients) ? a.recipients : [];

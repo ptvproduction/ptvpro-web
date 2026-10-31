@@ -31,7 +31,7 @@ function normalizeCrewId(raw: string): string {
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60');
   res.setHeader('X-Content-Type-Options', 'nosniff');
 
   if (req.method !== 'GET') {
@@ -140,19 +140,6 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       }
       return clean;
     };
-    let avatarUrl = sanitizeAvatarUrl(crewRow.photo_url || crewRow.metadata_json?.avatar_url || '');
-    if (crewRow.canonical_identity_id) {
-      const { data: canon } = await supabase
-        .from('canonical_identity')
-        .select('avatar_url')
-        .eq('id', crewRow.canonical_identity_id)
-        .maybeSingle();
-      if (canon?.avatar_url) {
-        const canonClean = sanitizeAvatarUrl(canon.avatar_url);
-        if (canonClean) avatarUrl = canonClean;
-      }
-    }
-
     // Normalisasi status kru (Aktif / Nonaktif / Purna Kru)
     const rawStatus = (crewRow.status || '').trim();
     let statusKru: 'Aktif' | 'Nonaktif' | 'Purna Kru' = 'Aktif';
@@ -162,7 +149,6 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       statusKru = 'Purna Kru';
     }
 
-    // Cek penugasan surat tugas aktif hari ini secara aman
     const today = new Date().toISOString().split('T')[0];
     let activeAssignment: {
       nomor_surat: string;
@@ -174,14 +160,28 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       verification_url: string;
     } | null = null;
 
+    // Optimasi Performa: Eksekusi resolusi avatar kanonikal dan surat tugas aktif secara paralel
+    let avatarUrl = sanitizeAvatarUrl(crewRow.photo_url || crewRow.metadata_json?.avatar_url || '');
     try {
-      const { data: assignments } = await supabase
-        .from('ptv_surat_tugas')
-        .select('nomor_surat, subject, jenis_kegiatan, tanggal_mulai, tanggal_selesai, penanggung_jawab, pembawa, recipients, status')
-        .lte('tanggal_mulai', today)
-        .gte('tanggal_selesai', today)
-        .in('status', ['disetujui', 'aktif', 'Disetujui', 'Aktif'])
-        .limit(10);
+      const [canonRes, assignmentsRes] = await Promise.all([
+        crewRow.canonical_identity_id
+          ? supabase.from('canonical_identity').select('avatar_url').eq('id', crewRow.canonical_identity_id).maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
+        supabase
+          .from('ptv_surat_tugas')
+          .select('nomor_surat, subject, jenis_kegiatan, tanggal_mulai, tanggal_selesai, penanggung_jawab, pembawa, recipients, status')
+          .lte('tanggal_mulai', today)
+          .gte('tanggal_selesai', today)
+          .in('status', ['disetujui', 'aktif', 'Disetujui', 'Aktif'])
+          .limit(10)
+      ]);
+
+      if (canonRes.data?.avatar_url) {
+        const canonClean = sanitizeAvatarUrl(canonRes.data.avatar_url);
+        if (canonClean) avatarUrl = canonClean;
+      }
+
+      const assignments = assignmentsRes.data;
 
       if (assignments && Array.isArray(assignments)) {
         const foundAss = assignments.find((a) => {

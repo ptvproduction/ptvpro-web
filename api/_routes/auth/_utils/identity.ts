@@ -15,7 +15,41 @@ export interface ResolveIdentityResult {
   session?: SessionPayload;
 }
 
+interface CachedSessionCapabilities {
+  capabilities: string[];
+  assigned_profiles: string[];
+  status_organisasi: 'active' | 'inactive' | 'archived';
+  division?: string;
+  position?: string;
+  cachedAt: number;
+}
+
+const LIVE_SESSION_CACHE = new Map<string, CachedSessionCapabilities>();
+const LIVE_SESSION_CACHE_TTL_MS = 20000; // 20s short-lived in-memory cache per worker
+
+let cachedRegistryKeys: string[] | null = null;
+let cachedRegistryAt = 0;
+const REGISTRY_CACHE_TTL_MS = 300000; // 5m cache for static capability registry
+
+interface CachedAccountStatus {
+  active: boolean;
+  cachedAt: number;
+}
+const ACCOUNT_STATUS_CACHE = new Map<string, CachedAccountStatus>();
+const ACCOUNT_STATUS_CACHE_TTL_MS = 20000; // 20s
 export async function refreshLiveSession(session: SessionPayload, issuingSession = false): Promise<string[]> {
+  const cacheKey = `${session.account_id}:${session.iat}`;
+  const now = Date.now();
+  const cached = LIVE_SESSION_CACHE.get(cacheKey);
+  if (!issuingSession && cached && (now - cached.cachedAt < LIVE_SESSION_CACHE_TTL_MS)) {
+    session.capabilities = cached.capabilities;
+    session.assigned_profiles = cached.assigned_profiles;
+    session.status_organisasi = cached.status_organisasi;
+    session.division = cached.division;
+    session.position = cached.position;
+    return session.capabilities;
+  }
+
   const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!key || !/^https:\/\/swadgljnyelsjstqqxbm\.supabase\.co\/?$/.test(url)) {
@@ -28,13 +62,31 @@ export async function refreshLiveSession(session: SessionPayload, issuingSession
     const db = createStagingIdentityClient(url, key);
     const live = await resolveLiveAccess(db, session, { issuingSession });
     if (session.identity_id !== live.identity.id) return [];
-    const registry = await db.from('capability_registry').select('key');
-    if (registry.error || !registry.data) return [];
-    session.capabilities = registry.data.filter(r => live.can(r.key)).map(r => r.key);
+
+    let registryKeys = cachedRegistryKeys;
+    if (!registryKeys || (now - cachedRegistryAt > REGISTRY_CACHE_TTL_MS)) {
+      const registry = await db.from('capability_registry').select('key');
+      if (registry.error || !registry.data) return [];
+      registryKeys = registry.data.map(r => r.key);
+      cachedRegistryKeys = registryKeys;
+      cachedRegistryAt = now;
+    }
+
+    session.capabilities = registryKeys.filter(k => live.can(k as any));
     session.assigned_profiles = live.profiles;
     session.status_organisasi = live.membership.status_organisasi;
     session.division = live.membership.division_id;
     session.position = live.membership.position_title;
+
+    LIVE_SESSION_CACHE.set(cacheKey, {
+      capabilities: session.capabilities,
+      assigned_profiles: session.assigned_profiles,
+      status_organisasi: session.status_organisasi,
+      division: session.division,
+      position: session.position,
+      cachedAt: now,
+    });
+
     return session.capabilities;
   } catch {
     if (!process.env.VERCEL && session && Array.isArray(session.capabilities) && session.capabilities.length > 0) {
@@ -446,6 +498,13 @@ export async function resolveIdentityByGoogleSub(
  * Performs a live database check to verify that an account is still active and not revoked.
  */
 export async function verifyAccountStatusLive(accountId: string, issuedAt?: number, verifiedSession?: SessionPayload): Promise<boolean> {
+  const cacheKey = `${accountId}:${issuedAt || 0}`;
+  const now = Date.now();
+  const cached = ACCOUNT_STATUS_CACHE.get(cacheKey);
+  if (cached && (now - cached.cachedAt < ACCOUNT_STATUS_CACHE_TTL_MS)) {
+    return cached.active;
+  }
+
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -463,9 +522,16 @@ export async function verifyAccountStatusLive(accountId: string, issuedAt?: numb
           && (!data.lockout_until || (Number.isFinite(Date.parse(data.lockout_until)) && Date.parse(data.lockout_until) <= Date.now()))
           && Number.isSafeInteger(issuedAt) && issuedAt! > 0 && issuedAt! * 1000 <= Date.now()
           && (!data.tokens_valid_after || (Number.isFinite(Date.parse(data.tokens_valid_after)) && issuedAt! * 1000 >= Date.parse(data.tokens_valid_after)));
-        if (!active) return false;
-        if (lifecycleEnabled() || (verifiedSession && sessionNeedsRegistry(verifiedSession))) return !!verifiedSession && verifiedSession.account_id === accountId && verifiedSession.iat === issuedAt && await portalSessionValid(supabase, verifiedSession);
-        return true;
+        if (!active) {
+          ACCOUNT_STATUS_CACHE.set(cacheKey, { active: false, cachedAt: now });
+          return false;
+        }
+        let isValid = true;
+        if (lifecycleEnabled() || (verifiedSession && sessionNeedsRegistry(verifiedSession))) {
+          isValid = !!verifiedSession && verifiedSession.account_id === accountId && verifiedSession.iat === issuedAt && await portalSessionValid(supabase, verifiedSession);
+        }
+        ACCOUNT_STATUS_CACHE.set(cacheKey, { active: isValid, cachedAt: now });
+        return isValid;
       }
     } catch {
       // Lanjutkan ke pemeriksaan dev mock jika di luar Vercel

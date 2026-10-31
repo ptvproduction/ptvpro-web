@@ -78,12 +78,16 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   if (req.method === 'GET') {
     let effectivePtvId = targetPtvId;
     if (isMine) {
+      res.setHeader('Cache-Control', 'no-store, private');
       if (!sessionUser) {
         res.statusCode = 401;
         res.end(JSON.stringify({ error: 'Sesi login kru diperlukan.', code: 'unauthorized' }));
         return;
       }
       effectivePtvId = sessionUser.ptv_id || sessionUser.username;
+    } else {
+      // Optimasi Performa: Cache publik untuk query karya portofolio publik
+      res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60');
     }
 
     if (!effectivePtvId) {

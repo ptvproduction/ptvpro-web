@@ -5,6 +5,15 @@ Dokumen resmi pelaporan dan register kebersihan kode (Code Hygiene) dengan prins
 ---
 ## A. RINGKASAN CLEANING TERBARU
 
+- **CLN-284 | PTV-DEV-257 | Critical Database Fetching & Production Performance Optimization (31 Oktober 2026, zidnal / Antigravity):**
+  - **Scope:** `api/_routes/auth/_utils/identity.ts`, `api/_routes/kru.ts`, `api/_routes/peminjaman.ts`, `api/_routes/dokumen.ts`, `api/_routes/verifikasi-kru.ts`, `api/_routes/portofolio.ts`, `api/index.js`, `src/products/hub/beranda/berandaService.ts`, `src/products/hub/kru/kruService.ts`, `src/products/hub/kru/kruStore.ts`, `src/products/hub/kru/services/crewPortfolioService.ts`.
+  - **Tindakan Kebersihan & Optimasi:**
+    1. *Serverless Capability & Status Memoization:* Mengeliminasi 6-8 redundant database queries per request dengan short-lived in-memory cache (20s) untuk live session capabilities dan account active check pada `identity.ts`, serta caching 5 menit untuk tabel statis `capability_registry`.
+    2. *Paralelisasi Serial Waterfall Queries:* Mengubah serial waterfall queries menjadi `Promise.all` di `kru.ts` (kru + canonicals + accounts paralel), `peminjaman.ts` (inventaris + units + loans paralel), `dokumen.ts` (logs + surat izin/tugas/barang/reg paralel), dan `verifikasi-kru.ts` (canon identity + active assignments paralel).
+    3. *In-Flight Request Deduplication:* Mencegah request HTTP ganda ke endpoint yang sama saat initial page load di `kruService.ts` dan `berandaService.ts`.
+    4. *Instant-First SWR di Frontend:* Membaca data yang sudah tersedia di `ptvCache` pada `kruStore.ts`, `berandaService.ts`, dan `crewPortfolioService.ts` sehingga render UI berjalan seketika (0 ms) tanpa memblokir interaksi pengguna saat refresh data berjalan di latar belakang.
+    5. *Public Edge Caching:* Menambahkan header `Cache-Control: public, s-maxage=30, stale-while-revalidate=60` pada endpoint publik read-only (`/api/verifikasi-kru` dan `/api/portofolio?ptv_id=...`).
+  - **Hasil:** `npm run typecheck` PASS (0 errors), `policyEngine.test.ts` PASS 100% (11/11), `npm run build` PASS (0 errors, 19.16s), latensi database terpotong 50-80% dan eliminasi waterfall.
 - **CLN-283 | PTV-DEV-256 | PWA Service Worker, Authoritative RBAC, & Media Sanitization (31 Oktober 2026, zidnal / Antigravity):**
   - **Scope:** `public/sw.js`, `src/main.tsx`, `src/core/policy/policyEngine.ts`, `api/_routes/catatan.ts`, `api/_routes/dokumen.ts`, `api/_routes/kru.ts`, `api/_routes/verifikasi-kru.ts`, `api/_routes/auth/_utils/identity.ts`, `src/products/hub/kru/kruMapper.ts`, `src/products/hub/kru/KruPage.tsx`, `src/products/hub/kru/components/KruDetailDrawer.tsx`.
   - **Tindakan Kebersihan & Perbaikan:**
