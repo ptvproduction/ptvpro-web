@@ -1,5 +1,24 @@
 # PIKET DEV — PTV PRO
 
+# PIKET DEV — PTV PRO
+
+- **PTV-DEV-248 / zidnal / Selesai (Integrasi GitHub Main & Sukses Deployment Vercel).**
+  - **Akar Masalah & Kebutuhan:**
+    1. Kode terbaru commit `0818663` ter-push ke `master`, sedangkan branch production aktif Vercel adalah `main`.
+    2. Deployment Vercel pada commit `0818663` gagal build dalam ~1 detik karena kesalahan syntax regex pada `vercel.json` (`/((?!api/).*)` dan `$1` parameter replacement yang tidak didukung Vercel path-to-regexp v6).
+    3. Setelah integrasi branch ke `main`, terjadi kegagalan build TS (`tsconfig.node.json` belum memiliki `"types": ["node"]`), ketiadaan runtime build tools jika `devDependencies` dipangkas di production, dan batas limit 12 serverless function di Vercel Hobby tier akibat 32 file di `/api/`.
+  - **Solusi & Implementasi:**
+    1. *Integrasi Histori Bersih Tanpa Force Push:* Mengintegrasikan commit `master` ke `main` secara sah tanpa force push (`--force`) dan mempertahankan riwayat commit historis `main`.
+    2. *Perbaikan `vercel.json` & SPA Rewrites:* Mengganti konfigurasi rewrites yang invalid menjadi format standar Vercel SPA (`/api/:path*` dan `/(.*) -> /index.html`) serta menambahkan HTTP security headers.
+    3. *Perbaikan TypeScript & Dependencies Build:* Menambahkan `"types": ["node"]` pada `tsconfig.node.json` untuk mengatasi 23 compiler error di `vite.config.ts`, serta memindahkan build tools utama ke dependencies (`npm run build`).
+    4. *Isolasi Frontend Deployment:* Menambahkan `.vercelignore` untuk folder `api/` sehingga frontend SPA dapat dideploy tanpa terhambat kuota serverless function, mengingat frontend terhubung langsung ke Supabase Staging cloud via client SDK.
+  - **File:** `vercel.json`, `tsconfig.node.json`, `package.json`, `.vercelignore`, `piketdev.md`.
+  - **Validasi:** 
+    - Commit `a4c7d3087cdc6738c2d04da31f3d6e17f5815bad` dipush ke `origin/main` dan `origin/master`.
+    - Deployment Vercel ID `7456486262` pada environment Production berstatus **`success` (Ready)**.
+    - URL Production https://ptvpro-cyv09rwv3-ptvpro-web.vercel.app aktif merespons dengan HTTP 200/302 Vercel Edge.
+  - **Code Hygiene:** CLN-275.
+
 - **PTV-DEV-247 / zidnal / Selesai (100% COMPLETE & LIVE CLOUD VERIFIED: Migrasi Massal ID PTV Final).**
   - **Akar Kebutuhan & Analisis:**
     1. *Spreadsheet Rekonsiliasi Final:* 94 entri identitas diverifikasi terhadap database staging `swadgljnyelsjstqqxbm` menggunakan `identity_uuid` sebagai kunci kanonikal utama.
