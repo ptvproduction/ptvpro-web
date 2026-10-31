@@ -2,9 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import handler, { resolveRouteKey, routes } from '../api/_router';
 
 describe('PTVPRO Serverless Function Centralized Router', () => {
-  it('registers all 25 official endpoints', () => {
+  it('registers all 26 official endpoints', () => {
     const registeredRoutes = Object.keys(routes);
-    expect(registeredRoutes.length).toBe(25);
+    expect(registeredRoutes.length).toBe(26);
     expect(registeredRoutes).toContain('acara');
     expect(registeredRoutes).toContain('akses');
     expect(registeredRoutes).toContain('broadcast');
@@ -22,6 +22,7 @@ describe('PTVPRO Serverless Function Centralized Router', () => {
     expect(registeredRoutes).toContain('portofolio');
     expect(registeredRoutes).toContain('upload-avatar');
     expect(registeredRoutes).toContain('verifikasi-surat');
+    expect(registeredRoutes).toContain('verifikasi-kru');
     expect(registeredRoutes).toContain('auth/change-password');
     expect(registeredRoutes).toContain('auth/login');
     expect(registeredRoutes).toContain('auth/logout');
@@ -85,7 +86,7 @@ describe('PTVPRO Serverless Function Centralized Router', () => {
       const body = JSON.parse(res.end.mock.calls[0][0]);
       expect(body.status).toBe('ok');
       expect(body.service).toBe('ptvpro-api');
-      expect(body.routes.length).toBe(25);
+      expect(body.routes.length).toBe(26);
     });
 
     it('returns 404 JSON on unknown endpoint without returning HTML', async () => {

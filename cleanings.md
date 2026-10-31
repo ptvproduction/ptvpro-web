@@ -5,6 +5,11 @@ Dokumen resmi pelaporan dan register kebersihan kode (Code Hygiene) dengan prins
 ---
 ## A. RINGKASAN CLEANING TERBARU
 
+- **CLN-281 | PTV-DEV-254 | Public Crew Verification Endpoint & Finance Session Guard (31 Oktober 2026, zidnal / Antigravity):**
+  - **Scope:** `api/_routes/verifikasi-kru.ts`, `api/_router.ts`, `api/index.js`, `src/products/verification/publicCrewService.ts`, `src/products/verification/VerifikasiIdentitasPage.tsx`, `src/products/hub/keuangan/Finance3Page.tsx`, `tests/hub/publicCrewVerification.test.ts`.
+  - **Tindakan Kebersihan:** Mengisolasi endpoint verifikasi kru publik mandiri tanpa membocorkan data privat ke internet, menghapus ketergantungan `VerifikasiIdentitasPage` terhadap `crewStore` internal, serta merapikan lifecycle sesi di `Finance3Page`.
+  - **Hasil:** Kompatibilitas 100%, zero warning, zero regression.
+
 - **CLN-280 | PTV-DEV-253 | Hotfix: Multi-Module Access Failure Resolution (31 Oktober 2026, zidnal / Antigravity):**
   - **Scope:** pi/_routes/dokumen.ts, pi/index.js, src/core/auth/authService.ts, src/products/hub/inventaris/services/inventoryPortalClient.ts, piketdev.md, cleanings.md.
   - **Akar Masalah & Resolusi:**

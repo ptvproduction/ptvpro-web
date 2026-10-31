@@ -10628,12 +10628,166 @@ async function handler17(req, res) {
   res.end(JSON.stringify({ error: `Metode ${req.method} tidak diizinkan.`, code: "method_not_allowed" }));
 }
 
+// api/_routes/verifikasi-kru.ts
+import { createClient as createClient19 } from "@supabase/supabase-js";
+var rateLimitMap2 = /* @__PURE__ */ new Map();
+function checkRateLimit2(clientId, maxRequests = 30, windowMs = 6e4) {
+  const now = Date.now();
+  const timestamps = rateLimitMap2.get(clientId) || [];
+  const validTimestamps = timestamps.filter((t) => now - t < windowMs);
+  if (validTimestamps.length >= maxRequests) {
+    return false;
+  }
+  validTimestamps.push(now);
+  rateLimitMap2.set(clientId, validTimestamps);
+  return true;
+}
+function normalizeCrewId(raw) {
+  const clean = raw.trim().toUpperCase().replace(/\s+/g, "").replace(/\/+$/, "");
+  if (!clean) return "";
+  const part = clean.replace(/^(PTV-?)+/i, "");
+  if (!part) return "";
+  if (/^\d+$/.test(part)) {
+    return `PTV-${part.padStart(3, "0")}`;
+  }
+  return `PTV-${part}`;
+}
+async function handler18(req, res) {
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  if (req.method !== "GET") {
+    res.statusCode = 405;
+    res.setHeader("Allow", "GET");
+    res.end(JSON.stringify({ error: "Metode tidak didukung. Gunakan GET.", code: "method_not_allowed" }));
+    return;
+  }
+  const clientFingerprint = (req.headers && req.headers["x-forwarded-for"] || req.headers && req.headers["user-agent"] || "client").slice(0, 32);
+  if (!checkRateLimit2(clientFingerprint)) {
+    res.statusCode = 429;
+    res.end(JSON.stringify({ error: "Terlalu banyak permintaan. Silakan tunggu beberapa saat.", code: "rate_limited" }));
+    return;
+  }
+  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    res.statusCode = 503;
+    res.end(JSON.stringify({ error: "Layanan verifikasi kru belum tersedia. Hubungi pengelola.", code: "service_unavailable" }));
+    return;
+  }
+  const searchParams = new URL(req.url || "/", "http://localhost").searchParams;
+  const queryId = searchParams.get("id") || searchParams.get("crew_id") || searchParams.get("kru") || searchParams.get("q") || "";
+  const rawClean = queryId.trim();
+  if (!rawClean) {
+    res.statusCode = 400;
+    res.end(JSON.stringify({ error: "Parameter identitas (id / q) wajib diisi.", code: "missing_parameter" }));
+    return;
+  }
+  if (rawClean.length > 80) {
+    res.statusCode = 400;
+    res.end(JSON.stringify({ error: "Panjang query identitas melebihi batas yang diizinkan.", code: "query_too_long" }));
+    return;
+  }
+  const normalizedId = normalizeCrewId(rawClean);
+  const supabase = createClient19(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  try {
+    let query = supabase.from("legacy_archive_kru").select(`
+      archive_id,
+      ptv_id,
+      full_name,
+      divisi,
+      jabatan,
+      angkatan,
+      status,
+      photo_url,
+      canonical_identity_id,
+      metadata_json
+    `);
+    if (normalizedId.startsWith("PTV-") && normalizedId.length <= 16) {
+      query = query.eq("ptv_id", normalizedId);
+    } else {
+      query = query.ilike("full_name", `%${rawClean}%`);
+    }
+    const { data: rows, error: queryErr } = await query.limit(2);
+    if (queryErr) {
+      throw queryErr;
+    }
+    if (!rows || rows.length === 0) {
+      res.statusCode = 200;
+      res.end(JSON.stringify({
+        is_found: false,
+        crew_id: normalizedId || rawClean,
+        full_name: "Identitas Kru Tidak Terdaftar",
+        position: "-",
+        division: "-",
+        angkatan: "-",
+        status_kru: "Nonaktif",
+        active_assignment: null
+      }));
+      return;
+    }
+    const crewRow = rows[0];
+    let avatarUrl = crewRow.photo_url || crewRow.metadata_json?.avatar_url || "";
+    if (crewRow.canonical_identity_id) {
+      const { data: canon } = await supabase.from("canonical_identity").select("avatar_url").eq("id", crewRow.canonical_identity_id).maybeSingle();
+      if (canon?.avatar_url) {
+        avatarUrl = canon.avatar_url;
+      }
+    }
+    const rawStatus = (crewRow.status || "").trim();
+    let statusKru = "Aktif";
+    if (rawStatus.toLowerCase() === "nonaktif" || rawStatus.toLowerCase() === "inactive") {
+      statusKru = "Nonaktif";
+    } else if (rawStatus.toLowerCase().includes("purna") || rawStatus.toLowerCase().includes("alumni")) {
+      statusKru = "Purna Kru";
+    }
+    const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+    let activeAssignment = null;
+    try {
+      const { data: assignments } = await supabase.from("ptv_surat_tugas").select("nomor_surat, subject, jenis_kegiatan, tanggal_mulai, tanggal_selesai, penanggung_jawab, pembawa, recipients, status").lte("tanggal_mulai", today).gte("tanggal_selesai", today).in("status", ["disetujui", "aktif", "Disetujui", "Aktif"]).limit(10);
+      if (assignments && Array.isArray(assignments)) {
+        const foundAss = assignments.find((a) => {
+          const recip = Array.isArray(a.recipients) ? a.recipients : [];
+          return a.pembawa && (a.pembawa.includes(crewRow.full_name) || a.pembawa.includes(crewRow.ptv_id)) || recip.some((r) => r.includes(crewRow.full_name) || r.includes(crewRow.ptv_id));
+        });
+        if (foundAss) {
+          activeAssignment = {
+            nomor_surat: foundAss.nomor_surat,
+            jenis_kegiatan: foundAss.jenis_kegiatan || foundAss.subject || "Liputan Acara",
+            tanggal_mulai: foundAss.tanggal_mulai,
+            tanggal_selesai: foundAss.tanggal_selesai,
+            penanggung_jawab: foundAss.penanggung_jawab || "Ketua Umum PTV",
+            is_today_active: true,
+            verification_url: `/verifikasi-surat?nomor=${encodeURIComponent(foundAss.nomor_surat)}`
+          };
+        }
+      }
+    } catch {
+    }
+    res.statusCode = 200;
+    res.end(JSON.stringify({
+      is_found: true,
+      crew_id: crewRow.ptv_id,
+      full_name: crewRow.full_name,
+      position: crewRow.jabatan || "Kru Operasional",
+      division: crewRow.divisi || "Umum",
+      angkatan: crewRow.angkatan || "-",
+      status_kru: statusKru,
+      foto_url: avatarUrl,
+      active_assignment: activeAssignment
+    }));
+  } catch (err) {
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: "Gagal memproses verifikasi identitas.", code: "server_error" }));
+  }
+}
+
 // api/_routes/auth/change-password.ts
 init_cookies();
 init_crypto();
-import { createClient as createClient19 } from "@supabase/supabase-js";
+import { createClient as createClient20 } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
-async function handler18(req, res) {
+async function handler19(req, res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") {
@@ -10692,7 +10846,7 @@ async function handler18(req, res) {
     res.end(JSON.stringify({ error: "Layanan autentikasi server belum siap." }));
     return;
   }
-  const supabase = createClient19(supabaseUrl, serviceKey, {
+  const supabase = createClient20(supabaseUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false }
   });
   try {
@@ -10818,7 +10972,7 @@ async function parseJsonBody8(req) {
   if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some((key) => !["identifier", "password"].includes(key))) throw new LoginInputError(400);
   return value;
 }
-async function handler19(req, res) {
+async function handler20(req, res) {
   res.setHeader?.("Content-Type", "application/json");
   res.setHeader?.("Cache-Control", "no-store");
   if (req.method !== "POST") {
@@ -10916,7 +11070,7 @@ init_cookies();
 init_cookies();
 init_crypto();
 init_portalLifecycle();
-async function handler20(req, res) {
+async function handler21(req, res) {
   res.setHeader?.("Cache-Control", "no-store");
   const raw = parseCookies(req.headers.cookie).ptv_hub_session;
   const session = raw && verifySessionToken(raw, process.env.AUTH_SECRET || "");
@@ -10966,8 +11120,8 @@ async function handler20(req, res) {
 init_cookies();
 init_crypto();
 init_liveAccess();
-import { createClient as createClient20 } from "@supabase/supabase-js";
-async function handler21(req, res) {
+import { createClient as createClient21 } from "@supabase/supabase-js";
+async function handler22(req, res) {
   res.setHeader?.("Content-Type", "application/json");
   res.setHeader?.("Cache-Control", "no-store");
   if (req.method !== "GET") {
@@ -10994,7 +11148,7 @@ async function handler21(req, res) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (key && /^https:\/\/swadgljnyelsjstqqxbm\.supabase\.co\/?$/.test(url)) {
     try {
-      const db = createClient20(url, key, { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(1e4) }) } });
+      const db = createClient21(url, key, { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(1e4) }) } });
       live = await resolveLiveAccess(db, session);
     } catch (error) {
       if (error instanceof LiveAccessUnavailableError || !(error instanceof Error) || error.message !== "forbidden") {
@@ -11048,12 +11202,12 @@ init_identity();
 // api/_routes/auth/_utils/loginProof.ts
 init_liveAccess();
 init_portalLifecycle();
-import { createClient as createClient21 } from "@supabase/supabase-js";
+import { createClient as createClient22 } from "@supabase/supabase-js";
 async function recordPortalLoginProof(session, verifiedGoogleSubject, signedToken) {
   const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!key || !/^https:\/\/swadgljnyelsjstqqxbm\.supabase\.co\/?$/.test(url)) throw new Error("login proof unavailable");
-  const db = createClient21(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  const db = createClient22(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
   const live = await resolveLiveAccess(db, session, { issuingSession: true });
   const credential = await db.from("auth_credentials").select("oauth_provider,oauth_subject_id,updated_at").eq("account_id", live.account.id).single();
   if (credential.error || credential.data?.oauth_provider !== "google" || !verifiedGoogleSubject || credential.data.oauth_subject_id !== verifiedGoogleSubject || !Number.isFinite(Date.parse(credential.data.updated_at))) throw new Error("login proof unavailable");
@@ -11083,7 +11237,7 @@ async function recordPortalLoginProof(session, verifiedGoogleSubject, signedToke
 // api/_routes/auth/google/callback.ts
 init_portalLifecycle();
 import { randomUUID as randomUUID6 } from "node:crypto";
-async function handler22(req, res) {
+async function handler23(req, res) {
   if (req.method !== "GET") {
     res.statusCode = 405;
     res.setHeader?.("Content-Type", "application/json");
@@ -11298,7 +11452,7 @@ function sanitizeReturnTo(rawTarget) {
   }
   return "/hub";
 }
-async function handler23(req, res) {
+async function handler24(req, res) {
   if (req.method !== "GET") {
     res.statusCode = 405;
     res.setHeader?.("Content-Type", "application/json");
@@ -11391,7 +11545,7 @@ async function handler23(req, res) {
 init_cookies();
 init_crypto();
 init_identity();
-async function handler24(req, res) {
+async function handler25(req, res) {
   res.setHeader?.("Content-Type", "application/json");
   if (req.method !== "GET") {
     res.statusCode = 405;
@@ -11437,7 +11591,7 @@ async function handler24(req, res) {
 init_cookies();
 init_crypto();
 init_identity();
-async function handler25(req, res) {
+async function handler26(req, res) {
   res.setHeader?.("Content-Type", "application/json");
   if (req.method !== "POST") {
     res.statusCode = 405;
@@ -11498,14 +11652,15 @@ var routes = {
   "portofolio": handler15,
   "upload-avatar": handler16,
   "verifikasi-surat": handler17,
-  "auth/change-password": handler18,
-  "auth/login": handler19,
-  "auth/logout": handler20,
-  "auth/session": handler21,
-  "auth/google/callback": handler22,
-  "auth/google/login": handler23,
-  "auth/google/status": handler24,
-  "auth/google/unlink": handler25
+  "verifikasi-kru": handler18,
+  "auth/change-password": handler19,
+  "auth/login": handler20,
+  "auth/logout": handler21,
+  "auth/session": handler22,
+  "auth/google/callback": handler23,
+  "auth/google/login": handler24,
+  "auth/google/status": handler25,
+  "auth/google/unlink": handler26
 };
 function resolveRouteKey(req) {
   const paramRoute = req.query?.__route;
@@ -11537,7 +11692,7 @@ function resolveRouteKey(req) {
   }
   return "";
 }
-async function handler26(req, res) {
+async function handler27(req, res) {
   const routeKey = resolveRouteKey(req);
   const originalUri = req.headers?.["x-forwarded-uri"];
   if (originalUri) {
@@ -11588,7 +11743,7 @@ async function handler26(req, res) {
   }
 }
 export {
-  handler26 as default,
+  handler27 as default,
   resolveRouteKey,
   routes
 };

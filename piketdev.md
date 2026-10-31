@@ -2,6 +2,15 @@
 
 # PIKET DEV — PTV PRO
 
+- **PTV-DEV-254 / zidnal / Selesai (HOTFIX: Public Crew Verification Endpoint & Finance Session Guard).**
+  - **Aktivitas:** Mengimplementasikan endpoint serverless khusus verifikasi identitas kru publik (/api/verifikasi-kru), mengintegrasikan VerifikasiIdentitasPage ke API publik tersebut agar tidak diblokir oleh 401 /api/kru internal, memulihkan alur pemuatan portofolio otomatis, dan menambahkan session-loading guard di Finance3Page.
+  - **Akar Masalah & Solusi:**
+    1. *Verifikasi Identitas Kru & Portofolio:* VerifikasiIdentitasPage sebelumnya mengandalkan crewStore yang memanggil endpoint terproteksi /api/kru (HTTP 401 bagi publik/tamu), mengakibatkan kru dianggap tidak terdaftar dan portofolio tidak pernah dipicu. Solusi: membangun endpoint serverless api/_routes/verifikasi-kru.ts yang mengembalikan data publik terverifikasi (ptv_id, full_name, jabatan, divisi, angkatan, status, foto_url, surat tugas aktif) tanpa mengekspos data privat.
+    2. *Keuangan:* Finance3Page sebelumnya memeriksa !user sebelum sesi selesai diinisialisasi (race condition), langsung melempar pembatalan request. Solusi: menambahkan guard isSessionLoading sehingga query menunggu sesi kru internal siap.
+  - **File:** api/_routes/verifikasi-kru.ts, api/_router.ts, api/index.js, src/products/verification/publicCrewService.ts, src/products/verification/VerifikasiIdentitasPage.tsx, src/products/verification/index.ts, src/products/hub/keuangan/Finance3Page.tsx, tests/apiRouter.test.ts, tests/hub/publicCrewVerification.test.ts, piketdev.md, cleanings.md.
+  - **Validasi:** npm run typecheck PASS (0 errors), vitest tests PASS (publicVerification: 34/34, apiRouter: 8/8, publicCrewVerification: 3/3), npm run build PASS (built in 20.23s).
+  - **Code Hygiene:** CLN-281.
+
 - **PTV-DEV-253 / zidnal / Selesai (HOTFIX PRODUCTION: Multi-Module Access Failure Resolution).**
   - **Aktivitas:** Mengatasi kegagalan multi-modul di Production (GET /api/dokumen 500, Inventaris 401, Kru & Broadcast 401) pasca deployment 0294b25 tanpa mengubah skema database, RLS, atau menyentuh Supabase project lama.
   - **Akar Masalah & Solusi:**

@@ -20,6 +20,7 @@ import portalHandler from './_routes/portal';
 import portofolioHandler from './_routes/portofolio';
 import uploadAvatarHandler from './_routes/upload-avatar';
 import verifikasiSuratHandler from './_routes/verifikasi-surat';
+import verifikasiKruHandler from './_routes/verifikasi-kru';
 import changePasswordHandler from './_routes/auth/change-password';
 import loginHandler from './_routes/auth/login';
 import logoutHandler from './_routes/auth/logout';
@@ -49,6 +50,7 @@ export const routes: Record<string, RouteHandler> = {
   'portofolio': portofolioHandler,
   'upload-avatar': uploadAvatarHandler,
   'verifikasi-surat': verifikasiSuratHandler,
+  'verifikasi-kru': verifikasiKruHandler,
   'auth/change-password': changePasswordHandler,
   'auth/login': loginHandler,
   'auth/logout': logoutHandler,

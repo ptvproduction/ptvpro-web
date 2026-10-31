@@ -45,6 +45,7 @@ interface Finance3PageProps {
 
 export function Finance3Page({ initialData, initialOperationalData }: Finance3PageProps = {}) {
   const user = useSessionStore(state => state.user);
+  const isSessionLoading = useSessionStore(state => state.isLoading);
   const [params, setParams] = useSearchParams();
 
   // Tab mapping for full feature navigation & backward compatibility
@@ -113,8 +114,13 @@ export function Finance3Page({ initialData, initialOperationalData }: Finance3Pa
     setLoading(true);
     setError('');
 
+    if (isSessionLoading) {
+      return () => controller.abort();
+    }
+
     if (!user) {
       setLoading(false);
+      setError('Sesi autentikasi diperlukan untuk mengakses data keuangan.');
       return () => controller.abort();
     }
 
@@ -132,7 +138,7 @@ export function Finance3Page({ initialData, initialOperationalData }: Finance3Pa
       });
 
     return () => controller.abort();
-  }, [user?.id, retry, initialData]);
+  }, [user?.id, isSessionLoading, retry, initialData]);
 
   // Fetch operational finance data (semesters, kas_records, loans)
   useEffect(() => {
@@ -144,7 +150,10 @@ export function Finance3Page({ initialData, initialOperationalData }: Finance3Pa
     if (initialData && !user) {
       return;
     }
-    if (!user) return;
+    if (isSessionLoading || !user) {
+      if (!isSessionLoading && !user) setOperationalLoading(false);
+      return;
+    }
 
     const controller = new AbortController();
     setOperationalLoading(true);

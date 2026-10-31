@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { verifyCrew, resolveCrewVerificationQrUrl } from './verificationService';
-import { crewStore } from '@products/hub/kru/kruStore';
+import { verifyCrewOnServer } from './publicCrewService';
+import type { PublicCrewVerificationResult } from './types';
 import { crewPortfolioService, PortfolioItem } from '@products/hub/kru/services/crewPortfolioService';
 import { LivingHeader } from '../living-portal/components/LivingHeader';
 import { LauncherFooter } from '../living-portal/components/LauncherFooter';
@@ -41,10 +42,16 @@ export function VerifikasiIdentitasPage() {
 
   const [inputVal, setInputVal] = useState(activeQuery);
   const [photoError, setPhotoError] = useState(false);
-  const [, setCrewVersion] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [portalSettings, setPortalSettings] = useState<PortalSettings | null>(null);
+
+  // Serverless Verification State
+  const [result, setResult] = useState<PublicCrewVerificationResult | null>(() => {
+    if (!activeQuery) return null;
+    return verifyCrew(activeQuery);
+  });
+  const [, setLoading] = useState(false);
 
   // Portfolio State for Verified Crew
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
@@ -61,20 +68,11 @@ export function VerifikasiIdentitasPage() {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Pastikan crewStore terinisialisasi
-    if (!crewStore.getAll().length) {
-      crewStore.init();
-    }
-    const unsub = crewStore.subscribe(() => {
-      setCrewVersion((v) => v + 1);
-    });
-
     portalManagementService.getPublicPortalData().then((data) => {
       if (data?.settings) setPortalSettings(data.settings);
     }).catch(() => {});
 
     return () => {
-      unsub();
       window.removeEventListener('scroll', handleScroll);
       document.documentElement.classList.remove('living-portal-active');
       document.body.classList.remove('living-portal-active');
@@ -87,22 +85,51 @@ export function VerifikasiIdentitasPage() {
     setPortfolioItems([]);
     setPortfolioFilter('all');
 
-    if (!activeQuery) return;
-
-    // Verifikasi kru & ambil portofolio jika ditemukan
-    const res = verifyCrew(activeQuery);
-    if (res?.is_found && res.crew_id) {
-      setPortfolioLoading(true);
-      crewPortfolioService.getCrewPortfolio(res.crew_id)
-        .then((items) => setPortfolioItems(items))
-        .catch(() => setPortfolioItems([]))
-        .finally(() => setPortfolioLoading(false));
+    if (!activeQuery) {
+      setResult(null);
+      setLoading(false);
+      return;
     }
-  }, [activeQuery]);
 
-  const result = useMemo(() => {
-    if (!activeQuery) return null;
-    return verifyCrew(activeQuery);
+    const controller = new AbortController();
+    setLoading(true);
+
+    // 1. Coba sinkronisasi lokal instan terlebih dahulu
+    const localRes = verifyCrew(activeQuery);
+    if (localRes?.is_found) {
+      setResult(localRes);
+    }
+
+    // 2. Verifikasi langsung ke Serverless API resmi tanpa butuh login internal
+    verifyCrewOnServer(activeQuery, controller.signal)
+      .then((serverRes) => {
+        if (!controller.signal.aborted) {
+          setResult(serverRes);
+          if (serverRes.is_found && serverRes.crew_id) {
+            setPortfolioLoading(true);
+            crewPortfolioService.getCrewPortfolio(serverRes.crew_id)
+              .then((items) => {
+                if (!controller.signal.aborted) setPortfolioItems(items);
+              })
+              .catch(() => {
+                if (!controller.signal.aborted) setPortfolioItems([]);
+              })
+              .finally(() => {
+                if (!controller.signal.aborted) setPortfolioLoading(false);
+              });
+          }
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted && !localRes?.is_found) {
+          setResult(localRes);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+
+    return () => controller.abort();
   }, [activeQuery]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
