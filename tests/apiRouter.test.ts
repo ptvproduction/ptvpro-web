@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import handler, { resolveRouteKey, routes } from '../api/[...route]';
+import handler, { resolveRouteKey, routes } from '../api/index';
 
 describe('PTVPRO Serverless Function Centralized Router', () => {
   it('registers all 25 official endpoints', () => {
@@ -33,6 +33,12 @@ describe('PTVPRO Serverless Function Centralized Router', () => {
   });
 
   describe('resolveRouteKey', () => {
+    it('resolves route key from Vercel rewrite parameter ?__route=...', () => {
+      expect(resolveRouteKey({ query: { __route: 'kru' } })).toBe('kru');
+      expect(resolveRouteKey({ query: { __route: 'auth/session' } })).toBe('auth/session');
+      expect(resolveRouteKey({ query: { __route: 'portal' } })).toBe('portal');
+    });
+
     it('resolves route key from Vercel catch-all array query param', () => {
       expect(resolveRouteKey({ query: { route: ['auth', 'session'] } })).toBe('auth/session');
       expect(resolveRouteKey({ query: { route: ['acara'] } })).toBe('acara');

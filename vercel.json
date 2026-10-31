@@ -30,7 +30,7 @@
     },
     {
       "source": "/api/:path*",
-      "destination": "/api/:path*"
+      "destination": "/api?__route=:path*"
     },
     {
       "source": "/(.*)",
