@@ -5,6 +5,11 @@ Dokumen resmi pelaporan dan register kebersihan kode (Code Hygiene) dengan prins
 ---
 ## A. RINGKASAN CLEANING TERBARU
 
+- **CLN-282 | PTV-DEV-255 | Fail-Closed Google OAuth Guard against Missing Client ID (31 Oktober 2026, zidnal / Antigravity):**
+  - **Scope:** pi/_routes/auth/google/login.ts, pi/index.js, piketdev.md, cleanings.md.
+  - **Tindakan Kebersihan:** Mengeliminasi kebocoran mock credential (mock-google-client-id) ke server pihak ketiga (Google) di environment production/staging live (mencegah pelanggaran Rule 5 AGENTS.md), menambahkan fail-closed redirect dengan pesan informatif di Hub Login.
+  - **Hasil:** Zero secret leak, 100% fail-closed guard, paritas paripurna di Vercel Production.
+
 - **CLN-281 | PTV-DEV-254 | Public Crew Verification Endpoint & Finance Session Guard (31 Oktober 2026, zidnal / Antigravity):**
   - **Scope:** `api/_routes/verifikasi-kru.ts`, `api/_router.ts`, `api/index.js`, `src/products/verification/publicCrewService.ts`, `src/products/verification/VerifikasiIdentitasPage.tsx`, `src/products/hub/keuangan/Finance3Page.tsx`, `tests/hub/publicCrewVerification.test.ts`.
   - **Tindakan Kebersihan:** Mengisolasi endpoint verifikasi kru publik mandiri tanpa membocorkan data privat ke internet, menghapus ketergantungan `VerifikasiIdentitasPage` terhadap `crewStore` internal, serta merapikan lifecycle sesi di `Finance3Page`.

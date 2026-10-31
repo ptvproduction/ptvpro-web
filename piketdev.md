@@ -2,6 +2,16 @@
 
 # PIKET DEV — PTV PRO
 
+- **PTV-DEV-255 / zidnal / Selesai (INVESTIGASI EMPIRIS & PERBAIKAN: Google OAuth & Final Production Verification).**
+  - **Aktivitas:** Menginvestigasi akar masalah Google OAuth, menguji endpoint publik Verifikasi Identitas Kru & Portofolio secara live di production, memverifikasi Keuangan, dan mengamankan serverless login endpoint terhadap mock leak.
+  - **Akar Masalah & Solusi:**
+    1. *Google OAuth:* Terbukti empiris GOOGLE_CLIENT_ID belum dikonfigurasi di Vercel Production Environment Variables, sehingga jatuh ke fallback mock-google-client-id yang ditolak Google dengan OAuth client restricted. Menambahkan fail-closed guard pada api/_routes/auth/google/login.ts agar me-redirect ke login hub dengan pesan informatif dan mendokumentasikan langkah perbaikan Google Cloud Console & Vercel.
+    2. *Verifikasi Identitas & Portofolio:* Terverifikasi live di production: q=PTV-456 (200, Aktif), q=PTV-015 (200, Nonaktif), q=15 (200, PTV-015), q=unknown-999 (200, is_found: false). Portofolio q=PTV-001 mengembalikan 4 item riil, empty state aman tanpa error. Nol kebocoran data privat.
+    3. *Keuangan:* Guard isSessionLoading aktif; /api/finance fail-closed 401. Query dengan sesi aktif ditandai jujur belum diverifikasi karena ketiadaan kredensial sesi kru internal terautentikasi.
+  - **File:** api/_routes/auth/google/login.ts, api/index.js, piketdev.md, cleanings.md.
+  - **Validasi:** npm run typecheck PASS, vitest target PASS (106/106), npm run build PASS, deployment Vercel Production d10a03f terverifikasi live.
+  - **Code Hygiene:** CLN-282.
+
 - **PTV-DEV-254 / zidnal / Selesai (HOTFIX: Public Crew Verification Endpoint & Finance Session Guard).**
   - **Aktivitas:** Mengimplementasikan endpoint serverless khusus verifikasi identitas kru publik (/api/verifikasi-kru), mengintegrasikan VerifikasiIdentitasPage ke API publik tersebut agar tidak diblokir oleh 401 /api/kru internal, memulihkan alur pemuatan portofolio otomatis, dan menambahkan session-loading guard di Finance3Page.
   - **Akar Masalah & Solusi:**
