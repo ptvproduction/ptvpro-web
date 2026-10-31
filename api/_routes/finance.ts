@@ -1,4 +1,4 @@
-﻿import type { IncomingMessage, ServerResponse } from 'node:http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { parseCookies } from './auth/_utils/cookies';
 import { verifySessionToken } from './auth/_utils/crypto';
@@ -26,6 +26,9 @@ export async function readFinance(db: SupabaseClient, access: FinanceAccess, ses
   const initialScope = await db.rpc('rpc_finance_visible_transactions_server', {
     p_account_id: session.account_id, p_session_iat: session.iat, p_transaction_ids: [],
   });
+  if (initialScope.error?.code === '42501') {
+    throw new Error('forbidden');
+  }
   if (initialScope.error?.code === 'PGRST202' || initialScope.error?.code === '42883') {
     throw new FinanceScopeUnavailableError();
   }

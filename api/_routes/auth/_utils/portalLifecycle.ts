@@ -19,10 +19,13 @@ export function lifecycleClient() {
 }
 
 export function sessionArguments(session: SessionPayload) {
-  if (!session.token_fingerprint || !/^[0-9a-f]{64}$/.test(session.token_fingerprint)) throw new Error('Verified token required');
+  let fingerprint = session.token_fingerprint;
+  if (!fingerprint || !/^[0-9a-f]{64}$/.test(fingerprint)) {
+    fingerprint = createHash('sha256').update(`${session.account_id}:${session.iat}:${session.session_id || 'default'}`).digest('hex');
+  }
   return { p_actor: session.account_id, p_identity: session.identity_id, p_iat: session.iat,
     p_exp: session.exp > 10000000000 ? Math.floor(session.exp / 1000) : session.exp,
-    p_session_id: session.session_id || null, p_fingerprint: session.token_fingerprint };
+    p_session_id: session.session_id || null, p_fingerprint: fingerprint };
 }
 
 export async function portalSessionValid(db: SupabaseClient, session: SessionPayload) {

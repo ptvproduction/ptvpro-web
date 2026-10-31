@@ -6,7 +6,7 @@ import { verifySessionToken } from './auth/_utils/crypto';
 import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
 
 async function parseJsonBody(req: IncomingMessage): Promise<any> {
-  if ((req as any).body) {
+  if ((req as any).body !== undefined && (req as any).body !== null) {
     if (typeof (req as any).body === 'object') return (req as any).body;
     try {
       return JSON.parse((req as any).body);
@@ -15,19 +15,22 @@ async function parseJsonBody(req: IncomingMessage): Promise<any> {
     }
   }
 
-  if (typeof req.on !== 'function') {
+  if (typeof req.on !== 'function' || (req as any).readableEnded) {
     return {};
   }
 
   return new Promise((resolve, reject) => {
     let body = '';
+    const timer = setTimeout(() => resolve({}), 4000);
     req.on('data', (chunk) => {
       body += chunk;
       if (body.length > 2 * 1024 * 1024) {
+        clearTimeout(timer);
         reject(new Error('Payload too large'));
       }
     });
     req.on('end', () => {
+      clearTimeout(timer);
       if (!body.trim()) {
         resolve({});
         return;
@@ -38,7 +41,10 @@ async function parseJsonBody(req: IncomingMessage): Promise<any> {
         reject(new Error('Format data JSON tidak valid.'));
       }
     });
-    req.on('error', reject);
+    req.on('error', (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
   });
 }
 
@@ -197,6 +203,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
     const supabase = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
+      global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(8000) }) },
     });
 
     // ========================================================

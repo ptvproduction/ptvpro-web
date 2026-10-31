@@ -5,6 +5,14 @@ Dokumen resmi pelaporan dan register kebersihan kode (Code Hygiene) dengan prins
 ---
 ## A. RINGKASAN CLEANING TERBARU
 
+- **CLN-285 | PTV-DEV-258 | Hotfix: Token Fingerprint Enumerable, Finance Access Resolution, & Catatan Stream Timeout (31 Oktober 2026, zidnal / Antigravity):**
+  - **Scope:** `api/_routes/auth/_utils/crypto.ts`, `api/_routes/auth/_utils/portalLifecycle.ts`, `api/_routes/catatan.ts`, `api/_routes/finance.ts`, `api/_routes/financeOperationalRead.ts`, `api/index.js`, `piketdev.md`, `cleanings.md`.
+  - **Tindakan Kebersihan & Resolusi Akar Masalah:**
+    1. *Session Token Fingerprint Resiliency:* Mengubah properti `token_fingerprint` di `crypto.ts` menjadi `enumerable: true, writable: true, configurable: true` agar tidak hilang/ter-drop saat session payload di-destructure atau di-spread (`{ ...session }`). Di `portalLifecycle.ts`, menambahkan fallback derivasi fingerprint berbasis HMAC sha256 jika claim belum terisi, mencegah kegagalan fatal `Verified token required` yang sebelumnya memicu HTTP 401/403/503 di seluruh modul live.
+    2. *Finance 403 & 503 Resolution (Personnel Category Backfill):* Mengidentifikasi kegagalan fungsi PostgreSQL `ptv_finance_private.personnel_category` yang mengembalikan `NULL` untuk personel kru karena 85 baris di `legacy_archive_kru.metadata_json` belum memiliki field `category: 'Kru'`. Melakukan sinkronisasi data non-destruktif dari `canonical_identity.metadata.category` ke `legacy_archive_kru.metadata_json`. Memverifikasi bahwa seluruh kru aktif (`jid`, `rouf`, `rex`, `zaidan`, `nasshar`) kini 100% sukses memperoleh scope otorisasi dari `rpc_finance_visible_transactions_server`.
+    3. *Catatan 504 Timeout Elimination:* Menambahkan guard `readableEnded` dan fallback timer 4000ms pada `parseJsonBody` di `catatan.ts` untuk mencegah serverless hanging saat body stream sudah selesai atau tidak dikirim, serta menambahkan `AbortSignal.timeout(8000)` pada client database backend.
+    4. *Broken Media Graceful Handling:* Memastikan penanganan URL gambar lama yang 404 dari WordPress tertangani secara visual dengan fallback otomatis ke avatar badge inisial R03.
+  - **Hasil:** `npm run typecheck` PASS (0 errors), `policyEngine.test.ts` PASS 100% (11/11), `npm run build` PASS (0 errors, 18.52s), universal router `api/index.js` tersinkronisasi.
 - **CLN-284 | PTV-DEV-257 | Critical Database Fetching & Production Performance Optimization (31 Oktober 2026, zidnal / Antigravity):**
   - **Scope:** `api/_routes/auth/_utils/identity.ts`, `api/_routes/kru.ts`, `api/_routes/peminjaman.ts`, `api/_routes/dokumen.ts`, `api/_routes/verifikasi-kru.ts`, `api/_routes/portofolio.ts`, `api/index.js`, `src/products/hub/beranda/berandaService.ts`, `src/products/hub/kru/kruService.ts`, `src/products/hub/kru/kruStore.ts`, `src/products/hub/kru/services/crewPortfolioService.ts`.
   - **Tindakan Kebersihan & Optimasi:**

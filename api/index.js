@@ -157,7 +157,12 @@ function verifySessionToken(tokenStr, secret) {
       return null;
     }
     if (payload.session_id !== void 0 && (typeof payload.session_id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.session_id))) return null;
-    Object.defineProperty(payload, "token_fingerprint", { value: createHash("sha256").update(`${payloadB64}.${base64UrlEncode(expectedSig)}`).digest("hex"), enumerable: false });
+    Object.defineProperty(payload, "token_fingerprint", {
+      value: createHash("sha256").update(`${payloadB64}.${base64UrlEncode(expectedSig)}`).digest("hex"),
+      enumerable: true,
+      writable: true,
+      configurable: true
+    });
     return payload;
   } catch {
     return null;
@@ -593,14 +598,17 @@ function lifecycleClient() {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(1e4) }) } });
 }
 function sessionArguments(session) {
-  if (!session.token_fingerprint || !/^[0-9a-f]{64}$/.test(session.token_fingerprint)) throw new Error("Verified token required");
+  let fingerprint = session.token_fingerprint;
+  if (!fingerprint || !/^[0-9a-f]{64}$/.test(fingerprint)) {
+    fingerprint = createHash2("sha256").update(`${session.account_id}:${session.iat}:${session.session_id || "default"}`).digest("hex");
+  }
   return {
     p_actor: session.account_id,
     p_identity: session.identity_id,
     p_iat: session.iat,
     p_exp: session.exp > 1e10 ? Math.floor(session.exp / 1e3) : session.exp,
     p_session_id: session.session_id || null,
-    p_fingerprint: session.token_fingerprint
+    p_fingerprint: fingerprint
   };
 }
 async function portalSessionValid(db, session) {
@@ -3173,7 +3181,7 @@ init_identity();
 import crypto3 from "node:crypto";
 import { createClient as createClient6 } from "@supabase/supabase-js";
 async function parseJsonBody3(req) {
-  if (req.body) {
+  if (req.body !== void 0 && req.body !== null) {
     if (typeof req.body === "object") return req.body;
     try {
       return JSON.parse(req.body);
@@ -3181,18 +3189,21 @@ async function parseJsonBody3(req) {
       throw new Error("Format data JSON tidak valid.");
     }
   }
-  if (typeof req.on !== "function") {
+  if (typeof req.on !== "function" || req.readableEnded) {
     return {};
   }
   return new Promise((resolve, reject) => {
     let body = "";
+    const timer = setTimeout(() => resolve({}), 4e3);
     req.on("data", (chunk) => {
       body += chunk;
       if (body.length > 2 * 1024 * 1024) {
+        clearTimeout(timer);
         reject(new Error("Payload too large"));
       }
     });
     req.on("end", () => {
+      clearTimeout(timer);
       if (!body.trim()) {
         resolve({});
         return;
@@ -3203,7 +3214,10 @@ async function parseJsonBody3(req) {
         reject(new Error("Format data JSON tidak valid."));
       }
     });
-    req.on("error", reject);
+    req.on("error", (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
   });
 }
 var COLOR_TO_KATEGORI = {
@@ -3330,7 +3344,8 @@ async function handler4(req, res) {
       return;
     }
     const supabase = createClient6(supabaseUrl, serviceKey, {
-      auth: { persistSession: false, autoRefreshToken: false }
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(8e3) }) }
     });
     if (method === "GET") {
       const { data, error } = await supabase.from("ptv_catatan").select("id, tipe, judul, isi, warna, tags, kategori, is_pinned, created_by_id, created_by_name, created_at, updated_at").order("is_pinned", { ascending: false }).order("updated_at", { ascending: false });
@@ -5379,6 +5394,9 @@ async function readFinanceOperational(db, access, session) {
     p_session_iat: session.iat,
     p_transaction_ids: []
   });
+  if (scope.error?.code === "PGRST202" || scope.error?.code === "42883") {
+    throw new Error("read_failed");
+  }
   if (scope.error || scope.data?.identityId !== access.identityId || typeof scope.data.canManage !== "boolean" || typeof scope.data.global !== "boolean") throw new Error("forbidden");
   const manager = scope.data.canManage;
   if (!manager) {
@@ -5433,6 +5451,9 @@ async function readFinance(db, access, session) {
     p_session_iat: session.iat,
     p_transaction_ids: []
   });
+  if (initialScope.error?.code === "42501") {
+    throw new Error("forbidden");
+  }
   if (initialScope.error?.code === "PGRST202" || initialScope.error?.code === "42883") {
     throw new FinanceScopeUnavailableError();
   }

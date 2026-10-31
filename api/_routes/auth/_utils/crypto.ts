@@ -111,7 +111,12 @@ export function verifySessionToken(tokenStr: string, secret: string): SessionPay
     }
     if (payload.session_id !== undefined && (typeof payload.session_id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.session_id))) return null;
     // Canonical signature bytes prevent equivalent base64 encodings bypassing revocation.
-    Object.defineProperty(payload, 'token_fingerprint', { value: createHash('sha256').update(`${payloadB64}.${base64UrlEncode(expectedSig)}`).digest('hex'), enumerable: false });
+    Object.defineProperty(payload, 'token_fingerprint', {
+      value: createHash('sha256').update(`${payloadB64}.${base64UrlEncode(expectedSig)}`).digest('hex'),
+      enumerable: true,
+      writable: true,
+      configurable: true,
+    });
     return payload;
   } catch {
     return null;

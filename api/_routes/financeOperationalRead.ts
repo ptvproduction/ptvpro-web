@@ -1,4 +1,4 @@
-﻿import type { SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { SessionPayload } from './auth/_utils/types';
 import type { FinanceAccess } from './financeAccess';
 import type { FinanceOperationalData } from '../../src/products/hub/keuangan/financeOperationalData';
@@ -16,6 +16,9 @@ export async function readFinanceOperational(
   const scope = await db.rpc('rpc_finance_visible_transactions_server', {
     p_account_id: session.account_id, p_session_iat: session.iat, p_transaction_ids: [],
   });
+  if (scope.error?.code === 'PGRST202' || scope.error?.code === '42883') {
+    throw new Error('read_failed');
+  }
   if (scope.error || scope.data?.identityId !== access.identityId
     || typeof scope.data.canManage !== 'boolean' || typeof scope.data.global !== 'boolean') throw new Error('forbidden');
   const manager = scope.data.canManage;
