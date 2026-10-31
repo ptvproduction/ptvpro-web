@@ -419,7 +419,8 @@ body.portal-page-active::after {
   border: 1px solid var(--line) !important;
   background: var(--card) !important;
   color: var(--ink) !important;
-  border-radius: var(--r-md) !important;
+  border-radius: var(--r-pill, 9999px) !important;
+  -webkit-border-radius: var(--r-pill, 9999px) !important;
   font: 500 0.9375rem var(--font-body);
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
@@ -917,7 +918,8 @@ body.portal-page-active::after {
   padding: 0 var(--s5);
   margin-top: var(--s5);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-pill, 9999px) !important;
+  -webkit-border-radius: var(--r-pill, 9999px) !important;
   background: var(--brand);
   color: var(--on-brand);
   font: 600 1rem var(--font-body);

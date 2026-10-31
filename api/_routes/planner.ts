@@ -1,10 +1,9 @@
-﻿import type { IncomingMessage, ServerResponse } from 'node:http';
+﻿import type { ServerResponse } from 'node:http';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'node:crypto';
-import { parseCookies } from './auth/_utils/cookies';
-import { verifySessionToken } from './auth/_utils/crypto';
-import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
+import { verifyAccountStatusLive } from './auth/_utils/identity';
 import { parseJsonBody } from './auth/_utils/bodyParser';
+import { withAuth, type AuthenticatedRequest } from './auth/_utils/middleware';
 import { parsePlannerDbRow, RawPlannerDbRow } from '../../src/products/hub/kalender/kalenderService';
 
 export { parsePlannerDbRow };
@@ -13,7 +12,7 @@ export type { RawPlannerDbRow };
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
+async function plannerHandler(req: AuthenticatedRequest, res: ServerResponse): Promise<void> {
   res.setHeader('Content-Type', 'application/json');
 
   const method = req.method || 'GET';
@@ -23,38 +22,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return;
   }
 
-  // 1. Session Authentication Gate (Vercel Direct Auth HttpOnly Cookie)
-  const cookies = parseCookies(req.headers.cookie);
-  const sessionToken = cookies['ptv_hub_session'];
-  const authSecret = process.env.AUTH_SECRET || '';
-
-  if (!sessionToken) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: 'Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses data Kalender & Momentum.',
-        code: 'unauthorized',
-      })
-    );
-    return;
-  }
-
-  // 2. Cryptographic Token Verification (HMAC-SHA256 & Expiration)
-  const session = verifySessionToken(sessionToken, authSecret);
-  if (!session || session.status_akun !== 'active') {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: 'Akses ditolak: Sesi tidak valid atau telah kedaluwarsa.',
-        code: 'invalid_session',
-      })
-    );
-    return;
-  }
-
-  // 3. RBAC & Capability Gate
-  const userCaps = await refreshLiveSession(session);
-  if (!userCaps.includes('hub.access')) { res.statusCode = 403; res.end(JSON.stringify({ error: 'Sesi atau izin telah dicabut.' })); return; }
+  const { session, userCaps } = req;
 
   if (method === 'GET') {
     const hasViewAccess =
@@ -395,3 +363,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 }
 
+
+
+export default withAuth(plannerHandler, {
+  unauthorizedMessage: "Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses data Kalender & Momentum."
+});

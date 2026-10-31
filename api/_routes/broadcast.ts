@@ -1,10 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
-import { parseCookies } from './auth/_utils/cookies';
-import { verifySessionToken } from './auth/_utils/crypto';
-import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
+import { verifyAccountStatusLive } from './auth/_utils/identity';
 import { parseJsonBody } from './auth/_utils/bodyParser';
+import { withAuth, type AuthenticatedRequest } from './auth/_utils/middleware';
 
 export interface RawPengumumanDbRow {
   id: string;
@@ -59,47 +58,12 @@ export function mapDbPengumumanToDTO(row: RawPengumumanDbRow): BroadcastAnnounce
 }
 
 
-export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
+async function broadcastHandler(req: AuthenticatedRequest, res: ServerResponse): Promise<void> {
   res.setHeader('Content-Type', 'application/json');
 
   const method = req.method || 'GET';
   const urlObj = new URL(req.url || '/', `http://${req.headers.host || 'localhost:5174'}`);
-
-  // 1. Session Authentication Gate
-  const cookies = parseCookies(req.headers.cookie);
-  const sessionToken = cookies['ptv_hub_session'];
-  const authSecret = process.env.AUTH_SECRET || '';
-
-  if (!sessionToken) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: 'Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses siaran pengumuman.',
-        code: 'unauthorized',
-      })
-    );
-    return;
-  }
-
-  const session = verifySessionToken(sessionToken, authSecret);
-  if (!session) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: 'Akses ditolak: Sesi login Anda tidak valid atau telah kedaluwarsa. Silakan masuk kembali.',
-        code: 'session_expired',
-      })
-    );
-    return;
-  }
-
-  // 2. RBAC check: all active crew can view, dispatchers/admins can mutate
-  const userCaps = await refreshLiveSession(session);
-  if (!userCaps.includes('hub.access')) {
-    res.statusCode = 403;
-    res.end(JSON.stringify({ error: 'Sesi atau izin telah dicabut.' }));
-    return;
-  }
+  const { session, userCaps } = req;
 
   const canView = userCaps.includes('broadcast.view') || userCaps.includes('hub.access');
   if (!canView) {
@@ -446,6 +410,11 @@ export async function handleBroadcastApiRequest(options: {
     },
   } as unknown as ServerResponse;
 
-  await handler(mockReq, mockRes);
+  await broadcastHandler(mockReq as any, mockRes);
   return { status: statusCode, body: responseData };
 }
+
+
+export default withAuth(broadcastHandler, {
+  unauthorizedMessage: "Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses siaran pengumuman."
+});

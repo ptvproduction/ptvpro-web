@@ -729,15 +729,33 @@
 .ann-card.ann-continuous,
 .stat-card.stat-continuous,
 .li.li-continuous,
-.li-ic.ptv-continuous-surface,
 .ann.ann-continuous,
 .stat.stat-continuous,
-.sec.sec-continuous,
-.chip.chip-continuous,
 .empty.empty-continuous {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
+  border: none !important;
+  border-radius: var(--r-ref-m, 18px) !important;
+  box-shadow: none !important;
+  outline: none;
+}
+.chip.chip-continuous {
+  background: transparent !important;
+  border: none !important;
+  border-radius: var(--ptv-curve-pill, 9999px) !important;
+  box-shadow: none !important;
+  outline: none;
+}
+.li-ic.ptv-continuous-surface {
+  background: transparent !important;
+  border: none !important;
+  border-radius: var(--r-icon-box, 13px) !important;
+  box-shadow: none !important;
+  outline: none;
+}
+.sec.sec-continuous {
+  background: transparent !important;
   border: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;

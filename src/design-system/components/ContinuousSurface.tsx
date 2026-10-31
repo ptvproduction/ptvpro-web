@@ -241,7 +241,8 @@ export const ContinuousSurface = React.forwardRef<HTMLElement, ContinuousSurface
           backgroundImage: 'none',
           border: 'none',
           boxShadow: 'none',
-          borderRadius: 0,
+          borderRadius: `${clampedR || radius}px`,
+          WebkitBorderRadius: `${clampedR || radius}px`,
           filter: effectiveShadow,
           transform: (isHovered && (interactive || hoverElevation)) ? 'translateY(-2px)' : undefined,
           transition: (interactive || hoverElevation)

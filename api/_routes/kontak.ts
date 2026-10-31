@@ -1,9 +1,8 @@
 ﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createClient } from '@supabase/supabase-js';
-import { parseCookies } from './auth/_utils/cookies';
-import { verifySessionToken } from './auth/_utils/crypto';
 import { verifyAccountStatusLive, refreshLiveSession } from './auth/_utils/identity';
 import { parseJsonBody } from './auth/_utils/bodyParser';
+import { withAuth, type AuthenticatedRequest } from './auth/_utils/middleware';
 import { safeRandomUuid } from '../../src/shared/utils/uuid';
 
 import {
@@ -25,7 +24,7 @@ const KNOWN_TEST_RECORD_PTV_IDS = new Set(['PTV-UJI-2712']);
 
 
 
-export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
+async function kontakHandler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   res.setHeader('Content-Type', 'application/json');
 
   const method = (req.method || 'GET').toUpperCase();
@@ -44,33 +43,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return;
   }
 
-  // 1. Session Authentication Gate
-  const cookies = parseCookies(req.headers.cookie);
-  const sessionToken = cookies['ptv_hub_session'];
-  const authSecret = process.env.AUTH_SECRET || '';
-
-  if (!sessionToken) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: 'Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses direktori kontak.',
-        code: 'unauthorized',
-      })
-    );
-    return;
-  }
-
-  const session = verifySessionToken(sessionToken, authSecret);
-  if (!session) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: 'Akses ditolak: Sesi login Anda tidak valid atau telah kedaluwarsa. Silakan masuk kembali.',
-        code: 'session_expired',
-      })
-    );
-    return;
-  }
+  const { session } = req as AuthenticatedRequest;
 
   // 2. Database connection & Anti-Production Barrier
   const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
@@ -681,3 +654,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     );
   }
 }
+
+
+export default withAuth(kontakHandler as any, {
+  unauthorizedMessage: "Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses direktori kontak."
+});

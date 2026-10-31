@@ -8,234 +8,6 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// api/_routes/auth/_utils/cookies.ts
-var cookies_exports = {};
-__export(cookies_exports, {
-  appendSetCookieHeader: () => appendSetCookieHeader,
-  parseCookies: () => parseCookies,
-  serializeCookie: () => serializeCookie
-});
-function parseCookies(cookieHeader) {
-  if (!cookieHeader) return {};
-  const list = {};
-  cookieHeader.split(";").forEach((cookie) => {
-    const parts = cookie.split("=");
-    const name = parts.shift()?.trim();
-    if (!name) return;
-    try {
-      list[name] = decodeURIComponent(parts.join("="));
-    } catch {
-    }
-  });
-  return list;
-}
-function serializeCookie(name, val, options = {}) {
-  const enc = encodeURIComponent;
-  let cookie = `${enc(name)}=${enc(val)}`;
-  if (options.maxAge != null) {
-    cookie += `; Max-Age=${Math.floor(options.maxAge)}`;
-  }
-  if (options.domain) {
-    cookie += `; Domain=${options.domain}`;
-  }
-  if (options.path) {
-    cookie += `; Path=${options.path}`;
-  } else {
-    cookie += "; Path=/";
-  }
-  if (options.expires) {
-    cookie += `; Expires=${options.expires.toUTCString()}`;
-  }
-  if (options.httpOnly !== false) {
-    cookie += "; HttpOnly";
-  }
-  if (options.secure) {
-    cookie += "; Secure";
-  }
-  if (options.sameSite) {
-    cookie += `; SameSite=${options.sameSite}`;
-  } else {
-    cookie += "; SameSite=Lax";
-  }
-  return cookie;
-}
-function appendSetCookieHeader(res, cookieStr) {
-  const existing = res.getHeader("Set-Cookie");
-  if (!existing) {
-    res.setHeader("Set-Cookie", cookieStr);
-  } else if (Array.isArray(existing)) {
-    res.setHeader("Set-Cookie", [...existing, cookieStr]);
-  } else {
-    res.setHeader("Set-Cookie", [String(existing), cookieStr]);
-  }
-}
-var init_cookies = __esm({
-  "api/_routes/auth/_utils/cookies.ts"() {
-    "use strict";
-  }
-});
-
-// api/_routes/auth/_utils/crypto.ts
-var crypto_exports = {};
-__export(crypto_exports, {
-  base64UrlDecode: () => base64UrlDecode,
-  base64UrlEncode: () => base64UrlEncode,
-  createHmacState: () => createHmacState,
-  generatePkceChallenge: () => generatePkceChallenge,
-  generatePkceVerifier: () => generatePkceVerifier,
-  signSessionToken: () => signSessionToken,
-  verifyGoogleIdToken: () => verifyGoogleIdToken,
-  verifyHmacState: () => verifyHmacState,
-  verifySessionToken: () => verifySessionToken
-});
-import { randomBytes, createHash, createHmac, timingSafeEqual, createVerify, createPublicKey } from "node:crypto";
-function base64UrlEncode(buffer) {
-  return buffer.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-function base64UrlDecode(str) {
-  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  while (base64.length % 4 !== 0) {
-    base64 += "=";
-  }
-  return Buffer.from(base64, "base64");
-}
-function generatePkceVerifier() {
-  return base64UrlEncode(randomBytes(32));
-}
-function generatePkceChallenge(verifier) {
-  return base64UrlEncode(createHash("sha256").update(verifier).digest());
-}
-function createHmacState(payload, secret) {
-  if (!secret) throw new Error("Konfigurasi penandatanganan sesi tidak tersedia.");
-  const jsonStr = JSON.stringify(payload);
-  const payloadB64 = base64UrlEncode(Buffer.from(jsonStr, "utf-8"));
-  const hmac = createHmac("sha256", secret).update(payloadB64).digest();
-  const sigB64 = base64UrlEncode(hmac);
-  return `${payloadB64}.${sigB64}`;
-}
-function verifyHmacState(stateStr, secret) {
-  if (!secret || !stateStr || !stateStr.includes(".")) return null;
-  const parts = stateStr.split(".");
-  if (parts.length !== 2) return null;
-  const [payloadB64, sigB64] = parts;
-  const expectedHmac = createHmac("sha256", secret).update(payloadB64).digest();
-  const actualHmac = base64UrlDecode(sigB64);
-  if (expectedHmac.length !== actualHmac.length) return null;
-  if (!timingSafeEqual(expectedHmac, actualHmac)) return null;
-  try {
-    const jsonStr = base64UrlDecode(payloadB64).toString("utf-8");
-    return JSON.parse(jsonStr);
-  } catch {
-    return null;
-  }
-}
-function signSessionToken(payload, secret) {
-  if (!secret) throw new Error("Konfigurasi penandatanganan sesi tidak tersedia.");
-  const { token_fingerprint: _derived, ...signedPayload } = payload;
-  const jsonStr = JSON.stringify(signedPayload);
-  const payloadB64 = base64UrlEncode(Buffer.from(jsonStr, "utf-8"));
-  const sig = createHmac("sha256", secret).update(payloadB64).digest();
-  const sigB64 = base64UrlEncode(sig);
-  return `${payloadB64}.${sigB64}`;
-}
-function verifySessionToken(tokenStr, secret) {
-  if (!secret || !tokenStr || !tokenStr.includes(".")) return null;
-  const parts = tokenStr.split(".");
-  if (parts.length !== 2) return null;
-  const [payloadB64, sigB64] = parts;
-  const expectedSig = createHmac("sha256", secret).update(payloadB64).digest();
-  const actualSig = base64UrlDecode(sigB64);
-  if (expectedSig.length !== actualSig.length) return null;
-  if (!timingSafeEqual(expectedSig, actualSig)) return null;
-  try {
-    const jsonStr = base64UrlDecode(payloadB64).toString("utf-8");
-    const payload = JSON.parse(jsonStr);
-    if (!payload || typeof payload !== "object" || typeof payload.account_id !== "string" || !payload.account_id.trim() || typeof payload.identity_id !== "string" || !payload.identity_id.trim() || !Number.isSafeInteger(payload.iat) || payload.iat <= 0 || !Number.isSafeInteger(payload.exp) || payload.exp <= 0) return null;
-    const now = Date.now();
-    const expMs = payload.exp > 1e10 ? payload.exp : payload.exp * 1e3;
-    if (now >= expMs || payload.iat * 1e3 > now || expMs <= payload.iat * 1e3) {
-      return null;
-    }
-    if (payload.session_id !== void 0 && (typeof payload.session_id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.session_id))) return null;
-    Object.defineProperty(payload, "token_fingerprint", {
-      value: createHash("sha256").update(`${payloadB64}.${base64UrlEncode(expectedSig)}`).digest("hex"),
-      enumerable: true,
-      writable: true,
-      configurable: true
-    });
-    return payload;
-  } catch {
-    return null;
-  }
-}
-async function getGoogleJwksKeys() {
-  const now = Date.now();
-  if (googleJwksCache && now - googleJwksCache.fetchedAt < 3600 * 1e3) {
-    return googleJwksCache.keys;
-  }
-  const resp = await fetch("https://www.googleapis.com/oauth2/v3/certs");
-  if (!resp.ok) {
-    throw new Error("Gagal mengunduh Google public JWKS certs.");
-  }
-  const data = await resp.json();
-  if (Array.isArray(data.keys)) {
-    googleJwksCache = { keys: data.keys, fetchedAt: now };
-    return data.keys;
-  }
-  return [];
-}
-async function verifyGoogleIdToken(idToken, expectedClientId, expectedNonce) {
-  if (!idToken || !idToken.includes(".")) return null;
-  const parts = idToken.split(".");
-  if (parts.length !== 3) return null;
-  try {
-    const headerStr = base64UrlDecode(parts[0]).toString("utf-8");
-    const header = JSON.parse(headerStr);
-    if (header.alg !== "RS256" || !header.kid) {
-      return null;
-    }
-    const keys = await getGoogleJwksKeys();
-    const matchingKey = keys.find((k) => k.kid === header.kid);
-    if (!matchingKey) {
-      return null;
-    }
-    const publicKey = createPublicKey({ key: matchingKey, format: "jwk" });
-    const verifier = createVerify("RSA-SHA256");
-    verifier.update(`${parts[0]}.${parts[1]}`);
-    const signatureBuffer = base64UrlDecode(parts[2]);
-    const isSignatureValid = verifier.verify(publicKey, signatureBuffer);
-    if (!isSignatureValid) {
-      return null;
-    }
-    const payloadStr = base64UrlDecode(parts[1]).toString("utf-8");
-    const claims = JSON.parse(payloadStr);
-    if (!claims || typeof claims.sub !== "string" || !claims.sub.trim() || !Number.isSafeInteger(claims.exp) || !Number.isSafeInteger(claims.iat) || claims.iat <= 0 || claims.exp <= claims.iat) return null;
-    if (claims.iss !== "https://accounts.google.com" && claims.iss !== "accounts.google.com") {
-      return null;
-    }
-    if (claims.aud !== expectedClientId) {
-      return null;
-    }
-    const nowSec = Math.floor(Date.now() / 1e3);
-    if (claims.exp < nowSec - 60 || claims.iat > nowSec + 60) {
-      return null;
-    }
-    if (expectedNonce && claims.nonce !== expectedNonce) {
-      return null;
-    }
-    return claims;
-  } catch {
-    return null;
-  }
-}
-var googleJwksCache;
-var init_crypto = __esm({
-  "api/_routes/auth/_utils/crypto.ts"() {
-    "use strict";
-    googleJwksCache = null;
-  }
-});
-
 // src/core/policy/capabilities.ts
 function isMutationCapability(capability) {
   return MUTATION_CAPABILITIES.has(capability);
@@ -568,6 +340,167 @@ async function verifyLegacyBcryptPassword(password, encoded) {
 var init_legacyPassword = __esm({
   "api/_routes/auth/_utils/legacyPassword.ts"() {
     "use strict";
+  }
+});
+
+// api/_routes/auth/_utils/crypto.ts
+var crypto_exports = {};
+__export(crypto_exports, {
+  base64UrlDecode: () => base64UrlDecode,
+  base64UrlEncode: () => base64UrlEncode,
+  createHmacState: () => createHmacState,
+  generatePkceChallenge: () => generatePkceChallenge,
+  generatePkceVerifier: () => generatePkceVerifier,
+  signSessionToken: () => signSessionToken,
+  verifyGoogleIdToken: () => verifyGoogleIdToken,
+  verifyHmacState: () => verifyHmacState,
+  verifySessionToken: () => verifySessionToken
+});
+import { randomBytes, createHash, createHmac, timingSafeEqual, createVerify, createPublicKey } from "node:crypto";
+function base64UrlEncode(buffer) {
+  return buffer.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function base64UrlDecode(str) {
+  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
+  while (base64.length % 4 !== 0) {
+    base64 += "=";
+  }
+  return Buffer.from(base64, "base64");
+}
+function generatePkceVerifier() {
+  return base64UrlEncode(randomBytes(32));
+}
+function generatePkceChallenge(verifier) {
+  return base64UrlEncode(createHash("sha256").update(verifier).digest());
+}
+function createHmacState(payload, secret) {
+  if (!secret) throw new Error("Konfigurasi penandatanganan sesi tidak tersedia.");
+  const jsonStr = JSON.stringify(payload);
+  const payloadB64 = base64UrlEncode(Buffer.from(jsonStr, "utf-8"));
+  const hmac = createHmac("sha256", secret).update(payloadB64).digest();
+  const sigB64 = base64UrlEncode(hmac);
+  return `${payloadB64}.${sigB64}`;
+}
+function verifyHmacState(stateStr, secret) {
+  if (!secret || !stateStr || !stateStr.includes(".")) return null;
+  const parts = stateStr.split(".");
+  if (parts.length !== 2) return null;
+  const [payloadB64, sigB64] = parts;
+  const expectedHmac = createHmac("sha256", secret).update(payloadB64).digest();
+  const actualHmac = base64UrlDecode(sigB64);
+  if (expectedHmac.length !== actualHmac.length) return null;
+  if (!timingSafeEqual(expectedHmac, actualHmac)) return null;
+  try {
+    const jsonStr = base64UrlDecode(payloadB64).toString("utf-8");
+    return JSON.parse(jsonStr);
+  } catch {
+    return null;
+  }
+}
+function signSessionToken(payload, secret) {
+  if (!secret) throw new Error("Konfigurasi penandatanganan sesi tidak tersedia.");
+  const { token_fingerprint: _derived, ...signedPayload } = payload;
+  const jsonStr = JSON.stringify(signedPayload);
+  const payloadB64 = base64UrlEncode(Buffer.from(jsonStr, "utf-8"));
+  const sig = createHmac("sha256", secret).update(payloadB64).digest();
+  const sigB64 = base64UrlEncode(sig);
+  return `${payloadB64}.${sigB64}`;
+}
+function verifySessionToken(tokenStr, secret) {
+  if (!secret || !tokenStr || !tokenStr.includes(".")) return null;
+  const parts = tokenStr.split(".");
+  if (parts.length !== 2) return null;
+  const [payloadB64, sigB64] = parts;
+  const expectedSig = createHmac("sha256", secret).update(payloadB64).digest();
+  const actualSig = base64UrlDecode(sigB64);
+  if (expectedSig.length !== actualSig.length) return null;
+  if (!timingSafeEqual(expectedSig, actualSig)) return null;
+  try {
+    const jsonStr = base64UrlDecode(payloadB64).toString("utf-8");
+    const payload = JSON.parse(jsonStr);
+    if (!payload || typeof payload !== "object" || typeof payload.account_id !== "string" || !payload.account_id.trim() || typeof payload.identity_id !== "string" || !payload.identity_id.trim() || !Number.isSafeInteger(payload.iat) || payload.iat <= 0 || !Number.isSafeInteger(payload.exp) || payload.exp <= 0) return null;
+    const now = Date.now();
+    const expMs = payload.exp > 1e10 ? payload.exp : payload.exp * 1e3;
+    if (now >= expMs || payload.iat * 1e3 > now || expMs <= payload.iat * 1e3) {
+      return null;
+    }
+    if (payload.session_id !== void 0 && (typeof payload.session_id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.session_id))) return null;
+    Object.defineProperty(payload, "token_fingerprint", {
+      value: createHash("sha256").update(`${payloadB64}.${base64UrlEncode(expectedSig)}`).digest("hex"),
+      enumerable: true,
+      writable: true,
+      configurable: true
+    });
+    return payload;
+  } catch {
+    return null;
+  }
+}
+async function getGoogleJwksKeys() {
+  const now = Date.now();
+  if (googleJwksCache && now - googleJwksCache.fetchedAt < 3600 * 1e3) {
+    return googleJwksCache.keys;
+  }
+  const resp = await fetch("https://www.googleapis.com/oauth2/v3/certs");
+  if (!resp.ok) {
+    throw new Error("Gagal mengunduh Google public JWKS certs.");
+  }
+  const data = await resp.json();
+  if (Array.isArray(data.keys)) {
+    googleJwksCache = { keys: data.keys, fetchedAt: now };
+    return data.keys;
+  }
+  return [];
+}
+async function verifyGoogleIdToken(idToken, expectedClientId, expectedNonce) {
+  if (!idToken || !idToken.includes(".")) return null;
+  const parts = idToken.split(".");
+  if (parts.length !== 3) return null;
+  try {
+    const headerStr = base64UrlDecode(parts[0]).toString("utf-8");
+    const header = JSON.parse(headerStr);
+    if (header.alg !== "RS256" || !header.kid) {
+      return null;
+    }
+    const keys = await getGoogleJwksKeys();
+    const matchingKey = keys.find((k) => k.kid === header.kid);
+    if (!matchingKey) {
+      return null;
+    }
+    const publicKey = createPublicKey({ key: matchingKey, format: "jwk" });
+    const verifier = createVerify("RSA-SHA256");
+    verifier.update(`${parts[0]}.${parts[1]}`);
+    const signatureBuffer = base64UrlDecode(parts[2]);
+    const isSignatureValid = verifier.verify(publicKey, signatureBuffer);
+    if (!isSignatureValid) {
+      return null;
+    }
+    const payloadStr = base64UrlDecode(parts[1]).toString("utf-8");
+    const claims = JSON.parse(payloadStr);
+    if (!claims || typeof claims.sub !== "string" || !claims.sub.trim() || !Number.isSafeInteger(claims.exp) || !Number.isSafeInteger(claims.iat) || claims.iat <= 0 || claims.exp <= claims.iat) return null;
+    if (claims.iss !== "https://accounts.google.com" && claims.iss !== "accounts.google.com") {
+      return null;
+    }
+    if (claims.aud !== expectedClientId) {
+      return null;
+    }
+    const nowSec = Math.floor(Date.now() / 1e3);
+    if (claims.exp < nowSec - 60 || claims.iat > nowSec + 60) {
+      return null;
+    }
+    if (expectedNonce && claims.nonce !== expectedNonce) {
+      return null;
+    }
+    return claims;
+  } catch {
+    return null;
+  }
+}
+var googleJwksCache;
+var init_crypto = __esm({
+  "api/_routes/auth/_utils/crypto.ts"() {
+    "use strict";
+    googleJwksCache = null;
   }
 });
 
@@ -1939,6 +1872,73 @@ var init_identity = __esm({
   }
 });
 
+// api/_routes/auth/_utils/cookies.ts
+var cookies_exports = {};
+__export(cookies_exports, {
+  appendSetCookieHeader: () => appendSetCookieHeader,
+  parseCookies: () => parseCookies,
+  serializeCookie: () => serializeCookie
+});
+function parseCookies(cookieHeader) {
+  if (!cookieHeader) return {};
+  const list = {};
+  cookieHeader.split(";").forEach((cookie) => {
+    const parts = cookie.split("=");
+    const name = parts.shift()?.trim();
+    if (!name) return;
+    try {
+      list[name] = decodeURIComponent(parts.join("="));
+    } catch {
+    }
+  });
+  return list;
+}
+function serializeCookie(name, val, options = {}) {
+  const enc = encodeURIComponent;
+  let cookie = `${enc(name)}=${enc(val)}`;
+  if (options.maxAge != null) {
+    cookie += `; Max-Age=${Math.floor(options.maxAge)}`;
+  }
+  if (options.domain) {
+    cookie += `; Domain=${options.domain}`;
+  }
+  if (options.path) {
+    cookie += `; Path=${options.path}`;
+  } else {
+    cookie += "; Path=/";
+  }
+  if (options.expires) {
+    cookie += `; Expires=${options.expires.toUTCString()}`;
+  }
+  if (options.httpOnly !== false) {
+    cookie += "; HttpOnly";
+  }
+  if (options.secure) {
+    cookie += "; Secure";
+  }
+  if (options.sameSite) {
+    cookie += `; SameSite=${options.sameSite}`;
+  } else {
+    cookie += "; SameSite=Lax";
+  }
+  return cookie;
+}
+function appendSetCookieHeader(res, cookieStr) {
+  const existing = res.getHeader("Set-Cookie");
+  if (!existing) {
+    res.setHeader("Set-Cookie", cookieStr);
+  } else if (Array.isArray(existing)) {
+    res.setHeader("Set-Cookie", [...existing, cookieStr]);
+  } else {
+    res.setHeader("Set-Cookie", [String(existing), cookieStr]);
+  }
+}
+var init_cookies = __esm({
+  "api/_routes/auth/_utils/cookies.ts"() {
+    "use strict";
+  }
+});
+
 // api/_routes/acara.ts
 import crypto2 from "node:crypto";
 
@@ -1959,8 +1959,6 @@ function normalizeAcaraColor(value) {
 }
 
 // api/_routes/acara.ts
-init_cookies();
-init_crypto();
 init_identity();
 import { createClient as createClient3 } from "@supabase/supabase-js";
 
@@ -2166,6 +2164,69 @@ async function parseJsonBody(req, options) {
 }
 var parseBody = parseJsonBody;
 
+// api/_routes/auth/_utils/middleware.ts
+init_cookies();
+init_crypto();
+init_identity();
+function withAuth(handler23, options) {
+  return async (req, res) => {
+    const cookies = parseCookies(req.headers.cookie);
+    const sessionToken = cookies["ptv_hub_session"];
+    const authSecret = process.env.AUTH_SECRET || "";
+    if (!sessionToken) {
+      res.statusCode = 401;
+      res.setHeader("Content-Type", "application/json");
+      res.end(
+        JSON.stringify({
+          error: options?.unauthorizedMessage ? options.unauthorizedMessage : options?.moduleName ? `Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses data ${options.moduleName}.` : "Akses ditolak: Autentikasi sesi login Hub diperlukan.",
+          code: "unauthorized"
+        })
+      );
+      return;
+    }
+    const session = verifySessionToken(sessionToken, authSecret);
+    if (!session || session.status_akun !== "active") {
+      res.statusCode = 401;
+      res.setHeader("Content-Type", "application/json");
+      res.end(
+        JSON.stringify({
+          error: "Akses ditolak: Sesi tidak valid atau telah kedaluwarsa.",
+          code: "invalid_session"
+        })
+      );
+      return;
+    }
+    let userCaps;
+    try {
+      userCaps = await refreshLiveSession(session);
+    } catch {
+      res.statusCode = 401;
+      res.setHeader("Content-Type", "application/json");
+      res.end(
+        JSON.stringify({
+          error: "Akses ditolak: Sesi tidak valid.",
+          code: "invalid_session"
+        })
+      );
+      return;
+    }
+    if (!userCaps.includes("hub.access")) {
+      res.statusCode = 403;
+      res.setHeader("Content-Type", "application/json");
+      res.end(
+        JSON.stringify({
+          error: "Sesi atau izin telah dicabut.",
+          code: "forbidden"
+        })
+      );
+      return;
+    }
+    req.session = session;
+    req.userCaps = userCaps;
+    return handler23(req, res);
+  };
+}
+
 // api/_routes/acara.ts
 function extractValidSqlTime(raw) {
   if (!raw) return null;
@@ -2335,7 +2396,7 @@ function sanitizeAcaraCrew(crewInput) {
   }
   return sanitized;
 }
-async function handler(req, res) {
+async function acaraHandler(req, res) {
   res.setHeader("Content-Type", "application/json");
   const method = req.method || "GET";
   if (!["GET", "POST", "PATCH", "PUT", "DELETE"].includes(method)) {
@@ -2343,36 +2404,7 @@ async function handler(req, res) {
     res.end(JSON.stringify({ error: `Metode HTTP ${method} tidak didukung.` }));
     return;
   }
-  const cookies = parseCookies(req.headers.cookie);
-  const sessionToken = cookies["ptv_hub_session"];
-  const authSecret = process.env.AUTH_SECRET || "";
-  if (!sessionToken) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: "Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses data Acara.",
-        code: "unauthorized"
-      })
-    );
-    return;
-  }
-  const session = verifySessionToken(sessionToken, authSecret);
-  if (!session || session.status_akun !== "active") {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: "Akses ditolak: Sesi tidak valid atau telah kedaluwarsa.",
-        code: "invalid_session"
-      })
-    );
-    return;
-  }
-  const userCaps = await refreshLiveSession(session);
-  if (!userCaps.includes("hub.access")) {
-    res.statusCode = 403;
-    res.end(JSON.stringify({ error: "Sesi atau izin telah dicabut." }));
-    return;
-  }
+  const { session, userCaps } = req;
   if (method === "GET") {
     const hasViewAccess = userCaps.includes("events.view") || userCaps.includes("calendar.view");
     if (!hasViewAccess) {
@@ -2703,6 +2735,7 @@ ${finalNotes}`.trim();
     res.end(JSON.stringify({ error: err.message || "Terjadi kesalahan internal server saat memproses data acara." }));
   }
 }
+var acara_default = withAuth(acaraHandler, { moduleName: "Acara" });
 
 // api/_routes/akses.ts
 init_cookies();
@@ -2782,7 +2815,7 @@ async function readAccessAccounts(db) {
     positionMappings: formatPositionMappingsAsArray(positionMappings)
   };
 }
-async function handler2(req, res) {
+async function handler(req, res) {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Cache-Control", "no-store");
   const send = (status, body) => {
@@ -2988,8 +3021,6 @@ async function handler2(req, res) {
 }
 
 // api/_routes/broadcast.ts
-init_cookies();
-init_crypto();
 init_identity();
 import { randomUUID as randomUUID2 } from "node:crypto";
 import { createClient as createClient5 } from "@supabase/supabase-js";
@@ -3011,40 +3042,11 @@ function mapDbPengumumanToDTO(row) {
     berlaku_sampai: row.berlaku_sampai || null
   };
 }
-async function handler3(req, res) {
+async function broadcastHandler(req, res) {
   res.setHeader("Content-Type", "application/json");
   const method = req.method || "GET";
   const urlObj = new URL(req.url || "/", `http://${req.headers.host || "localhost:5174"}`);
-  const cookies = parseCookies(req.headers.cookie);
-  const sessionToken = cookies["ptv_hub_session"];
-  const authSecret = process.env.AUTH_SECRET || "";
-  if (!sessionToken) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: "Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses siaran pengumuman.",
-        code: "unauthorized"
-      })
-    );
-    return;
-  }
-  const session = verifySessionToken(sessionToken, authSecret);
-  if (!session) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: "Akses ditolak: Sesi login Anda tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
-        code: "session_expired"
-      })
-    );
-    return;
-  }
-  const userCaps = await refreshLiveSession(session);
-  if (!userCaps.includes("hub.access")) {
-    res.statusCode = 403;
-    res.end(JSON.stringify({ error: "Sesi atau izin telah dicabut." }));
-    return;
-  }
+  const { session, userCaps } = req;
   const canView = userCaps.includes("broadcast.view") || userCaps.includes("hub.access");
   if (!canView) {
     res.statusCode = 403;
@@ -3292,10 +3294,11 @@ async function handler3(req, res) {
   res.statusCode = 405;
   res.end(JSON.stringify({ error: `Metode ${method} tidak didukung.`, code: "method_not_allowed" }));
 }
+var broadcast_default = withAuth(broadcastHandler, {
+  unauthorizedMessage: "Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses siaran pengumuman."
+});
 
 // api/_routes/catatan.ts
-init_cookies();
-init_crypto();
 init_identity();
 import crypto3 from "node:crypto";
 import { createClient as createClient6 } from "@supabase/supabase-js";
@@ -3311,7 +3314,7 @@ var COLOR_TO_KATEGORI = {
   slate: "Umum",
   default: "Umum"
 };
-async function handler4(req, res) {
+async function catatanHandler(req, res) {
   res.setHeader("Content-Type", "application/json");
   const method = req.method || "GET";
   if (!["GET", "POST", "PATCH", "PUT", "DELETE"].includes(method)) {
@@ -3319,36 +3322,7 @@ async function handler4(req, res) {
     res.end(JSON.stringify({ error: `Metode HTTP ${method} tidak didukung.` }));
     return;
   }
-  const cookies = parseCookies(req.headers.cookie);
-  const sessionToken = cookies["ptv_hub_session"];
-  const authSecret = process.env.AUTH_SECRET || "";
-  if (!sessionToken) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: "Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses data Catatan.",
-        code: "unauthorized"
-      })
-    );
-    return;
-  }
-  const session = verifySessionToken(sessionToken, authSecret);
-  if (!session || session.status_akun !== "active") {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: "Akses ditolak: Sesi tidak valid atau telah kedaluwarsa.",
-        code: "invalid_session"
-      })
-    );
-    return;
-  }
-  const userCaps = await refreshLiveSession(session);
-  if (!userCaps.includes("hub.access")) {
-    res.statusCode = 403;
-    res.end(JSON.stringify({ error: "Sesi atau izin telah dicabut." }));
-    return;
-  }
+  const { session, userCaps } = req;
   if (method === "GET") {
     const hasViewAccess = userCaps.includes("notes.view");
     if (!hasViewAccess) {
@@ -3645,6 +3619,7 @@ ${nextIsi}`;
     res.end(JSON.stringify({ error: err.message || "Terjadi kesalahan internal pada server." }));
   }
 }
+var catatan_default = withAuth(catatanHandler, { moduleName: "Catatan" });
 
 // api/_routes/dokumen.ts
 import { randomUUID as randomUUID3 } from "node:crypto";
@@ -3991,7 +3966,7 @@ function mapSuratBarangToDoc(row) {
     ]
   };
 }
-async function handler5(req, res) {
+async function handler2(req, res) {
   res.setHeader("Content-Type", "application/json");
   const method = (req.method || "GET").toUpperCase();
   const urlObj = new URL(req.url || "", "http://localhost");
@@ -5659,7 +5634,7 @@ async function readFinance(db, access, session) {
   }
   return snapshot;
 }
-async function handler6(req, res) {
+async function handler3(req, res) {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Cache-Control", "no-store");
   const send = (status, body) => {
@@ -6197,7 +6172,7 @@ async function readBody(req, limit) {
     throw new InventoryError(400, err?.message || "Gagal membaca payload.");
   }
 }
-async function handler7(req, res) {
+async function handler4(req, res) {
   const send = (status, body) => {
     res.statusCode = status;
     res.end(JSON.stringify(body));
@@ -6352,8 +6327,6 @@ async function handler7(req, res) {
 }
 
 // api/_routes/kontak.ts
-init_cookies();
-init_crypto();
 init_identity();
 import { createClient as createClient9 } from "@supabase/supabase-js";
 
@@ -6459,7 +6432,7 @@ function classifyInternalContact(c) {
 
 // api/_routes/kontak.ts
 var KNOWN_TEST_RECORD_PTV_IDS = /* @__PURE__ */ new Set(["PTV-UJI-2712"]);
-async function handler8(req, res) {
+async function kontakHandler(req, res) {
   res.setHeader("Content-Type", "application/json");
   const method = (req.method || "GET").toUpperCase();
   const bodyPromise = ["POST", "PUT", "PATCH"].includes(method) ? parseJsonBody(req) : Promise.resolve({});
@@ -6473,30 +6446,7 @@ async function handler8(req, res) {
     );
     return;
   }
-  const cookies = parseCookies(req.headers.cookie);
-  const sessionToken = cookies["ptv_hub_session"];
-  const authSecret = process.env.AUTH_SECRET || "";
-  if (!sessionToken) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: "Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses direktori kontak.",
-        code: "unauthorized"
-      })
-    );
-    return;
-  }
-  const session = verifySessionToken(sessionToken, authSecret);
-  if (!session) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: "Akses ditolak: Sesi login Anda tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
-        code: "session_expired"
-      })
-    );
-    return;
-  }
+  const { session } = req;
   const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
   if (!supabaseUrl || !serviceRoleKey) {
@@ -6970,6 +6920,9 @@ async function handler8(req, res) {
     );
   }
 }
+var kontak_default = withAuth(kontakHandler, {
+  unauthorizedMessage: "Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses direktori kontak."
+});
 
 // api/_routes/kru.ts
 init_cookies();
@@ -7073,7 +7026,7 @@ function normalizePersonnelAliases(value) {
   if (payload.status_kru === "nonaktif") payload.status_kru = "Nonaktif";
   return payload;
 }
-async function handler9(req, res) {
+async function handler5(req, res) {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Cache-Control", "no-store");
   const method = (req.method || "GET").toUpperCase();
@@ -8061,7 +8014,7 @@ function normalizeDamageSeverity(rawSeverity) {
   if (norm.includes("ringan") || norm.includes("low")) return "Ringan";
   return "Sedang";
 }
-async function handler10(req, res) {
+async function handler6(req, res) {
   if (req.method !== "GET" && req.method !== "POST") {
     res.statusCode = 405;
     res.setHeader("Content-Type", "application/json");
@@ -8278,7 +8231,7 @@ function normalizeLostFoundStatus(rawStatus) {
   }
   return "Dicari";
 }
-async function handler11(req, res) {
+async function handler7(req, res) {
   if (req.method !== "GET" && req.method !== "POST") {
     res.statusCode = 405;
     res.setHeader("Content-Type", "application/json");
@@ -8510,7 +8463,7 @@ function computeLoanStatus(dbStatus, tenggatKembali, tanggalKembali) {
   }
   return "dipinjam";
 }
-async function handler12(req, res) {
+async function handler8(req, res) {
   if (req.method !== "GET" && req.method !== "POST") {
     res.statusCode = 405;
     res.setHeader("Content-Type", "application/json");
@@ -8724,8 +8677,6 @@ async function handler12(req, res) {
 }
 
 // api/_routes/planner.ts
-init_cookies();
-init_crypto();
 init_identity();
 import { createClient as createClient14 } from "@supabase/supabase-js";
 import crypto4 from "node:crypto";
@@ -9007,7 +8958,7 @@ var kalenderService = new KalenderService();
 
 // api/_routes/planner.ts
 var UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-async function handler13(req, res) {
+async function plannerHandler(req, res) {
   res.setHeader("Content-Type", "application/json");
   const method = req.method || "GET";
   if (!["GET", "POST", "PATCH", "PUT", "DELETE"].includes(method)) {
@@ -9015,36 +8966,7 @@ async function handler13(req, res) {
     res.end(JSON.stringify({ error: `Metode HTTP ${method} tidak didukung.` }));
     return;
   }
-  const cookies = parseCookies(req.headers.cookie);
-  const sessionToken = cookies["ptv_hub_session"];
-  const authSecret = process.env.AUTH_SECRET || "";
-  if (!sessionToken) {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: "Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses data Kalender & Momentum.",
-        code: "unauthorized"
-      })
-    );
-    return;
-  }
-  const session = verifySessionToken(sessionToken, authSecret);
-  if (!session || session.status_akun !== "active") {
-    res.statusCode = 401;
-    res.end(
-      JSON.stringify({
-        error: "Akses ditolak: Sesi tidak valid atau telah kedaluwarsa.",
-        code: "invalid_session"
-      })
-    );
-    return;
-  }
-  const userCaps = await refreshLiveSession(session);
-  if (!userCaps.includes("hub.access")) {
-    res.statusCode = 403;
-    res.end(JSON.stringify({ error: "Sesi atau izin telah dicabut." }));
-    return;
-  }
+  const { session, userCaps } = req;
   if (method === "GET") {
     const hasViewAccess = userCaps.includes("calendar.view") || userCaps.includes("events.view");
     if (!hasViewAccess) {
@@ -9287,6 +9209,9 @@ async function handler13(req, res) {
     res.end(JSON.stringify({ error: "Terjadi kesalahan internal server saat memproses data momentum." }));
   }
 }
+var planner_default = withAuth(plannerHandler, {
+  unauthorizedMessage: "Akses ditolak: Autentikasi sesi login Hub diperlukan untuk mengakses data Kalender & Momentum."
+});
 
 // api/_routes/portal.ts
 init_cookies();
@@ -9311,7 +9236,7 @@ function getSupabase(signal) {
     }
   });
 }
-async function handler14(req, res) {
+async function handler9(req, res) {
   const controller = new AbortController();
   const isReadRequest = (req.method || "GET") === "GET";
   const timer = isReadRequest ? setTimeout(() => controller.abort(), PORTAL_SERVER_TIMEOUT_MS) : void 0;
@@ -10041,7 +9966,7 @@ async function handlePortal(req, res, signal) {
 init_cookies();
 import { createClient as createClient16 } from "@supabase/supabase-js";
 init_crypto();
-async function handler15(req, res) {
+async function handler10(req, res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
@@ -10219,7 +10144,7 @@ async function handler15(req, res) {
 init_cookies();
 init_crypto();
 import { createClient as createClient17 } from "@supabase/supabase-js";
-async function handler16(req, res) {
+async function handler11(req, res) {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") {
@@ -10389,7 +10314,7 @@ function checkRateLimit(clientId, maxRequests = 15, windowMs = 6e4) {
   rateLimitMap.set(clientId, validTimestamps);
   return true;
 }
-async function handler17(req, res) {
+async function handler12(req, res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
@@ -10677,7 +10602,7 @@ function normalizeCrewId(raw) {
   }
   return `PTV-${part}`;
 }
-async function handler18(req, res) {
+async function handler13(req, res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
   res.setHeader("X-Content-Type-Options", "nosniff");
@@ -10827,7 +10752,7 @@ init_cookies();
 init_crypto();
 import { createClient as createClient20 } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
-async function handler19(req, res) {
+async function handler14(req, res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") {
@@ -10999,7 +10924,7 @@ async function parseJsonBody2(req) {
   if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some((key) => !["identifier", "password"].includes(key))) throw new LoginInputError(400);
   return value;
 }
-async function handler20(req, res) {
+async function handler15(req, res) {
   res.setHeader?.("Content-Type", "application/json");
   res.setHeader?.("Cache-Control", "no-store");
   if (req.method !== "POST") {
@@ -11097,7 +11022,7 @@ init_cookies();
 init_cookies();
 init_crypto();
 init_portalLifecycle();
-async function handler21(req, res) {
+async function handler16(req, res) {
   res.setHeader?.("Cache-Control", "no-store");
   const raw = parseCookies(req.headers.cookie).ptv_hub_session;
   const session = raw && verifySessionToken(raw, process.env.AUTH_SECRET || "");
@@ -11148,7 +11073,7 @@ init_cookies();
 init_crypto();
 init_liveAccess();
 import { createClient as createClient21 } from "@supabase/supabase-js";
-async function handler22(req, res) {
+async function handler17(req, res) {
   res.setHeader?.("Content-Type", "application/json");
   res.setHeader?.("Cache-Control", "no-store");
   if (req.method !== "GET") {
@@ -11264,7 +11189,7 @@ async function recordPortalLoginProof(session, verifiedGoogleSubject, signedToke
 // api/_routes/auth/google/callback.ts
 init_portalLifecycle();
 import { randomUUID as randomUUID6 } from "node:crypto";
-async function handler23(req, res) {
+async function handler18(req, res) {
   if (req.method !== "GET") {
     res.statusCode = 405;
     res.setHeader?.("Content-Type", "application/json");
@@ -11479,7 +11404,7 @@ function sanitizeReturnTo(rawTarget) {
   }
   return "/hub";
 }
-async function handler24(req, res) {
+async function handler19(req, res) {
   if (req.method !== "GET") {
     res.statusCode = 405;
     res.setHeader?.("Content-Type", "application/json");
@@ -11578,7 +11503,7 @@ async function handler24(req, res) {
 init_cookies();
 init_crypto();
 init_identity();
-async function handler25(req, res) {
+async function handler20(req, res) {
   res.setHeader?.("Content-Type", "application/json");
   if (req.method !== "GET") {
     res.statusCode = 405;
@@ -11624,7 +11549,7 @@ async function handler25(req, res) {
 init_cookies();
 init_crypto();
 init_identity();
-async function handler26(req, res) {
+async function handler21(req, res) {
   res.setHeader?.("Content-Type", "application/json");
   if (req.method !== "POST") {
     res.statusCode = 405;
@@ -11668,32 +11593,32 @@ async function handler26(req, res) {
 
 // api/_router.ts
 var routes = {
-  "acara": handler,
-  "akses": handler2,
-  "broadcast": handler3,
-  "catatan": handler4,
-  "dokumen": handler5,
-  "finance": handler6,
-  "inventaris": handler7,
-  "kontak": handler8,
-  "kru": handler9,
-  "lapor-kerusakan": handler10,
-  "lost-found": handler11,
-  "peminjaman": handler12,
-  "planner": handler13,
-  "portal": handler14,
-  "portofolio": handler15,
-  "upload-avatar": handler16,
-  "verifikasi-surat": handler17,
-  "verifikasi-kru": handler18,
-  "auth/change-password": handler19,
-  "auth/login": handler20,
-  "auth/logout": handler21,
-  "auth/session": handler22,
-  "auth/google/callback": handler23,
-  "auth/google/login": handler24,
-  "auth/google/status": handler25,
-  "auth/google/unlink": handler26
+  "acara": acara_default,
+  "akses": handler,
+  "broadcast": broadcast_default,
+  "catatan": catatan_default,
+  "dokumen": handler2,
+  "finance": handler3,
+  "inventaris": handler4,
+  "kontak": kontak_default,
+  "kru": handler5,
+  "lapor-kerusakan": handler6,
+  "lost-found": handler7,
+  "peminjaman": handler8,
+  "planner": planner_default,
+  "portal": handler9,
+  "portofolio": handler10,
+  "upload-avatar": handler11,
+  "verifikasi-surat": handler12,
+  "verifikasi-kru": handler13,
+  "auth/change-password": handler14,
+  "auth/login": handler15,
+  "auth/logout": handler16,
+  "auth/session": handler17,
+  "auth/google/callback": handler18,
+  "auth/google/login": handler19,
+  "auth/google/status": handler20,
+  "auth/google/unlink": handler21
 };
 function resolveRouteKey(req) {
   const paramRoute = req.query?.__route;
@@ -11725,7 +11650,7 @@ function resolveRouteKey(req) {
   }
   return "";
 }
-async function handler27(req, res) {
+async function handler22(req, res) {
   const routeKey = resolveRouteKey(req);
   const originalUri = req.headers?.["x-forwarded-uri"];
   if (originalUri) {
@@ -11776,7 +11701,7 @@ async function handler27(req, res) {
   }
 }
 export {
-  handler27 as default,
+  handler22 as default,
   resolveRouteKey,
   routes
 };

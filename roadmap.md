@@ -1,5 +1,29 @@
 # ROADMAP UTAMA & KONSOLIDASI SISTEM PTVPRO / PTV HUB
 
+## PTV-DEV-260 | Backend Middleware Consolidation & Cross-Device Rounded UI Consistency (31 Oktober 2026, zidnal / Antigravity)
+
+- **Status: SELESAI (100% COMPLETE & VERIFIED).** Menyelesaikan konsolidasi backend middleware Fase 3 dan standardisasi visual border-radius / continuous rounded R03 lintas perangkat:
+- **1. Backend Middleware Consolidation (`withAuth` & `withCapability`):**
+  - Membangun modul middleware kanonikal di `api/_routes/auth/_utils/middleware.ts` dengan wrapper function yang mendukung opsi modul:
+    * `withAuth(handler, options)`: Memvalidasi session token cookie/header, mengekstraksi live session ter-dekrip, menyuntikkan `req.authenticatedUser`, dan memancarkan respon fail-closed `401 Unauthorized` dengan pesan yang dapat dikustomisasi.
+    * `withCapability(capability, handler, options)`: Memverifikasi kapabilitas live kru sebelum mengeksekusi handler, memancarkan respon fail-closed `403 Forbidden` jika kapabilitas tidak terpenuhi.
+  - Mengintegrasikan middleware ke 5 route handlers backend: `catatan.ts`, `acara.ts`, `broadcast.ts`, `kontak.ts`, dan `planner.ts`.
+  - Memadukan modul body parser R02 terpusat (`bodyParser.ts`) secara mulus tanpa query autentikasi berulang.
+- **2. Cross-Device Rounded UI Consistency (R03):**
+  - **ContinuousSurface.tsx:** Menghapus style container `borderRadius: 0` inline yang memicu glitch sudut kotak tajam saat initial render perangkat seluler; menggantinya dengan fallback radius proporsional (`${clampedR || radius}px`) dan `-webkit-border-radius`.
+  - **ContinuousButton.tsx:** Menormalkan radius bawaan komponen menjadi `9999px` (true pill button sesuai standar R03) daripada boxy radius lama (`9px`/`12px`/`16px`).
+  - **Dashboard & Mobile Modals:** Menghapus override `border-radius: 0 !important` pada `.sheet.loan-picker-sheet-modal` di mobile breakpoint (`@media (max-width: 860px)`), mengembalikan kelengkungan sheet atas `var(--r-ref-xl, 30px) var(--r-ref-xl, 30px) 0 0 !important`.
+  - **Beranda Bento & Stats:** Menghapus aturan `border-radius: 0 !important` pada `.stat-card`, `.stat`, `.ann`, `.bento-card`, dan `.chip` di `beranda.css`, menormalkannya ke token R03 (`var(--r-ref-m, 18px)` untuk kartu dan `var(--ptv-curve-pill, 9999px)` untuk chip).
+  - **Normalisasi Token CSS:** Mengganti nilai border-radius mentah non-standar (`4px`, `6px`, `10px`, `12px`, `14px`) di `catatan.css` dan `generatorSurat.css` dengan token semantik kanonikal (`var(--r-ref-xs, 9px)`, `var(--r-ref-s, 13px)`, `var(--r-ref-m, 18px)`, `var(--r-ref-l, 24px)`).
+  - **Portal Buttons & Dialogs:** Menyelaraskan seluruh tombol `.btn` dan filter `.chips button` di portal dengan `var(--r-pill, 9999px) !important;` serta dialog modal dengan `var(--ptv-curve-2xl, 24px) !important;`.
+- **3. Quality Gates & Bukti Verifikasi:**
+  - `npm run typecheck`: PASS (0 errors).
+  - Unit tests terarah (`tests/api/middleware.test.ts`, `tests/api/bodyParser.test.ts`, `tests/hub/designSystem.test.ts`): PASS 100% (33/33 tests).
+  - Bundling universal router `node scripts/bundle-api.cjs`: PASS (`api/index.js` tersinkronisasi).
+  - Production build `npm run build`: PASS (built in 15.56s, 0 errors).
+
+---
+
 ## PTV-DEV-259 | Backend Foundation Hardening: Centralized Body Parser & Frontend Session Readiness (31 Oktober 2026, zidnal / Antigravity)
 
 - **Status: SELESAI (100% COMPLETE & VERIFIED).** Mengatasi dua isu sistemik yang ditemukan pada audit `docs/audits/PTVPRO_BACKEND_FOUNDATION_R01.md`:

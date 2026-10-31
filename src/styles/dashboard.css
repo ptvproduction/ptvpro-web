@@ -8477,7 +8477,8 @@ span.fin-matrix-cell.unpaid {
     height: 100% !important;
     height: 100dvh !important;
     max-height: none !important;
-    border-radius: 0 !important;
+    border-radius: var(--r-ref-xl, 30px) var(--r-ref-xl, 30px) 0 0 !important;
+    -webkit-border-radius: var(--r-ref-xl, 30px) var(--r-ref-xl, 30px) 0 0 !important;
     margin: 0 !important;
     padding: 0 !important;
     transform: translateY(100%) !important;
@@ -8493,7 +8494,8 @@ span.fin-matrix-cell.unpaid {
     position: relative !important;
     z-index: 10000 !important;
     padding: max(14px, env(safe-area-inset-top)) 16px 12px 16px !important;
-    border-radius: 0 !important;
+    border-radius: var(--r-ref-xl, 30px) var(--r-ref-xl, 30px) 0 0 !important;
+    -webkit-border-radius: var(--r-ref-xl, 30px) var(--r-ref-xl, 30px) 0 0 !important;
     flex-shrink: 0 !important;
     background: var(--surface) !important;
     pointer-events: auto !important;

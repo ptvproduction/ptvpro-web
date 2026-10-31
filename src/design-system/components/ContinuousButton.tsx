@@ -4,7 +4,6 @@
  */
 
 import React from 'react';
-import { PTV_CURVE_TOKENS } from '../geometry/continuousCurve';
 
 export interface ContinuousButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'soft' | 'outline' | 'ghost' | 'danger';
@@ -29,8 +28,7 @@ export const ContinuousButton = React.forwardRef<HTMLButtonElement, ContinuousBu
     ref
   ) => {
     // Dynamic radius based on button size
-    const effectiveRadius =
-      radius ?? (size === 'sm' ? PTV_CURVE_TOKENS.sm : size === 'lg' ? PTV_CURVE_TOKENS.lg : PTV_CURVE_TOKENS.md);
+    const effectiveRadius = radius ?? 9999;
 
     const getBaseStyles = (): React.CSSProperties => {
       const base: React.CSSProperties = {
