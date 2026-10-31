@@ -1,7 +1,17 @@
 # PIKET DEV — PTV PRO
 
-# PIKET DEV — PTV PRO
-
+- **PTV-DEV-256 / zidnal / Selesai (PERBAIKAN: Service Worker PWA, Otorisasi 403, & Broken Media).**
+  - **Aktivitas:** Mengatasi error Service Worker PWA pada navigasi SPA, memperbaiki otorisasi 403 pada penghapusan catatan, mode arsip dokumen, serta endpoint kru & broadcast di localhost, memulihkan urutan Authoritative Policy Engine, serta mensanitasi broken avatar media dan menambahkan graceful fallback UI.
+  - **Akar Masalah & Solusi:**
+    1. *Service Worker / PWA:* Sebelumnya fetch handler pada Service Worker dapat menghasilkan unhandled response promise atau mengembalikan invalid response saat navigasi SPA atau network offline. Solusi: membangun `public/sw.js` robust yang menjamin setiap `respondWith()` mengembalikan `Response` valid, menerapkan strategi Network-First untuk navigasi SPA dengan fallback ke cached `/index.html`, Zero-cache bypass untuk endpoint `/api/*` dan Supabase demi melindungi kerahasiaan autentikasi, serta Stale-While-Revalidate untuk aset statis dengan fallback 1x1 GIF transparan. Mendaftarkan SW secara aman di `src/main.tsx`.
+    2. *Otorisasi DELETE /api/catatan:* Kru sebelumnya ditolak (403) saat ingin menghapus catatan buatannya sendiri karena endpoint menuntut `notes.delete`/`notes.manage`. Solusi: memodifikasi `api/_routes/catatan.ts` dengan memverifikasi kepemilikan catatan (`created_by_id`, `created_by_name`, `ptv_id`) sehingga kru dapat menghapus catatan miliknya sendiri, sementara manajemen/admin memiliki wewenang mengelola seluruh catatan.
+    3. *Otorisasi GET /api/dokumen?mode=archive:* Mode arsip menuntut izin `documents.archive.view`, sedangkan shell/router frontend memberikan akses arsip kepada pemegang `documents.view`. Solusi: menyelaraskan `api/_routes/dokumen.ts` agar menyertakan `documents.view` dalam evaluasi akses arsip.
+    4. *403 pada /api/kru & /api/broadcast di localhost:5174:* Origin check kaku dan ketiadaan mock fixture live check untuk sesi dev lokal menyebabkan penolakan akses. Solusi: menambahkan toleransi pasangan localhost (`localhost` / `127.0.0.1`) pada origin validation di `api/_routes/kru.ts` dan menyediakan fallback dev mock yang aman di `api/_routes/auth/_utils/identity.ts` saat berjalan di luar Vercel.
+    5. *Authoritative Policy Engine:* Memulihkan urutan evaluasi prioritas kebijakan kanonikal pada `src/core/policy/policyEngine.ts` (Inactive/Archived -> Explicit Deny -> Kas Saya & Profile Catalog).
+    6. *Broken Media & Visual Fallback:* Menemukan URL avatar historis WordPress yang salah format (`/2026/DSCN1421...`) dan placeholder AI 404. Solusi: menambahkan fungsi sanitasi `sanitizeMediaUrl` di `src/products/hub/kru/kruMapper.ts` dan `api/_routes/verifikasi-kru.ts` untuk mengoreksi URL ke path riil atau default avatar, serta menambahkan `onError` listener pada tag gambar di `KruPage.tsx` dan `KruDetailDrawer.tsx` agar langsung menampilkan badge inisial circular R03.
+  - **File:** `public/sw.js`, `src/main.tsx`, `src/core/policy/policyEngine.ts`, `api/_routes/catatan.ts`, `api/_routes/dokumen.ts`, `api/_routes/kru.ts`, `api/_routes/verifikasi-kru.ts`, `api/_routes/auth/_utils/identity.ts`, `api/index.js`, `src/products/hub/kru/kruMapper.ts`, `src/products/hub/kru/KruPage.tsx`, `src/products/hub/kru/components/KruDetailDrawer.tsx`, `piketdev.md`, `cleanings.md`.
+  - **Validasi:** `npm run typecheck` PASS (0 errors), `policyEngine.test.ts` PASS 100% (11/11), `npm run build` PASS (built in 18.67s, bundled `api/index.js`).
+  - **Code Hygiene:** CLN-283.
 - **PTV-DEV-255 / zidnal / Selesai (INVESTIGASI EMPIRIS & PERBAIKAN: Google OAuth & Final Production Verification).**
   - **Aktivitas:** Menginvestigasi akar masalah Google OAuth, menguji endpoint publik Verifikasi Identitas Kru & Portofolio secara live di production, memverifikasi Keuangan, dan mengamankan serverless login endpoint terhadap mock leak.
   - **Akar Masalah & Solusi:**

@@ -129,15 +129,18 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       return;
     }
   } else if (method === 'DELETE') {
-    const hasDeleteAccess =
+    const hasDeleteCapability =
       userCaps.includes('notes.delete') ||
-      userCaps.includes('notes.manage');
+      userCaps.includes('notes.manage') ||
+      userCaps.includes('notes.edit') ||
+      userCaps.includes('notes.create') ||
+      userCaps.includes('notes.view');
 
-    if (!hasDeleteAccess) {
+    if (!hasDeleteCapability) {
       res.statusCode = 403;
       res.end(
         JSON.stringify({
-          error: 'Akses ditolak: Akun Anda tidak memiliki izin untuk menghapus catatan.',
+          error: 'Akses ditolak: Akun Anda tidak memiliki izin untuk mengelola catatan.',
           code: 'forbidden',
         })
       );
@@ -328,13 +331,43 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
       const { data: existing, error: errFind } = await supabase
         .from('ptv_catatan')
-        .select('id, judul')
+        .select('id, judul, created_by_id, created_by_name')
         .eq('id', noteId)
         .maybeSingle();
 
       if (errFind || !existing) {
         res.statusCode = 404;
         res.end(JSON.stringify({ error: 'Data catatan tidak ditemukan di database backend Staging.', code: 'not_found' }));
+        return;
+      }
+
+      // Validasi kepemilikan: Pembuat catatan diizinkan menghapus catatannya sendiri,
+      // sementara manajemen/admin memiliki wewenang mengelola seluruh catatan.
+      const canManageAllNotes =
+        userCaps.includes('notes.delete') ||
+        userCaps.includes('notes.manage') ||
+        userCaps.includes('system.manage') ||
+        userCaps.includes('role:eksekutif') ||
+        userCaps.includes('role:administrasi');
+
+      const isOwner = Boolean(
+        (existing.created_by_id && (
+          existing.created_by_id === session.account_id ||
+          existing.created_by_id === (session as any).ptv_id ||
+          existing.created_by_id === (session as any).identity_id ||
+          existing.created_by_id === session.username
+        )) ||
+        (existing.created_by_name && session.full_name && existing.created_by_name.trim().toLowerCase() === session.full_name.trim().toLowerCase())
+      );
+
+      if (!canManageAllNotes && !isOwner) {
+        res.statusCode = 403;
+        res.end(
+          JSON.stringify({
+            error: 'Akses ditolak: Anda hanya dapat menghapus catatan yang Anda buat sendiri.',
+            code: 'forbidden_not_owner',
+          })
+        );
         return;
       }
 

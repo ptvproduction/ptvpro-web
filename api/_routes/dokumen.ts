@@ -339,7 +339,9 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   if (mode === 'archive') {
     const canViewAny =
       isExecOrAdmin ||
-      userCaps.includes('documents.archive.view');
+      userCaps.includes('documents.archive.view') ||
+      userCaps.includes('documents.archive.manage') ||
+      userCaps.includes('documents.view');
 
     if (!canViewAny) {
       res.statusCode = 403;

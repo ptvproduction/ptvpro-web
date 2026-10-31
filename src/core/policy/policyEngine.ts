@@ -3,7 +3,7 @@
  * Implements Section 6.2 of docs/PTV-HUB-FINAL-DATABASE-AUTH-CONTRACT.md
  */
 
-import { AppCapability } from './capabilities';
+import { AppCapability, isMutationCapability } from './capabilities';
 import { AccessProfile, PROFILE_CAPABILITIES } from './profiles';
 
 export type AccountStatus = 'active' | 'inactive';
@@ -26,15 +26,17 @@ export interface PermissionContext {
  * Deterministic capability resolution algorithm.
  *
  * Evaluation Order:
- * 1. Root protection: Root profile always retains full authority.
- * 2. Account status must be active. Inactive account => false (cannot authenticate or act).
- * 3. Status kru dan akun independen: Kru yang sudah purna/lulus/nonaktif tetap boleh login
- *    selama status akunnya aktif dan memiliki izin akses.
- * 4. Explicit user deny override => false (highest override priority).
- * 5. Explicit user allow override => true (permits granular capabilities).
- * 6. Assigned profiles and position capability check.
- * 7. Direct capabilities check (fail-closed fallback).
- * 8. Default deny => false.
+ * 1. Account status must be active. Inactive account => false (cannot authenticate or act).
+ * 2. Organization status:
+ *    - 'archived' => false (archived identities are disabled).
+ *    - 'inactive' => all mutation capabilities are strictly blocked (read-only alumni mode).
+ * 3. Explicit user deny override => false (highest override priority, applies to all profiles).
+ * 4. Finance restriction: Pembina/Pengarah blocked from studio finance.
+ * 5. Root Executive profile retain full remaining authority.
+ * 6. Explicit user allow override => true (permits granular capabilities).
+ * 7. Assigned profiles and position capability check.
+ * 8. Direct capabilities check (fail-closed fallback).
+ * 9. Default deny => false.
  */
 export function hasCapability(
   context: PermissionContext | null | undefined,
@@ -44,21 +46,28 @@ export function hasCapability(
     return false;
   }
 
-  const assignedProfiles: readonly AccessProfile[] = Array.isArray(context.assigned_profiles)
-    ? context.assigned_profiles
-    : [];
-
-  // 1. Root protection: ROOT account never loses access
-  if (assignedProfiles.includes('root_executive')) {
-    return true;
-  }
-
-  // 2. Inactive account rejects all capabilities (Fail-closed)
+  // 1. Inactive account rejects all capabilities (Fail-closed)
   if (context.status_akun !== 'active') {
     return false;
   }
 
-  // 3. ATURAN AKSES KEUANGAN: Personel berkategori Pembina atau Pengarah dilarang keras
+  // 2. Archived accounts are completely disabled
+  if (context.status_organisasi === 'archived') {
+    return false;
+  }
+
+  // 3. Organization inactive users are strictly read-only (mutations blocked)
+  if (context.status_organisasi === 'inactive' && isMutationCapability(capability)) {
+    return false;
+  }
+
+  // 4. Explicit user-level deny override takes highest precedence (Fail-closed, overrides root)
+  const deniedOverrides = Array.isArray(context.denied_overrides) ? context.denied_overrides : [];
+  if (deniedOverrides.includes(capability)) {
+    return false;
+  }
+
+  // 5. ATURAN AKSES KEUANGAN: Personel berkategori Pembina atau Pengarah dilarang keras
   // mengakses capability keuangan studio (finance.*), independen dari jabatan atau role portal.
   if (capability.startsWith('finance.') && capability !== 'finance.view_own') {
     const rawCategory = (context.category || context.kategori || context.kategori_personel || '').toLowerCase().trim();
@@ -67,31 +76,28 @@ export function hasCapability(
     }
   }
 
-  // 4. Explicit user-level deny override takes highest precedence (Fail-closed)
-  const deniedOverrides = Array.isArray(context.denied_overrides) ? context.denied_overrides : [];
-  if (deniedOverrides.includes(capability)) {
-    return false;
+  const assignedProfiles: readonly AccessProfile[] = Array.isArray(context.assigned_profiles)
+    ? context.assigned_profiles
+    : [];
+
+  // 6. Root Executive retain full remaining authority
+  if (assignedProfiles.includes('root_executive')) {
+    return true;
   }
 
-  // 5. Explicit user-level allow override takes precedence over default role restrictions
+  // 7. Explicit user-level allow override takes precedence over default role restrictions
   const allowedOverrides = Array.isArray(context.allowed_overrides) ? context.allowed_overrides : [];
   if (allowedOverrides.includes(capability)) {
     return true;
   }
 
-  // 6. Kas Saya is derived from operational membership
-  if (context.capabilities_verified_live && capability === 'finance.view_own') {
-    return !assignedProfiles.includes('pembina')
-      && (assignedProfiles.includes('crew') || assignedProfiles.includes('eksekutif') || assignedProfiles.includes('root_executive'));
-  }
-
-  if (context.capabilities_verified_live) {
-    return Array.isArray(context.capabilities) && context.capabilities.includes(capability);
-  }
-
-  // 6b. Synthesized capability resolution for finance.view_own
+  // 8. Kas Saya is derived from operational membership
   if (capability === 'finance.view_own') {
-    if (assignedProfiles.includes('pembina') && !assignedProfiles.includes('crew') && !assignedProfiles.includes('eksekutif')) {
+    const rawCat = (context.category || context.kategori || context.kategori_personel || '').toLowerCase().trim();
+    if (context.status_organisasi !== 'active' || rawCat === 'pembina' || rawCat === 'pengarah') {
+      return false;
+    }
+    if (assignedProfiles.includes('pembina')) {
       return false;
     }
     return (
@@ -101,7 +107,11 @@ export function hasCapability(
     );
   }
 
-  // 7. Check assigned profiles against static profile capabilities catalog
+  if (context.capabilities_verified_live) {
+    return Array.isArray(context.capabilities) && context.capabilities.includes(capability);
+  }
+
+  // 9. Check assigned profiles against static profile capabilities catalog
   for (const profile of assignedProfiles) {
     const profileCaps = PROFILE_CAPABILITIES[profile];
     if (profileCaps && profileCaps.has(capability)) {
@@ -109,13 +119,13 @@ export function hasCapability(
     }
   }
 
-  // 8. Direct capability fallback list check
+  // 10. Direct capability fallback list check
   const directCapabilities = Array.isArray(context.capabilities) ? context.capabilities : [];
   if (directCapabilities.includes(capability)) {
     return true;
   }
 
-  // 9. Fail-closed: Default deny
+  // 11. Fail-closed: Default deny
   return false;
 }
 
@@ -138,7 +148,9 @@ export function getEffectiveCapabilities(
   if (assignedProfiles.includes('root_executive')) {
     const all = new Set<AppCapability>();
     for (const caps of Object.values(PROFILE_CAPABILITIES)) {
-      for (const c of caps) all.add(c);
+      for (const c of caps) {
+        if (hasCapability(context, c)) all.add(c);
+      }
     }
     return all;
   }
@@ -170,4 +182,8 @@ export function getEffectiveCapabilities(
   }
 
   return result;
+}
+
+export function canAccessHub(context: PermissionContext | null | undefined): boolean {
+  return hasCapability(context, 'hub.access');
 }

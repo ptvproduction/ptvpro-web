@@ -129,7 +129,18 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     const crewRow = rows[0];
 
     // Cek canonical identity untuk avatar resmi terbaru jika ada
-    let avatarUrl = crewRow.photo_url || crewRow.metadata_json?.avatar_url || '';
+    const sanitizeAvatarUrl = (url: string | null | undefined): string => {
+      if (!url) return '';
+      let clean = String(url).trim();
+      if (clean.includes('/wp-content/uploads/2026/DSCN1421-scaled-e1763575335817.webp')) {
+        clean = 'https://progresiftv.id/wp-content/uploads/DSCN1421-scaled-e1763575335817.webp';
+      }
+      if (clean.includes('Gemini_Generated_Image')) {
+        return '';
+      }
+      return clean;
+    };
+    let avatarUrl = sanitizeAvatarUrl(crewRow.photo_url || crewRow.metadata_json?.avatar_url || '');
     if (crewRow.canonical_identity_id) {
       const { data: canon } = await supabase
         .from('canonical_identity')
@@ -137,7 +148,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         .eq('id', crewRow.canonical_identity_id)
         .maybeSingle();
       if (canon?.avatar_url) {
-        avatarUrl = canon.avatar_url;
+        const canonClean = sanitizeAvatarUrl(canon.avatar_url);
+        if (canonClean) avatarUrl = canonClean;
       }
     }
 

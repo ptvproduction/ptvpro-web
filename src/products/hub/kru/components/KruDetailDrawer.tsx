@@ -171,11 +171,21 @@ export const KruDetailDrawer: React.FC<KruDetailDrawerProps> = ({
           {/* Identity Hero Card */}
           <div className="kk-profile-hero">
             {localCrew.foto_url ? (
-              <img
-                src={localCrew.foto_url}
-                alt={localCrew.full_name}
-                className="kk-profile-avatar-img"
-              />
+              <>
+                <img
+                  src={localCrew.foto_url}
+                  alt={localCrew.full_name}
+                  className="kk-profile-avatar-img"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const fb = e.currentTarget.nextElementSibling as HTMLElement | null;
+                    if (fb) fb.style.display = 'grid';
+                  }}
+                />
+                <div className="kk-profile-avatar-fallback" style={{ display: 'none' }}>
+                  {initials}
+                </div>
+              </>
             ) : (
               <div className="kk-profile-avatar-fallback">
                 {initials}

@@ -85,7 +85,18 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   const method = (req.method || 'GET').toUpperCase();
   try {
-    if (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host) throw new Error('origin');
+    if (req.headers.origin) {
+      const originHost = new URL(req.headers.origin).host.toLowerCase();
+      const requestHost = (req.headers.host || '').toLowerCase();
+      const isExactMatch = originHost === requestHost;
+      const isCanonicalPair =
+        (originHost === 'ptvpro.com' && requestHost === 'www.ptvpro.com') ||
+        (originHost === 'www.ptvpro.com' && requestHost === 'ptvpro.com');
+      const isLocalhostPair =
+        (originHost.includes('localhost') || originHost.includes('127.0.0.1')) &&
+        (requestHost.includes('localhost') || requestHost.includes('127.0.0.1'));
+      if (!isExactMatch && !isCanonicalPair && !isLocalhostPair) throw new Error('origin');
+    }
   } catch { res.statusCode = 403; res.end(JSON.stringify({ error: 'Origin permintaan tidak diizinkan.' })); return; }
 
   // 0. Only allow GET, POST, PUT, PATCH. Reject DELETE or others on Kru module

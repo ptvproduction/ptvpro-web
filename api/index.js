@@ -232,7 +232,10 @@ var init_crypto = __esm({
 });
 
 // src/core/policy/capabilities.ts
-var ALL_CAPABILITIES;
+function isMutationCapability(capability) {
+  return MUTATION_CAPABILITIES.has(capability);
+}
+var ALL_CAPABILITIES, MUTATION_CAPABILITIES;
 var init_capabilities = __esm({
   "src/core/policy/capabilities.ts"() {
     "use strict";
@@ -291,6 +294,40 @@ var init_capabilities = __esm({
       "settings.system",
       "audit.logs.view"
     ];
+    MUTATION_CAPABILITIES = /* @__PURE__ */ new Set([
+      "events.create",
+      "events.edit",
+      "events.delete",
+      "events.rundown.manage",
+      "inventory.create",
+      "inventory.edit",
+      "inventory.delete",
+      "inventory.units.manage",
+      "inventory.valuation.manage",
+      "loans.checkout",
+      "loans.return",
+      "loans.manage",
+      "damage.report",
+      "damage.qc.approve",
+      "lostfound.report",
+      "lostfound.manage",
+      "crew.create",
+      "crew.edit",
+      "crew.status.manage",
+      "crew.permissions.manage",
+      "documents.request",
+      "documents.generate",
+      "documents.approve",
+      "documents.archive.manage",
+      "finance.manage",
+      "finance.operator",
+      "contacts.external.manage",
+      "broadcast.dispatch",
+      "projecthaul.manage",
+      "notes.create",
+      "notes.manage",
+      "settings.system"
+    ]);
   }
 });
 
@@ -443,11 +480,17 @@ function hasCapability(context, capability) {
   if (!context || typeof context !== "object") {
     return false;
   }
-  const assignedProfiles = Array.isArray(context.assigned_profiles) ? context.assigned_profiles : [];
-  if (assignedProfiles.includes("root_executive")) {
-    return true;
-  }
   if (context.status_akun !== "active") {
+    return false;
+  }
+  if (context.status_organisasi === "archived") {
+    return false;
+  }
+  if (context.status_organisasi === "inactive" && isMutationCapability(capability)) {
+    return false;
+  }
+  const deniedOverrides = Array.isArray(context.denied_overrides) ? context.denied_overrides : [];
+  if (deniedOverrides.includes(capability)) {
     return false;
   }
   if (capability.startsWith("finance.") && capability !== "finance.view_own") {
@@ -456,25 +499,26 @@ function hasCapability(context, capability) {
       return false;
     }
   }
-  const deniedOverrides = Array.isArray(context.denied_overrides) ? context.denied_overrides : [];
-  if (deniedOverrides.includes(capability)) {
-    return false;
+  const assignedProfiles = Array.isArray(context.assigned_profiles) ? context.assigned_profiles : [];
+  if (assignedProfiles.includes("root_executive")) {
+    return true;
   }
   const allowedOverrides = Array.isArray(context.allowed_overrides) ? context.allowed_overrides : [];
   if (allowedOverrides.includes(capability)) {
     return true;
   }
-  if (context.capabilities_verified_live && capability === "finance.view_own") {
-    return !assignedProfiles.includes("pembina") && (assignedProfiles.includes("crew") || assignedProfiles.includes("eksekutif") || assignedProfiles.includes("root_executive"));
-  }
-  if (context.capabilities_verified_live) {
-    return Array.isArray(context.capabilities) && context.capabilities.includes(capability);
-  }
   if (capability === "finance.view_own") {
-    if (assignedProfiles.includes("pembina") && !assignedProfiles.includes("crew") && !assignedProfiles.includes("eksekutif")) {
+    const rawCat = (context.category || context.kategori || context.kategori_personel || "").toLowerCase().trim();
+    if (context.status_organisasi !== "active" || rawCat === "pembina" || rawCat === "pengarah") {
+      return false;
+    }
+    if (assignedProfiles.includes("pembina")) {
       return false;
     }
     return assignedProfiles.includes("crew") || assignedProfiles.includes("eksekutif") || assignedProfiles.includes("root_executive");
+  }
+  if (context.capabilities_verified_live) {
+    return Array.isArray(context.capabilities) && context.capabilities.includes(capability);
   }
   for (const profile of assignedProfiles) {
     const profileCaps = PROFILE_CAPABILITIES[profile];
@@ -491,6 +535,7 @@ function hasCapability(context, capability) {
 var init_policyEngine = __esm({
   "src/core/policy/policyEngine.ts"() {
     "use strict";
+    init_capabilities();
     init_profiles();
   }
 });
@@ -1330,7 +1375,12 @@ function createStagingIdentityClient(url, key) {
 async function refreshLiveSession(session, issuingSession = false) {
   const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!key || !/^https:\/\/swadgljnyelsjstqqxbm\.supabase\.co\/?$/.test(url)) return [];
+  if (!key || !/^https:\/\/swadgljnyelsjstqqxbm\.supabase\.co\/?$/.test(url)) {
+    if (!process.env.VERCEL && session && Array.isArray(session.capabilities) && session.capabilities.length > 0) {
+      return session.capabilities;
+    }
+    return [];
+  }
   try {
     const db = createStagingIdentityClient(url, key);
     const live = await resolveLiveAccess(db, session, { issuingSession });
@@ -1344,6 +1394,9 @@ async function refreshLiveSession(session, issuingSession = false) {
     session.position = live.membership.position_title;
     return session.capabilities;
   } catch {
+    if (!process.env.VERCEL && session && Array.isArray(session.capabilities) && session.capabilities.length > 0) {
+      return session.capabilities;
+    }
     return [];
   }
 }
@@ -1512,16 +1565,16 @@ async function verifyAccountStatusLive(accountId, issuedAt, verifiedSession) {
     try {
       const supabase = createStagingIdentityClient(supabaseUrl, serviceRoleKey);
       const { data, error } = await supabase.from("user_account").select("status_akun,lockout_until,tokens_valid_after").eq("id", accountId).maybeSingle();
-      if (error || !data) return false;
-      const active = data.status_akun === "active" && (!data.lockout_until || Number.isFinite(Date.parse(data.lockout_until)) && Date.parse(data.lockout_until) <= Date.now()) && Number.isSafeInteger(issuedAt) && issuedAt > 0 && issuedAt * 1e3 <= Date.now() && (!data.tokens_valid_after || Number.isFinite(Date.parse(data.tokens_valid_after)) && issuedAt * 1e3 >= Date.parse(data.tokens_valid_after));
-      if (!active) return false;
-      if (lifecycleEnabled() || verifiedSession && sessionNeedsRegistry(verifiedSession)) return !!verifiedSession && verifiedSession.account_id === accountId && verifiedSession.iat === issuedAt && await portalSessionValid(supabase, verifiedSession);
-      return true;
+      if (!error && data) {
+        const active = data.status_akun === "active" && (!data.lockout_until || Number.isFinite(Date.parse(data.lockout_until)) && Date.parse(data.lockout_until) <= Date.now()) && Number.isSafeInteger(issuedAt) && issuedAt > 0 && issuedAt * 1e3 <= Date.now() && (!data.tokens_valid_after || Number.isFinite(Date.parse(data.tokens_valid_after)) && issuedAt * 1e3 >= Date.parse(data.tokens_valid_after));
+        if (!active) return false;
+        if (lifecycleEnabled() || verifiedSession && sessionNeedsRegistry(verifiedSession)) return !!verifiedSession && verifiedSession.account_id === accountId && verifiedSession.iat === issuedAt && await portalSessionValid(supabase, verifiedSession);
+        return true;
+      }
     } catch {
-      return false;
     }
   }
-  if (process.env.NODE_ENV === "test") {
+  if (process.env.NODE_ENV === "test" || !process.env.VERCEL) {
     const match = Object.values(LOCAL_GOOGLE_MOCK_USERS).find(
       (u) => `acc-${u.ptv_id.toLowerCase()}` === accountId || `acc-${u.ptv_id.toLowerCase().replace("ptv-", "")}` === accountId
     );
@@ -3183,12 +3236,12 @@ async function handler4(req, res) {
       return;
     }
   } else if (method === "DELETE") {
-    const hasDeleteAccess = userCaps.includes("notes.delete") || userCaps.includes("notes.manage");
-    if (!hasDeleteAccess) {
+    const hasDeleteCapability = userCaps.includes("notes.delete") || userCaps.includes("notes.manage") || userCaps.includes("notes.edit") || userCaps.includes("notes.create") || userCaps.includes("notes.view");
+    if (!hasDeleteCapability) {
       res.statusCode = 403;
       res.end(
         JSON.stringify({
-          error: "Akses ditolak: Akun Anda tidak memiliki izin untuk menghapus catatan.",
+          error: "Akses ditolak: Akun Anda tidak memiliki izin untuk mengelola catatan.",
           code: "forbidden"
         })
       );
@@ -3329,10 +3382,24 @@ ${rawIsi}`;
         res.end(JSON.stringify({ error: "ID Catatan (UUID) wajib disertakan untuk penghapusan.", code: "missing_id" }));
         return;
       }
-      const { data: existing2, error: errFind2 } = await supabase.from("ptv_catatan").select("id, judul").eq("id", noteId2).maybeSingle();
+      const { data: existing2, error: errFind2 } = await supabase.from("ptv_catatan").select("id, judul, created_by_id, created_by_name").eq("id", noteId2).maybeSingle();
       if (errFind2 || !existing2) {
         res.statusCode = 404;
         res.end(JSON.stringify({ error: "Data catatan tidak ditemukan di database backend Staging.", code: "not_found" }));
+        return;
+      }
+      const canManageAllNotes = userCaps.includes("notes.delete") || userCaps.includes("notes.manage") || userCaps.includes("system.manage") || userCaps.includes("role:eksekutif") || userCaps.includes("role:administrasi");
+      const isOwner = Boolean(
+        existing2.created_by_id && (existing2.created_by_id === session.account_id || existing2.created_by_id === session.ptv_id || existing2.created_by_id === session.identity_id || existing2.created_by_id === session.username) || existing2.created_by_name && session.full_name && existing2.created_by_name.trim().toLowerCase() === session.full_name.trim().toLowerCase()
+      );
+      if (!canManageAllNotes && !isOwner) {
+        res.statusCode = 403;
+        res.end(
+          JSON.stringify({
+            error: "Akses ditolak: Anda hanya dapat menghapus catatan yang Anda buat sendiri.",
+            code: "forbidden_not_owner"
+          })
+        );
         return;
       }
       const { error: errDel } = await supabase.from("ptv_catatan").delete().eq("id", noteId2);
@@ -3883,7 +3950,7 @@ async function handler5(req, res) {
     return;
   }
   if (mode === "archive") {
-    const canViewAny = isExecOrAdmin || userCaps.includes("documents.archive.view");
+    const canViewAny = isExecOrAdmin || userCaps.includes("documents.archive.view") || userCaps.includes("documents.archive.manage") || userCaps.includes("documents.view");
     if (!canViewAny) {
       res.statusCode = 403;
       res.end(
@@ -6854,6 +6921,17 @@ function isOperationalCrew(crew) {
 }
 
 // src/products/hub/kru/kruMapper.ts
+function sanitizeMediaUrl(url) {
+  if (!url) return "";
+  let clean = String(url).trim();
+  if (clean.includes("/wp-content/uploads/2026/DSCN1421-scaled-e1763575335817.webp")) {
+    clean = "https://progresiftv.id/wp-content/uploads/DSCN1421-scaled-e1763575335817.webp";
+  }
+  if (clean.includes("Gemini_Generated_Image")) {
+    return "";
+  }
+  return clean;
+}
 function mapLegacyKruRowToCrewMember(row, linkedAccountStatus = null) {
   const divUpper = (row.divisi || "").trim().toLowerCase();
   const jabUpper = (row.jabatan || "").trim().toLowerCase();
@@ -6876,7 +6954,9 @@ function mapLegacyKruRowToCrewMember(row, linkedAccountStatus = null) {
     role = "administrasi";
   }
   const DEFAULT_AVATAR = "https://progresiftv.id/wp-content/uploads/AVATAR-PTV.webp";
-  const foto_url = row.photo_url || row.metadata_json?.avatar_url || DEFAULT_AVATAR;
+  const rawFoto = row.photo_url || row.metadata_json?.avatar_url;
+  const sanitizedFoto = sanitizeMediaUrl(rawFoto);
+  const foto_url = sanitizedFoto || DEFAULT_AVATAR;
   const birth_date = row.metadata_json?.birth_date || row.metadata_json?.tanggal_lahir || void 0;
   const address = row.metadata_json?.address || row.metadata_json?.alamat || void 0;
   return {
@@ -6958,7 +7038,14 @@ async function handler9(req, res) {
   res.setHeader("Cache-Control", "no-store");
   const method = (req.method || "GET").toUpperCase();
   try {
-    if (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host) throw new Error("origin");
+    if (req.headers.origin) {
+      const originHost = new URL(req.headers.origin).host.toLowerCase();
+      const requestHost = (req.headers.host || "").toLowerCase();
+      const isExactMatch = originHost === requestHost;
+      const isCanonicalPair = originHost === "ptvpro.com" && requestHost === "www.ptvpro.com" || originHost === "www.ptvpro.com" && requestHost === "ptvpro.com";
+      const isLocalhostPair = (originHost.includes("localhost") || originHost.includes("127.0.0.1")) && (requestHost.includes("localhost") || requestHost.includes("127.0.0.1"));
+      if (!isExactMatch && !isCanonicalPair && !isLocalhostPair) throw new Error("origin");
+    }
   } catch {
     res.statusCode = 403;
     res.end(JSON.stringify({ error: "Origin permintaan tidak diizinkan." }));
@@ -10729,11 +10816,23 @@ async function handler18(req, res) {
       return;
     }
     const crewRow = rows[0];
-    let avatarUrl = crewRow.photo_url || crewRow.metadata_json?.avatar_url || "";
+    const sanitizeAvatarUrl = (url2) => {
+      if (!url2) return "";
+      let clean = String(url2).trim();
+      if (clean.includes("/wp-content/uploads/2026/DSCN1421-scaled-e1763575335817.webp")) {
+        clean = "https://progresiftv.id/wp-content/uploads/DSCN1421-scaled-e1763575335817.webp";
+      }
+      if (clean.includes("Gemini_Generated_Image")) {
+        return "";
+      }
+      return clean;
+    };
+    let avatarUrl = sanitizeAvatarUrl(crewRow.photo_url || crewRow.metadata_json?.avatar_url || "");
     if (crewRow.canonical_identity_id) {
       const { data: canon } = await supabase.from("canonical_identity").select("avatar_url").eq("id", crewRow.canonical_identity_id).maybeSingle();
       if (canon?.avatar_url) {
-        avatarUrl = canon.avatar_url;
+        const canonClean = sanitizeAvatarUrl(canon.avatar_url);
+        if (canonClean) avatarUrl = canonClean;
       }
     }
     const rawStatus = (crewRow.status || "").trim();

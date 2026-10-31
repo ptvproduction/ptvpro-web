@@ -240,11 +240,21 @@ export const KruPage: React.FC = () => {
               >
                 <div className="kru-row-left">
                   {c.foto_url ? (
-                    <img
-                      src={c.foto_url}
-                      alt={c.full_name}
-                      className="kru-row-avatar-img"
-                    />
+                    <>
+                      <img
+                        src={c.foto_url}
+                        alt={c.full_name}
+                        className="kru-row-avatar-img"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const fb = e.currentTarget.nextElementSibling as HTMLElement | null;
+                          if (fb) fb.style.display = 'grid';
+                        }}
+                      />
+                      <div className="kru-row-avatar-fallback" style={{ display: 'none' }}>
+                        {inits}
+                      </div>
+                    </>
                   ) : (
                     <div className="kru-row-avatar-fallback">
                       {inits}
@@ -301,11 +311,21 @@ export const KruPage: React.FC = () => {
             >
               <div className="kru-row-left">
                 {c.foto_url ? (
-                  <img
-                    src={c.foto_url}
-                    alt={c.full_name}
-                    className="kru-row-avatar-img"
-                  />
+                  <>
+                    <img
+                      src={c.foto_url}
+                      alt={c.full_name}
+                      className="kru-row-avatar-img"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const fb = e.currentTarget.nextElementSibling as HTMLElement | null;
+                        if (fb) fb.style.display = 'grid';
+                      }}
+                    />
+                    <div className="kru-row-avatar-fallback" style={{ display: 'none' }}>
+                      {inits}
+                    </div>
+                  </>
                 ) : (
                   <div className="kru-row-avatar-fallback">
                     {inits}

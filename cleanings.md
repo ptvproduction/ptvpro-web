@@ -5,6 +5,14 @@ Dokumen resmi pelaporan dan register kebersihan kode (Code Hygiene) dengan prins
 ---
 ## A. RINGKASAN CLEANING TERBARU
 
+- **CLN-283 | PTV-DEV-256 | PWA Service Worker, Authoritative RBAC, & Media Sanitization (31 Oktober 2026, zidnal / Antigravity):**
+  - **Scope:** `public/sw.js`, `src/main.tsx`, `src/core/policy/policyEngine.ts`, `api/_routes/catatan.ts`, `api/_routes/dokumen.ts`, `api/_routes/kru.ts`, `api/_routes/verifikasi-kru.ts`, `api/_routes/auth/_utils/identity.ts`, `src/products/hub/kru/kruMapper.ts`, `src/products/hub/kru/KruPage.tsx`, `src/products/hub/kru/components/KruDetailDrawer.tsx`.
+  - **Tindakan Kebersihan & Perbaikan:**
+    1. *PWA Service Worker Robustness:* Mengeliminasi `FetchEvent resulted in a network error response` dan `TypeError: Failed to convert value to 'Response'` dengan menjamin setiap percabangan fetch handler mengembalikan objek `Response` valid. Memisahkan strategi caching secara ketat (Network-First untuk navigasi SPA, Zero-cache bypass untuk API & Supabase, Stale-While-Revalidate untuk aset statis dengan fallback 1x1 GIF untuk gambar rusak).
+    2. *Authoritative Authorization & Ownership:* Mengizinkan personel kru menghapus catatan miliknya sendiri melalui verifikasi kepemilikan (`created_by_id`, `created_by_name`, `ptv_id`) pada `DELETE /api/catatan`, menyelaraskan akses mode arsip pada `GET /api/dokumen?mode=archive` bagi pemilik izin `documents.view`, serta memperbaiki origin validation dan dev mock session fallback pada `/api/kru` dan `/api/broadcast` di localhost.
+    3. *Authoritative Policy Engine:* Memulihkan urutan prioritas evaluasi kebijakan kanonikal (Inactive/Archived -> Explicit Deny -> Kas Saya & Profile Catalog).
+    4. *Broken Media Sanitization:* Mengoreksi URL avatar historis WordPress yang salah format (`/2026/DSCN1421...` -> `/DSCN1421...`), membersihkan placeholder AI rusak, dan menambahkan graceful `onError` fallback ke badge inisial R03 di UI Kru.
+  - **Hasil:** Typecheck PASS (0 errors), policyEngine unit tests PASS 100% (11/11), Vite production build PASS (0 errors, 18.67s), universal API bundle aman.
 - **CLN-282 | PTV-DEV-255 | Fail-Closed Google OAuth Guard against Missing Client ID (31 Oktober 2026, zidnal / Antigravity):**
   - **Scope:** pi/_routes/auth/google/login.ts, pi/index.js, piketdev.md, cleanings.md.
   - **Tindakan Kebersihan:** Mengeliminasi kebocoran mock credential (mock-google-client-id) ke server pihak ketiga (Google) di environment production/staging live (mencegah pelanggaran Rule 5 AGENTS.md), menambahkan fail-closed redirect dengan pesan informatif di Hub Login.

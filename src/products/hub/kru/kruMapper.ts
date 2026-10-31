@@ -39,6 +39,21 @@ export interface RawLegacyKruDbRow {
 /**
  * Normalizes legacy database row into authoritative React CrewMember interface
  */
+/**
+ * Authoritative media URL sanitizer for kru avatars and portraits.
+ * Corrects historic path discrepancies and strips broken synthetic media references.
+ */
+export function sanitizeMediaUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  let clean = String(url).trim();
+  if (clean.includes('/wp-content/uploads/2026/DSCN1421-scaled-e1763575335817.webp')) {
+    clean = 'https://progresiftv.id/wp-content/uploads/DSCN1421-scaled-e1763575335817.webp';
+  }
+  if (clean.includes('Gemini_Generated_Image')) {
+    return '';
+  }
+  return clean;
+}
 export function mapLegacyKruRowToCrewMember(row: RawLegacyKruDbRow, linkedAccountStatus: 'active' | 'inactive' | null = null): CrewMember {
   const divUpper = (row.divisi || '').trim().toLowerCase();
   const jabUpper = (row.jabatan || '').trim().toLowerCase();
@@ -82,7 +97,9 @@ export function mapLegacyKruRowToCrewMember(row: RawLegacyKruDbRow, linkedAccoun
 
   // Avatar URL resolution (prioritizes photo_url, then metadata_json.avatar_url, fallback to standard avatar)
   const DEFAULT_AVATAR = 'https://progresiftv.id/wp-content/uploads/AVATAR-PTV.webp';
-  const foto_url = row.photo_url || row.metadata_json?.avatar_url || DEFAULT_AVATAR;
+  const rawFoto = row.photo_url || row.metadata_json?.avatar_url;
+  const sanitizedFoto = sanitizeMediaUrl(rawFoto);
+  const foto_url = sanitizedFoto || DEFAULT_AVATAR;
 
   const birth_date = row.metadata_json?.birth_date || row.metadata_json?.tanggal_lahir || undefined;
   const address = row.metadata_json?.address || row.metadata_json?.alamat || undefined;
