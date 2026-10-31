@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import handler, { resolveRouteKey, routes } from '../api/index';
+import handler, { resolveRouteKey, routeLoaders } from '../api/index';
 
 describe('PTVPRO Serverless Function Centralized Router', () => {
   it('registers all 25 official endpoints', () => {
-    const registeredRoutes = Object.keys(routes);
+    const registeredRoutes = Object.keys(routeLoaders);
     expect(registeredRoutes.length).toBe(25);
     expect(registeredRoutes).toContain('acara');
     expect(registeredRoutes).toContain('akses');

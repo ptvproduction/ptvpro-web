@@ -23,6 +23,11 @@
       ]
     }
   ],
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "api/_routes/**"
+    }
+  },
   "rewrites": [
     {
       "source": "/api",
